@@ -2,8 +2,8 @@
 #include <string>
 #include <d3d12.h>
 #include <Core/View/SRVManager.h>
-
-using namespace Microsoft::WRL;
+#include <utility>
+#include <Utility/Vector.h>
 
 class TextureData {
 public:
@@ -12,7 +12,11 @@ public:
 	~TextureData() = default;
 
 	//Window用のテクスチャを作成
-	void Create(uint32_t width, uint32_t height);
+	void Create(uint32_t width, uint32_t height, Vector4 clearColor, bool forSwapChain, ID3D12Device* device, SRVManager* srvManager);
+
+	int GetOffset() const { return srvHandle_.GetOffset(); }
+	ID3D12Resource* GetResource() const { return textureResource_.Get(); }
+	std::pair<uint32_t, uint32_t> GetSize() const { return { width_, height_ }; }
 
 private:
 
@@ -21,15 +25,15 @@ private:
 
 private:
 
-	uint32_t width_;
-	uint32_t height_;
+	uint32_t width_ = 0;
+	uint32_t height_ = 0;
 
-	ComPtr<ID3D12Resource> textureResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_ = nullptr;
 
 	//CommandListが一度executeされたら削除するやつ
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermadiateResource_ = nullptr;
 
-	SRVHandle srvHandle_;
+	SRVHandle srvHandle_{};
 
 };
 

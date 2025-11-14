@@ -6,7 +6,7 @@
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Utility\MyMath\MyMath.cpp" />
     <ClCompile Include="Engine\SHEngine.cpp" />
-    <ClCompile Include="Engine\Display\Display.cpp" />
+    <ClCompile Include="Engine\Display\WindowsApp\WindowsApp.cpp" />
     <ClCompile Include="Engine\Utility\Operator\Operator.cpp" />
     <ClCompile Include="Engine\Utility\MatrixFactory\MatrixFactory.cpp" />
     <ClCompile Include="Engine\Utility\Quaternion.h" />
@@ -14,11 +14,32 @@
     <ClCompile Include="Engine\Core\Render\Render.cpp" />
     <ClCompile Include="Engine\Core\View\SRVManager.cpp" />
     <ClCompile Include="Engine\Core\View\Data\Function.h" />
-    <ClCompile Include="Engine\Assets\AssetsLoader.cpp" />
     <ClCompile Include="Engine\Assets\Texture\TextureManager.cpp" />
     <ClCompile Include="Engine\Assets\Texture\TextureData.cpp" />
     <ClCompile Include="Engine\Utility\CreateResource.h" />
     <ClCompile Include="Engine\Utility\InsertBarrier.h" />
+    <ClCompile Include="Engine\Core\View\Data\Function.cpp" />
+    <ClCompile Include="Engine\Utility\ConvertString.cpp" />
+    <ClCompile Include="Engine\Utility\CreateResource.cpp" />
+    <ClCompile Include="Engine\Utility\InsertBarrier.cpp" />
+    <ClCompile Include="Engine\PSO\Shelf\BlendStateShelf.cpp" />
+    <ClCompile Include="Engine\PSO\Shelf\DepthStencilShelf.cpp" />
+    <ClCompile Include="Engine\PSO\Shelf\InputLayoutShelf.cpp" />
+    <ClCompile Include="Engine\PSO\Shelf\RasterizerShelf.cpp" />
+    <ClCompile Include="Engine\PSO\Shelf\RootSignatureShelf.cpp" />
+    <ClCompile Include="Engine\PSO\Shelf\ShaderShelf.cpp" />
+    <ClCompile Include="Engine\PSO\PSOEditor.cpp" />
+    <ClCompile Include="Engine\PSO\PSOManager.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp" />
+    <ClCompile Include="Engine\Display\SwapChain.cpp" />
+    <ClCompile Include="Engine\Display\Display.cpp" />
+    <ClCompile Include="Engine\Core\View\RTVManager.cpp" />
+    <ClCompile Include="Engine\Core\View\DSVManager.cpp" />
+    <ClCompile Include="Engine\Display\Display.cpp" />
+    <ClCompile Include="Engine\Utility\Color.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Device\DXDevice.h" />
@@ -26,7 +47,7 @@
     <ClInclude Include="Engine\Utility\LeakChecker.h" />
     <ClInclude Include="Engine\Utility\MyMath\MyMath.h" />
     <ClInclude Include="Engine\SHEngine.h" />
-    <ClInclude Include="Engine\Display\Display.h" />
+    <ClInclude Include="Engine\Display\WindowsApp\WindowsApp.h" />
     <ClInclude Include="Engine\Utility\Operator\Operator.h" />
     <ClInclude Include="Engine\Utility\Matrix.h" />
     <ClInclude Include="Engine\Utility\Vector.h" />
@@ -36,8 +57,27 @@
     <ClInclude Include="Engine\Core\Command\Command.h" />
     <ClInclude Include="Engine\Core\Render\Render.h" />
     <ClInclude Include="Engine\Core\View\SRVManager.h" />
-    <ClInclude Include="Engine\Assets\AssetsLoader.h" />
     <ClInclude Include="Engine\Assets\Texture\TextureManager.h" />
     <ClInclude Include="Engine\Assets\Texture\TextureData.h" />
+    <ClInclude Include="Engine\PSO\Shelf\BlendStateShelf.h" />
+    <ClInclude Include="Engine\PSO\Shelf\DepthStencilShelf.h" />
+    <ClInclude Include="Engine\PSO\Shelf\InputLayoutShelf.h" />
+    <ClInclude Include="Engine\PSO\Shelf\RasterizerShelf.h" />
+    <ClInclude Include="Engine\PSO\Shelf\RootSignatureShelf.h" />
+    <ClInclude Include="Engine\PSO\Shelf\ShaderShelf.h" />
+    <ClInclude Include="Engine\PSO\PSOConfig.h" />
+    <ClInclude Include="Engine\PSO\PSOEditor.h" />
+    <ClInclude Include="Engine\PSO\PSOManager.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\Value.h" />
+    <ClInclude Include="Engine\Tools\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Tools\FPS\FPSObserver.h" />
+    <ClInclude Include="Engine\Display\SwapChain.h" />
+    <ClInclude Include="Engine\Display\Display.h" />
+    <ClInclude Include="Engine\Core\View\RTVManager.h" />
+    <ClInclude Include="Engine\Core\View\DSVManager.h" />
+    <ClInclude Include="Engine\Display\Display.h" />
+    <ClInclude Include="Engine\Utility\Color.h" />
   </ItemGroup>
 </Project>

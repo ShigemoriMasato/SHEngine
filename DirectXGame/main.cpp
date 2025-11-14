@@ -1,29 +1,37 @@
-#include <Engine/SHEngine.h>
-#include <Engine/Core/Display/Display.h>
+#include <SHEngine.h>
+#include <Display/SwapChain.h>
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	auto engine = std::make_unique<SHEngine>();
 	engine->Initialize();
 
-	auto display = std::make_unique<Display>();
-	display->SetWindowName(L"SH-Engine");
-	display->SetWindowProc([&](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) -> LRESULT {
+	auto window = std::make_unique<WindowsApp>();
+	window->SetWindowName(L"DirectXGame");
+	window->Create();
+	window->Show(WindowsApp::kShow);
 
-		switch (msg) {
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-		}
-
-		return DefWindowProc(hwnd, msg, wparam, lparam);
-		});
-
-	display->Create();
-	display->Show(Display::kShow);
-
+	auto swapChain = std::make_unique<SwapChain>();
+	swapChain->CreateCommandObject();
+	swapChain->Initialize(window.get(), 0xffffff);
+	
 	while (engine->IsLoop()) {
+
+		//更新===
+
 		engine->Update();
+
+
+		//描画===
+		engine->PreDraw();
+
+		swapChain->SwitchRenderTarget(true);
+
+		auto commandList = swapChain->GetCommandList();
+		commandList->Close();
+		ID3D12CommandList* commandLists[] = { commandList };
+		engine->EndFrame(commandLists);
+		swapChain->Present();
 	}
 
 	return 0;

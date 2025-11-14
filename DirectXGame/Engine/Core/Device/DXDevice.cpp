@@ -1,5 +1,5 @@
 #include "DXDevice.h"
-#include <Engine/Utility/ConvertString.h>
+#include <Utility/ConvertString.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -124,4 +124,37 @@ void DXDevice::Initialize() {
 	//CommandQueue作成
     D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
     hr = device_->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
+
+    //初期値1でフェンスを作る
+    hr = device_->CreateFence(1, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+    assert(SUCCEEDED(hr));
+
+    //FenceのSignalを待つためのイベントを作成する
+    fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+    assert(fenceEvent_ != nullptr);
+}
+
+void DXDevice::Execute(ID3D12CommandList** commandLists) {
+	commandQueue_->ExecuteCommandLists(1, commandLists);
+}
+
+void DXDevice::SendSignal() {
+    //次の値に更新
+    fenceValue_[index_] += 2;
+    //コマンドキューにシグナルを送る
+    HRESULT hr = commandQueue_->Signal(fence_.Get(), fenceValue_[index_]);
+    assert(SUCCEEDED(hr));
+	//インデックスを反転させる
+	index_ = (index_ - 1) * -1;
+}
+
+void DXDevice::WaitSignal() {
+    //まだGPUが処理を終えていない場合
+    if (fence_->GetCompletedValue() < fenceValue_[index_]) {
+        //イベントがセットされるようにする
+        HRESULT hr = fence_->SetEventOnCompletion(fenceValue_[index_], fenceEvent_);
+        assert(SUCCEEDED(hr));
+        //イベントがセットされるまで待機する
+        WaitForSingleObject(fenceEvent_, INFINITE);
+	}
 }

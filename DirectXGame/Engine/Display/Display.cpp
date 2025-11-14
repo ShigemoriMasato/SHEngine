@@ -1,90 +1,121 @@
 #include "Display.h"
-#include <unordered_map>
-#include <Engine/Logger/Logger.h>
+#include <Utility/InsertBarrier.h>
+#include <Utility/Color.h>
+
+ID3D12Device* Display::device_ = nullptr;
+RTVManager* Display::rtvManager_ = nullptr;
+DSVManager* Display::dsvManager_ = nullptr;
 
 namespace {
-	std::unordered_map<HWND, std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)>> windowProcMap;
+
+    ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+        //生成するResourceの設定
+        D3D12_RESOURCE_DESC resourceDesc{};
+        resourceDesc.Width = width;
+        resourceDesc.Height = height;
+        resourceDesc.MipLevels = 1;
+        resourceDesc.DepthOrArraySize = 1;
+        resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        resourceDesc.SampleDesc.Count = 1;
+        resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+        //利用するヒープの設定
+        D3D12_HEAP_PROPERTIES heapProperties{};
+        heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+        //深度値のクリア設定
+        D3D12_CLEAR_VALUE depthClearValue{};
+        depthClearValue.DepthStencil.Depth = 1.0f;
+        depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+        //Resourceの生成
+        ID3D12Resource* resource = nullptr;
+        HRESULT hr = device->CreateCommittedResource(
+            &heapProperties,
+            D3D12_HEAP_FLAG_NONE,
+            &resourceDesc,
+            D3D12_RESOURCE_STATE_DEPTH_WRITE,
+            &depthClearValue,
+            IID_PPV_ARGS(&resource));
+        assert(SUCCEEDED(hr));
+
+        return resource;
+    }
+
 }
 
-Display::~Display() {
+void Display::StaticInitialize(ID3D12Device* device, RTVManager* rtvManager, DSVManager* dsvManager) {
+	device_ = device;
+	rtvManager_ = rtvManager;
+	dsvManager_ = dsvManager;
 }
 
-void Display::SetWindowProc(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> windowProc) {
-	// ウィンドウハンドルとウィンドウプロシージャをマップに登録する
-	windowProc_ = windowProc;
+void Display::Initialize(TextureData* data, uint32_t clearColor) {
+	textureResource_ = data->GetResource();
+	width_ = data->GetSize().first;
+	height_ = data->GetSize().second;
+	clearColor_ = ConvertColor(clearColor);
+
+    //バリアの初期状態を設定
+    resourceState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+    //RTVの設定
+    rtvHandle_.UpdateHandle(rtvManager_);
+
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;	//出力結果をSRGBに変換して書き込む
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;	//2Dテクスチャとしてよみこむ
+	device_->CreateRenderTargetView(textureResource_, &rtvDesc, rtvHandle_.GetCPU());
+
+	//DSVの設定
+    dsvHandle_.UpdateHandle(dsvManager_);
+
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+    dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+    depthStencilResource_.Attach(CreateDepthStencilTextureResource(device_, width_, height_));
+
+    device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, dsvHandle_.GetCPU());
 }
 
-void Display::SetSize(int32_t width, int32_t height) {
-	clientWidth_ = width;
-	clientHeight_ = height;
-}
+void Display::DrawReady(ID3D12GraphicsCommandList* commandList, bool isClear) {
+	EditBarrier(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-void Display::SetWindowName(std::wstring name) {
-	windowName_ = name;
-}
+    auto dsvCpu = dsvHandle_.GetCPU();
+	auto rtvCpu = rtvHandle_.GetCPU();
+	commandList->OMSetRenderTargets(1, &rtvCpu, false, &dsvCpu);
 
-void Display::SetWindowClassName(std::wstring name) {
-	windowClassName_ = name;
-}
+    if (isClear) {
+        //レンダーターゲットのクリア
+        commandList->ClearRenderTargetView(rtvHandle_.GetCPU(), reinterpret_cast<const FLOAT*>(&clearColor_), 0, nullptr);
+        //デプスステンシルビューのクリア
+        commandList->ClearDepthStencilView(dsvHandle_.GetCPU(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-void Display::Create() {
-	auto logger = Logger::getLogger("Window");
+        //ビューポート
+        D3D12_VIEWPORT viewport{};
+        //クライアント領域のサイズと一緒にして画面全体に表示
+        viewport.Width = static_cast<float>(width_);
+        viewport.Height = static_cast<float>(height_);
+        viewport.TopLeftX = 0;
+        viewport.TopLeftY = 0;
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
 
-    //ウィンドウプロシージャ
-    wc_.lpfnWndProc = WindowProc;
-    //ウィンドウクラス名
-    wc_.lpszClassName = windowClassName_.c_str();
-    //インスタンスハンドル
-    wc_.hInstance = GetModuleHandleA(nullptr);
-    //カーソル
-    wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
+        //シザー矩形
+        D3D12_RECT scissorRect{};
+        //基本的にビューポートと同じく刑が構成されるようにする
+        scissorRect.left = 0;
+        scissorRect.right = width_;
+        scissorRect.top = 0;
+        scissorRect.bottom = height_;
 
-    //ウィンドウクラスの登録
-    RegisterClass(&wc_);
-
-    //ウィンドウサイズを表す構造体にクライアント領域を入れる
-    RECT wrc = { 0, 0, clientWidth_, clientHeight_ };
-
-    //クライアント領域をもとに実際のサイズにwrcに変更してもらう
-    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-    //ウィンドウの作成
-    hwnd_ = CreateWindow(
-        wc_.lpszClassName,			//利用するクラスの名前
-        windowName_.c_str(),			//タイトルバーの文字
-        WS_OVERLAPPEDWINDOW,		//よく見るウィンドウスタイル
-        CW_USEDEFAULT,				//表示x座標
-        CW_USEDEFAULT,				//表示y座標
-        wrc.right - wrc.left,		//ウィンドウ幅
-        wrc.bottom - wrc.top,		//ウィンドウ高さ
-        nullptr,					//親ウィンドウハンドル
-        nullptr,					//メニューハンドル
-        wc_.hInstance,				//インスタンスハンドル
-        nullptr);					//オプション
-
-	// ウィンドウプロシージャをマップに登録する
-	windowProcMap[hwnd_] = windowProc_;
-}
-
-void Display::Show(ShowType cmd) {
-	ShowWindow(hwnd_, cmd);
-}
-
-void Display::Close() {
-	CloseWindow(hwnd_);
-}
-
-inline void Display::Destroy() {
-	DestroyWindow(hwnd_);
-}
-
-LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	// 登録されたウィンドウプロシージャを呼び出す
-	auto it = windowProcMap.find(hwnd);
-	if(it != windowProcMap.end()) {
-		return it->second(hwnd, msg, wparam, lparam);
+        commandList->RSSetViewports(1, &viewport);
+        commandList->RSSetScissorRects(1, &scissorRect);
 	}
+}
 
-	//標準のメッセージ
-	return DefWindowProc(hwnd, msg, wparam, lparam);
+void Display::EditBarrier(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState) {
+	InsertBarrier(commandList, newState, resourceState_, textureResource_);
 }

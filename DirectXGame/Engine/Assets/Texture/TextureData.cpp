@@ -66,10 +66,9 @@ namespace {
         commandList->ResourceBarrier(1, &barrier);
         return intermediateResource;
     }
-
 }
 
-void TextureData::Create(uint32_t width, uint32_t height) {
+void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, bool forSwapChain, ID3D12Device* device, SRVManager* srvManager) {
     //PostEffect用のリソースの作成
     D3D12_RESOURCE_DESC desc = {};
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -85,11 +84,17 @@ void TextureData::Create(uint32_t width, uint32_t height) {
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;              // defaultのヒープを使用
 
-    HRESULT hr = device->GetDevice()->CreateCommittedResource(
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = forSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+    for (int i = 0; i < 4; ++i) {
+		clearValue.Color[i] = clearColor[i];
+    }
+
+    HRESULT hr = device->CreateCommittedResource(
         &heapProps, D3D12_HEAP_FLAG_NONE,
         &desc,
         D3D12_RESOURCE_STATE_RENDER_TARGET,
-        nullptr,
+        &clearValue,
         IID_PPV_ARGS(&textureResource_)
     );
     assert(SUCCEEDED(hr) && "Failed to create off-screen resource");
@@ -106,8 +111,10 @@ void TextureData::Create(uint32_t width, uint32_t height) {
     srvHandle_.UpdateHandle(srvManager);
 
     // SRVを作成
-    device->GetDevice()->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.CPU);
+    device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
 
+    width_ = width;
+    height_ = height;
 }
 
 void TextureData::Create(std::string filePath, ID3D12Device* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager) {
@@ -133,5 +140,5 @@ void TextureData::Create(std::string filePath, ID3D12Device* device, ID3D12Graph
     srvHandle_.UpdateHandle(srvManager, true);
 
     //SRVを作成する
-    device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.CPU);
+    device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
 }

@@ -7,12 +7,8 @@ SRVManager::SRVManager(DXDevice* device, int num) : maxCount(num), descriptorSiz
 	isUsed_.resize(maxCount, false);
 }
 
-uint32_t SRVManager::GetNextOffset(bool isTexture) {
-	uint32_t i = 0;
-
-	if (!isTexture) {
-		i = maxCount / 4;
-	}
+uint32_t SRVManager::GetNextOffset(int startIndex) {
+	uint32_t i = startIndex;
 
 	for (i; i < maxCount; ++i) {
 		if (!isUsed_[i]) {
@@ -28,11 +24,15 @@ SRVHandle::~SRVHandle() {
 		manager_->isUsed_[offset_] = false;
 }
 
-void SRVHandle::UpdateHandle(SRVManager* manager, bool isTexture) {
+void SRVHandle::UpdateHandle(SRVManager* manager, int operateIndex) {
 	if(isUpdated_)
 		return;
 
-	offset_ = manager->GetNextOffset(isTexture);
+	if (operateIndex == -1) {
+		operateIndex = 1024;
+	}
+
+	offset_ = manager->GetNextOffset(operateIndex);
 	manager_ = manager;
 	CPU = GetCPUDesscriptorHandle(manager->GetHeap(), manager->descriptorSizeSRV, offset_);
 	GPU = GetGPUDesscriptorHandle(manager->GetHeap(), manager->descriptorSizeSRV, offset_);

@@ -8,15 +8,19 @@ public:
 	SRVHandle() = default;
 	~SRVHandle();
 
-	void UpdateHandle(SRVManager* manager, bool isTexture = false);
+	void UpdateHandle(SRVManager* manager, int operateIndex = -1);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE CPU;
-	D3D12_GPU_DESCRIPTOR_HANDLE GPU;
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPU() const { return CPU; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGPU() const { return GPU; }
+	int GetOffset() const { return offset_; }
 
 private:
 
-	SRVManager* manager_;
+	D3D12_CPU_DESCRIPTOR_HANDLE CPU;
+	D3D12_GPU_DESCRIPTOR_HANDLE GPU;
 	int offset_;
+
+	SRVManager* manager_;
 
 	bool isUpdated_ = false;
 };
@@ -31,7 +35,7 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetStartPtr() { return srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart(); }
 
-	uint32_t GetNextOffset(bool isTexture);
+	uint32_t GetNextOffset(int startIndex);
 
 private:
 

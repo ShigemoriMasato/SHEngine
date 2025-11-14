@@ -1,54 +1,43 @@
 #pragma once
-#include <Windows.h>
-#include <functional>
-#include <string>
-
-static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+#include <Core/View/DSVManager.h>
+#include <Core/View/RTVManager.h>
+#include <Assets/Texture/TextureData.h>
+#include <Utility/Vector.h>
 
 class Display {
 public:
 
-	enum ShowType : uint32_t {
-		kNormal = SW_SHOWNORMAL,
-		kShow = SW_SHOW,
-		kShowMax = SW_SHOWMAXIMIZED,
-		kShowMin = SW_SHOWMINIMIZED,
-		kRestore = SW_RESTORE,
-		kHide = SW_HIDE,
-
-		kCount
-	};
-
-public:
+	static void StaticInitialize(ID3D12Device* device, RTVManager* rtvManager, DSVManager* dsvManager);
 
 	Display() = default;
-	~Display();
+	~Display() = default;
 
-	void SetWindowProc(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> windowProc);
-	void SetSize(int32_t width, int32_t height);
-	void SetWindowName(std::wstring name);
-	void SetWindowClassName(std::wstring name);
+	void Initialize(TextureData* data, uint32_t clearColor);
+	void DrawReady(ID3D12GraphicsCommandList* commandList, bool isClear);
 
-	void Create();
+	void EditBarrier(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState);
 
-	void Show(ShowType cmd = kShow);
-
-	void Close();
-
-	void Destroy();
+	ID3D12Resource* GetTextureResource() const { return textureResource_; }
+	RTVHandle GetRTVHandle() const { return rtvHandle_; }
 
 private:
 
-	//hwndを統括するためにstaticを使用
-	HWND hwnd_;
-	WNDCLASS wc_;
+	static ID3D12Device* device_;
+	static RTVManager* rtvManager_;
+	static DSVManager* dsvManager_;
 
-	std::wstring windowName_ = L"DirectXGame";
-	std::wstring windowClassName_ = L"DirectXGameClass";
+private:
 
-	std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> windowProc_;
+	RTVHandle rtvHandle_;
+	DSVHandle dsvHandle_;
 
-	int32_t clientWidth_ = 1280;
-	int32_t clientHeight_ = 720;
+	D3D12_RESOURCE_STATES resourceState_;
+	
+	ID3D12Resource* textureResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 
+	Vector4 clearColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	int width_;
+	int height_;
 };
