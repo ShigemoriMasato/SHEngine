@@ -163,7 +163,9 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "$(ProjectDir)Scripts/Filter
     <ClCompile Include="AppSource\Common\DebugParam\InspectorWindow.cpp" />
     <ClCompile Include="AppSource\Common\DebugParam\ParamManager.cpp" />
     <ClCompile Include="AppSource\GameCamera\CameraController.cpp" />
-    <ClCompile Include="AppSource\Item\OreManage.cpp" />
+    <ClCompile Include="AppSource\Item\Object\GoldOre.cpp" />
+    <ClCompile Include="AppSource\Item\Object\OreObject.cpp" />
+    <ClCompile Include="AppSource\Item\OreItemManager.cpp" />
     <ClCompile Include="AppSource\Unit\MapChipField.cpp" />
     <ClCompile Include="AppSource\Unit\MapChipRender.cpp" />
     <ClCompile Include="AppSource\Unit\Ore\OreUnit.cpp" />
@@ -216,7 +218,10 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "$(ProjectDir)Scripts/Filter
     <ClCompile Include="Engine\Utility\src\Easing.cpp" />
     <ClCompile Include="Engine\Utility\src\MyMath.cpp" />
     <ClInclude Include="AppSource\GameCamera\DebugMousePos.h" />
-    <ClInclude Include="AppSource\Item\OreManager.h" />
+    <ClInclude Include="AppSource\Item\Object\GoldOre.h" />
+    <ClInclude Include="AppSource\Item\Object\OreItem.h" />
+    <ClInclude Include="AppSource\Item\Object\OreObject.h" />
+    <ClInclude Include="AppSource\Item\OreItemManager.h" />
     <ClInclude Include="AppSource\Unit\MapChipRender.h" />
     <ClInclude Include="Engine\Utility\Quaternion.h" />
     <ClCompile Include="AppSource\Scene\src\IScene.cpp" />
