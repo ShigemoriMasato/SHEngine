@@ -27,9 +27,17 @@ void GameScene::Initialize() {
 	inst->AddItem("Test", "param4", param4, 3);
 	inst->AddItem("Test", "param5", param5, 4);
 
+	//==================================================
+	// カメラシステム
+	//==================================================
+
 	// ゲームカメラを設定
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize(input_);
+
+	//============================================
+	// マップシステム
+	//============================================
 
 	// マップデータ解釈機能を初期化
 	mapChipField_ = std::make_unique<MapChipField>();
@@ -43,6 +51,22 @@ void GameScene::Initialize() {
 	// マップの描画機能を初期化
 	mapChipRenderer_ = std::make_unique<MapChipRender>();
 	mapChipRenderer_->Initialize(drawDataManager_->GetDrawData(wallModel.drawDataIndex), mapChipField_->GetMapData());
+
+	//================================================================
+	// 鉱石システム
+	//================================================================
+
+	// 鉱石モデル
+	int oreItemModelID = modelManager_->LoadModel(playerModelName);
+	auto oreItemModel = modelManager_->GetNodeModelData(oreItemModelID);
+
+	// 鉱石の管理システムを初期化
+	oreItemManager_ = std::make_unique<OreItemManager>();
+	oreItemManager_->Initialize(drawDataManager_->GetDrawData(oreItemModel.drawDataIndex));
+
+	//============================================================================
+	// ユニットシステム
+	//============================================================================
 
 	// プレイヤーモデルを取得
 	int playerModelID = modelManager_->LoadModel(playerModelName);
