@@ -5,6 +5,7 @@
 
 #include"Unit/UnitManager.h"
 #include"Unit/MapChipField.h"
+#include"Unit/MapChipRender.h"
 #include"GameCamera/CameraController.h"
 
 class GameScene : public IScene {
@@ -37,6 +38,9 @@ private:
 
 	// マップデータの中間管理職
 	std::unique_ptr<MapChipField> mapChipField_;
+
+	// マップの描画
+	std::unique_ptr<MapChipRender> mapChipRenderer_;
 
 	// ゲームカメラの管理
 	std::unique_ptr<CameraController> cameraController_;

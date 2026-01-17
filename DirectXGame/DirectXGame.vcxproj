@@ -163,7 +163,9 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "$(ProjectDir)Scripts/Filter
     <ClCompile Include="AppSource\Common\DebugParam\InspectorWindow.cpp" />
     <ClCompile Include="AppSource\Common\DebugParam\ParamManager.cpp" />
     <ClCompile Include="AppSource\GameCamera\CameraController.cpp" />
+    <ClCompile Include="AppSource\Item\OreManage.cpp" />
     <ClCompile Include="AppSource\Unit\MapChipField.cpp" />
+    <ClCompile Include="AppSource\Unit\MapChipRender.cpp" />
     <ClCompile Include="AppSource\Unit\Ore\OreUnit.cpp" />
     <ClCompile Include="AppSource\Unit\Ore\OreUnitObject.cpp" />
     <ClCompile Include="AppSource\Unit\Player\PlayerUnit.cpp" />
@@ -213,6 +215,9 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "$(ProjectDir)Scripts/Filter
     <ClCompile Include="Engine\Utility\src\ConvertString.cpp" />
     <ClCompile Include="Engine\Utility\src\Easing.cpp" />
     <ClCompile Include="Engine\Utility\src\MyMath.cpp" />
+    <ClInclude Include="AppSource\GameCamera\DebugMousePos.h" />
+    <ClInclude Include="AppSource\Item\OreManager.h" />
+    <ClInclude Include="AppSource\Unit\MapChipRender.h" />
     <ClInclude Include="Engine\Utility\Quaternion.h" />
     <ClCompile Include="AppSource\Scene\src\IScene.cpp" />
     <ClCompile Include="AppSource\Scene\src\InitializeScene.cpp" />
@@ -350,6 +355,22 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "$(ProjectDir)Scripts/Filter
     <ClInclude Include="AppSource\MapEditor\Editor\Data\Pencil.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Assets\Shader\Instancing3d.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shader\Instancing3d.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Assets\Shader\Object3d.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>

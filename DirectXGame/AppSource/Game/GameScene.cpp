@@ -1,5 +1,7 @@
 #include "GameScene.h"
 #include <Common/DebugParam/GameParamEditor.h>
+#include"GameCamera/DebugMousePos.h"
+#include"FpsCount.h"
 
 namespace {
 	bool debug = false;
@@ -34,13 +36,21 @@ void GameScene::Initialize() {
 	// デバックで使用するマップデータを構築
 	mapChipField_->SetDebugMapData();
 
+	// 壁モデルを取得
+	int wallModelID = modelManager_->LoadModel(playerModelName);
+	auto wallModel = modelManager_->GetNodeModelData(wallModelID);
+
+	// マップの描画機能を初期化
+	mapChipRenderer_ = std::make_unique<MapChipRender>();
+	mapChipRenderer_->Initialize(drawDataManager_->GetDrawData(wallModel.drawDataIndex), mapChipField_->GetMapData());
+
 	// プレイヤーモデルを取得
 	int playerModelID = modelManager_->LoadModel(playerModelName);
-	auto playerModel = modelManager_->GetSkinningModelData(playerModelID);
+	auto playerModel = modelManager_->GetNodeModelData(playerModelID);
 
 	// おれモデルを取得
 	int oreModelID = modelManager_->LoadModel(playerModelName);
-	auto oreModel = modelManager_->GetSkinningModelData(oreModelID);
+	auto oreModel = modelManager_->GetNodeModelData(oreModelID);
 
 	// ユニットの管理クラス
 	unitManager_ = std::make_unique<UnitManager>();
@@ -51,8 +61,29 @@ void GameScene::Initialize() {
 
 std::unique_ptr<IScene> GameScene::Update() {
 
+	// Δタイムを取得する
+	FpsCount::deltaTime = engine_->GetFPSObserver()->GetDeltatime();
+
+	// 入力処理の更新
+	input_->Update();
+	commonData_->keyManager->Update();
+
 	debugCamera_->Update();
 	camera_ = *static_cast<Camera*>(debugCamera_.get());
+
+	// マウスのスクリーン座標を取得する
+	POINT cursorPos;
+	if (GetCursorPos(&cursorPos)) {
+		// スクリーン座標をクライアント座標に変換
+		ScreenToClient(gameWindow_->GetWindow()->GetHwnd(), &cursorPos);
+		// カーソル位置をワールド座標に変換
+		DebugMousePos::screenMousePos = { static_cast<float>(cursorPos.x), static_cast<float>(cursorPos.y) };
+	}
+	// カメラの更新処理
+	cameraController_->Update();
+
+	// ユニットの更新処理
+	unitManager_->Update();
 
 	return nullptr;
 }
@@ -62,6 +93,12 @@ void GameScene::Draw() {
 
 	//Playerとかの処理
 
+	// マップを描画
+	mapChipRenderer_->Draw(gameWindow_->GetWindow(), debugCamera_->GetVPMatrix());
+
+	// ユニットを描画
+	unitManager_->Draw(gameWindow_->GetWindow(), debugCamera_->GetVPMatrix());
+
 	display_->PostDraw(gameWindow_->GetCommandList());
 
 	gameWindow_->PreDraw();
@@ -70,6 +107,9 @@ void GameScene::Draw() {
 	//ImGui
 	gameWindow_->DrawDisplayWithImGui();
 	paramManager_->Draw();
+
+	// カメラのデバック情報
+	cameraController_->DebugDraw();
 
 	engine_->ImGuiDraw();
 }

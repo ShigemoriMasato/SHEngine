@@ -6,7 +6,7 @@ void UnitManager::Initalize(MapChipField* mapChipField, DrawData playerDrawData,
 
 	// プレイヤーユニットを初期化
 	playerUnit_ = std::make_unique<PlayerUnit>();
-	playerUnit_->Initialize(mapChipField_, playerDrawData,{1.0f,0.0f,1.0f}, keyManager);
+	playerUnit_->Initialize(mapChipField_, playerDrawData,{3.0f,0.0f,3.0f}, keyManager);
 
 	// おれのモデルデータを取得
 	oreDrawData_ = oreDrawData;
@@ -24,9 +24,9 @@ void UnitManager::Update() {
 	playerUnit_->Update();
 
 	// おれユニットの更新処理
-	for (const auto& [id, unit] : oreUnits_) {
-		unit->Update();
-	}
+	//for (const auto& [id, unit] : oreUnits_) {
+	//	unit->Update();
+	//}
 }
 
 void UnitManager::Draw(Window* window, const Matrix4x4& vpMatrix) {
@@ -35,9 +35,9 @@ void UnitManager::Draw(Window* window, const Matrix4x4& vpMatrix) {
 	playerUnit_->Draw(window, vpMatrix);
 
 	// おれを描画
-	for (const auto& [id, unit] : oreUnits_) {
-		unit->Draw(window, vpMatrix);
-	}
+	//for (const auto& [id, unit] : oreUnits_) {
+	//	unit->Draw(window, vpMatrix);
+	//}
 }
 
 void UnitManager::AddOreUnit(const Vector3& pos) {

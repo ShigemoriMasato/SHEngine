@@ -1,6 +1,7 @@
 #include "GameWindow.h"
 #include <SHEngine.h>
 #include <imgui/imgui.h>
+#include"GameCamera/DebugMousePos.h"
 
 void GameWindow::Initialize(SHEngine* engine, const WindowConfig& config, uint32_t clearColor) {
 	window_ = engine->GetWindowMaker()->MakeWindow(config, clearColor);
@@ -20,10 +21,26 @@ void GameWindow::DrawDisplayWithImGui() {
 		TextureData* textureData = textureManager_->GetTextureData(config.textureIndex);
 		auto textureHandle = textureData->GetGPUHandle();
 		ImGuiIO& io = ImGui::GetIO();
+
+		// マウス位置を取得
+		if (config.name == "Main Display") {
+			ImVec2 tmp = ImGui::GetCursorScreenPos();
+			DebugMousePos::windowPos.x = tmp.x;
+			DebugMousePos::windowPos.y = tmp.y;
+		}
+
+		// 画像を描画する
 		ImGui::Image(
 			ImTextureID(textureHandle.ptr),
 			ImVec2(static_cast<float>(config.width), static_cast<float>(config.height))
 		);
+
+		// 画像内のマウス位置を取得する
+		if (config.name == "Main Display") {
+			if (ImGui::IsItemHovered()) {
+				DebugMousePos::gameMousePos = DebugMousePos::screenMousePos - DebugMousePos::windowPos;
+			}
+		}
 		ImGui::End();
 	}
 

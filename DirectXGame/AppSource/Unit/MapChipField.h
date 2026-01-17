@@ -2,17 +2,10 @@
 #include<vector>
 #include<array>
 #include"Utility/Vector.h"
+#include"Game/MapData/Data/MapData.h"
 
 class MapChipField {
 public:
-
-	enum class BlockType {
-		Air,  // 空気
-		road, // 道
-		Wall, // 壁
-
-		Count,			//ブロックの種類の総数
-	};
 
 	struct IndexSet {
 		int32_t xIndex;
@@ -62,9 +55,12 @@ public: // マップの情報
 	/// マップデータを設定する
 	/// </summary>
 	/// <param name="data"></param>
-	void SetMapChipData(std::vector<std::vector<BlockType>> data);
+	void SetMapChipData(std::vector<std::vector<TileType>> data);
 
 	void SetDebugMapData();
+
+	// マップデータを取得
+	std::vector<std::vector<TileType>> GetMapData() { return data_; }
 
 	/// <summary>
 	/// 指定されたマップチップデータの種類を返す
@@ -72,7 +68,7 @@ public: // マップの情報
 	/// <param name="xIndex"></param>
 	/// <param name="yIndex"></param>
 	/// <returns></returns>
-	BlockType GetBlockTypeByIndex(int32_t xIndex, int32_t zIndex) const;
+	TileType GetBlockTypeByIndex(int32_t xIndex, int32_t zIndex) const;
 
 	/// <summary>
 	/// 指定されたマップチップデータの座標を返す
@@ -117,7 +113,7 @@ private:
 	static inline int32_t kNumBlockHorizontal = 10;
 
 	// マップデータ
-	std::vector<std::vector<BlockType>> data_;
+	std::vector<std::vector<TileType>> data_;
 
 private:
 

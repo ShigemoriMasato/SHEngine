@@ -1,6 +1,6 @@
 #include"MapChipField.h"
 
-void MapChipField::SetMapChipData(std::vector<std::vector<BlockType>> data) {
+void MapChipField::SetMapChipData(std::vector<std::vector<TileType>> data) {
 	// データを取得
 	data_ = data;
 
@@ -14,35 +14,45 @@ void MapChipField::SetDebugMapData() {
 	kNumBlockVirtical = 40;
 	kNumBlockHorizontal = 60;
 
+	data_.resize(kNumBlockVirtical);
+	for (auto& row : data_) {
+		row.resize(kNumBlockHorizontal);
+	}
+
 	// デバックのマップデータを取得
 	for (int32_t z = 0; z < kNumBlockVirtical; ++z) {
 		for (int32_t x = 0; x < kNumBlockHorizontal; ++x) {
 			
 			// 外周をブロックで囲む
 			if (z == 0 || z == kNumBlockVirtical-1 || x == 0 || x == kNumBlockHorizontal-1) {
-				data_[z][x] = BlockType::Wall;
+				data_[z][x] = TileType::Wall;
 			} else {
-				data_[z][x] = BlockType::Air;
+				data_[z][x] = TileType::Air;
 			}
 		}
 	}
+
+	data_[5][4] = TileType::Wall;
+	data_[6][4] = TileType::Wall;
+	data_[5][5] = TileType::Wall;
+	data_[6][5] = TileType::Wall;
 }
 
-MapChipField::BlockType MapChipField::GetBlockTypeByIndex(int32_t xIndex, int32_t zIndex) const {
+TileType MapChipField::GetBlockTypeByIndex(int32_t xIndex, int32_t zIndex) const {
 
 	// 範囲外を指定されたら空白を返す
 	if (xIndex < 0 || kNumBlockHorizontal - 1 < xIndex) {
-		return BlockType::Air;
+		return TileType::Air;
 	}
 	if (zIndex < 0 || kNumBlockVirtical - 1 < zIndex) {
-		return BlockType::Air;
+		return TileType::Air;
 	}
 
 	return data_[zIndex][xIndex];
 }
 
 Vector3 MapChipField::GetMapChipPositionByIndex(int32_t xIndex, int32_t zIndex) const {
-	return Vector3(kBlockWidth * static_cast<float>(xIndex), 0, static_cast<float>(kNumBlockVirtical * zIndex));
+	return Vector3(kBlockWidth * static_cast<float>(xIndex), 0, static_cast<float>(kBlockHeight * zIndex));
 }
 
 MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const Vector3& position) {
@@ -89,30 +99,30 @@ bool MapChipField::IsBlockHit(MoveDir dir, const CollisionMapInfo& info) {
 	case MapChipField::MoveDir::Above:
 		corner1 = static_cast<uint32_t>(Corner::kLeftTop);
 		corner2 = static_cast<uint32_t>(Corner::kRightTop);
-		moveZ = 1;
+		moveZ = -1;
 		break;
 
 	case MapChipField::MoveDir::Below:
 		corner1 = static_cast<uint32_t>(Corner::kLeftBottom);
 		corner2 = static_cast<uint32_t>(Corner::kRightBottom);
-		moveZ = -1;
+		moveZ = 1;
 		break;
 
 	case MapChipField::MoveDir::Right:
 		corner1 = static_cast<uint32_t>(Corner::kRightTop);
 		corner2 = static_cast<uint32_t>(Corner::kRightBottom);
-		moveX = 1;
+		moveX = -1;
 		break;
 
 	case MapChipField::MoveDir::Left:
 		corner1 = static_cast<uint32_t>(Corner::kLeftTop);
 		corner2 = static_cast<uint32_t>(Corner::kLeftBottom);
-		moveX = -1;
+		moveX = 1;
 		break;
 	}
 
-	BlockType blockType;
-	BlockType blockTypeNext;
+	TileType blockType;
+	TileType blockTypeNext;
 	// 角1、角2の当たり判定を行う
 	bool hit = false;
 	// 角1の点の判定
@@ -120,14 +130,14 @@ bool MapChipField::IsBlockHit(MoveDir dir, const CollisionMapInfo& info) {
 	indexSet = GetMapChipIndexSetByPosition(positionsNew[corner1]);
 	blockType = GetBlockTypeByIndex(indexSet.xIndex, indexSet.zIndex);
 	blockTypeNext = GetBlockTypeByIndex(indexSet.xIndex + moveX, indexSet.zIndex + moveZ);
-	if ((blockType != BlockType::Air) && (blockTypeNext == BlockType::Air)) {
+	if ((blockType != TileType::Air) && (blockTypeNext == TileType::Air)) {
 		hit = true;
 	}
 	// 角2の点の判定
 	indexSet = GetMapChipIndexSetByPosition(positionsNew[corner2]);
 	blockType = GetBlockTypeByIndex(indexSet.xIndex, indexSet.zIndex);
 	blockTypeNext = GetBlockTypeByIndex(indexSet.xIndex + moveX, indexSet.zIndex + moveZ);
-	if ((blockType != BlockType::Air) && (blockTypeNext == BlockType::Air)) {
+	if ((blockType != TileType::Air) && (blockTypeNext == TileType::Air)) {
 		hit = true;
 	}
 
@@ -138,10 +148,10 @@ Vector3 MapChipField::CornerPosition(const Vector3& center, Corner corner, const
 
 	// 各角の座標
 	Vector3 offsetTable[static_cast<size_t>(Corner::MaxCount)] = {
-		Vector3(info.size.x / 2.0f, -info.size.z / 2.0f, 0.0f),
-		Vector3(-info.size.x / 2.0f, -info.size.z / 2.0f, 0.0f),
-		Vector3(info.size.x / 2.0f, info.size.z / 2.0f, 0.0f),
-		Vector3(-info.size.x / 2.0f, info.size.z / 2.0f, 0.0f)
+		Vector3(info.size.x / 2.0f,0.0f, -info.size.z / 2.0f),
+		Vector3(-info.size.x / 2.0f,0.0f, -info.size.z / 2.0f),
+		Vector3(info.size.x / 2.0f,0.0f, info.size.z / 2.0f),
+		Vector3(-info.size.x / 2.0f,0.0f, info.size.z / 2.0f)
 	};
 
 	return center + offsetTable[static_cast<int32_t>(corner)];
