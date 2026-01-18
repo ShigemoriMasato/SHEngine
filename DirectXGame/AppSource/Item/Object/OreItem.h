@@ -24,4 +24,7 @@ public:
 
 	// 位置
 	virtual Vector3 GetPos() = 0;
+
+	// サイズ
+	virtual Vector3 GetSize() = 0;
 };

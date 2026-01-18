@@ -11,7 +11,6 @@ void OreItemManager::Initialize(const DrawData& goldOreDrawData) {
 	// メモリを確保
 	oreItems_.reserve(10);
 
-
 }
 
 void OreItemManager::Update() {
@@ -42,4 +41,23 @@ void OreItemManager::AddOreItem(OreType type, const Vector3& pos) {
 		oreItems_.push_back(std::move(ore));
 		break;
 	}
+}
+
+bool OreItemManager::IsSelectOre(const Vector3 selectpos, Vector3& worldPos) {
+
+	// 選択した位置に鉱石が存在しているかを確認
+	for (auto& ore : oreItems_) {
+
+		Vector3 orePos = ore->GetPos();
+		Vector3 oreSize = ore->GetSize();
+
+		if (selectpos.x >= orePos.x - oreSize.x * 0.5f && selectpos.x <= orePos.x + oreSize.x * 0.5f) {
+			if (selectpos.z >= orePos.z - oreSize.z * 0.5f && selectpos.z <= orePos.z + oreSize.z * 0.5f) {
+				// 移動する位置を設定
+				worldPos = orePos;
+				return true;
+			}
+		}
+	}
+	return false;
 }

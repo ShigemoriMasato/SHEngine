@@ -95,6 +95,10 @@ std::unique_ptr<IScene> GameScene::Update() {
 	debugCamera_->Update();
 	camera_ = *static_cast<Camera*>(debugCamera_.get());
 
+	//====================================================
+	// カメラの更新庶路
+	//====================================================
+
 	// マウスのスクリーン座標を取得する
 	POINT cursorPos;
 	if (GetCursorPos(&cursorPos)) {
@@ -106,6 +110,33 @@ std::unique_ptr<IScene> GameScene::Update() {
 	// カメラの更新処理
 	cameraController_->Update();
 
+	//==============================================================
+	// ユニットの選択処理
+	//==============================================================
+
+	// マウスの位置に鉱石が存在していればユニットを動かす
+	Vector3 oreWorldPos = {};
+	if (oreItemManager_->IsSelectOre(cameraController_->GetWorldPos(), oreWorldPos)) {
+
+		// 左クリックを取得
+		if (Input::GetMouseButtonState()[0] == 0x80 && Input::GetPreMouseButtonState()[0] == 0x00) {
+
+			// おれを追加
+			unitManager_->AddOreUnit(oreWorldPos);
+		}
+	}
+
+	//=====================================================
+	// 鉱石の更新処理
+	//=====================================================
+
+	// 鉱石管理の更新処理
+	oreItemManager_->Update();
+
+	//====================================================================
+	// ユニットの更新処理
+	//====================================================================
+
 	// ユニットの更新処理
 	unitManager_->Update();
 
@@ -115,13 +146,17 @@ std::unique_ptr<IScene> GameScene::Update() {
 void GameScene::Draw() {
 	display_->PreDraw(gameWindow_->GetCommandList(), true);
 
-	//Playerとかの処理
+	// カメラ行列
+	Matrix4x4 vpMatrix = cameraController_->GetVpMatrix();
 
 	// マップを描画
-	mapChipRenderer_->Draw(gameWindow_->GetWindow(), debugCamera_->GetVPMatrix());
+	mapChipRenderer_->Draw(gameWindow_->GetWindow(), vpMatrix);
+
+	// 鉱石の描画
+	oreItemManager_->Draw(gameWindow_->GetWindow(), vpMatrix);
 
 	// ユニットを描画
-	unitManager_->Draw(gameWindow_->GetWindow(), debugCamera_->GetVPMatrix());
+	unitManager_->Draw(gameWindow_->GetWindow(), vpMatrix);
 
 	display_->PostDraw(gameWindow_->GetCommandList());
 

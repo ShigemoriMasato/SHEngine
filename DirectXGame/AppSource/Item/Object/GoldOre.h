@@ -19,9 +19,14 @@ public:
 	// 位置
 	Vector3 GetPos() override { return object_->transform_.position; }
 
+	// サイズ
+	Vector3 GetSize() override { return size_; }
+
 private:
 	// オブジェクトデータ
 	std::unique_ptr<OreObject> object_;
 
 	int32_t hp_ = 0;
+
+	Vector3 size_ = {10.0f,10.0f,10.0f};
 };

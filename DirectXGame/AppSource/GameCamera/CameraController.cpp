@@ -16,15 +16,12 @@ void CameraController::Initialize(Input* input) {
 	// カメラを初期化
 	camera_ = std::make_unique<Camera>();
 	camera_->SetProjectionMatrix(PerspectiveFovDesc{});
-	camera_->position_ = { 0.0f,10.0f,0.0f };
-	camera_->rotation_ = { std::numbers::pi_v<float> / 2.0f,0.0f,0.0f };
+	camera_->position_ = { 0.0f,30.0f,0.0f };
+	camera_->rotation_ = { -0.7f,0.0f,0.0f };
 	camera_->MakeMatrix();
 }
 
 void CameraController::Update() {
-
-	// マウス座標を取得
-	//Vector3 worldPos = ScreenToWorld(mouseScreenPos, 1280.0f, 720.0f);
 
 	// 0:左, 1:右, 2:中
 	BYTE* mouseKey = input_->GetMouseButtonState();
@@ -35,11 +32,18 @@ void CameraController::Update() {
 		Vector2 mouseDelta = input_->GetMouseMove();
 		// 移動
 		camera_->position_.x += mouseDelta.x * moveSpeed_ * FpsCount::deltaTime;
-		camera_->position_.y -= mouseDelta.y * moveSpeed_ * FpsCount::deltaTime;
+		camera_->position_.z -= mouseDelta.y * moveSpeed_ * FpsCount::deltaTime;
 	}
 
 	// カメラの更新処理
 	camera_->MakeMatrix();
+
+	// ワールド座標の位置を取得する
+#ifdef USE_IMGUI
+	worldPos_ = ScreenToWorld(DebugMousePos::gameMousePos, 1280.0f, 720.0f);
+#else
+	worldPos_ = ScreenToWorld(DebugMousePos::screenMousePos, 1280.0f, 720.0f);
+#endif
 }
 
 void CameraController::DebugDraw() {
@@ -50,6 +54,7 @@ void CameraController::DebugDraw() {
 	ImGui::Text("GameMousePos x : %.2f, y : %.2f", DebugMousePos::gameMousePos.x, DebugMousePos::gameMousePos.y);
 	ImGui::Text("WindowMousePos x : %.2f, y : %.2f", DebugMousePos::windowPos.x, DebugMousePos::windowPos.y);
 	ImGui::Text("ScreenMousePos x : %.2f, y : %.2f", DebugMousePos::screenMousePos.x, DebugMousePos::screenMousePos.y);
+	ImGui::Text("WorldMousePos x : %.2f, y : %.2f, z : %.2f", worldPos_.x, worldPos_.y, worldPos_.z);
 	ImGui::End();
 }
 

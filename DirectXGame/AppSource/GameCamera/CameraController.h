@@ -12,7 +12,7 @@ public:
 	void DebugDraw();
 
 	/// <summary>
-	/// マウスのスクリーン座標を3D空間の座標に変換（Y=0の平面上）
+	/// マウスのスクリーン座標を3D空間の座標に変換
 	/// </summary>
 	/// <param name="screenPos">マウスのスクリーン座標</param>
 	/// <param name="screenWidth">スクリーンの幅</param>
@@ -25,6 +25,8 @@ public:
 	Matrix4x4 GetVpMatrix() const { return camera_->GetVPMatrix(); }
 	Camera* GetCamera() const { return camera_.get(); }
 
+	Vector3 GetWorldPos() { return worldPos_; }
+
 private:
 
 	Input* input_ = nullptr;
@@ -34,4 +36,7 @@ private:
 
 	// 移動速度
 	float moveSpeed_ = 30.0f;
+
+	// ワールド座標の位置
+	Vector3 worldPos_ = {};
 };

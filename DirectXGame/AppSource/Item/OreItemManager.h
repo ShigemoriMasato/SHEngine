@@ -17,6 +17,14 @@ public:
 
 	void AddOreItem(OreType type, const Vector3& pos);
 
+	/// <summary>
+	/// 選択した位置に鉱石が存在しているかを取得
+	/// </summary>
+	/// <param name="selectpos">選択する位置</param>
+	/// <param name="worldPos">選択した鉱石の位置</param>
+	/// <returns></returns>
+	bool IsSelectOre(const Vector3 selectpos,Vector3& worldPos);
+
 private:
 
 	// 鉱石の描画データ

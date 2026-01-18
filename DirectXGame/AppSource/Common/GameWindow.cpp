@@ -39,6 +39,7 @@ void GameWindow::DrawDisplayWithImGui() {
 		if (config.name == "Main Display") {
 			if (ImGui::IsItemHovered()) {
 				DebugMousePos::gameMousePos = DebugMousePos::screenMousePos - DebugMousePos::windowPos;
+				DebugMousePos::gameMousePos *= 2.0f;
 			}
 		}
 		ImGui::End();
