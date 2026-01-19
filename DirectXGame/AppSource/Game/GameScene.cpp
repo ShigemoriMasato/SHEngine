@@ -119,7 +119,7 @@ std::unique_ptr<IScene> GameScene::Update() {
 	if (oreItemManager_->IsSelectOre(cameraController_->GetWorldPos(), oreWorldPos)) {
 
 		// 左クリックを取得
-		if (Input::GetMouseButtonState()[0] == 0x80 && Input::GetPreMouseButtonState()[0] == 0x00) {
+		if ((Input::GetMouseButtonState()[0] & 0x80) && !(Input::GetPreMouseButtonState()[0] & 0x80)) {
 
 			// おれを追加
 			unitManager_->AddOreUnit(oreWorldPos);

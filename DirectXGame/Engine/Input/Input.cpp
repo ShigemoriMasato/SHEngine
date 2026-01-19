@@ -182,7 +182,7 @@ BYTE* Input::GetPreMouseButtonState() {
 	if (!isInitialized_) {
 		return nullptr;
 	}
-	return reinterpret_cast<BYTE*>(&preMouseState);
+	return preMouseState.rgbButtons;
 }
 
 bool* Input::GetXBoxButtonState() {

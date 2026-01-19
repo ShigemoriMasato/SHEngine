@@ -11,6 +11,8 @@ void OreItemManager::Initialize(const DrawData& goldOreDrawData) {
 	// メモリを確保
 	oreItems_.reserve(10);
 
+	// テストで鉱石を設定
+	AddOreItem(OreType::Gold, {4.0f,0.0f,7.0f});
 }
 
 void OreItemManager::Update() {

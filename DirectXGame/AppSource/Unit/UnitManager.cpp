@@ -4,6 +4,9 @@ void UnitManager::Initalize(MapChipField* mapChipField, DrawData playerDrawData,
 	// マップデータを取得
 	mapChipField_ = mapChipField;
 
+	// ユニットの出現位置を取得する
+	homePosList_ = mapChipField_->GetHomePosList();
+
 	// プレイヤーユニットを初期化
 	playerUnit_ = std::make_unique<PlayerUnit>();
 	playerUnit_->Initialize(mapChipField_, playerDrawData,{3.0f,0.0f,3.0f}, keyManager);
@@ -56,12 +59,17 @@ void UnitManager::AddOreUnit(const Vector3& targetPos) {
 
 	// 登録
 	std::unique_ptr<OreUnit> oreUnit = std::make_unique<OreUnit>();
-	oreUnit->Initialize(mapChipField_, oreDrawData_, homePos);
+	oreUnit->Initialize(mapChipField_, oreDrawData_, homePos,targetPos);
 
 	oreUnits_[index] = std::move(oreUnit);
 }
 
 Vector3 UnitManager::GetNearHomePos(const Vector3& targetPos) {
+
+	if (homePosList_.empty()) {
+		assert(0 && "Not HomePosList");
+	}
+
 	float minDis = FLT_MAX;
 	Vector3 nearPos = homePosList_[0];
 

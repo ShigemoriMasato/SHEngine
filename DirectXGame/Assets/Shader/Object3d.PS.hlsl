@@ -7,6 +7,12 @@ struct VertexShaderOutput
     float32_t3 worldPosition : POSITION1;
 };
 
+struct Material
+{
+    float32_t4 color;
+};
+ConstantBuffer<Material> gMaterial : register(b0);
+
 struct PSOutput
 {
     float4 color : SV_TARGET0;
@@ -15,6 +21,6 @@ struct PSOutput
 PSOutput main(VertexShaderOutput input)
 {
     PSOutput output;
-    output.color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    output.color = gMaterial.color;
     return output;
 }

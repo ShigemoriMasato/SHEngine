@@ -16,7 +16,7 @@ void CameraController::Initialize(Input* input) {
 	// カメラを初期化
 	camera_ = std::make_unique<Camera>();
 	camera_->SetProjectionMatrix(PerspectiveFovDesc{});
-	camera_->position_ = { 0.0f,30.0f,0.0f };
+	camera_->position_ = { 0.0f,8.0f,0.0f };
 	camera_->rotation_ = { -0.7f,0.0f,0.0f };
 	camera_->MakeMatrix();
 }

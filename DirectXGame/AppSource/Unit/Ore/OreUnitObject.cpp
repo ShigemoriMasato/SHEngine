@@ -17,7 +17,11 @@ void OreUnitObject::Initialize(DrawData drawData) {
 	vsDataIndex_ = renderObject_->CreateCBV(sizeof(TransformationMatrix), ShaderType::VERTEX_SHADER, "TestScene::VSData");
 
 	// Materialを登録
+	psDataIndex_ = renderObject_->CreateCBV(sizeof(Material), ShaderType::PIXEL_SHADER, "TestScene::psData");
 
+	// 色を設定
+	material_.color = { 1.0f,1.0f,1.0f,1.0f };
+	renderObject_->CopyBufferData(psDataIndex_, &material_, sizeof(Material));
 }
 
 void OreUnitObject::Update() {

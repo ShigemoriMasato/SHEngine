@@ -12,6 +12,10 @@ public:
 		Matrix4x4 worldInverseTranspose = Matrix4x4::Identity();
 	};
 
+	struct Material {
+		Vector4 color = {1.0f,1.0f,1.0f,1.0f};
+	};
+
 	// 初期化
 	void Initialize(DrawData drawData);
 
@@ -35,4 +39,8 @@ private:
 	TransformationMatrix vsData_{};
 	int vsDataIndex_ = -1;
 	Matrix4x4 worldMatrix_;
+
+	// マテリアル関係
+	Material material_{};
+	int psDataIndex_ = -1;
 };

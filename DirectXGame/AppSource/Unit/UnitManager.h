@@ -15,9 +15,6 @@ public:
 
 	void Draw(Window* window, const Matrix4x4& vpMatrix);
 
-	// 出現する位置を取得
-	void SetHomePos(std::vector<Vector3> list) { homePosList_ = list; }
-
 	/// <summary>
 	/// ユニットを追加
 	/// </summary>

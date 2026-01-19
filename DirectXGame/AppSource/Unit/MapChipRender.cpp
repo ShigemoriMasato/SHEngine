@@ -34,13 +34,23 @@ void MapChipRender::Initialize(DrawData wallDrawData, std::vector<std::vector<Ti
 		for (uint32_t x = 0; x < map[0].size(); ++x) {
 
 			if (map[z][x] == TileType::Wall) {
+				// 壁
 				uint32_t i = n++;
 				transformDatas_[i].transform.position = { 1.0f * x,0.0f,1.0f * z };
 				transformDatas_[i].worldMatrix = Matrix::MakeAffineMatrix(transformDatas_[i].transform.scale, transformDatas_[i].transform.rotate, transformDatas_[i].transform.position);
+				transformDatas_[i].color = { 1.0f,0.0f,1.0f,1.0f };
 			} else if (map[z][x] == TileType::Road) {
+				// 道
 				uint32_t i = n++;
 				transformDatas_[i].transform.position = { 1.0f * x,-1.0f,1.0f * z };
 				transformDatas_[i].worldMatrix = Matrix::MakeAffineMatrix(transformDatas_[i].transform.scale, transformDatas_[i].transform.rotate, transformDatas_[i].transform.position);
+				transformDatas_[i].color = { 1.0f,0.0f,0.0f,1.0f };
+			} else if (map[z][x] == TileType::Home) {
+				// 家
+				uint32_t i = n++;
+				transformDatas_[i].transform.position = { 1.0f * x,-1.0f,1.0f * z };
+				transformDatas_[i].worldMatrix = Matrix::MakeAffineMatrix(transformDatas_[i].transform.scale, transformDatas_[i].transform.rotate, transformDatas_[i].transform.position);
+				transformDatas_[i].color = { 1.0f,1.0f,0.0f,1.0f };
 			}
 		}
 	}

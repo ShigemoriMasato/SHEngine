@@ -1,8 +1,10 @@
 #pragma once
+#include"Collision/Collider.h"
+
 #include"OreItem.h"
 #include"OreObject.h"
 
-class GoldOre : public OreItem {
+class GoldOre : public OreItem,public Collider {
 public:
 
 	void Initialize(DrawData drawData, const Vector3& pos);
@@ -10,6 +12,10 @@ public:
 	void Update() override;
 
 	void Draw(Window* window, const Matrix4x4& vpMatrix) override;
+
+	void OnCollision(Collider* other) override {
+		other;
+	}
 
 public:
 
@@ -28,5 +34,5 @@ private:
 
 	int32_t hp_ = 0;
 
-	Vector3 size_ = {10.0f,10.0f,10.0f};
+	Vector3 size_ = {3.0f,3.0f,3.0f};
 };
