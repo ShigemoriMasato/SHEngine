@@ -94,6 +94,12 @@ void GameScene::Initialize() {
 	postEffectConfig_.window = gameWindow_->GetWindow();
 	postEffectConfig_.origin = display_;
 	postEffectConfig_.jobs_ = (uint32_t) PostEffectJob::Blur | PostEffectJob::Fade | PostEffectJob::Glitch;
+
+	//============================================================================
+	// ユニットシステム
+	//============================================================================
+	miniMap_ = std::make_unique<MiniMap>();
+	miniMap_->Initialize((int)mapChipField_->GetMapData()[0].size(), (int)mapChipField_->GetMapData().size(), textureManager_);
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
@@ -188,29 +194,39 @@ std::unique_ptr<IScene> GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	display_->PreDraw(gameWindow_->GetCommandObject(), true);
+	for (int i = 0; i < 2; ++i) {
+		Matrix4x4 vpMatrix{};
+		if (i == 0) {
+			vpMatrix = miniMap_->PreDraw(gameWindow_->GetWindow())->GetVPMatrix();
+		} else {
+			display_->PreDraw(gameWindow_->GetCommandObject(), true);
+			// カメラ行列
+			vpMatrix = cameraController_->GetVpMatrix();
+		}
 
-	// カメラ行列
-	Matrix4x4 vpMatrix = cameraController_->GetVpMatrix();
+		// マップを描画
+		mapChipRenderer_->Draw(gameWindow_->GetWindow(), vpMatrix);
 
-	// マップを描画
-	mapChipRenderer_->Draw(gameWindow_->GetWindow(), vpMatrix);
+		// 鉱石の描画
+		oreItemManager_->Draw(gameWindow_->GetWindow(), vpMatrix);
 
-	// 鉱石の描画
-	oreItemManager_->Draw(gameWindow_->GetWindow(), vpMatrix);
+		// ユニットを描画
+		unitManager_->Draw(gameWindow_->GetWindow(), vpMatrix);
 
-	// ユニットを描画
-	unitManager_->Draw(gameWindow_->GetWindow(), vpMatrix);
+		display_->PostDraw(gameWindow_->GetCommandObject());
 
-	display_->PostDraw(gameWindow_->GetCommandObject());
+		//PostEffectとか
+		postEffect_->Draw(postEffectConfig_);
 
-	//PostEffectとか
-	postEffect_->Draw(postEffectConfig_);
+		if (i == 0) {
+			miniMap_->PostDraw(gameWindow_->GetWindow());
+		} else {
+			gameWindow_->PreDraw();
+		}
+	}
 
-	gameWindow_->PreDraw();
-	
 	//ImGui
-
+	miniMap_->DrawImGui();
 	gameWindow_->DrawDisplayWithImGui();
 	paramManager_->Draw();
 

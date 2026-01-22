@@ -4,6 +4,7 @@
 #include <Common/DebugParam/ParamManager.h>
 #include <Render/PostEffect.h>
 #include <Collision/ColliderManager.h>
+#include <Game/MiniMap/MiniMap.h>
 
 #include"Unit/UnitManager.h"
 #include"Unit/MapChipField.h"
@@ -57,4 +58,7 @@ private:
 
 	// ユニット管理
 	std::unique_ptr<UnitManager> unitManager_;
+
+	//MiniMap
+	std::unique_ptr<MiniMap> miniMap_ = nullptr;
 };

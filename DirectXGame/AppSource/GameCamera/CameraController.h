@@ -30,7 +30,7 @@ private:
 
 	void MakeMatrix() override;
 
-	Vector3 backDir_ = { 0.0f,-0.4f,0.7f };
+	Vector3 backDir_ = { 0.0f,-0.84f,0.55f };
 	float backDist_ = 10.0f;
 
 	Input* input_ = nullptr;

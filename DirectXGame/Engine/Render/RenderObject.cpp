@@ -178,6 +178,8 @@ void RenderObject::Draw(Window* window) {
 
 	//描画コマンド
 	cmdList->DrawIndexedInstanced(indexNum_, instanceNum_, 0, 0, 0);
+
+	index_ = (index_ + 1) % 2;
 }
 
 void RenderObject::SetUseTexture(bool useTexture) {

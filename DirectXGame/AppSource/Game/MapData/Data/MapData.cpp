@@ -56,7 +56,7 @@ bool MapDataForBin::Verify() const {
 		valid = false;
 	}
 	if (tileData.size() != static_cast<size_t>(width * height)) {
-		assert(false && "MapDataForBin::Verify() failed: mapID is negative");
+		assert(false && "MapDataForBin::Verify() failed: mapSize is Defferent");
 		valid = false;
 	}
 	if (mapID < 0) {
