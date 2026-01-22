@@ -2,6 +2,7 @@
 #include <optional>
 #include<array>
 #include<functional>
+#include<numbers>
 
 #include"Collision/Collider.h"
 
@@ -86,6 +87,8 @@ private:
 	Vector3 homePos_ = {};
 	// プレイヤーの位置
 	Vector3* playerPos_ = nullptr;
+	// 回転する移動先
+	Vector3 toRotPos_ = {};
 
 	// 体力の計算に使用
 	float lifeTimer_ = 0.0f;
@@ -105,6 +108,9 @@ private:
 	Vector3 startMovePos;
 	Vector3 endMovePos;
 
+	// デバック用
+	std::string kGroupName_ = "OreUnit";
+
 private: // 調整項目
 
 	// ダメージを食らう間隔
@@ -114,7 +120,10 @@ private: // 調整項目
 	int32_t maxHp_ = 10;
 
 	// 移動速度
-	float speed_ = 5.0f;
+	float moveSpeed_ = 2.0f;
+
+	// 角度補間
+	float rotateSpeed_ = 3.0f;
 
 	// 採掘時間
 	float miningTime_ = 1.0f;
@@ -134,6 +143,9 @@ private:
 
 	// 移動
 	void Move();
+
+	// 進行方向に回転する
+	void Rotate();
 
 	// 行きの更新処理
 	void GoToUpdate();
@@ -158,3 +170,18 @@ private:
 	/// </summary>
 	void ApplyDebugParam();
 };
+
+// ヘルプ関数
+namespace {
+
+	// 最短角度を求める
+	float GetShortAngleY(float diffY) {
+		while (diffY > std::numbers::pi_v<float>) {
+			diffY -= std::numbers::pi_v<float> *2.0f;
+		}
+		while (diffY < -std::numbers::pi_v<float>) {
+			diffY += std::numbers::pi_v<float> *2.0f;
+		}
+		return diffY;
+	}
+}

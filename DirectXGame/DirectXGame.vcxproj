@@ -236,7 +236,6 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "$(ProjectDir)Scripts/Filter
     <ClCompile Include="Engine\Screen\Display\src\IDisplay.cpp" />
     <ClCompile Include="AppSource\Game\GameScene.cpp" />
     <ClCompile Include="Engine\Assets\Fonts\FontLoader.cpp" />
-    <ClCompile Include="AppSource\Item\GoldPlacement.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\SHEngine.cpp" />
     <ClCompile Include="Engine\Utility\src\Operator.cpp" />

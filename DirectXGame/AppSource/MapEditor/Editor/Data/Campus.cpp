@@ -173,7 +173,7 @@ void MapEditor::Campus::DrawImGui(MapDataForBin& data) {
 
 	mapSize = ImVec2(
 		float(4 * tileSize_),
-		float(float(TileType::Count) / 4.0f * tileSize_)
+		(float(float(TileType::Count) / 4.0f + 1.0f) * 36.f)
 	);
 
 	ImGui::InvisibleButton("Pallet", mapSize);
@@ -183,7 +183,7 @@ void MapEditor::Campus::DrawImGui(MapDataForBin& data) {
 	tileColorMap_[pencil_.type] = ImU32(ConvertColorForImGui(buffer));
 
 	ImGui::Separator();
-	ImGui::DragInt("TileSize", &tileSize_, 1.0f, 8, 128, "%.0f");
+	ImGui::DragInt("TileSize", &tileSize_, 1.0f, 8, 128);
 
 	if (ImGui::Button("Clear")) {
 		undoStack_.push_back(data.tileData);

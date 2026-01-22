@@ -1,7 +1,9 @@
 #include "MapData.h"
+#include <random>
 
-std::vector<std::vector<TileType>> MapDataForBin::GetDirectionGrid(const Direction& direction) const {
+std::vector<std::vector<TileType>> MapDataForBin::GetDirectionGrid(const Direction& direction, float goldFrequency) const {
 	std::vector<std::vector<TileType>> ans;
+	std::vector<std::pair<int, int>> goldPositions;
 	int index = 0;
 	switch (direction) {
 	case Direction::Front:
@@ -10,6 +12,9 @@ std::vector<std::vector<TileType>> MapDataForBin::GetDirectionGrid(const Directi
 			for (int x = 0; x < width; ++x) {
 				index = y * width + x;
 				ans[y][x] = tileData[index];
+				if (tileData[index] == TileType::Gold) {
+					goldPositions.emplace_back(x, y);
+				}
 			}
 		}
 		break;
@@ -20,6 +25,9 @@ std::vector<std::vector<TileType>> MapDataForBin::GetDirectionGrid(const Directi
 			for (int x = 0; x < height; ++x) {
 				index = width * (height - 1 - x) + y;
 				ans[y][x] = tileData[index];
+				if (tileData[index] == TileType::Gold) {
+					goldPositions.emplace_back(x, y);
+				}
 			}
 		}
 		break;
@@ -30,6 +38,9 @@ std::vector<std::vector<TileType>> MapDataForBin::GetDirectionGrid(const Directi
 			for (int x = 0; x < width; ++x) {
 				index = (height - 1 - y) * width + (width - 1 - x);
 				ans[y][x] = tileData[index];
+				if (tileData[index] == TileType::Gold) {
+					goldPositions.emplace_back(x, y);
+				}
 			}
 		}
 		break;
@@ -40,10 +51,23 @@ std::vector<std::vector<TileType>> MapDataForBin::GetDirectionGrid(const Directi
 			for (int x = 0; x < height; ++x) {
 				index = (width - 1 - y) + width * x;
 				ans[y][x] = tileData[index];
+				if (tileData[index] == TileType::Gold) {
+					goldPositions.emplace_back(x, y);
+				}
 			}
 		}
 		break;
 	}
+
+	//金の抽選
+	int goldNum = static_cast<int>(goldPositions.size() * goldFrequency);
+	std::shuffle(goldPositions.begin(), goldPositions.end(), std::mt19937(std::random_device()()));
+
+	for (int i = 0; i < goldNum; ++i) {
+		auto [x, y] = goldPositions[i];
+		ans[y][x] = TileType::Gold;
+	}
+
 	return ans;
 }
 

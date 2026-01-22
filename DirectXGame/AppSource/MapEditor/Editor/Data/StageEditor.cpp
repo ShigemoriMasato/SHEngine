@@ -60,7 +60,7 @@ void StageEditor::DrawImGui(const std::vector<MapDataForBin>& mapData, std::map<
 	StageData& editStage = stageData_[editStageID_];
 	ToggleInt("MapID", editStage.mapID, 0, 0, int(mapData.size() - 1));
 	ImGui::Combo("Direction", (int*)&editStage.direction, directionNames_.data(), (int)directionNames_.size());
-	ImGui::DragFloat("Gold Frequency", &editStage.goldFrequency, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("Gold Frequency", &editStage.goldFrequency, 0.01f, 0.0f, 1.0f);
 	ImGui::EndChild();
 
 	ImGui::SameLine();

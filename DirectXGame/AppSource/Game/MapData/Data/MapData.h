@@ -9,6 +9,7 @@ enum class TileType : int {
 	Road,
 	Wall,
 	Home,
+	Gold,
 
 	Count
 };
@@ -20,7 +21,7 @@ struct MapDataForBin {
 	int mapID = -1;
 	std::vector<TileType> tileData;
 
-	std::vector<std::vector<TileType>> GetDirectionGrid(const Direction& direction) const;
+	std::vector<std::vector<TileType>> GetDirectionGrid(const Direction& direction, float goldFrequency) const;
 
 	bool Verify() const;
 };

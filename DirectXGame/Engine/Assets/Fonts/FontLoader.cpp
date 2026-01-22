@@ -70,9 +70,7 @@ CharPosition FontLoader::GetCharPosition(const std::string& filePath, wchar_t ch
 		return fontData.charPositions[character];
 	}
 
-	logger_->error("FontLoader GetCharPosition Character Not Found: {} in {}", ConvertString(std::wstring(&character)), factPath.string());
-	assert(false);
-	return {};
+	return fontData.charPositions[L'□'];
 }
 
 FontLoader::FontData FontLoader::CreateFontBuffer(const std::string& filePath, int fontSize) {
@@ -154,6 +152,9 @@ FontLoader::FontData FontLoader::CreateFontBuffer(const std::string& filePath, i
 		dest_x += bitmap.width + 2;
 	}
 
+	logger_->info("LastUsedIndex: {}", data.lastUsedIndex);
+	logger_->info("leftHeight: {}", atlas_height_ - dest_y);
+
 	return data;
 }
 
@@ -173,6 +174,10 @@ void FontLoader::LoadResponseText() {
 
 	std::wstring wLine = ConvertString(line);
 	text_ = std::vector<wchar_t>(wLine.begin(), wLine.end());
+
+	//重複削除
+	std::sort(text_.begin(), text_.end());
+	text_.erase(std::unique(text_.begin(), text_.end()), text_.end());
 }
 
 std::string FontLoader::FilePathChecker(const std::string& filePath) {

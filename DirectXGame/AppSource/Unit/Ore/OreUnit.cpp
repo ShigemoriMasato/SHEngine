@@ -36,6 +36,7 @@ OreUnit::OreUnit(MapChipField* mapChipField, DrawData drawData, Vector3* playerP
 		[this]() {
 			returnPhase_ = ReturnPhase::Rise;
 			timer_ = 0.0f;
+			toRotPos_ = homePos_;
 		}
 	};
 
@@ -209,6 +210,9 @@ void OreUnit::GoToUpdate() {
 
 	// 鉱石まで移動する
 	Move();
+
+	// 進行方向に回転
+	Rotate();
 }
 
 void OreUnit::MiningUpdate() {
@@ -252,6 +256,9 @@ void OreUnit::ToDeliverUpdate() {
 
 	// 移動する
 	Move();
+
+	// 進行方向に回転
+	Rotate();
 }
 
 void OreUnit::ReturnUpdate() {
@@ -264,6 +271,9 @@ void OreUnit::ReturnUpdate() {
 
 		// 移動
 		object_->transform_.position.y = lerp(0.0f, risePosY_, timer_, EaseType::EaseInOutQuad);
+
+		// 回転移動
+		Rotate();
 
 		// 終了
 		if (timer_ >= 1.0f) {
@@ -357,20 +367,57 @@ void OreUnit::Move() {
 	} else {
 		// 目的地に向かって移動
 		// 正規化（長さを1にする）して速度を掛ける
-		Vector3 velocity = (toTarget / distance) * speed_;
+		Vector3 velocity = (toTarget / distance) * moveSpeed_;
 		object_->transform_.position += velocity * FpsCount::deltaTime;
 
 		// 進行方向を向かせる（Y軸回転）
-		if (distance > 0.001f) {
-			object_->transform_.rotate.y = std::atan2(velocity.x, velocity.z);
-		}
+		//if (distance > 0.001f) {
+		//	object_->transform_.rotate.y = std::atan2(velocity.x, velocity.z);
+		//}
 	}
 }
 
-void OreUnit::RegisterDebugParam() {
+void OreUnit::Rotate() {
+	// 回転処理
+	if (!path_.empty()) {
+		toRotPos_ = path_.front();
+	}
+	Vector3 nextTarget = toRotPos_;
+	Vector3 toTarget = nextTarget - object_->transform_.position;
+	toTarget.y = 0.0f;
+	toTarget.Normalize();
 
+	Vector3 targetRot = { 0, 0, 0 };
+	// Y軸回転を取得
+	targetRot.y = atan2f(toTarget.x, toTarget.z);
+	Vector3 currentRot = object_->transform_.rotate;
+
+	// 最短距離の角度を取得
+	float diffY = GetShortAngleY(targetRot.y - currentRot.y);
+
+	// 回転
+	currentRot.y += diffY * rotateSpeed_ * FpsCount::deltaTime;
+	object_->transform_.rotate = currentRot;
+}
+
+void OreUnit::RegisterDebugParam() {
+	// 登録
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "MoveSpeed", moveSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "RotateSpeed", rotateSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "MaxHp", maxHp_);	
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "RiseHeight", risePosY_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "RiseTime", riseTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "MoveTime", moveTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "FallTime", FallTime_);
 }
 
 void OreUnit::ApplyDebugParam() {
-
+	// 適応
+	moveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "MoveSpeed");
+	rotateSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RotateSpeed");
+	maxHp_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupName_, "MaxHp");
+	risePosY_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RiseHeight");
+	riseTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RiseTime");
+	moveTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "MoveTime");
+	FallTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "FallTime");
 }

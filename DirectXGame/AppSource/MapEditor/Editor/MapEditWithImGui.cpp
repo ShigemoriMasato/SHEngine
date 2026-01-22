@@ -27,17 +27,23 @@ void EditConfig::DrawImGui(MapDataForBin& mapData) {
 	if (ImGui::Button("Load")) {
 		mapData.modelFilePath = modelFilePathBuffer_;
 	}
-	
+
 	int prevWidth = mapData.width;
-	if (ImGui::DragInt("MapSize", &mapData.width, 1.0f, 0, 1024)) {
-		for (int i = prevWidth - 1; i < prevWidth * mapData.height; i += prevWidth) {
-			mapData.tileData.insert(mapData.tileData.begin() + i + (mapData.width - prevWidth) * (i / prevWidth),TileType::Air);
+	if (ImGui::DragInt("Width", &mapData.width, 1.0f, 1, 1024)) {
+		int dif = mapData.width - prevWidth;
+		if (dif > 0) {
+			for (int i = prevWidth; i < mapData.width * mapData.height; i += mapData.width) {
+				mapData.tileData.insert(mapData.tileData.begin() + i, dif, TileType::Home);
+			}
+		} else {
+			dif *= -1;
+			for (int i = mapData.width; i < mapData.width * mapData.height + 1; i += mapData.width) {
+				mapData.tileData.erase(mapData.tileData.begin() + i, mapData.tileData.begin() + i + dif);
+			}
 		}
 	}
 
-	ImGui::SameLine();
-
-	if (ImGui::DragInt("/", &mapData.height, 1.0f, 0, 1024)) {
+	if (ImGui::DragInt("Height", &mapData.height, 1.0f, 1, 1024)) {
 		mapData.tileData.resize(mapData.width * mapData.height, TileType::Air);
 	}
 
