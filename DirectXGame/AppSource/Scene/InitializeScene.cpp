@@ -37,13 +37,6 @@ std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
 	commonData_->cmdObject->ResetCommandList();
 
-	ImGui::Begin("Test");
-	ImGui::Text("InitializeScene");
-
-	ImGui::Image(ImTextureRef(commonData_->display->GetTextureData()->GetGPUHandle().ptr), { 640, 360 });
-
-	ImGui::End();
-
 	return nullptr;
 }
 

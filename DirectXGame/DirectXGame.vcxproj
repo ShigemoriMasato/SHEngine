@@ -203,7 +203,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\Screen\SwapChain.cpp" />
     <ClCompile Include="Engine\SHEngine.cpp" />
     <ClCompile Include="AppSource\Core\Terminal.cpp" />
-    <ClCompile Include="AppSource\Game\GameScene.cpp" />
     <ClCompile Include="AppSource\Scene\InitializeScene.cpp" />
     <ClCompile Include="AppSource\Scene\SceneManager.cpp" />
     <ClInclude Include="AppSource\Scene\CommonData.h" />
@@ -237,7 +236,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\Screen\SwapChain.h" />
     <ClInclude Include="Engine\SHEngine.h" />
     <ClInclude Include="AppSource\Core\Terminal.h" />
-    <ClInclude Include="AppSource\Game\GameScene.h" />
     <ClInclude Include="AppSource\Scene\InitializeScene.h" />
     <ClInclude Include="AppSource\Scene\IScene.h" />
     <ClInclude Include="AppSource\Scene\SceneManager.h" />
