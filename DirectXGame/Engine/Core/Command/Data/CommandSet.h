@@ -5,9 +5,11 @@ namespace SHEngine::Command {
 
 	enum class Type {
 		Direct,
-		Texture,
+		Texture = Direct,
 		Compute
 	};
+
+	class Queue;
 
 	class DXList {
 	public:
@@ -21,11 +23,11 @@ namespace SHEngine::Command {
 		bool CanExecute();
 		/// @brief コマンドを積めるようになるまで待機する
 		void WaitForCanExecute();
+		/// @brief コマンドを実行できる状態にして渡す
+		void Execute(Queue* queue, std::vector<ID3D12CommandList*>& cmdLists);
 
 		/// @brief コマンドリストを取得
 		ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
-
-		void SendSignal(ID3D12CommandQueue* commandQueue);
 
 		void ResetCommandList();
 
@@ -35,11 +37,6 @@ namespace SHEngine::Command {
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
 
-		/// @brief 現在のフェンス値
-		UINT64 fenceValue_ = 0;
-		/// @brief フェンスオブジェクト
-		Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
-		/// @brief フェンスイベントハンドル
-		HANDLE fenceEvent_ = nullptr;
+		std::vector<std::pair<Queue*, uint64_t>> executed_;		//実行中のキューとフェンス。実行できるかのチェック用
 	};
 }

@@ -34,7 +34,6 @@ struct Vector3 final {
 	float z;
 	Vector3() :x(0.0f), y(0.0f), z(0.0f) {}
 	Vector3(float x_, float y_, float z_) :x(x_), y(y_), z(z_) {}
-	Vector3(const Vector2& v, float z = 0.0f);
 
 	float Length() const {
 		return sqrtf(x * x + y * y + z * z);
@@ -79,12 +78,6 @@ struct Vector4 final {
 		return *(&x + i);
 	}
 };
-
-inline Vector3::Vector3(const Vector2& v, float z) {
-	x = v.x;
-	y = v.y;
-	z = z;
-}
 
 inline Vector2::Vector2(const Vector3& v) {
 	x = v.x;

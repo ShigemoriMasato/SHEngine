@@ -47,4 +47,6 @@ private:
 	/// @brief 登録されている全てのコライダーのリスト
 	std::vector<Collider*> colliders_;
 
+	int nextID_ = 0;
+
 };

@@ -2,6 +2,9 @@
 #include <Tool/Dump/CreateDump.h>
 #include <Render/Screen/IDisplay.h>
 #include <Render/RenderObject.h>
+#include <Compute/ComputeObject.h>
+#include <Render/Font/Text.h>
+#include <Render/Renderer.h>
 
 #pragma comment(lib, "Dbghelp.lib")
 
@@ -46,14 +49,26 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	input_ = std::make_unique<Input>();
 	input_->Initialize(hInstance);
 
+	psoEditor_ = std::make_unique<PSO::Editor>();
+	psoEditor_->Initialize(device_.get());
+
+	csPsoManager_ = std::make_unique<PSO::CSPSOManager>();
+	csPsoManager_->Initialize(device_.get());
+
 	Screen::IDisplay::SetDevice(device_.get());
-	RenderObject::StaticInitialize(device_.get());
+	RenderObject::StaticInitialize(device_.get(), psoEditor_.get());
+	Renderer::SetPSOEditor(psoEditor_.get(), device_->GetSRVManager()->GetStartPtr());
+	GPUBuffer::SetDevice(device_.get());
+	Text::SetFontLoader(fontLoader_.get());
+	ComputeObject::StaticInitialize(csPsoManager_.get());
+
+	fpsObserver_ = std::make_unique<FPSObserver>();
 
 	hInstance_ = hInstance;
 }
 
 bool Engine::IsLoop() {
-	if (PeekMessage(&msg_, nullptr, 0, 0, PM_REMOVE)) {
+	while (PeekMessage(&msg_, nullptr, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg_);
 		DispatchMessage(&msg_);
 	}
@@ -62,17 +77,20 @@ bool Engine::IsLoop() {
 
 void Engine::BeginFrame() {
 	input_->Update();
+	fpsObserver_->TimeAdjustment();
 	if (imGuiWrapper_) {
 		imGuiWrapper_->NewFrame();
+		imguiDrawed_ = false;
 	}
 }
 
 void Engine::PostDraw() {
-	cmdManager_->Execute(Command::Type::Direct);
-}
 
-void Engine::EndFrame() {
-	cmdManager_->SendSignal(Command::Type::Direct);
+	if (!imguiDrawed_) {
+		imGuiWrapper_->EndFrame();
+		imguiDrawed_ = true;
+	}
+
 }
 
 std::unique_ptr<Screen::SwapChain> SHEngine::Engine::MakeWindow(Screen::WindowsAPI* windowsApi, uint32_t clearColor) {

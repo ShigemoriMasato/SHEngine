@@ -30,7 +30,7 @@ namespace SHEngine::Screen {
 		bool IsCloseButtonPushed() const { return isPushCloseButton_; }
 
 		HWND GetHwnd() const { return hwnd_; }
-		std::pair<int, int> GetWindowSize() const { return { desc_.width, desc_.height }; }
+		std::pair<int, int> GetWindowSize() const { return { width_, height_ }; }
 
 	private:
 
@@ -39,6 +39,9 @@ namespace SHEngine::Screen {
 
 		WindowDesc desc_;		///< ウィンドウの説明
 		Logger logger_;			///< ロガー
+
+		int width_ = 0;			///< ウィンドウの幅
+		int height_ = 0;		///< ウィンドウの高さ
 
 		bool isPushCloseButton_ = false;	///< ウィンドウのクローズボタンが押されたかどうか
 	};

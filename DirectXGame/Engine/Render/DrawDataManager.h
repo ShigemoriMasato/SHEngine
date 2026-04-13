@@ -81,7 +81,7 @@ namespace SHEngine {
 		std::vector<std::pair<DrawData, MapDataForBin>> drawDataList_;
 
 		/**
-		 * @struct Resource
+		 * @struct GPUBuffer
 		 * @brief リソースラッパー
 		 */
 		struct Resource {

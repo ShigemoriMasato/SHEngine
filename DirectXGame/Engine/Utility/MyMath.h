@@ -21,8 +21,10 @@ namespace MyMath {
 	float Length(const Vector3& vec);
 
 	std::vector<Vector3> GetSplinePoints(const std::vector<Vector3>& controlPoints, int segment);
+	std::vector<Vector2> GetSplinePoints(const std::vector<Vector2>& controlPoints, int segment);
 	std::vector<Vector3> GetCatmullPoints(const std::vector<Vector3>& points, int segmentsPerCurve);
 	Vector3 GetCatmullPoint(const std::vector<Vector3>& points, float t);
+	Vector2 GetSplinePoint(const std::vector<Vector2>& controlPoints, float t);
 	float CalculateAngle(const Vector3& a, const Vector3& b);
 
 }

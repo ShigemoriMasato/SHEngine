@@ -26,13 +26,13 @@ StructuredBuffer<Well> matrices : register(t0);
 StructuredBuffer<Vertex> vertices : register(t1);
 StructuredBuffer<VertexInfluence> influences : register(t2);
 StructuredBuffer<Vertex> output : register(u0);
-ConstantBuffer<SkinningInformation> skinninfInfo : register(b0);
+ConstantBuffer<SkinningInformation> skinningInfo : register(b0);
 
 [numthreads(1024, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint vertexIndex = DTid.x;
-    if (vertexIndex >= skinninfInfo.numVertices)
+    if (vertexIndex >= skinningInfo.numVertices)
     {
         //必要なデータの抽出
         Vertex input = vertices[vertexIndex];

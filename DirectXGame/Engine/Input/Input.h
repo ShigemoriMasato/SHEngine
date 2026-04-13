@@ -47,14 +47,6 @@ namespace SHEngine {
 		~Input() = default;
 
 		/**
-		 * @brief ウィンドウハンドルを設定
-		 * @param hwnd ウィンドウハンドル
-		 */
-		void SetHWND(HWND hwnd) {
-			hwnd_ = hwnd;
-		}
-
-		/**
 		 * @brief ウィンドウを設定
 		 * @param hwnd ウィンドウハンドル
 		 */
@@ -86,6 +78,10 @@ namespace SHEngine {
 		/// @brief マウスの移動量を取得
 		/// @return マウス移動量
 		Vector2 GetMouseMove();
+
+		/// @brief マウスの現在位置を取得
+		/// @return マウス位置
+		Vector2 GetCursorPos();
 
 		/// @brief マウスホイールの回転量を取得
 		/// @return ホイール回転量
@@ -148,6 +144,8 @@ namespace SHEngine {
 		DIMOUSESTATE preMouseState;
 		/// @brief 現在のマウス状態
 		DIMOUSESTATE mouseState;
+		/// @brief マウスの現在位置
+		Vector2 mousePos_;
 
 		/// @brief 初期化済みフラグ（static関数使用の為に必要）
 		bool isInitialized_;

@@ -5,6 +5,7 @@
 using namespace SHEngine;
 
 DXDevice* RenderObject::device_ = nullptr;
+PSO::Editor* RenderObject::psoEditor_ = nullptr;
 Logger RenderObject::logger_ = getLogger("Engine");
 
 RenderObject::RenderObject(std::string debugName) {
@@ -16,14 +17,19 @@ RenderObject::~RenderObject() {
 	logger_->debug("RenderObject Destroyed: {}", debugName_);
 }
 
-void RenderObject::StaticInitialize(DXDevice* device) {
+void RenderObject::StaticInitialize(DXDevice* device, PSO::Editor* psoEditor) {
 	device_ = device;
+	psoEditor_ = psoEditor;
 }
 
 void RenderObject::Initialize() {
 	logger_->debug("RenderObject Initialized: {}", debugName_);
 	index_ = 0;
 	psoConfig_ = PSO::Config{};
+	resources_.clear();
+	bufferDatas_.clear();
+	cbvAddresses_.clear();
+	srvHandles_.clear();
 }
 
 void RenderObject::SetDrawData(const DrawData& data) {
@@ -159,7 +165,7 @@ void RenderObject::Draw(Command::Object* cmdObject) {
 	auto cmdList = cmdObject->GetCommandList();
 
 	//パイプラインステートの設定
-	device_->SetPSO(cmdList, psoConfig_);
+	psoEditor_->SetPSO(cmdList, psoConfig_);
 
 	//頂点バッファの設定
 	cmdList->IASetVertexBuffers(0, UINT(vbv_.size()), vbv_.data());

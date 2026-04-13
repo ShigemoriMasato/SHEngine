@@ -9,6 +9,18 @@
  * @brief 透視投影の設定パラメータ
  */
 struct PerspectiveFovDesc {
+	/// @brief 設定をまとめて行う関数
+	/// @param width 画面の幅
+	/// @param height 画面の高さ
+	/// @param fovY 視野角Y（ラジアン）
+	/// @param nearClip 表示する一番近いZ値
+	/// @param farClip 表示する一番遠いZ値
+	void SetValue(float width = 1280, float height = 720, float fovY = 0.45f, float nearClip = 0.1f, float farClip = 1000.0f) {
+		this->fovY = fovY;
+		this->aspectRatio = width / height;
+		this->nearClip = nearClip;
+		this->farClip = farClip;
+	}
 	/// @brief 視野角Y（ラジアン）
 	float fovY = 0.45f;
 	/// @brief アスペクト比
@@ -24,6 +36,15 @@ struct PerspectiveFovDesc {
  * @brief 正射影投影の設定パラメータ
  */
 struct OrthographicDesc {
+	OrthographicDesc SetValue(float width = 1280, float height = 720, float zeroPointX = 0.0f, float zeroPointY = 0.0f, float nearClip = 0.0f, float farClip = 1000.0f) {
+		this->left = -zeroPointX;
+		this->top = -zeroPointY;
+		this->right = -zeroPointX + width;
+		this->bottom = -zeroPointY + height;
+		this->nearClip = nearClip;
+		this->farClip = farClip;
+		return *this;
+	}
 	/// @brief 左端
 	float left = -0.0f;
 	/// @brief 上端
@@ -56,9 +77,12 @@ public:
 
 	//TransformとProjectionMatrixをかけて、VPMatrixを作成する
 	virtual void MakeMatrix();
-	void DrawImGui();
+	virtual void DrawImGui();
 
 	void SetTransform(Matrix4x4 mat);
+	void SetScale(Vector3 scale) { scale_ = scale; }
+	void SetRotation(Vector3 rotation) { rotation_ = rotation; }
+	void SetPosition(Vector3 position) { position_ = position; }
 
 	//VPMatrixを取得
 	virtual Matrix4x4 GetVPMatrix() const;

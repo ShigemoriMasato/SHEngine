@@ -17,8 +17,10 @@ enum class CollTag : uint32_t {
 	Player = 1 << 0,   ///< プレイヤー
 	Enemy = 1 << 1,    ///< 敵
 	Item = 1 << 2,     ///< アイテム
-	Stage = 1 << 3,    ///< ステージ
-	Unit = 1 << 4      ///< ユニット
+	Slot = 1 << 3,     ///< バックパックの秋スロット
+	Chip = 1 << 4,     ///< Pieceのチップ
+	Cursor = 1 << 5,   ///< カーソル
+	Attack = 1 << 6,   ///< 攻撃オブジェクト
 };
 
 /**
@@ -40,6 +42,18 @@ uint32_t operator|(uint32_t a, CollTag b);
 uint32_t operator&(uint32_t a, CollTag b);
 
 /**
+ * @brief CollTagとuint32_tのビットAND演算子
+ * @return ビットANDの結果
+ */
+uint32_t operator&(CollTag a, uint32_t b);
+
+/**
+ * @brief CollTagのビットAND演算子
+ * @return ビットANDの結果
+ */
+uint32_t operator&(CollTag a, CollTag b);
+
+/**
  * @brief CollTagのビットNOT演算子
  * @return ビットNOTの結果
  */
@@ -54,8 +68,8 @@ uint32_t operator~(CollTag a);
 struct CollConfig {
 	CollTag ownTag = CollTag::None;                 ///< 自身のタグ
 	uint32_t targetTag = 0;                          ///< 衝突対象のタグ(ビットマスク)
-	std::variant<Circle*, Quad*> colliderInfo;      ///< コライダーの形状情報(円または矩形)
-	bool isActive = false;                           ///< 有効/無効フラグ
+	std::variant<Circle*, Quad*, DirCircle*> colliderInfo;      ///< コライダーの形状情報(円または矩形)
+	bool isActive = true;                           ///< 有効/無効フラグ
 };
 
 class Collider {
@@ -81,10 +95,15 @@ public:
 	 * 
 	 * @param other 衝突相手のCollider
 	 */
-	virtual void OnCollision(Collider* other) = 0;
+	virtual void OnCollision(Collider* other) {};
+
+	virtual void NonCollision(Collider* other) {};
 
 	// 自分のタグ
 	virtual CollTag GetOwnTag() { return ownTag_; }
+
+	/// @brief コライダーの有効状態を取得
+	int GetID() const { return id_; }
 
 protected:
 
@@ -121,7 +140,7 @@ private:
 	friend class ColliderManager;
 
 	/// @brief コライダーの形状情報(円または矩形)
-	std::variant<Circle*, Quad*> colliderInfo_;
+	std::variant<Circle*, Quad*, DirCircle*> colliderInfo_;
 	/// @brief 自身のタグ
 	CollTag ownTag_ = CollTag::None;
 	/// @brief 衝突対象のタグ(ビットマスク)

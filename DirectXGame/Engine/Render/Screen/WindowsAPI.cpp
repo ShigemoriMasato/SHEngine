@@ -56,6 +56,8 @@ void SHEngine::Screen::WindowsAPI::Initialize(WindowDesc& desc, HINSTANCE hInsta
 	windowMap[hwnd_] = this;
 
 	desc_ = desc;
+	width_ = desc.width;
+	height_ = desc.height;
 
 	ShowWindow(hwnd_, SW_SHOW);
 }
@@ -64,6 +66,12 @@ LRESULT CALLBACK SHEngine::Screen::WindowsAPI::WindowProc(HWND hwnd, UINT msg, W
 
 	auto it = windowMap.find(hwnd);
 	if (it != windowMap.end()) {
+		
+		RECT rc;
+		GetClientRect(hwnd, &rc);
+
+		it->second->width_ = rc.right - rc.left;
+		it->second->height_ = rc.bottom - rc.top;
 
 		if (msg == WM_DESTROY) {
 			it->second->logger_->info("Window is pushed Close Button.");

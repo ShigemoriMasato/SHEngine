@@ -19,21 +19,32 @@ std::vector<std::string> SearchFiles(const fs::path& directory, const std::strin
     return contents;
 }
 
-std::vector<std::string> SearchFileNames(const fs::path& directory) {
+std::vector<std::string> SearchDirectoryNames(const fs::path& directory) {
     std::vector<std::string> contents;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
         return {};
     }
 
-    for (const auto& entry : fs::directory_iterator(directory)) {
+    for (const auto& entry : fs::recursive_directory_iterator(directory)) {
         if (entry.is_directory()) {
-            contents.push_back(entry.path().filename().generic_string());
+            // このディレクトリが子ディレクトリを持たない場合のみ追加（末端ディレクトリ）
+            bool hasChildDir = false;
+            for (const auto& child : fs::directory_iterator(entry.path())) {
+                if (child.is_directory()) {
+                    hasChildDir = true;
+                    break;
+                }
+            }
+
+            if (!hasChildDir) {
+                fs::path relativePath = entry.path().lexically_relative(directory);
+                contents.push_back(relativePath.generic_string());
+            }
         }
     }
 
     return contents;
-
 }
 
 std::vector<std::string> SearchFilePathsAddChild(const fs::path& directory, const std::string& extension) {
@@ -45,6 +56,23 @@ std::vector<std::string> SearchFilePathsAddChild(const fs::path& directory, cons
 
     for (const auto& entry : fs::recursive_directory_iterator(directory)) {
         if (entry.is_regular_file() && (entry.path().extension() == extension || extension.empty())) {
+            fs::path relativePath = entry.path().lexically_relative(directory);
+            result.push_back(relativePath.generic_string());
+        }
+    }
+
+    return result;
+}
+
+std::vector<std::string> SearchDirectoryPathsAddChild(const fs::path& directory) {
+    std::vector<std::string> result;
+
+    if (!fs::exists(directory) || !fs::is_directory(directory)) {
+        return {};
+    }
+
+    for (const auto& entry : fs::recursive_directory_iterator(directory)) {
+        if (entry.is_directory()) {
             fs::path relativePath = entry.path().lexically_relative(directory);
             result.push_back(relativePath.generic_string());
         }

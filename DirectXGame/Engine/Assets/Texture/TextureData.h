@@ -32,6 +32,8 @@ namespace SHEngine {
 		//Window用のテクスチャを作成
 		void Create(uint32_t width, uint32_t height, Vector4 clearColor, ID3D12Device* device, SRVManager* srvManager);
 		//SwapChain用のテクスチャを作成
+		void Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager, uint32_t clearColor);
+		//Depth用のテクスチャを作成
 		void Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager);
 		//ビットマップテクスチャを作成
 		Microsoft::WRL::ComPtr<ID3D12Resource> Create(uint32_t width, uint32_t height, std::vector<uint32_t> colorMap, ID3D12Device* device, SRVManager* srvManager, ID3D12GraphicsCommandList* cmdList);

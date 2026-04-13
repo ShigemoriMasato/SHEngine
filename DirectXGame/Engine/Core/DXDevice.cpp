@@ -1,9 +1,12 @@
 #include "DXDevice.h"
 #include <Utility/ConvertString.h>
+#include <format>
+#include <Utility/ConvertString.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "dxcompiler.lib")
 
 using namespace SHEngine;
 
@@ -92,7 +95,7 @@ void DXDevice::Initialize() {
     uint32_t descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	//各種DescriptorHeapManagerの生成
-    srvManager_ = std::make_unique<SRVManager>(device_.Get(), descriptorSizeSRV, 2048);
+    srvManager_ = std::make_unique<SRVManager>(device_.Get(), descriptorSizeSRV, 4096);
     rtvManager_ =  std::make_unique<RTVManager>(device_.Get(), descriptorSizeRTV_, 128);
     dsvManager_ =  std::make_unique<DSVManager>(device_.Get(), descriptorSizeDSV, 128);
 	logger_->info("Complete create DescriptorHeapManagers");
@@ -129,10 +132,74 @@ void DXDevice::Initialize() {
 
 #endif
 
-	psoEditor_ = std::make_unique<PSO::Editor>(device_.Get());
-	psoEditor_->Initialize(device_.Get());
+    //dxcCompilerを初期化
+    hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
+    assert(SUCCEEDED(hr));
+    hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
+    assert(SUCCEEDED(hr));
+
+    //includeに対応するための設定を行っておく
+    hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
+    assert(SUCCEEDED(hr));
+
 }
 
-void DXDevice::SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config) {
-	psoEditor_->SetPSO(commandList, config);
+IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderType shaderType) {
+	std::wstring profile = compileProfiles_[shaderType];
+	std::wstring wFilePath = ConvertString(filePath);
+    logger_->info("Begin CompileShader, path: {}", filePath);
+
+    //hlslファイルを読む
+    IDxcBlobEncoding* shaderSource = nullptr;
+    HRESULT hr = dxcUtils_->LoadFile(wFilePath.c_str(), nullptr, &shaderSource);
+    //読めなかったら止める
+    assert(SUCCEEDED(hr));
+    //読み込んだファイルの内容を設定する
+    DxcBuffer shaderSourceBuffer;
+    shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+    shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+    shaderSourceBuffer.Encoding = DXC_CP_UTF8;//utf8の文字コードであることを通知
+
+    LPCWSTR arguments[] = {
+        wFilePath.c_str(),	//コンパイル対象のhlslファイル名
+        L"-E", L"main",     //エントリーポイントの指定。基本的にmain以外にはしない
+        L"-T", profile.c_str(),    //ShaderProfileの設定
+        L"-Zi", L"-Qembed_debug", //デバッグ用の情報を埋め込む
+        L"-Od",     //最適化を行わない
+        L"-Zpr",     //メモリレイアウトは行優先
+    };
+    //実際にShaderをコンパイルする
+    IDxcResult* shaderResult = nullptr;
+    hr = dxcCompiler_->Compile(
+        &shaderSourceBuffer,	//読み込んだファイル
+        arguments,			    //コンパイルオプション
+        _countof(arguments),	//コンパイルオプションの数
+        includeHandler_.Get(),		    //includeが含まれた諸々
+        IID_PPV_ARGS(&shaderResult)		//コンパイル結果
+    );
+    //コンパイルエラーではなくdxcが起動できないなどの致命的な状況
+    assert(SUCCEEDED(hr));
+
+    //警告・エラーが出てたらログに出して止める
+    IDxcBlobUtf8* shaderError = nullptr;
+    shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+    if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+        logger_->error(shaderError->GetStringPointer());
+        //警告・エラーが起きている状態なので止める
+        assert(false);
+    }
+
+    //コンパイル結果から実行用のバイナリ部分を取得
+    IDxcBlob* shaderBlob = nullptr;
+    hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+    assert(SUCCEEDED(hr));
+    //成功したログを出す
+    logger_->info("Compile Successd, path: {}", filePath);
+
+    //もう使わないリソースを開放
+    shaderSource->Release();
+    shaderResult->Release();
+
+    //実行用のバイナリを返却
+    return shaderBlob;
 }

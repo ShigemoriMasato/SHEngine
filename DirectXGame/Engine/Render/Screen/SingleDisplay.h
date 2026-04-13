@@ -25,17 +25,19 @@ namespace SHEngine::Screen {
 		void ToTexture(Command::Object* cmdObject) override;
 
 		TextureData* GetTextureData() const override { return textureData_; }
+		TextureData* GetDepthTexture() const override { return depthTextureData_; }
 
-		DXGI_FORMAT D3D12GetRTVFormat() override { return rtvFormat_; }
+		DXGI_FORMAT GetRTVFormat() override { return rtvFormat_; }
 
 	private:
 
-		void PrivateInitialize();
+		void PrivateInitialize(SHEngine::TextureManager* textureManager);
 
 		void TransitionBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after);
+		void TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after);
 
 		TextureData* textureData_ = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
+		TextureData* depthTextureData_ = nullptr;
 
 		RTVHandle rtvHandle_{};
 		DSVHandle dsvHandle_{};
@@ -43,10 +45,12 @@ namespace SHEngine::Screen {
 		DXGI_FORMAT rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
 		D3D12_RESOURCE_STATES currentBarrier_ = D3D12_RESOURCE_STATE_COMMON;
+		D3D12_RESOURCE_STATES currentDepthBarrier_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
 		int width_ = 0;
 		int height_ = 0;
 
+		bool isOffScreen_ = false;
 	};
 
 }

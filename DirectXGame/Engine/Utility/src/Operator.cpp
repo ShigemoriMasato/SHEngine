@@ -104,6 +104,10 @@ bool operator!=(const Vector2& a, const Vector2& b) {
 	return !(a == b);
 }
 
+Vector2 operator-(const Vector2& a) {
+	return Vector2(-a.x, -a.y);
+}
+
 Vector3 operator+(const Vector3& a, const Vector3& b) {
 	return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 }

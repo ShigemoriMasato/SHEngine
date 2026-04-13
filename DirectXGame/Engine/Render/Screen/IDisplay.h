@@ -20,13 +20,21 @@ namespace SHEngine::Screen {
 		/// @param cmdObject コマンドオブジェト
 		virtual void PostDraw(Command::Object* cmdObject) = 0;
 
-		/// @brief 描画結果をテクスチャにコピーする
+		/// @brief バリアをピクセルシェーダーで使用できるようにする
 		/// @param cmdObject コマンドオブジェクト
 		virtual void ToTexture(Command::Object* cmdObject) = 0;
 
+		/// @brief テクスチャ情報を取得する
 		virtual TextureData* GetTextureData() const = 0;
 
-		virtual DXGI_FORMAT D3D12GetRTVFormat() = 0;
+		/// @brief 深度テクスチャ情報を取得する
+		virtual TextureData* GetDepthTexture() const = 0;
+
+		/// @brief RTVのフォーマットを取得する
+		virtual DXGI_FORMAT GetRTVFormat() = 0;
+
+		// @brief RTVの数を取得する
+		virtual int GetRTVNum() { return 1; };
 
 	protected:
 

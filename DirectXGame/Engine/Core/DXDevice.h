@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <d3d12.h>
 #include <dxgi1_6.h>
+#include <dxcapi.h>
 #include <Tool/Logger/Logger.h>
 
 #include <wrl.h>
@@ -10,7 +11,17 @@
 #include "View/RTVManager.h"
 #include "View/DSVManager.h"
 
-#include <Render/PSO/PSOEditor.h>
+/**
+ * @enum ShaderType
+ * @brief シェーダーの種類
+ */
+enum class ShaderType {
+	VERTEX_SHADER,  ///< 頂点シェーダー
+	PIXEL_SHADER,   ///< ピクセルシェーダー
+	COMPUTE_SHADER, ///< コンピュートシェーダー
+
+	Count           ///< シェーダータイプの総数
+};
 
 namespace SHEngine {
 
@@ -59,12 +70,7 @@ namespace SHEngine {
 		/// @return DSVManager*
 		DSVManager* GetDSVManager() { return dsvManager_.get(); }
 
-		/**
-		 * @brief パイプラインステートオブジェクト（PSO）を設定する
-		 * @param commandList コマンドリスト
-		 * @param config PSO設定
-		 */
-		void SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config);
+		IDxcBlob* CompileShader(const std::string& filePath, ShaderType shaderType);
 
 	private:
 
@@ -84,13 +90,23 @@ namespace SHEngine {
 		/// @brief DSVディスクリプタヒープマネージャー
 		std::unique_ptr<DSVManager> dsvManager_;
 
-		/// @brief パイプラインステートエディタ
-		std::unique_ptr<PSO::Editor> psoEditor_;
-
 	private:
 
 		/// @brief ロガー
 		Logger logger_;
+
+	private:
+
+		//コンパイル関係
+		Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_ = nullptr;
+		Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
+		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_ = nullptr;
+
+		std::map<ShaderType, std::wstring> compileProfiles_ = {
+			{ShaderType::VERTEX_SHADER, L"vs_6_0"},
+			{ShaderType::PIXEL_SHADER, L"ps_6_0"},
+			{ShaderType::COMPUTE_SHADER, L"cs_6_0"}
+		};
 
 	};
 

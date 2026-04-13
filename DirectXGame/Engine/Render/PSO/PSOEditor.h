@@ -17,7 +17,7 @@ namespace SHEngine::PSO {
 		 * @brief コンストラクタ
 		 * @param device DirectX12デバイス
 		 */
-		Editor(ID3D12Device* device);
+		Editor();
 		/// @brief デストラクタ
 		~Editor() = default;
 
@@ -25,7 +25,7 @@ namespace SHEngine::PSO {
 		 * @brief PSOエディタを初期化
 		 * @param device DirectX12デバイス
 		 */
-		void Initialize(ID3D12Device* device);
+		void Initialize(DXDevice* device);
 
 		/**
 		 * @brief フレーム開始時の初期化

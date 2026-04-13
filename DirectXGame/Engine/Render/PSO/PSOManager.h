@@ -1,7 +1,5 @@
 #pragma once
-#include <d3d12.h>
-#include <wrl.h>
-#include <dxcapi.h>
+#include <Core/DXDevice.h>
 #include <vector>
 #include <Tool/Binary/BinaryManager.h>
 #include <Render/PSO/PSOConfig.h>
@@ -24,7 +22,7 @@ namespace SHEngine::PSO {
 		 *
 		 * @param device DirectX12デバイス
 		 */
-		Manager(ID3D12Device* device);
+		Manager(DXDevice* device);
 
 		/**
 		 * @brief デストラクタ

@@ -8,7 +8,7 @@ class SRVManager;
 
 /**
  * @class SRVHandle
- * @brief SRV（Shader Resource View）ハンドルを管理するクラス
+ * @brief SRV（Shader GPUBuffer View）ハンドルを管理するクラス
  * 
  * SRVディスクリプタヒープ内の位置を保持し、
  * CPUとGPUディスクリプタハンドルへのアクセスを提供する。

@@ -9,91 +9,48 @@ void Manager::Initialize(DXDevice* device) {
 	//=========================================
 	//コマンドキューの生成
 	//=========================================
-	// DirectQueue
-	D3D12_COMMAND_QUEUE_DESC directQueueDesc{};
 	auto& directQueue = queue_[Type::Direct].emplace_back();
-	directQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	directQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-	directQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	HRESULT hr = device_->GetDevice()->CreateCommandQueue(&directQueueDesc, IID_PPV_ARGS(&directQueue));
-	assert(SUCCEEDED(hr) && "Failed to create CommandQueue");
+	directQueue = std::make_unique<Queue>(device, Type::Direct);
 
-	//TextureQueue(Barrierの張りかえを行うため、DirectQueueを使う)
-	auto& copyQueue = queue_[Type::Texture].emplace_back();
-	copyQueue = directQueue; // DirectQueueと同じキューを使用
-
-	//ComputeQueue(複数作成)
-	D3D12_COMMAND_QUEUE_DESC computeQueueDesc{};
-	computeQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-	computeQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-	computeQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+	queue_[Type::Compute].resize(6);
 	for (int i = 0; i < 6; ++i) {
-		auto& computeQueue = queue_[Type::Compute].emplace_back();
-		hr = device_->GetDevice()->CreateCommandQueue(&computeQueueDesc, IID_PPV_ARGS(&computeQueue));
-		assert(SUCCEEDED(hr) && "Failed to create CommandQueue");
+		auto& computeQueue = queue_[Type::Compute][i];
+		computeQueue = std::make_unique<Queue>(device, Type::Compute);
 	}
 
-	//==========================================
-	//コマンドオブジェクト管理用のコンテナ初期化
-	//==========================================
-	for (auto type : { Type::Direct, Type::Texture, Type::Compute }) {
-		commandObjects_[type] = std::vector<std::map<int, Object*>>(queue_[type].size());
-		nextIDsForObject_[type] = 0;
-	}
+	//=========================================
+	//コマンドオブジェクトの初期化
+	//=========================================
+	objects_[Type::Direct].resize(1);
+	objects_[Type::Direct].resize(6);
 }
 
 std::unique_ptr<Object> SHEngine::Command::Manager::CreateCommandObject(Type type, int index, int listNum) {
-	std::unique_ptr<Object> commandObject = std::make_unique<Object>();
-	int id = nextIDsForObject_[type]++;
-	commandObject->Initialize(device_, this, type, index, id, listNum);
+	QueueChecker;
 
-	// コマンドオブジェクトを管理用コンテナに登録
-	if (type != Type::Compute) {
-		index = 0; // DirectとCopyはキューが1つしかないのでindexを0に固定
-	}
-	commandObjects_[type][index][id] = commandObject.get();
+	auto queue = queue_[type][index].get();
+	std::unique_ptr<Object> commandObject = std::make_unique<Object>(device_, this, type, queue, listNum);
+
+	queue->RegisterObject(commandObject.get());
 
 	return std::move(commandObject);
 }
 
-void SHEngine::Command::Manager::Execute(Type type, int index) {
-	std::vector<ID3D12CommandList*> cmdLists;
-	// コマンドオブジェクトにコマンドリストを追加させる
-	for (auto& [id, commandObject] : commandObjects_[type][index]) {
-		commandObject->Execute(cmdLists);
-	}
-
-	// コマンドキューでコマンドリストを実行
-	if (cmdLists.empty()) {
-		return;
-	}
-
-	if (type != Type::Compute) {
-		index = 0; // DirectとCopyはキューが1つしかないのでindexを0に固定
-	}
+void SHEngine::Command::Manager::Execute(Type type, int index, std::vector<CmdObj*> cmdObj) {
+	QueueChecker;
 
 	auto& cmdQueue = queue_[type][index];
-	cmdQueue->ExecuteCommandLists(static_cast<UINT>(cmdLists.size()), cmdLists.data());
+	cmdQueue->Execute(cmdObj);
 }
 
-void SHEngine::Command::Manager::SendSignal(Type type, int index) {
-	auto& cmdQueue = queue_[type][index];
-
-	if (type != Type::Compute) {
-		index = 0; // DirectとCopyはキューが1つしかないのでindexを0に固定
-	}
-
-	// 各コマンドオブジェクトにシグナルを送信させる
-	for (auto& [id, commandObject] : commandObjects_[type][index]) {
-		commandObject->SendSignal(cmdQueue.Get());
-	}
-}
-
-void SHEngine::Command::Manager::ReleaseObject(Type type, int index, int id) {
-	auto& objMap = commandObjects_[type][index];
-	auto it = objMap.find(id);
-	if (it != objMap.end()) {
-		// コマンドオブジェクトを削除(unique_ptrで外に出しているので、解放はされる前提)
-		objMap.erase(it);
+void SHEngine::Command::Manager::ReleaseObject(Queue* queue, Object* obj) {
+	for (auto& [type, queues] : queue_) {
+		for (const auto& q : queues) {
+			if (q.get() == queue) {
+				auto& objects = objects_[type][&q - &queues[0]];
+				objects.erase(std::remove(objects.begin(), objects.end(), obj), objects.end());
+				return;
+			}
+		}
 	}
 }

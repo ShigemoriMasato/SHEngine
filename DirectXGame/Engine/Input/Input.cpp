@@ -9,6 +9,12 @@
 using XC = XBoxController;
 using namespace SHEngine;
 
+namespace {
+	BOOL GetMouseCursorPos(POINT* pos) {
+		return GetCursorPos(pos);
+	}
+}
+
 void Input::Initialize(HINSTANCE hInstance) {
 	if (isInitialized_) {
 		return;
@@ -104,16 +110,36 @@ void Input::Update() {
 	}
 
 	HRESULT hr = keyboard_->Acquire();
-	assert(SUCCEEDED(hr));
+
+	if (FAILED(hr)) {
+		if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED || hr == E_ACCESSDENIED) {
+			// 入力が失われた場合や、まだ取得されていない場合はあきらめる
+			MouseKeyboardClear();
+			return;
+		} else {
+			assert(false); // その他のエラーは想定外
+			return;
+		}
+	}
+
 	std::memcpy(preKeyState, keyState, sizeof(keyState));
 	hr = keyboard_->GetDeviceState(sizeof(keyState), keyState);
 	assert(SUCCEEDED(hr));
 
+	//KeyBoardで入力の可否を確かめているので、此処では単純にasssertにかける
 	hr = mouse_->Acquire();
 	assert(SUCCEEDED(hr));
 	std::memcpy(&preMouseState, &mouseState, sizeof(DIMOUSESTATE));
 	hr = mouse_->GetDeviceState(sizeof(DIMOUSESTATE), &mouseState);
 	assert(SUCCEEDED(hr));
+
+	POINT cursorPos;
+	if (GetMouseCursorPos(&cursorPos)) {
+		// スクリーン座標をクライアント座標に変換
+		ScreenToClient(hwnd_, &cursorPos);
+		// カーソル位置をワールド座標に変換
+		mousePos_ = { static_cast<float>(cursorPos.x), static_cast<float>(cursorPos.y) };
+	}
 }
 
 BYTE* Input::GetKeyState() {
@@ -155,6 +181,10 @@ Vector2 Input::GetMouseMove() {
 		return {};
 	}
 	return Vector2(float(mouseState.lX), float(mouseState.lY));
+}
+
+Vector2 SHEngine::Input::GetCursorPos() {
+	return mousePos_;
 }
 
 float Input::GetMouseWheel() {

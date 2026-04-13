@@ -5,67 +5,42 @@
 
 namespace fs = std::filesystem;
 
-template<>
-void BinaryManager::RegisterOutput<std::string>(std::string* data) {
-	constexpr TypeID id = TypeIDResolver<std::string>::id;
-	size_t size = data->size();
-
-	binaryBuffer_.append(reinterpret_cast<const char*>(&id), sizeof(id));
-	binaryBuffer_.append(reinterpret_cast<const char*>(&size), sizeof(size));
-	binaryBuffer_.append(data->data(), size);
-}
-
-template<>
-std::string BinaryManager::Reverse<std::string>(BinaryData& buffer) {
-	std::string value;
-
-	if (buffer.size() < headerSize) {
-		return value;
-	}
-
-	TypeID id;
-	size_t size;
-	std::memcpy(&id, buffer.data(), idSize);
-	std::memcpy(&size, buffer.data() + idSize, sizeSize);
-
-	if(id != TypeIDResolver<std::string>::id) {
-		return value;
-	}
-
-	if(buffer.size() < headerSize + size) {
-		return value;
-	}
-
-	value.resize(size);
-	std::memcpy(value.data(), buffer.data() + headerSize, size);
-	buffer.erase(0, headerSize + size);
-
-	return value;
-}
-
 void BinaryManager::Write(const std::string& fileName) {
-	std::ofstream file(fileName, std::ios::binary);
+	std::ofstream file(basePath + fileName, std::ios::binary);
 
 	if (!file) {
 		throw std::runtime_error("Failed to open file for writing: " + fileName);
 	}
 
+	file.write(reinterpret_cast<const char*>(&version_), sizeof(version_)); // バージョンを書き込む
 	file.write(binaryBuffer_.data(), binaryBuffer_.size());
 
 	file.close();
+
+	// 書き込み後はバッファをクリア
+	binaryBuffer_.clear();
 }
 
-BinaryData BinaryManager::Read(const std::string& fileName) {
-	std::ifstream file(fileName, std::ios::binary);
-	if (!file) {
-		throw std::runtime_error("Failed to open file for reading: " + fileName);
+bool BinaryManager::Boot(const std::string& fileName) {
+	const std::string path = basePath + fileName;
+	std::ifstream file(path, std::ios::binary);
+	if (!file.is_open()) {
+		return false;
 	}
 
-	const auto fileSize = fs::file_size(fileName);
-	std::string buffer;
-	buffer.resize(fileSize);
+	const auto fileSize = fs::file_size(path);
+	inputBuffer_.resize(static_cast<size_t>(fileSize));
+	file.read(inputBuffer_.data(), fileSize);
 
-	file.read((char*)buffer.data(), fs::file_size(fileName));
+	uint8_t fileVersion;
+	std::memcpy(&fileVersion, inputBuffer_.data(), sizeof(fileVersion));
 
-	return buffer;
+	//Versionが違う場合は読み込まない
+	if (fileVersion != version) {
+		inputBuffer_.clear();
+		return false;
+	}
+	inputBuffer_.erase(0, sizeof(fileVersion)); // バージョンを読み取った後、バッファから削除
+
+	return true;
 }

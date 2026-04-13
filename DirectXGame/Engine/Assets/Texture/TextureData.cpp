@@ -3,6 +3,7 @@
 #include <Utility/ConvertString.h>
 #include <Assets/Texture/TextureManager.h>
 #include <Utility/DirectUtilFuncs.h>
+#include <Utility/Color.h>
 
 using namespace Microsoft::WRL;
 using namespace SHEngine;
@@ -130,7 +131,7 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, ID
 	textureResource_->SetName(LPCWSTR(ConvertString("WindowTexture : " + std::to_string(debugTextureCount++)).c_str()));
 }
 
-void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager) {
+void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager, uint32_t clearColor) {
 	textureResource_.Attach(resource);
 
 	// metadataがないのでフォーマットとミップ数は手動設定
@@ -151,8 +152,34 @@ void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVMana
 
 	width_ = static_cast<uint32_t>(desc.Width);
 	height_ = static_cast<uint32_t>(desc.Height);
+	clearColor_ = ConvertColor(clearColor);
 
-	textureResource_->SetName(LPCWSTR(ConvertString("WindowTexture : " + std::to_string(debugTextureCount++)).c_str()));
+	textureResource_->SetName(LPCWSTR(ConvertString("SwapChainTexture : " + std::to_string(debugTextureCount++)).c_str()));
+}
+
+void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager) {
+	textureResource_.Attach(resource);
+
+	// metadataがないのでフォーマットとミップ数は手動設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//!mipmapを使うかどうかは今後要検討
+	srvDesc.Texture2D.MipLevels = 1;
+
+	// SRV用ディスクリプタ位置を確保
+	srvHandle_.UpdateHandle(manager, 0);
+
+	// SRVを作成
+	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
+
+	auto desc = resource->GetDesc();
+
+	width_ = static_cast<uint32_t>(desc.Width);
+	height_ = static_cast<uint32_t>(desc.Height);
+
+	textureResource_->SetName(LPCWSTR(ConvertString("DepthTexture : " + std::to_string(debugTextureCount++)).c_str()));
 }
 
 ComPtr<ID3D12Resource> TextureData::Create(uint32_t width, uint32_t height, std::vector<uint32_t> colorMap, ID3D12Device* device, SRVManager* srvManager, ID3D12GraphicsCommandList* cmdList) {
@@ -217,8 +244,25 @@ ComPtr<ID3D12Resource> TextureData::Create(uint32_t width, uint32_t height, std:
 		IID_PPV_ARGS(&intermediateResource)
 	);
 
-	//コマンドリストにコピーコマンドを記録
-	intermediateResource.Attach(UploadTextureData(textureResource_.Get(), DirectX::ScratchImage(), device, cmdList));
+	// colorMap から直接サブリソースを作ってアップロードする
+	assert(colorMap.size() == static_cast<size_t>(width) * static_cast<size_t>(height) && "colorMap size mismatch");
+	D3D12_SUBRESOURCE_DATA subresourceData{};
+	subresourceData.pData = colorMap.data();
+	subresourceData.RowPitch = static_cast<SIZE_T>(width) * sizeof(uint32_t);
+	subresourceData.SlicePitch = subresourceData.RowPitch * static_cast<SIZE_T>(height);
+
+	UpdateSubresources(cmdList, textureResource_.Get(), intermediateResource.Get(), 0, 0, 1, &subresourceData);
+
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = textureResource_.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	cmdList->ResourceBarrier(1, &barrier);
+
+	textureResource_->SetName(LPCWSTR(ConvertString("BitMapTexture : " + std::to_string(debugTextureCount++)).c_str()));
 
 	return intermediateResource;
 }
@@ -250,6 +294,8 @@ ComPtr<ID3D12Resource> TextureData::Create(std::string filePath, ID3D12Device* d
 	//テクスチャデータをアップロードするためのリソースを作成し、コマンドリストにコピーコマンドを記録する
 	ComPtr<ID3D12Resource> intermediateResource;
 	intermediateResource.Attach(UploadTextureData(textureResource_.Get(), mipImages, device, cmdList));
+	
+	textureResource_->SetName(LPCWSTR(ConvertString("LoadTexture : " + std::to_string(debugTextureCount++)).c_str()));
 
 	return intermediateResource;
 }

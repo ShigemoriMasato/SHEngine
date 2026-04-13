@@ -22,7 +22,7 @@ namespace SHEngine {
 		/// @brief デフォルトコンストラクタ
 		TextureManager() = default;
 		/// @brief デストラクタ
-		~TextureManager() = default;
+		~TextureManager();
 
 		/**
 		 * @brief テクスチャマネージャーを初期化
@@ -70,6 +70,13 @@ namespace SHEngine {
 		 * @return テクスチャハンドル
 		 */
 		int CreateSwapChainTexture(ID3D12Resource* resource, uint32_t clearColor);
+
+		/**
+		* @brief 深度テクスチャを作成
+		* @param resource 深度テクスチャのリソース
+		* @return テクスチャハンドル
+		*/
+		int CreateDepthTexture(ID3D12Resource* resource);
 
 		/**
 		 * @brief ビットマップテクスチャを作成

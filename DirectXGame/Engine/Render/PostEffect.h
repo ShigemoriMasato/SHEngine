@@ -1,6 +1,6 @@
 #pragma once
 #include <Render/RenderObject.h>
-#include <Screen/DualDisplay.h>
+#include <Render/Screen/MultiDisplay.h>
 #include "PostEffectData.h"
 
 enum class PostEffectJob : uint32_t {
@@ -22,9 +22,9 @@ uint32_t operator~(PostEffectJob a);
 bool operator<(PostEffectJob a, PostEffectJob b);
 
 struct PostEffectConfig {
-	Window* window = nullptr;
-	IDisplay* origin = nullptr;
-	IDisplay* output = nullptr;	//nullptrの場合はoriginに描画する
+	CmdObj* cmdObj = nullptr;
+	SHEngine::Screen::IDisplay* origin = nullptr;
+	SHEngine::Screen::IDisplay* output = nullptr;	//nullptrの場合はoriginに描画する
 
 	uint32_t jobs_ = 0;
 
@@ -33,15 +33,15 @@ struct PostEffectConfig {
 class PostEffect {
 public:
 
-	void Initialize(TextureManager* textureManager, DrawData drawData);
+	void Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData);
 	template<typename T>
 	void CopyBuffer(PostEffectJob job, const T& data);
 	void Draw(const PostEffectConfig& config);
 
 private:
 
-	std::unique_ptr<DualDisplay> intermediateDisplay_ = nullptr;
-	std::map<PostEffectJob, std::unique_ptr<RenderObject>> postEffectObjects_{};
+	std::unique_ptr<SHEngine::Screen::MultiDisplay> intermediateDisplay_ = nullptr;
+	std::map<PostEffectJob, std::unique_ptr<SHEngine::RenderObject>> postEffectObjects_{};
 
 };
 

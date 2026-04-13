@@ -3,11 +3,7 @@
 
 using namespace SHEngine::Command;
 
-Object::~Object() {
-	manager_->ReleaseObject(type_, queueIndex_, id_);
-}
-
-void Object::Initialize(DXDevice* device, Manager* manager, Type type, int index, int id, int listNum) {
+SHEngine::Command::Object::Object(DXDevice* device, Manager* manager, Type type, Queue* queue, int listNum) {
 	device_ = device;
 
 	// コマンドリストを3つ作成
@@ -17,10 +13,16 @@ void Object::Initialize(DXDevice* device, Manager* manager, Type type, int index
 	}
 
 	// コマンドオブジェクトのタイプとキューインデックスを保存
-	manager_ = manager;
+	queue_ = queue;
 	type_ = type;
-	queueIndex_ = index;
-	id_ = id;
+	manager_ = manager;
+
+	ResetCommandList();
+}
+
+Object::~Object() {
+	WaitForGPUIdle(); // すべてのコマンドが終了されるのを待つ
+	manager_->ReleaseObject(queue_, this); // Managerからも削除する
 }
 
 bool Object::CanExecute() {
@@ -28,41 +30,36 @@ bool Object::CanExecute() {
 	return commandLists_[dxListIndex_].CanExecute();
 }
 
-void Object::WaitForCanExecute() {
-	// 現在のコマンドリストが実行可能になるまで待機
-	commandLists_[dxListIndex_].WaitForCanExecute();
+void SHEngine::Command::Object::WaitForGPUIdle() {
+	for(auto& cmdList : commandLists_) {
+		cmdList.WaitForCanExecute();
+	}
 }
 
 void SHEngine::Command::Object::ResetCommandList() {
+	if(state_ == State::Open) {
+		// コマンドリストが開いている場合はリセットするとエラーになるのでリセットしない
+		return;
+	}
+
 	commandLists_[dxListIndex_].ResetCommandList();
+	state_ = State::Open;
 }
 
 void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdLists) {
-	// 現在のコマンドリストを取得
-	auto& currentDXList = commandLists_[dxListIndex_];
+	if(state_ == State::Close) {
+		//実行できるようにリセットする
+		ResetCommandList();
+	}
 
-	// コマンドリストを取得して閉じる
-	ID3D12GraphicsCommandList* commandList = currentDXList.GetCommandList();
-	HRESULT hr = commandList->Close();
-	assert(SUCCEEDED(hr) && "Failed to close Command List");
-	// コマンドリストを引数に追加
-	cmdLists.push_back(commandList);
-}
+	commandLists_[dxListIndex_].Execute(queue_, cmdLists);
 
-void SHEngine::Command::Object::SendSignal(ID3D12CommandQueue* executedCmdQueue) {
-	// 現在のコマンドリストでシグナルを送信
-	auto& currentDXList = commandLists_[dxListIndex_];
-	currentDXList.SendSignal(executedCmdQueue);
-
-	// 次のコマンドリストに移動（3つのコマンドリストを循環）
-	dxListIndex_ = (dxListIndex_ + 1) % commandLists_.size();
+	state_ = State::Close;
 }
 
 std::string SHEngine::Command::Object::Log() const {
 	std::string ans;
 	ans = "CommandObject - Type: " + std::to_string(static_cast<int>(type_)) +
-		", QueueIndex: " + std::to_string(queueIndex_) +
-		", ID: " + std::to_string(id_) +
 		", CurrentDXListIndex: " + std::to_string(dxListIndex_);
 	return ans;
 }

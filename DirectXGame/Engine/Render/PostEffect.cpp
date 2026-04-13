@@ -20,22 +20,18 @@ bool operator<(PostEffectJob a, PostEffectJob b) {
 	return uint32_t(a) < uint32_t(b);
 }
 
-void PostEffect::Initialize(TextureManager* textureManager, DrawData drawData) {
+void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData) {
 	//PostEffect用Displayの初期化
-	intermediateDisplay_ = std::make_unique<DualDisplay>("PE:intermediate");
-	int textureIndex = textureManager->CreateWindowTexture(1280, 720, 0xff0000ff);
-	int textureIndex2 = textureManager->CreateWindowTexture(1280, 720, 0xff0000ff);
-	auto textureData = textureManager->GetTextureData(textureIndex);
-	auto textureData2 = textureManager->GetTextureData(textureIndex2);
-	intermediateDisplay_->Initialize(textureData, textureData2);
+	intermediateDisplay_ = std::make_unique<SHEngine::Screen::MultiDisplay>();
+	intermediateDisplay_->Initialize(1280, 720, 0xffffffff, textureManager);
 
 	//RenderObjectの初期化
 	auto createPostEffectObject = [&](PostEffectJob job, std::string psPath) {
-		auto postEffectObject = std::make_unique<RenderObject>("PostEffect::" + psPath);
+		auto postEffectObject = std::make_unique<SHEngine::RenderObject>("PostEffect::" + psPath);
 		postEffectObject->Initialize();
 		postEffectObject->psoConfig_.vs = "PostEffect/PostEffect.VS.hlsl";
 		postEffectObject->psoConfig_.ps = "PostEffect/" + psPath + ".PS.hlsl";
-		postEffectObject->psoConfig_.rootConfig.samplers = uint32_t(SamplerID::ClampClamp_MinMagNearest);
+		postEffectObject->psoConfig_.rootConfig.samplers = uint32_t(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 		postEffectObject->SetUseTexture(true);
 		postEffectObject->SetDrawData(drawData);
 		postEffectObject->CreateCBV(sizeof(int), ShaderType::PIXEL_SHADER, "PostEffect::SourceTexture");
@@ -56,9 +52,9 @@ void PostEffect::Initialize(TextureManager* textureManager, DrawData drawData) {
 
 void PostEffect::Draw(const PostEffectConfig& config) {
 	uint32_t jobs = config.jobs_;
-	IDisplay* origin = config.origin;
-	IDisplay* output = intermediateDisplay_.get();
-	auto cmdObject = config.window->GetCommandObject();
+	SHEngine::Screen::IDisplay* origin = config.origin;
+	SHEngine::Screen::IDisplay* output = intermediateDisplay_.get();
+	auto cmdObject = config.cmdObj;
 
 	//jobがなければ飛ばす
 	if (jobs == 0) {
@@ -78,7 +74,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 		int textureIndex = origin->GetTextureData()->GetOffset();
 		obj->CopyBufferData(0, &textureIndex, sizeof(int));
 		obj->psoConfig_.isSwapChain = output->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-		obj->Draw(config.window);
+		obj->Draw(cmdObject);
 
 		//描画先と描画元の入れ替え
 		std::swap(origin, output);
@@ -111,6 +107,6 @@ FINAL_DRAW:
 	auto finalObj = postEffectObjects_.at(PostEffectJob::None).get();
 	finalObj->CopyBufferData(0, &textureIndex, sizeof(int));
 	finalObj->psoConfig_.isSwapChain = output->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	finalObj->Draw(config.window);
+	finalObj->Draw(cmdObject);
 	output->PostDraw(cmdObject);
 }

@@ -4,7 +4,7 @@
 using namespace SHEngine;
 
 void SHEngine::Screen::MultiDisplay::Initialize(int width, int height, uint32_t clearColor, TextureManager* textureManager) {
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 1; ++i) {
 		auto display = std::make_unique<SingleDisplay>();
 		display->Initialize(textureManager, width, height, clearColor);
 		displays_.push_back(std::move(display));

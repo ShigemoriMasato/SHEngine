@@ -1,12 +1,12 @@
 #include "ImGuiWrapper.h"
-#include <imgui/imgui.h>
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
+#include <filesystem>
 
 using namespace SHEngine;
 
 void ImGuiWrapper::Initialize(DXDevice* device, Command::Manager* manager, Screen::WindowsAPI* window, Command::Object* cmdObject) {
-	logger_ = getLogger("ImGui");
+	logger_ = getLogger("ImGui", LoggerFlag::UseDebugString);
 
 #ifdef USE_IMGUI
 	IMGUI_CHECKVERSION();
@@ -14,8 +14,11 @@ void ImGuiWrapper::Initialize(DXDevice* device, Command::Manager* manager, Scree
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(window->GetHwnd());
 	ImGuiIO& io = ImGui::GetIO();
+	io.IniFilename = "Assets/ImGui/imgui.ini"; // 設定ファイルのパスを指定
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // ドッキングを有効化
-
+	std::filesystem::create_directory("Assets/ImGui"); // ini用ディレクトリを作成
+	io.Fonts->AddFontFromFileTTF("Assets/.EngineResource/Fonts/MPLUS1p-Medium.ttf", 17.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+	
 	ImGui_ImplDX12_InitInfo initInfo;
 	initInfo.Device = device->GetDevice();
 	initInfo.NumFramesInFlight = bufferNum_;
@@ -23,9 +26,9 @@ void ImGuiWrapper::Initialize(DXDevice* device, Command::Manager* manager, Scree
 	initInfo.CommandQueue = manager->GetCommandQueue(Command::Type::Direct);
 	initInfo.SrvDescriptorHeap = device->GetSRVManager()->GetHeap();
 
+	srvHandles_.resize(bufferNum_);
 	for (int i = 0; i < bufferNum_; ++i) {
-		srvHandles_.emplace_back();
-		srvHandles_.back().UpdateHandle(device->GetSRVManager(), 1024 + i);
+		srvHandles_[i].UpdateHandle(device->GetSRVManager());
 	}
 
 	initInfo.LegacySingleSrvCpuDescriptor = srvHandles_.front().GetCPU();
@@ -78,14 +81,15 @@ void ImGuiWrapper::NewFrame() {
 
 void ImGuiWrapper::Render() {
 #ifdef USE_IMGUI
-
-	// ディスクリプタヒープをコマンドリストに設定
-	ID3D12DescriptorHeap* heaps[] = { device_->GetSRVManager()->GetHeap()};
-	cmdObject_->GetCommandList()->SetDescriptorHeaps(1, heaps);
-
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdObject_->GetCommandList());
 
+#endif
+}
+
+void ImGuiWrapper::EndFrame() {
+#ifdef USE_IMGUI
+	ImGui::EndFrame();
 #endif
 }
 

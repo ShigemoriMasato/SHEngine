@@ -6,13 +6,17 @@
 
 using namespace SHEngine;
 
+SHEngine::TextureManager::~TextureManager() {
+	cmdObject_->WaitForGPUIdle();
+}
+
 void TextureManager::Initialize(DXDevice* device, Command::Manager* manager) {
 	device_ = device;
 	cmdObject_ = manager->CreateCommandObject(Command::Type::Texture, 0, 1);
 	srvManager_ = device->GetSRVManager();
 	manager_ = manager;
 
-	cmdObject_->WaitForCanExecute();
+	cmdObject_->WaitForGPUIdle();
 	cmdObject_->ResetCommandList();
 
 	LoadTexture("Assets/.EngineResource/Texture/white1x1.png");
@@ -113,8 +117,16 @@ int TextureManager::CreateWindowTexture(uint32_t width, uint32_t height, uint32_
 
 int TextureManager::CreateSwapChainTexture(ID3D12Resource* resource, uint32_t clearColor) {
 	auto textureData = std::make_unique<TextureData>();
+	textureData->Create(resource, device_->GetDevice(), srvManager_, clearColor);
+	textureData->textureManager_ = this;
+	int offset = textureData->GetOffset();
+	textureDataList_[offset] = std::move(textureData);
+	return offset;
+}
+
+int SHEngine::TextureManager::CreateDepthTexture(ID3D12Resource* resource) {
+	auto textureData = std::make_unique<TextureData>();
 	textureData->Create(resource, device_->GetDevice(), srvManager_);
-	textureData->clearColor_ = ConvertColor(clearColor);
 	textureData->textureManager_ = this;
 	int offset = textureData->GetOffset();
 	textureDataList_[offset] = std::move(textureData);
@@ -159,17 +171,13 @@ void TextureManager::UploadResources() {
 	}
 
 	//実行
-	manager_->Execute(Command::Type::Texture);
-	manager_->SendSignal(Command::Type::Texture);
-
-	//待機
-	cmdObject_->WaitForCanExecute();
-
-	//中間リソースをクリア
-	intermediateResources_.clear();
+	manager_->Execute(Command::Type::Texture, 0, { cmdObject_.get() });
 
 	//コマンドリストをリセット
 	cmdObject_->ResetCommandList();
+
+	//中間リソースをクリア
+	intermediateResources_.clear();
 }
 
 void TextureManager::CheckMaxCount(int offset) {

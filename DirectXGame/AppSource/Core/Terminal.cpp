@@ -10,7 +10,6 @@ Terminal::Terminal(HINSTANCE hInstance) {
 void Terminal::Run() {
 
 	while (IsLoop()) {
-
 		engine_->BeginFrame();
 
 		sceneManager_->Update();
@@ -20,11 +19,12 @@ void Terminal::Run() {
 		engine_->PostDraw();
 
 		sceneManager_->Present();
-
-		engine_->EndFrame();
-
 	}
 
+	engine_->StopGPU(SHEngine::Command::Type::Direct, 0);
+	for (int i = 0; i < 6; ++i) {
+		engine_->StopGPU(SHEngine::Command::Type::Compute, i);
+	}
 }
 
 bool Terminal::IsLoop() const {

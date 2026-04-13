@@ -2,13 +2,12 @@
 
 using namespace SHEngine::PSO;
 
-Editor::Editor(ID3D12Device* device) {
+Editor::Editor() {
 	logger_ = getLogger("Engine");
-
-	psoManager_ = std::make_unique<Manager>(device);
 }
 
-void Editor::Initialize(ID3D12Device* device) {
+void Editor::Initialize(DXDevice* device) {
+	psoManager_ = std::make_unique<Manager>(device);
 	psoManager_->Initialize();
 }
 

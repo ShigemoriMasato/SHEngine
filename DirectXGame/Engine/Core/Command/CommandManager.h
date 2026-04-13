@@ -2,10 +2,17 @@
 #include <Core/DXDevice.h>
 #include <Tool/Logger/Logger.h>
 #include <Core/Command/Data/CommandObject.h>
+#include <Core/Command/Data/SHCmdQueue.h>
+
+//コマンドオブジェクトのエイリアス
+using CmdObj = SHEngine::Command::Object;
 
 namespace SHEngine::Command {
 
 	class Manager {
+	private:
+#define QueueChecker assert(queue_.find(type) != queue_.end() && index < queue_[type].size())
+
 	public:
 
 		void Initialize(DXDevice* device);
@@ -18,19 +25,19 @@ namespace SHEngine::Command {
 		/// @brief コマンドを実行する
 		/// @param type コマンドキューのタイプ
 		/// @param index コマンドキューのインデックス
-		void Execute(Type type, int index = 0);
-
-		/// @brief シグナルを送る
-		/// @param type コマンドキューのタイプ
-		/// @param index コマンドキューのインデックス
-		void SendSignal(Type type, int index = 0);
+		void Execute(Type type, int index = 0, std::vector<CmdObj*> cmdObj = {});
 
 		/// @brief コマンドオブジェクトを解放するとき、Managerからも削除する
-		void ReleaseObject(Type type, int index, int id);
+		void ReleaseObject(Queue* queue, Object* obj);
+
+		void StopGPU(Type type, int index = 0) {
+			QueueChecker;
+			queue_[type][index]->StopGPU();
+		}
 
 		ID3D12CommandQueue* GetCommandQueue(Type type, int index = 0) {
-			assert(queue_.find(type) != queue_.end() && index < queue_[type].size());
-			return queue_[type][index].Get();
+			QueueChecker;
+			return queue_[type][index]->GetQueue();
 		}
 
 	private:
@@ -38,10 +45,7 @@ namespace SHEngine::Command {
 		DXDevice* device_;
 		Logger logger_;
 
-		std::map<Type, std::vector<Microsoft::WRL::ComPtr<ID3D12CommandQueue>>> queue_{};
-
-		// Type->QueueのIndex->CommandObjectまとめ
-		std::map<Type, std::vector<std::map<int, Object*>>> commandObjects_;
-		std::map<Type, int> nextIDsForObject_;
+		std::map<Type, std::vector<std::unique_ptr<Queue>>> queue_{};
+		std::map<Type, std::vector<std::vector<Object*>>> objects_{};
 	};
 }
