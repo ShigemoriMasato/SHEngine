@@ -29,10 +29,6 @@ void SceneManager::Draw() {
 	commonData_->mainWindow.second->Present();
 }
 
-void SceneManager::Present() {
-	commonData_->mainWindow.second->Present();
-}
-
 bool SceneManager::IsLoop() const {
 	//CommonDataとかからループを抜ける条件を判断する
 	return true;

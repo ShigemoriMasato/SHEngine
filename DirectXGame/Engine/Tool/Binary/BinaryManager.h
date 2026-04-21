@@ -9,7 +9,7 @@ public:
 	bool Boot(const std::string& fileName);
 
 	template<typename T>
-	void Register(T* data);
+	void Register(const T* data);
 	void Write(const std::string& fileName);
 
 	//Registerした順番で値を吐き出す。一回しか吐き出さない。
@@ -35,10 +35,10 @@ private:
 };
 
 template<typename T>
-void BinaryManager::Register(T* data) {
+void BinaryManager::Register(const T* data) {
 	constexpr TypeID currentID = TypeIDResolver<T>::id;
 	uint32_t size = uint32_t(sizeof(T));
-	
+
 	// 未対応の型の場合は登録しない
 	if (currentID == TypeID::kUnknown) {
 		return;
@@ -78,8 +78,7 @@ T BinaryManager::Reverse() {
 }
 
 template<>
-inline void BinaryManager::Register<std::string>(std::string* data)
-{
+inline void BinaryManager::Register<std::string>(const std::string* data) {
 	constexpr TypeID id = TypeIDResolver<std::string>::id;
 	uint32_t size = uint32_t(data->size());
 
@@ -89,12 +88,10 @@ inline void BinaryManager::Register<std::string>(std::string* data)
 }
 
 template<>
-inline std::string BinaryManager::Reverse<std::string>()
-{
+inline std::string BinaryManager::Reverse<std::string>() {
 	std::string value;
 
-	if (inputBuffer_.size() < headerSize)
-	{
+	if (inputBuffer_.size() < headerSize) {
 		return value;
 	}
 
@@ -103,13 +100,11 @@ inline std::string BinaryManager::Reverse<std::string>()
 	std::memcpy(&id, inputBuffer_.data(), idSize);
 	std::memcpy(&size, inputBuffer_.data() + idSize, sizeSize);
 
-	if (id != TypeIDResolver<std::string>::id)
-	{
+	if (id != TypeIDResolver<std::string>::id) {
 		return value;
 	}
 
-	if (inputBuffer_.size() < headerSize + size)
-	{
+	if (inputBuffer_.size() < headerSize + size) {
 		return value;
 	}
 

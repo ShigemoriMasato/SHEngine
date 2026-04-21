@@ -9,7 +9,6 @@ public:
 	void Initialize(SHEngine::Engine* engine);
 	void Update();
 	void Draw();
-	void Present();
 
 	/// @brief アプリケーションの終了命令
 	bool IsLoop() const;

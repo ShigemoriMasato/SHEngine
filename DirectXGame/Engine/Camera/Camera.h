@@ -86,6 +86,7 @@ public:
 
 	//VPMatrixを取得
 	virtual Matrix4x4 GetVPMatrix() const;
+	virtual Matrix4x4 GetBillboardMatrix() const;
 
 	Matrix4x4 GetTransformMatrix() const { return transformMatrix_; }
 	Matrix4x4 GetProjectionMatrix() const { return projectionMatrix_; }

@@ -1,0 +1,154 @@
+#include "GameScene.h"
+#include <imgui/imgui.h>
+#include <Utility/Color.h>
+#include <Title/TitleScene.h>
+
+using namespace SHEngine;
+
+namespace {
+	Matrix4x4 gameoverMat;
+}
+
+GameScene::GameScene() {
+	tetris_ = std::make_unique<Tetris>();
+	debugCamera_ = std::make_unique<DebugCamera>();
+	manualCamera_ = std::make_unique<Camera>();
+	manualCamera_->SetProjectionMatrix(PerspectiveFovDesc());
+	manualCamera_->MakeMatrix();
+	postEffect_ = std::make_unique<PostEffect>();
+	gameCamera_ = std::make_unique<GameCamera>();
+	effect_ = std::make_unique<Effect>();
+
+	gameCamera_->Initialize();
+	worldCamera_ = debugCamera_.get();
+}
+
+void GameScene::Initialize() {
+	keyCoating_ = std::make_unique<KeyCoating>(commonData_->keyManager.get());
+	debugCamera_->Initialize(input_);
+	auto model = modelManager_->GetNodeModelData(0);	//Cube
+	DrawData drawData = drawDataManager_->GetDrawData(model.drawDataIndex);
+
+	tetris_->Initialize(keyCoating_.get(), worldCamera_, drawData);
+
+	//PostEffectの初期化
+	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
+	postEffect_->Initialize(textureManager_, pedd, true);		//描画だけするやつなのでコピーオンリー
+	postEffectConfig_.cmdObj = commonData_->cmdObject.get();
+	postEffectConfig_.origin = commonData_->display->GetDisplay();
+	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
+
+	gameOverText = std::make_unique<RenderObject>("GameOverText");
+	gameOverText->Initialize();
+	gameOverText->CreateCBV(sizeof(Matrix4x4), ShaderType::VERTEX_SHADER, "GameOverText::WVPMatrix");
+	gameOverText->psoConfig_.vs = "Simple.VS.hlsl";
+	gameOverText->psoConfig_.ps = "White.PS.hlsl";
+	int modelIndex = modelManager_->LoadModel("GameOver");
+	model = modelManager_->GetNodeModelData(modelIndex);
+	auto gameOverdd = drawDataManager_->GetDrawData(model.drawDataIndex);
+	gameOverText->SetDrawData(gameOverdd);
+
+	auto planeDrawData = drawDataManager_->GetDrawData(modelManager_->GetNodeModelData(1).drawDataIndex);
+	effect_->Initialize(planeDrawData, engine_);
+
+	gameoverMat = Matrix::MakeAffineMatrix(
+		Vector3(1.0f, 1.0f, 1.0f),
+		Vector3(),
+		Vector3(0.0f, 0.0f, -5.0f)
+	);
+}
+
+std::unique_ptr<IScene> GameScene::Update() {
+	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
+	commonData_->cmdObject->ResetCommandList();
+
+	input_->Update();
+	commonData_->keyManager->Update();
+	keyCoating_->Update(deltaTime);
+
+	debugCamera_->Update();
+	gameCamera_->Update(deltaTime);
+
+	tetris_->Update(deltaTime);
+
+	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix());
+
+	//線を消したときのやつ
+	int deleteNum = tetris_->IsLineDeleted();
+	if (deleteNum) {
+
+		if (deleteNum > 2) {
+			gameCamera_->Shake(0.3f * deleteNum, 0.5f);
+		}
+	}
+	auto key = keyCoating_->GetKeyStates();
+
+	if (key.at(Key::Left)) {
+	}
+
+	if (key.at(Key::Right)) {
+	}
+
+	if (key.at(Key::Down)) {
+	}
+
+	if (key.at(Key::HardDrop)) {
+	}
+
+	if (key.at(Key::Debug1)) {
+		return std::make_unique<GameScene>();
+	}
+
+	if (tetris_->IsGameOver() && (key.at(Key::HardDrop) || key.at(Key::Hold))) {
+		return std::make_unique<TitleScene>();
+	}
+
+	return nullptr;
+}
+
+void GameScene::Draw() {
+	auto cmdObj = commonData_->cmdObject.get();
+	auto display = commonData_->display.get();
+	auto window = commonData_->mainWindow.second->GetCurrentDisplay();
+
+	effect_->Draw(display->GetDisplay());
+
+	display->PreDraw(cmdObj, false);
+
+	tetris_->Draw(cmdObj);
+	if (tetris_->IsGameOver()) {
+		Matrix4x4 wvp = gameoverMat * worldCamera_->GetVPMatrix();
+		gameOverText->CopyBufferData(0, &wvp, sizeof(Matrix4x4));
+		gameOverText->Draw(cmdObj);
+	}
+	display->PostDraw(cmdObj);
+
+#ifdef SH_RELEASE
+
+	postEffect_->Draw(postEffectConfig_);
+	cmdObj->SetRenderTarget(window, false);
+
+#else
+
+	cmdObj->SetRenderTarget(window);
+
+#endif
+
+	//ここ以外で記述する場合、ifdefを忘れないようにすること
+#ifdef USE_IMGUI
+	display->DrawImGui();
+	manualCamera_->DrawImGui();
+	manualCamera_->MakeMatrix();
+	tetris_->DrawImGui();
+	gameCamera_->DrawImGui();
+
+	ImGui::Begin("Input Debug");
+	Vector2 cursor = input_->GetCursorPos();
+	ImGui::Text("Cursor Pos: (%.1f, %.1f)", cursor.x, cursor.y);
+	ImGui::End();
+#endif
+
+	engine_->DrawImGui();
+	window->ToPresent(cmdObj);
+
+}

@@ -70,3 +70,12 @@ void Camera::SetTransform(Matrix4x4 mat) {
 Matrix4x4 Camera::GetVPMatrix() const {
 	return vpMatrix_;
 }
+
+Matrix4x4 Camera::GetBillboardMatrix() const {
+	Matrix4x4 billboardMatrix = transformMatrix_;
+	//平行移動成分を削除
+	for (int i = 0; i < 3; ++i) {
+		billboardMatrix.m[3][i] = 0.0f;
+	}
+	return billboardMatrix;
+}

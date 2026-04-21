@@ -175,7 +175,25 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
+    <ClCompile Include="AppSource\Common\KeyConfig\WorldCursor.cpp" />
+    <ClCompile Include="AppSource\Common\MainDisplay.cpp" />
+    <ClCompile Include="AppSource\Game\Camera\GameCamera.cpp" />
+    <ClCompile Include="AppSource\Game\GameScene.cpp" />
+    <ClCompile Include="AppSource\Game\KeyCoating\KeyCoating.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Block\BlockRender.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Block\Delete\DeleteEffect.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Field\Field.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Mino\Tetrimino.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Player\Player.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Score\LevelManager.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Score\ScoreManager.cpp" />
+    <ClCompile Include="AppSource\Game\Tetris\Tetris.cpp" />
     <ClCompile Include="AppSource\Scene\CommonData.cpp" />
+    <ClCompile Include="AppSource\Title\TitleScene.cpp" />
+    <ClCompile Include="AppSource\Title\Title\Title.cpp" />
+    <ClCompile Include="AppSource\Title\WaterWave\WaterWave.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Effect.cpp" />
     <ClCompile Include="Engine\Assets\Audio\Data\PlayData.cpp" />
     <ClCompile Include="Engine\Assets\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Compute\PSO\CSPSOManager.cpp" />
@@ -237,7 +255,28 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Core\Terminal.cpp" />
     <ClCompile Include="AppSource\Scene\InitializeScene.cpp" />
     <ClCompile Include="AppSource\Scene\SceneManager.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Pool\ParticlePool.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Wave\WaveParticle.cpp" />
+    <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
+    <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
+    <ClInclude Include="AppSource\Common\MainDisplay.h" />
+    <ClInclude Include="AppSource\Game\Camera\GameCamera.h" />
+    <ClInclude Include="AppSource\Game\GameScene.h" />
+    <ClInclude Include="AppSource\Game\KeyCoating\KeyCoating.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Block\BlockRender.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Block\Delete\DeleteEffect.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Data.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Field\Field.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Mino\Tetrimino.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Player\Player.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Score\LevelManager.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Score\ScoreManager.h" />
+    <ClInclude Include="AppSource\Game\Tetris\Tetris.h" />
     <ClInclude Include="AppSource\Scene\CommonData.h" />
+    <ClInclude Include="AppSource\Title\TitleScene.h" />
+    <ClInclude Include="AppSource\Title\Title\Title.h" />
+    <ClInclude Include="AppSource\Title\WaterWave\WaterWave.h" />
+    <ClInclude Include="AppSource\Game\Effect\Effect.h" />
     <ClInclude Include="Engine\Assets\Audio\Data\PlayData.h" />
     <ClInclude Include="Engine\Assets\Model\ModelManager.h" />
     <ClInclude Include="Engine\Compute\PSO\CSPSOManager.h" />
@@ -287,6 +326,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Scene\IScene.h" />
     <ClInclude Include="AppSource\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Core\ImGuiWrapper.h" />
+    <ClInclude Include="AppSource\Game\Effect\Pool\ParticlePool.h" />
+    <ClInclude Include="AppSource\Game\Effect\Wave\WaveParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

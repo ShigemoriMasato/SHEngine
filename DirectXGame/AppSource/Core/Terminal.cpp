@@ -18,7 +18,6 @@ void Terminal::Run() {
 
 		engine_->PostDraw();
 
-		sceneManager_->Present();
 	}
 
 	engine_->StopGPU(SHEngine::Command::Type::Direct, 0);
