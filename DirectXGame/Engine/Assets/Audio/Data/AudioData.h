@@ -1,48 +1,9 @@
 #pragma once
 #include <string>
-#include <xaudio2.h>
-#include <filesystem>
-#include <fstream>
-#include <array>
-#include <wrl.h>
+#include <memory>
+#include <vector>
 
-enum class AudioType {
-	wav,
-	mp3
-};
-
-/**
- * @struct ChunkHeader
- * @brief WAVファイルのチャンクヘッダ情報
- * 
- * RIFFフォーマットの各チャンクに共通するヘッダ構造。
- */
-struct ChunkHeader {
-	char id[4];   ///< チャンクID(4文字のASCII)
-	int32_t size; ///< チャンクのデータサイズ(バイト)
-};
-
-/**
- * @struct RiffHeader
- * @brief WAVファイルのRIFFヘッダ
- * 
- * WAVファイル全体を示すRIFFチャンクのヘッダ情報。
- */
-struct RiffHeader {
-	ChunkHeader chunk; ///< RIFFチャンクヘッダ
-	char type[4];      ///< ファイルタイプ("WAVE")
-};
-
-/**
- * @struct FormatChunk
- * @brief WAVファイルのフォーマットチャンク
- * 
- * 音声データの形式(サンプリングレート、ビット深度等)を定義する。
- */
-struct FormatChunk {
-	ChunkHeader chunk;  ///< fmtチャンクヘッダ
-	WAVEFORMATEX fmt;   ///< 波形フォーマット情報
-};
+#include "PlayData.h"
 
 /**
  * @class AudioData
@@ -54,78 +15,50 @@ struct FormatChunk {
 class AudioData {
 public:
 
-	AudioData() = default;
+	AudioData(IXAudio2* xAudio);
 	~AudioData();
 
-	/**
-	 * @brief 音声ファイルの読み込み(純粋仮想関数)
-	 * 
-	 * 派生クラスで各フォーマットに応じた読み込み処理を実装する。
-	 * 
-	 * @param filePath 読み込むファイルのパス
-	 */
-	virtual void Load(const std::filesystem::path& filePath) = 0;
+	void Update();
 
-	/**
-	 * @brief 音量の設定
-	 * 
-	 * @param volume 音量(0.0f～1.0f以上)
-	 */
+	// @brief 鳴っている音をすべて止める。CustomPlayは止まらない。
+	void StopAll();
+
+	// @brief 音量を設定する。0.0f ~ 1.0fの範囲で指定する
 	void SetVolume(float volume);
 
-	/**
-	 * @brief 読み込んだ音声データを再生(純粋仮想関数)
-	 * 
-	 * 派生クラスで各フォーマットに応じた再生処理を実装する。
-	 * 
-	 * @param xAudio XAudio2インスタンス
-	 * @param isLoop ループ再生するかどうか
-	 * @return 再生ハンドル
-	 */
-	virtual int Play(IXAudio2* xAudio, bool isLoop) = 0;
+	// @brief 全体の音量を設定する。0.0f ~ 1.0fの範囲で指定する。全てのAudioDataに影響する
+	static void SetOverallVolume(float volume);
 
-	/**
-	 * @brief 指定ハンドルの音声が再生中かどうか
-	 * 
-	 * @param handle 再生ハンドル
-	 * @return 再生中の場合true
-	 */
-	bool IsPlay(int handle);
+	// @brief 音が終わるまで再生する。ループ再生はしない。途中で音量を変えられない。
+	void Play(int loopCount = 0);
 
-	/**
-	 * @brief 再生の停止
-	 * 
-	 * @param handle 再生ハンドル
-	 */
-	void Stop(int handle);
+	// @brief 再生データを取得できる再生関数。再生後の音に干渉したい時用
+	// @return 再生データのポインタ
+	std::unique_ptr<PlayData> CustomPlay(int loopCount);
+
+	// @brief 再生データを破棄する。デストラクタで呼ばれる。
+	void ReleasePlayData(PlayData* data);
+
+	// @brief 音声データの名前を取得する
+	std::string GetName() const { return name_; }
+
+	// @brief 音量を取得する。全体の音量 x AudioDataの音量で計算される
+	float GetVolume() const { return overallVolume_ * volume_; }
 
 protected:
 
-	/// @brief 波形フォーマット情報
-	WAVEFORMATEX wfex_;
-	/// @brief 音声データバッファの先頭アドレス
-	std::unique_ptr<BYTE[]> pBuffer_;
-	/// @brief バッファのサイズ(バイト)
-	unsigned int bufferSize_;
-	/// @brief 音声データの名前
-	std::string name_;
+	WAVEFORMATEX wfex_;					///< フォーマット
+	std::vector<BYTE> audioData_;		///< 音声データのバイト列
+	std::string name_;					///< 音声データの名前
 
-	/// @brief 音声データの形式
-	AudioType type_;
+private:
 
-	/// @brief 同時再生可能な最大数
-	static const int resourceNum_ = 8;
+	IXAudio2* xAudio_;					///< XAudio2インスタンスへのポインタ
 
-	/// @brief 通常再生用のソースボイス配列
-	std::array<IXAudio2SourceVoice*, resourceNum_> playResource_ = {
-		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
-	};
-	/// @brief ループ再生用のソースボイス
-	IXAudio2SourceVoice* loopPlayResource_ = 0;
-	/// @brief 次に使用する再生リソースのインデックス
-	int playResourceIndex_ = 0;
+	float volume_ = 1.0f;				///< 音量(0.0f ~ 1.0f)
+	static inline float overallVolume_ = 1.0f; ///< 全体の音量(0.0f ~ 1.0f)
 
-	/// @brief 音量(デフォルト1.0f)
-	float volume_ = 1.0f;
+	std::vector<std::unique_ptr<PlayData>> autoDataList_; ///< カスタム再生じゃない方の再生データのリスト。寿命管理用
+	std::vector<PlayData*> playDataList_; ///< 現在使用中の再生データ
 
 };

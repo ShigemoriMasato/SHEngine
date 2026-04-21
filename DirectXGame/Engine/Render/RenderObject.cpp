@@ -1,6 +1,7 @@
 #include "RenderObject.h"
 #include <Utility/DirectUtilFuncs.h>
 #include <Utility/ConvertString.h>
+#include <Render/Screen/IDisplay.h>
 
 using namespace SHEngine;
 
@@ -27,7 +28,7 @@ void RenderObject::Initialize() {
 	index_ = 0;
 	psoConfig_ = PSO::Config{};
 	resources_.clear();
-	bufferDatas_.clear();
+	bufferList_.clear();
 	cbvAddresses_.clear();
 	srvHandles_.clear();
 }
@@ -60,7 +61,7 @@ int RenderObject::CreateCBV(size_t size, ShaderType type, std::string debugName)
 		cbvAddresses.push_back(res.res->GetGPUVirtualAddress());
 	}
 
-	bufferDatas_.push_back(cbvBufferDatas);
+	bufferList_.push_back(cbvBufferDatas);
 	cbvAddresses_.push_back(cbvAddresses);
 
 	logger_->debug("CBV Created: {}", debugName_);
@@ -73,7 +74,7 @@ int RenderObject::CreateCBV(size_t size, ShaderType type, std::string debugName)
 	}
 
 	//indexの交付
-	return int(bufferDatas_.size() - 1);
+	return int(bufferList_.size() - 1);
 }
 
 int RenderObject::CreateSRV(size_t size, uint32_t num, ShaderType type, std::string debugName) {
@@ -113,7 +114,7 @@ int RenderObject::CreateSRV(size_t size, uint32_t num, ShaderType type, std::str
 		srvBufferDatas.push_back(bufferData);
 	}
 
-	bufferDatas_.push_back(srvBufferDatas);
+	bufferList_.push_back(srvBufferDatas);
 	srvHandles_.push_back(std::move(srvHandles));
 
 	logger_->debug("SRV Created: {}", debugName_);
@@ -127,11 +128,11 @@ int RenderObject::CreateSRV(size_t size, uint32_t num, ShaderType type, std::str
 		psoConfig_.rootConfig.srvNums.second++;
 	}
 
-	return int(bufferDatas_.size() - 1);
+	return int(bufferList_.size() - 1);
 }
 
 void RenderObject::CopyBufferData(int index, const void* data, size_t size) {
-	auto& gpuData = bufferDatas_[index][index_];
+	auto& gpuData = bufferList_[index][index_];
 
 	if (size > gpuData.size) {
 		logger_->error("=========== CopyBufferData || Size exceeds buffer size ===========");
@@ -165,6 +166,7 @@ void RenderObject::Draw(Command::Object* cmdObject) {
 	auto cmdList = cmdObject->GetCommandList();
 
 	//パイプラインステートの設定
+	psoConfig_.isSwapChain = cmdObject->GetRenderTarget()->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	psoEditor_->SetPSO(cmdList, psoConfig_);
 
 	//頂点バッファの設定

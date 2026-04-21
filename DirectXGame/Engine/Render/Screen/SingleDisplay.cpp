@@ -99,47 +99,19 @@ void SHEngine::Screen::SingleDisplay::PrivateInitialize(SHEngine::TextureManager
 
 }
 
-void SHEngine::Screen::SingleDisplay::PreDraw(Command::Object* cmdObject, bool isClear) {
-    TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-	auto commandList = cmdObject->GetCommandList();
-
-    auto dsvCpu = dsvHandle_.GetCPU();
-    auto rtvCpu = rtvHandle_.GetCPU();
-    commandList->OMSetRenderTargets(1, &rtvCpu, false, &dsvCpu);
-
-
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(width_);
-    viewport.Height = static_cast<float>(height_);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じく刑が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = width_;
-    scissorRect.top = 0;
-    scissorRect.bottom = height_;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
-
-    if (isClear) {
-		Vector4 clearColor = textureData_->GetClearColor();
-        //レンダーターゲットのクリア
-        commandList->ClearRenderTargetView(rtvHandle_.GetCPU(), &clearColor.x, 0, nullptr);
-        //デプスステンシルビューのクリア
-        commandList->ClearDepthStencilView(dsvHandle_.GetCPU(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-    }
+void SHEngine::Screen::SingleDisplay::Clear(Command::Object* cmdObject) {
+    Vector4 color = textureData_->GetClearColor();
+    //レンダーターゲットと深度ステンシルをクリア
+    cmdObject->GetCommandList()->ClearRenderTargetView(GetRTVHandle(), &color.x, 0, nullptr);
+	cmdObject->GetCommandList()->ClearDepthStencilView(GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-void SHEngine::Screen::SingleDisplay::PostDraw(Command::Object* cmdObject) {
+void SHEngine::Screen::SingleDisplay::ToRenderTarget(Command::Object* cmdObject) {
+    TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+}
+
+void SHEngine::Screen::SingleDisplay::ToPresent(Command::Object* cmdObject) {
     if (isOffScreen_) {
 		ToTexture(cmdObject);
     } else {

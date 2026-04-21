@@ -13,12 +13,16 @@ void SHEngine::Screen::MultiDisplay::Initialize(int width, int height, uint32_t 
 	currentDisplayIndex_ = 0;
 }
 
-void SHEngine::Screen::MultiDisplay::PreDraw(Command::Object* cmdObject, bool isClear) {
-	displays_[currentDisplayIndex_]->PreDraw(cmdObject, isClear);
+void SHEngine::Screen::MultiDisplay::Clear(Command::Object* cmdObject) {
+	displays_[currentDisplayIndex_]->Clear(cmdObject);
 }
 
-void SHEngine::Screen::MultiDisplay::PostDraw(Command::Object* cmdObject) {
-	displays_[currentDisplayIndex_]->PostDraw(cmdObject);
+void SHEngine::Screen::MultiDisplay::ToRenderTarget(Command::Object* cmdObject) {
+	displays_[currentDisplayIndex_]->ToRenderTarget(cmdObject);
+}
+
+void SHEngine::Screen::MultiDisplay::ToPresent(Command::Object* cmdObject) {
+	displays_[currentDisplayIndex_]->ToPresent(cmdObject);
 	currentDisplayIndex_ = (currentDisplayIndex_ + 1) % displays_.size();
 }
 

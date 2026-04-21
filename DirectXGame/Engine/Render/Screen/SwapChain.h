@@ -10,7 +10,7 @@ namespace SHEngine::Screen {
 		void Initialize(DXDevice* device, TextureManager* textureManager, Command::Manager* cmdManager, WindowsAPI* window, uint32_t clearColor);
 
 		void PreDraw(Command::Object* cmdObject, bool isClear = true);
-		void PostDraw(Command::Object* cmdObject);
+		void ToPresent(Command::Object* cmdObject);
 		void ToTexture(Command::Object* cmdObject);
 		void Present();
 

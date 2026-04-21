@@ -2,7 +2,7 @@
 #include <Tool/Logger/Logger.h>
 #include <Core/Command/CommandManager.h>
 #include <Compute/PSO/CSPSOManager.h>
-#include <Render/SHResource.h>
+#include <Render/Buffer/BufferContainer.h>
 
 namespace SHEngine {
 
@@ -20,7 +20,9 @@ namespace SHEngine {
 		// @brief スレッドグループのサイズを登録
 		void SetThreadGroupSize(int x, int y = 1, int z = 1) { threadGroupSize_ = { x, y, z }; }
 		// @brief CBV/SRV/UAVを登録
-		void SetGPUBuffer(GPUBuffer* buffer, BufferType bufferType, ShaderType shaderType);
+		void SetGPUBuffer(BufferType bufferType, GPUBuffer* buffer);
+		// @brief 複数のCBV/SRV/UAVを登録
+		void SetGPUBuffers(BufferType bufferType, std::vector<GPUBuffer*> buffers);
 
 		// @brief 登録したCBV/SRV/UAVをComputeShaderにセットして、ComputeShaderを実行する。
 		// @param cmdObj コマンドオブジェクト。この関数の後にengine_->ExecuteCommandを呼び出すこと。

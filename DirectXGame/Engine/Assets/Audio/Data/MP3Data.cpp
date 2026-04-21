@@ -4,16 +4,16 @@
 
 #include <mfapi.h>
 #include <mfidl.h>
+#include <filesystem>
 #include <mfreadwrite.h>
 
 namespace fs = std::filesystem;
 
-void MP3Data::Load(const std::filesystem::path& filepath) {
+MP3Data::MP3Data(IXAudio2* xAudio, std::string filePath) : AudioData(xAudio) {
 	// 音声データを登録
-	type_ = AudioType::mp3;
-	name_ = filepath.string();
+	name_ = filePath;
 
-	std::wstring path = ConvertString(filepath.string());
+	std::wstring path = ConvertString(name_);
 
 	// ソースリーダーの作成
 	IMFSourceReader* pMFSourceReader{ nullptr };
@@ -24,7 +24,7 @@ void MP3Data::Load(const std::filesystem::path& filepath) {
 	IMFMediaType* pMFMediaType{ nullptr };
 	hr = MFCreateMediaType(&pMFMediaType);
 	assert(SUCCEEDED(hr));
-	
+
 	pMFMediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
 	pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
 	pMFSourceReader->SetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), nullptr, pMFMediaType);
@@ -39,7 +39,7 @@ void MP3Data::Load(const std::filesystem::path& filepath) {
 	assert(SUCCEEDED(hr));
 
 	// データ読み込み
-	std::vector<BYTE> bufferData;
+	std::vector<BYTE>& bufferData = audioData_;
 	while (true) {
 		IMFSample* pMFSample{ nullptr };
 		DWORD dwStreamFlags = 0;
@@ -66,53 +66,10 @@ void MP3Data::Load(const std::filesystem::path& filepath) {
 	}
 
 	// 読み込んだデータをメモリにコピー
-	auto pAudioData = std::make_unique<BYTE[]>(bufferData.size());
-	memcpy(pAudioData.get(), bufferData.data(), bufferData.size());
-
 	wfex_ = *waveFormat;
-	pBuffer_ = std::move(pAudioData);
-	bufferSize_ = static_cast<UINT32>(bufferData.size());
 
 	// 解放処理
 	CoTaskMemFree(waveFormat);
 	pMFMediaType->Release();
 	pMFSourceReader->Release();
-}
-
-int MP3Data::Play(IXAudio2* xAudio, bool isLoop) {
-	IXAudio2SourceVoice* pSourceVoice{ nullptr };
-	xAudio->CreateSourceVoice(&pSourceVoice, &wfex_);
-	pSourceVoice->SetVolume(volume_);
-
-	XAUDIO2_BUFFER buffer{ 0 };
-	buffer.pAudioData = pBuffer_.get();
-	buffer.Flags = XAUDIO2_END_OF_STREAM;
-	buffer.AudioBytes = sizeof(BYTE) * static_cast<UINT32>(bufferSize_);
-	buffer.LoopCount = isLoop ? XAUDIO2_LOOP_INFINITE : 0;
-
-	// 再生する
-	HRESULT hr = pSourceVoice->SubmitSourceBuffer(&buffer);
-	assert(SUCCEEDED(hr));
-
-
-	hr = pSourceVoice->Start();
-	assert(SUCCEEDED(hr));
-
-	// 管理テーブルに登録
-	if (!isLoop) {
-		//保存場所の変更
-		playResourceIndex_++;
-		if (playResourceIndex_ >= resourceNum_) {
-			playResourceIndex_ = 0;
-		}
-
-		playResource_[playResourceIndex_] = pSourceVoice;
-
-		return playResourceIndex_;
-
-	} else {
-		loopPlayResource_ = pSourceVoice;
-		return 9;
-	}
-
 }

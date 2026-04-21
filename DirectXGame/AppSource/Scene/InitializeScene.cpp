@@ -45,11 +45,11 @@ void InitializeScene::Draw() {
 	auto display = commonData_->display.get();
 	auto cmdObj = commonData_->cmdObject.get();
 
-	display->PreDraw(cmdObj);
-	display->PostDraw(cmdObj);
+	display->ToPresent(cmdObj);
+	display->ToPresent(cmdObj);
 
 	swapChain->PreDraw(cmdObj);
 
 	engine_->DrawImGui();
-	swapChain->PostDraw(cmdObj);
+	swapChain->ToPresent(cmdObj);
 }

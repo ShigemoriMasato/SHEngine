@@ -10,9 +10,6 @@ using CmdObj = SHEngine::Command::Object;
 namespace SHEngine::Command {
 
 	class Manager {
-	private:
-#define QueueChecker assert(queue_.find(type) != queue_.end() && index < queue_[type].size())
-
 	public:
 
 		void Initialize(DXDevice* device);
@@ -25,22 +22,26 @@ namespace SHEngine::Command {
 		/// @brief コマンドを実行する
 		/// @param type コマンドキューのタイプ
 		/// @param index コマンドキューのインデックス
-		void Execute(Type type, int index = 0, std::vector<CmdObj*> cmdObj = {});
+		WaitFence Execute(Type type, int index = 0, std::vector<CmdObj*> cmdObj = {});
 
 		/// @brief コマンドオブジェクトを解放するとき、Managerからも削除する
 		void ReleaseObject(Queue* queue, Object* obj);
 
+		void WaitFence(const WaitFence& waitFence, Type type, int index = 0);
+
 		void StopGPU(Type type, int index = 0) {
-			QueueChecker;
+			QueueChecker(type);
 			queue_[type][index]->StopGPU();
 		}
 
 		ID3D12CommandQueue* GetCommandQueue(Type type, int index = 0) {
-			QueueChecker;
+			QueueChecker(type);
 			return queue_[type][index]->GetQueue();
 		}
 
 	private:
+
+		void QueueChecker(Type type);
 
 		DXDevice* device_;
 		Logger logger_;

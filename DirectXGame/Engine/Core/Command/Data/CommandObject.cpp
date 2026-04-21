@@ -1,5 +1,7 @@
 #include "CommandObject.h"
 #include <Core/Command/CommandManager.h>
+#include <Render/Screen/IDisplay.h>
+#include <Utility/DirectUtilFuncs.h>
 
 using namespace SHEngine::Command;
 
@@ -27,12 +29,49 @@ Object::~Object() {
 
 bool Object::CanExecute() {
 	// 現在のコマンドリストが実行可能かどうかを確認
-	return commandLists_[dxListIndex_].CanExecute();
+	return commandLists_[currentIndex_ % uint32_t(commandLists_.size())].CanExecute();
 }
 
 void SHEngine::Command::Object::WaitForGPUIdle() {
 	for(auto& cmdList : commandLists_) {
 		cmdList.WaitForCanExecute();
+	}
+}
+
+void SHEngine::Command::Object::SetRenderTarget(Screen::IDisplay* display, bool clear) {
+	renderTarget_ = display;
+
+	auto texture = display->GetTextureData();
+	auto depthTexture = display->GetDepthTexture();
+	auto rtvHandle = display->GetRTVHandle();
+	auto dsvHandle = display->GetDSVHandle();
+	auto cmdList = GetCommandList();
+
+	display->ToRenderTarget(this);
+
+	cmdList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+	
+	//ViewPortとScissorRectの設定
+	D3D12_VIEWPORT viewPort{};
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
+	viewPort.Width = static_cast<float>(texture->GetSize().first);
+	viewPort.Height = static_cast<float>(texture->GetSize().second);
+	viewPort.MinDepth = 0.0f;
+	viewPort.MaxDepth = 1.0f;
+
+	cmdList->RSSetViewports(1, &viewPort);
+
+	D3D12_RECT scissorRect{};
+	scissorRect.left = 0;
+	scissorRect.top = 0;
+	scissorRect.right = static_cast<LONG>(texture->GetSize().first);
+	scissorRect.bottom = static_cast<LONG>(texture->GetSize().second);
+
+	cmdList->RSSetScissorRects(1, &scissorRect);
+
+	if(clear) {
+		display->Clear(this);
 	}
 }
 
@@ -42,7 +81,7 @@ void SHEngine::Command::Object::ResetCommandList() {
 		return;
 	}
 
-	commandLists_[dxListIndex_].ResetCommandList();
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].ResetCommandList();
 	state_ = State::Open;
 }
 
@@ -52,7 +91,7 @@ void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdList
 		ResetCommandList();
 	}
 
-	commandLists_[dxListIndex_].Execute(queue_, cmdLists);
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].Execute(queue_, cmdLists);
 
 	state_ = State::Close;
 }
@@ -60,6 +99,6 @@ void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdList
 std::string SHEngine::Command::Object::Log() const {
 	std::string ans;
 	ans = "CommandObject - Type: " + std::to_string(static_cast<int>(type_)) +
-		", CurrentDXListIndex: " + std::to_string(dxListIndex_);
+		", CurrentDXListIndex: " + std::to_string(currentIndex_ % uint32_t(commandLists_.size()));
 	return ans;
 }

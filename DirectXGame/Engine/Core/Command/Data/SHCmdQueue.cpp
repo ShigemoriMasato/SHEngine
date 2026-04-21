@@ -37,7 +37,7 @@ void SHEngine::Command::Queue::RegisterObject(Object* object) {
 	objects_.push_back(object);
 }
 
-void SHEngine::Command::Queue::Execute(std::vector<Object*> cmdObjs) {
+SHEngine::Command::WaitFence SHEngine::Command::Queue::Execute(std::vector<Object*> cmdObjs) {
 	std::vector<ID3D12CommandList*> cmdLists;
 	if (cmdObjs.empty()) {
 		for (const auto& obj : objects_) {
@@ -51,6 +51,11 @@ void SHEngine::Command::Queue::Execute(std::vector<Object*> cmdObjs) {
 
 	commandQueue_->ExecuteCommandLists(UINT(cmdLists.size()), cmdLists.data());
 	commandQueue_->Signal(fence_.Get(), ++fenceValue_);
+
+	WaitFence result = {};
+	result.fence = fence_.Get();
+	result.value = fenceValue_;
+	return result;
 }
 
 uint64_t SHEngine::Command::Queue::GetLastSendFence() {
@@ -69,6 +74,10 @@ void SHEngine::Command::Queue::WaitForFence(uint64_t fence) {
 		assert(SUCCEEDED(hr) && "Failed to set event on completion");
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
+}
+
+void SHEngine::Command::Queue::WaitForFence(const WaitFence& waitFence) {
+	commandQueue_->Wait(waitFence.fence, waitFence.value);
 }
 
 void SHEngine::Command::Queue::StopGPU() {

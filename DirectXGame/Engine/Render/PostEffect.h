@@ -33,7 +33,7 @@ struct PostEffectConfig {
 class PostEffect {
 public:
 
-	void Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData);
+	void Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData, bool copyOnly = false);
 	template<typename T>
 	void CopyBuffer(PostEffectJob job, const T& data);
 	void Draw(const PostEffectConfig& config);

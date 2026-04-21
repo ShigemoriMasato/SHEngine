@@ -1,34 +1,29 @@
-#include "SHResource.h"
+#include "GPUBuffer.h"
 #include <Utility/DirectUtilFuncs.h>
 #include <DirectXTex/d3dx12.h>
-#define Sigma(x) for (uint32_t i = 0; i < x; ++i)
 
-SHEngine::GPUBuffer::GPUBuffer(ResourceDesc& desc) {
-	//この組み合わせしたら殺す
-	assert(!((desc.bufferType & BufferType::CBV) && (desc.bufferType & BufferType::UAV)));
+SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num, uint32_t bufferNum) {
+	sizeInBytes_ = size * num;
+	UINT alignmentSize = (sizeInBytes_ + 255) & ~255;
 
-	sizeInBytes_ = desc.sizeInBytes * desc.elementCount;
-	UINT size = 0;
-	if (desc.bufferType & uint8_t(BufferType::CBV)) {
-		size = (static_cast<UINT>(sizeInBytes_) + 255) & ~255;	//CBVは256バイトアラインメント
-	} else {
-		size = static_cast<UINT>(sizeInBytes_);
-	}
+	resources_.reserve(bufferNum);
+	mappedData_.reserve(bufferNum);
+	currentState_.resize(bufferNum, D3D12_RESOURCE_STATE_COMMON);
 
-	resources_.reserve(desc.bufferNum);
-	mappedData_.reserve(desc.bufferNum);
-	currentState_.resize(desc.bufferNum, desc.initialState);
-	auto heapType = ((desc.bufferType & BufferType::UAV) == 0U ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT);
+	bufferType_ = uint8_t(bufferType);
 
-	for (uint32_t i = 0; i < desc.bufferNum; ++i) {
+	//UAVが含まれている場合はDEFAULT、そうでない場合はUPLOADにする。UAVバッファはGPUから書き込むこともあるため、CPUからのアクセスができないヒープタイプにする必要がある。
+	auto heapType = ((uint8_t(bufferType) & BufferType::UAV) ? D3D12_HEAP_TYPE_DEFAULT : D3D12_HEAP_TYPE_UPLOAD);
+
+	for (uint32_t i = 0; i < bufferNum; ++i) {
 		//頂点リソース用のヒープの設定
 		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-		uploadHeapProperties.Type = ((desc.bufferType & BufferType::UAV) == 0U ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT);
+		uploadHeapProperties.Type = heapType;
 		//頂点リソースの設定
 		D3D12_RESOURCE_DESC bufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
 		//バッファリソース、テクスチャの場合はまた別の設定をする
 		bufferResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		bufferResourceDesc.Width = UINT64(size);
+		bufferResourceDesc.Width = alignmentSize;
 		bufferResourceDesc.Height = 1;
 		//バッファの場合はこれにする決まり
 		bufferResourceDesc.DepthOrArraySize = 1;
@@ -37,35 +32,40 @@ SHEngine::GPUBuffer::GPUBuffer(ResourceDesc& desc) {
 		//バッファの場合はこれにする決まり
 		bufferResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
+		//UAVバッファの場合はフラグを追加する
+		if (bufferType_ & BufferType::UAV) {
+			bufferResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
+
 		auto& bufferResource = resources_.emplace_back().res;
 
 		HRESULT reason = device_->GetDevice()->GetDeviceRemovedReason();
 
 		HRESULT hr = device_->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
-			&bufferResourceDesc, desc.initialState, nullptr,
+			&bufferResourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
 			IID_PPV_ARGS(&bufferResource));
 		assert(SUCCEEDED(hr));
 
-		if ((desc.bufferType & BufferType::UAV) == 0) {
+		if ((bufferType_ & BufferType::UAV) == 0) {
 			auto& mapped = mappedData_.emplace_back();
 			hr = bufferResource->Map(0, nullptr, &mapped);
 		}
 	}
 
 	auto HasBuffer = [&](BufferType t) noexcept -> bool {
-		return (desc.bufferType & static_cast<uint8_t>(t)) != 0u;
+		return (bufferType_ & static_cast<uint8_t>(t)) != 0u;
 		};
 
-	assert(desc.bufferType & 0b111);	//SRV/CBV/UAVのどれかが指定されていること
+	assert(bufferType_ & 0b111);	//SRV/CBV/UAVのどれかが指定されていること
 
 	if (HasBuffer(BufferType::CBV)) {
-		for (uint32_t i = 0; i < desc.bufferNum; ++i) {
+		for (uint32_t i = 0; i < bufferNum; ++i) {
 			descriptorHandles_[BufferType::CBV].push_back(static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>(resources_[i].res->GetGPUVirtualAddress()));
 		}
 	}
 
 	if (HasBuffer(BufferType::SRV)) {
-		for (uint32_t i = 0; i < desc.bufferNum; ++i) {
+		for (uint32_t i = 0; i < bufferNum; ++i) {
 			auto& res = resources_[i].res;
 
 			// SRVハンドルの取得
@@ -80,8 +80,8 @@ SHEngine::GPUBuffer::GPUBuffer(ResourceDesc& desc) {
 			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 			srvDesc.Buffer.FirstElement = 0;
 			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-			srvDesc.Buffer.NumElements = desc.elementCount;
-			srvDesc.Buffer.StructureByteStride = UINT(desc.sizeInBytes);
+			srvDesc.Buffer.NumElements = num;
+			srvDesc.Buffer.StructureByteStride = UINT(size);
 
 			device_->GetDevice()->CreateShaderResourceView(res.Get(), &srvDesc, srvHandle->GetCPU());
 
@@ -90,7 +90,7 @@ SHEngine::GPUBuffer::GPUBuffer(ResourceDesc& desc) {
 	}
 
 	if (HasBuffer(BufferType::UAV)) {
-		for (uint32_t i = 0; i < desc.bufferNum; ++i) {
+		for (uint32_t i = 0; i < bufferNum; ++i) {
 			auto& res = resources_[i].res;
 
 			// UAVハンドルの取得
@@ -103,10 +103,10 @@ SHEngine::GPUBuffer::GPUBuffer(ResourceDesc& desc) {
 			uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 			uavDesc.Buffer.FirstElement = 0;
-			uavDesc.Buffer.NumElements = desc.elementCount;
+			uavDesc.Buffer.NumElements = num;
 			uavDesc.Buffer.CounterOffsetInBytes = 0;
 			uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-			uavDesc.Buffer.StructureByteStride = UINT(desc.sizeInBytes);
+			uavDesc.Buffer.StructureByteStride = UINT(size);
 
 			device_->GetDevice()->CreateUnorderedAccessView(res.Get(), nullptr, &uavDesc, uavHandle->GetCPU());
 
@@ -115,16 +115,17 @@ SHEngine::GPUBuffer::GPUBuffer(ResourceDesc& desc) {
 	}
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetGPUDescriptorHandle(BufferType type, uint32_t bufferIndex) const {
+D3D12_GPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetGPUDescriptorHandle(BufferType type) const {
 	auto it = descriptorHandles_.find(type);
 	assert(it != descriptorHandles_.end());
+	uint32_t bufferIndex = currentIndex_ % resources_.size();
 	return it->second.at(bufferIndex);
 }
 
 void SHEngine::GPUBuffer::CopyBuffer(const void* data, size_t dataSize) {
 	//安全性担保
 	assert(dataSize <= sizeInBytes_);
-	if (!uavHandles_.empty()) {
+	if (bufferType_ & BufferType::UAV) {
 		assert(false && "Cant copy data to UAV buffer");
 		return;
 	}
@@ -137,8 +138,10 @@ void SHEngine::GPUBuffer::TransitionBarrier(D3D12_RESOURCE_STATES after) {
 	nextState_ = after;
 }
 
-void SHEngine::GPUBuffer::Flush(CmdObj* cmdObj, uint32_t bufferIndex) {
-	if (uavHandles_.empty()) {
+void SHEngine::GPUBuffer::Flush(CmdObj* cmdObj) {
+	uint32_t bufferIndex = currentIndex_ % resources_.size();
+	//UAVが含まれていない場合は値をコピーする
+	if (!(bufferType_ & BufferType::UAV)) {
 		std::memcpy(mappedData_[bufferIndex], nextData_.data(), nextData_.size());
 	}
 

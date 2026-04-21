@@ -123,7 +123,7 @@ namespace SHEngine {
 			size_t size = 0;
 		};
 		/// @brief バッファデータのリスト（二重配列：外側=バッファ種類、内側=スワップチェーン対応）
-		std::vector<std::vector<BufferData>> bufferDatas_{};
+		std::vector<std::vector<BufferData>> bufferList_{};
 
 		/// @brief 定数バッファのGPUアドレスリスト
 		std::vector<std::vector<D3D12_GPU_VIRTUAL_ADDRESS>> cbvAddresses_{};
@@ -132,10 +132,6 @@ namespace SHEngine {
 
 		/// @brief スワップチェーンインデックス
 		int index_ = 0;
-
-
-		//例外的に描画限界を増やすやつら
-		std::vector<int> extraIndexNums_{1};
 
 	private://寿命管理
 

@@ -1,15 +1,15 @@
 #include "WAVData.h"
 #include <cassert>
-
+#include <filesystem>
+#include <fstream>
 
 namespace fs = std::filesystem;
 
-void WAVData::Load(const fs::path& filepath) {
-
+WAVData::WAVData(IXAudio2* xAudio, std::string filePath) : AudioData(xAudio) {
 	// ファイル入力ストリームのインスタンス
 	std::ifstream file;
 	// .wavファイルをバイナリモードで開く
-	file.open(filepath, std::ios_base::binary);
+	file.open(filePath, std::ios_base::binary);
 	// ファイルオープン失敗を検出する
 	assert(file.is_open());
 
@@ -68,54 +68,9 @@ void WAVData::Load(const fs::path& filepath) {
 	// Waveファイルを閉じる
 	file.close();
 
-	fs::path path = filepath;
-	
 	// returnする為の音声データ
 	wfex_ = format.fmt;
-	pBuffer_ = std::move(pBuffer);
-	bufferSize_ = data.size;
-	name_ = path.string();
-	type_ = AudioType::wav;
-}
-
-int WAVData::Play(IXAudio2* xAudio, bool isLoop) {
-
-	// 波形フォーマットを元にSourceVoiceの生成
-	IXAudio2SourceVoice* pPlayResource = nullptr;
-	HRESULT hr = xAudio->CreateSourceVoice(&pPlayResource, &wfex_);
-	assert(SUCCEEDED(hr));
-
-	// 再生する波形データの設定
-	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = pBuffer_.get();
-	buf.AudioBytes = bufferSize_;
-	buf.Flags = XAUDIO2_END_OF_STREAM;
-	buf.LoopCount = isLoop ? XAUDIO2_LOOP_INFINITE : 0;
-
-	pPlayResource->SetVolume(volume_);
-
-	// 再生リソースをSourceVoiceに登録
-	hr = pPlayResource->SubmitSourceBuffer(&buf);
-	assert(SUCCEEDED(hr));
-
-	// 再生
-	hr = pPlayResource->Start();
-	assert(SUCCEEDED(hr));
-
-	if (!isLoop) {
-		//保存場所の変更
-		playResourceIndex_++;
-		if (playResourceIndex_ >= resourceNum_) {
-			playResourceIndex_ = 0;
-		}
-
-		playResource_[playResourceIndex_] = pPlayResource;
-
-		return playResourceIndex_;
-
-	} else {
-		loopPlayResource_ = pPlayResource;
-		return 9;
-	}
-
+	audioData_.resize(data.size);
+	std::memcpy(audioData_.data(), pBuffer.get(), data.size);
+	name_ = filePath;
 }

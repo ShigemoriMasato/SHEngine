@@ -10,9 +10,9 @@ namespace SHEngine::Screen {
 
 		void Initialize(SHEngine::TextureManager* textureManager);
 
-		void PreDraw(Command::Object* cmdObject, bool isClear) override;
+		void Clear(Command::Object* cmdObject) override;
 
-		void PostDraw(Command::Object* cmdObject) override;
+		void ToPresent(Command::Object* cmdObject) override;
 
 		void ToTexture(Command::Object* cmdObject) override;
 

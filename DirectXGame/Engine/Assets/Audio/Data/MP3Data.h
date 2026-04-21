@@ -4,11 +4,8 @@
 class MP3Data : public AudioData {
 public:
 
-	MP3Data() = default;
+	MP3Data(IXAudio2* xAudio, std::string filePath);
 	~MP3Data() = default;
-
-	void Load(const std::filesystem::path& filepath) override;
-	int Play(IXAudio2* xAudio, bool isLoop) override;
 
 private:
 

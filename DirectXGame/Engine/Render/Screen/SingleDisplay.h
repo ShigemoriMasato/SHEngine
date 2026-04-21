@@ -20,12 +20,16 @@ namespace SHEngine::Screen {
 		/// @param resource スワップチェーンのリソース
 		void Initialize(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor);
 
-		void PreDraw(Command::Object* cmdObject, bool isClear = true) override;
-		void PostDraw(Command::Object* cmdObject) override;
+		void Clear(Command::Object* cmdObject) override;
+		void ToRenderTarget(Command::Object* cmdObject) override;
+		void ToPresent(Command::Object* cmdObject) override;
 		void ToTexture(Command::Object* cmdObject) override;
 
 		TextureData* GetTextureData() const override { return textureData_; }
 		TextureData* GetDepthTexture() const override { return depthTextureData_; }
+
+		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() override { return rtvHandle_.GetCPU(); }
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle() override { return dsvHandle_.GetCPU(); }
 
 		DXGI_FORMAT GetRTVFormat() override { return rtvFormat_; }
 

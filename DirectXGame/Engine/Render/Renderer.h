@@ -1,5 +1,5 @@
 #pragma once
-#include "SHResource.h"
+#include "Buffer/BufferContainer.h"
 #include "DrawDataManager.h"
 #include "PSO/PSOEditor.h"
 
@@ -19,15 +19,35 @@ namespace SHEngine {
 		/// <param name="type"></param>
 		void SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType);
 
+		// @brief VertexShaderのファイル名をセットする。デフォルトは"Simple.VS.hlsl"。
+		void SetVS(const std::string& vs) { vs_ = vs; }
+		// @brief PixelShaderのファイル名をセットする。デフォルトは"White.PS.hlsl"。
+		void SetPS(const std::string& ps) { ps_ = ps; }
+		// @brief 入力レイアウトIDをセットする。デフォルトはPSO::InputLayoutID::Default。
+		void SetInputLayout(PSO::InputLayoutID id) { inputLayoutID_ = id; }
+		// @brief ブレンドステートIDをセットする。デフォルトはPSO::BlendStateID::Normal。
+		void SetBlendState(PSO::BlendStateID id) { blendID_ = id; }
+		// @brief 深度ステンシルIDをセットする。デフォルトはPSO::DepthStencilID::Default。
+		void SetDepthStencil(PSO::DepthStencilID id) { depthStencilID_ = id; }
+		// @brief ラスタライザーIDをセットする。デフォルトはPSO::RasterizerID::Fill。
+		void SetRasterizer(PSO::RasterizerID id) { rasterizerID_ = id; }
+		// @brief プリミティブトポロジーをセットする。デフォルトはD3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST。
+		void SetTopology(D3D12_PRIMITIVE_TOPOLOGY topology) { topology_ = topology; }
+		// @brief スワップチェーン用かどうかをセットする。デフォルトはfalse。
+		void SetUseTexture(bool use) { isUseTexture_ = use; }
+
+		// @brief 指定された設定を基に描画コマンドを発行する。
 		void Draw(CmdObj* cmdObj);
 
 		// インスタンスの数
 		uint32_t instanceNum_ = 1;
 
+	private:
+
 		/// @brief 頂点シェーダーファイル名
-		std::string vs_ = "Object3d.VS.hlsl";
+		std::string vs_ = "Simple.VS.hlsl";
 		/// @brief ピクセルシェーダーファイル名
-		std::string ps_ = "Object3d.PS.hlsl";
+		std::string ps_ = "White.PS.hlsl";
 		/// @brief 入力レイアウトID
 		PSO::InputLayoutID inputLayoutID_ = PSO::InputLayoutID::Default;
 		/// @brief ブレンドステートID
@@ -43,13 +63,11 @@ namespace SHEngine {
 		/// @brief 画像を使用するかどうか
 		bool isUseTexture_ = false;
 
-	private:
-
 		static inline PSO::Editor* psoEditor_ = nullptr;
 		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
 
 		DrawData drawData_;
-		std::map<ShaderType, std::map<BufferType, std::vector<GPUBuffer*>>> gpuBuffers_;
+		std::map<BufferType, std::map<ShaderType, std::vector<GPUBuffer*>>> gpuBuffers_;
 
 	};
 

@@ -51,11 +51,11 @@ void SHEngine::Screen::SwapChain::Initialize(DXDevice* device, TextureManager* t
 }
 
 void SHEngine::Screen::SwapChain::PreDraw(Command::Object* cmdObject, bool isClear) {
-    displays_[currentBufferIndex_]->PreDraw(cmdObject, isClear);
+	cmdObject->SetRenderTarget(GetCurrentDisplay(), isClear);
 }
 
-void SHEngine::Screen::SwapChain::PostDraw(Command::Object* cmdObject) {
-    displays_[currentBufferIndex_]->PostDraw(cmdObject);
+void SHEngine::Screen::SwapChain::ToPresent(Command::Object* cmdObject) {
+    displays_[currentBufferIndex_]->ToPresent(cmdObject);
 }
 
 void SHEngine::Screen::SwapChain::ToTexture(Command::Object* cmdObject) {

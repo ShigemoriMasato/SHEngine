@@ -176,6 +176,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppSource\Scene\CommonData.cpp" />
+    <ClCompile Include="Engine\Assets\Audio\Data\PlayData.cpp" />
     <ClCompile Include="Engine\Assets\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Compute\PSO\CSPSOManager.cpp" />
     <ClCompile Include="Engine\Compute\PSO\CSRootSignature.cpp" />
@@ -185,13 +186,15 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Core\Command\CommandManager.cpp" />
     <ClCompile Include="Engine\Compute\ComputeObject.cpp" />
     <ClCompile Include="Engine\Core\Command\Data\SHCmdQueue.cpp" />
+    <ClCompile Include="Engine\Core\FrameCounter.cpp" />
+    <ClCompile Include="Engine\Render\Buffer\BufferContainer.cpp" />
+    <ClCompile Include="Engine\Render\Buffer\GPUBuffer.cpp" />
     <ClCompile Include="Engine\Render\DrawDataManager.cpp" />
     <ClCompile Include="Engine\Render\Font\Text.cpp" />
     <ClCompile Include="Engine\Render\PostEffect.cpp" />
     <ClCompile Include="Engine\Render\Renderer.cpp" />
     <ClCompile Include="Engine\Render\RenderObject.cpp" />
     <ClCompile Include="Engine\Render\Screen\ShadowMap.cpp" />
-    <ClCompile Include="Engine\Render\SHResource.cpp" />
     <ClCompile Include="Engine\Tool\Binary\BinaryManager.cpp" />
     <ClCompile Include="Engine\Assets\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Assets\Audio\Data\AudioData.cpp" />
@@ -235,6 +238,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Scene\InitializeScene.cpp" />
     <ClCompile Include="AppSource\Scene\SceneManager.cpp" />
     <ClInclude Include="AppSource\Scene\CommonData.h" />
+    <ClInclude Include="Engine\Assets\Audio\Data\PlayData.h" />
     <ClInclude Include="Engine\Assets\Model\ModelManager.h" />
     <ClInclude Include="Engine\Compute\PSO\CSPSOManager.h" />
     <ClInclude Include="Engine\Compute\PSO\CSRootSignature.h" />
@@ -244,6 +248,9 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Core\Command\CommandManager.h" />
     <ClInclude Include="Engine\Compute\ComputeObject.h" />
     <ClInclude Include="Engine\Core\Command\Data\SHCmdQueue.h" />
+    <ClInclude Include="Engine\Core\FrameCounter.h" />
+    <ClInclude Include="Engine\Render\Buffer\BufferContainer.h" />
+    <ClInclude Include="Engine\Render\Buffer\GPUBuffer.h" />
     <ClInclude Include="Engine\Render\DrawDataManager.h" />
     <ClInclude Include="Engine\Render\Font\Text.h" />
     <ClInclude Include="Engine\Render\PostEffect.h" />
@@ -251,7 +258,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\Renderer.h" />
     <ClInclude Include="Engine\Render\RenderObject.h" />
     <ClInclude Include="Engine\Render\Screen\ShadowMap.h" />
-    <ClInclude Include="Engine\Render\SHResource.h" />
     <ClInclude Include="Engine\Tool\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Assets\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Tool\Binary\Value.h" />

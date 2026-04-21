@@ -14,8 +14,9 @@ namespace SHEngine::Screen {
 
 		void Initialize(int width, int height, uint32_t clearColor, TextureManager* textureManager);
 
-		void PreDraw(Command::Object* cmdObject, bool isClear = true) override;
-		void PostDraw(Command::Object* cmdObject) override;
+		void Clear(Command::Object* cmdObject) override;
+		void ToRenderTarget(Command::Object* cmdObject) override;
+		void ToPresent(Command::Object* cmdObject) override;
 		void ToTexture(Command::Object* cmdObject) override;
 
 		TextureData* GetTextureData() const override {
@@ -26,6 +27,9 @@ namespace SHEngine::Screen {
 		}
 
 		DXGI_FORMAT GetRTVFormat() override { return DXGI_FORMAT_R8G8B8A8_UNORM; }
+
+		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() override { return displays_[currentDisplayIndex_]->GetRTVHandle(); }
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle() override { return displays_[currentDisplayIndex_]->GetDSVHandle(); }
 
 	private:
 

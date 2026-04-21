@@ -20,11 +20,7 @@ bool operator<(PostEffectJob a, PostEffectJob b) {
 	return uint32_t(a) < uint32_t(b);
 }
 
-void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData) {
-	//PostEffect用Displayの初期化
-	intermediateDisplay_ = std::make_unique<SHEngine::Screen::MultiDisplay>();
-	intermediateDisplay_->Initialize(1280, 720, 0xffffffff, textureManager);
-
+void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData, bool copyOnly) {
 	//RenderObjectの初期化
 	auto createPostEffectObject = [&](PostEffectJob job, std::string psPath) {
 		auto postEffectObject = std::make_unique<SHEngine::RenderObject>("PostEffect::" + psPath);
@@ -40,14 +36,21 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 		};
 
 	createPostEffectObject(PostEffectJob::None, "Simple");
-	createPostEffectObject(PostEffectJob::BlurV, "BlurVert");
-	createPostEffectObject(PostEffectJob::BlurH, "BlurHori");
-	createPostEffectObject(PostEffectJob::Fade, "Fade");
-	createPostEffectObject(PostEffectJob::Glitch, "Glitch");
-	createPostEffectObject(PostEffectJob::GrayScale, "GrayScale");
-	createPostEffectObject(PostEffectJob::GridTransition, "GridTransition");
-	createPostEffectObject(PostEffectJob::SlowMotion, "SlowMotion");
-	createPostEffectObject(PostEffectJob::HeavyBlur, "Blur");
+
+	if (!copyOnly) {
+		createPostEffectObject(PostEffectJob::BlurV, "BlurVert");
+		createPostEffectObject(PostEffectJob::BlurH, "BlurHori");
+		createPostEffectObject(PostEffectJob::Fade, "Fade");
+		createPostEffectObject(PostEffectJob::Glitch, "Glitch");
+		createPostEffectObject(PostEffectJob::GrayScale, "GrayScale");
+		createPostEffectObject(PostEffectJob::GridTransition, "GridTransition");
+		createPostEffectObject(PostEffectJob::SlowMotion, "SlowMotion");
+		createPostEffectObject(PostEffectJob::HeavyBlur, "Blur");
+
+		//PostEffect用Displayの初期化
+		intermediateDisplay_ = std::make_unique<SHEngine::Screen::MultiDisplay>();
+		intermediateDisplay_->Initialize(1280, 720, 0xffffffff, textureManager);
+	}
 }
 
 void PostEffect::Draw(const PostEffectConfig& config) {
@@ -68,7 +71,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 		}
 
 		//描画処理
-		output->PreDraw(cmdObject, true);
+		cmdObject->SetRenderTarget(output);
 		origin->ToTexture(cmdObject);
 		//RenderObjectにテクスチャをセット
 		int textureIndex = origin->GetTextureData()->GetOffset();
@@ -101,12 +104,12 @@ FINAL_DRAW:
 		return;
 	}
 
-	output->PreDraw(cmdObject, false);
+	cmdObject->SetRenderTarget(output, true);
 	origin->ToTexture(cmdObject);
 	int textureIndex = origin->GetTextureData()->GetOffset();
 	auto finalObj = postEffectObjects_.at(PostEffectJob::None).get();
 	finalObj->CopyBufferData(0, &textureIndex, sizeof(int));
 	finalObj->psoConfig_.isSwapChain = output->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	finalObj->Draw(cmdObject);
-	output->PostDraw(cmdObject);
+	output->ToPresent(cmdObject);
 }

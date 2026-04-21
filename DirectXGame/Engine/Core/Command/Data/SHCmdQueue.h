@@ -3,6 +3,11 @@
 
 namespace SHEngine::Command {
 
+	struct WaitFence {
+		ID3D12Fence* fence;
+		UINT64 value;
+	};
+
 	class Queue {
 	public:
 
@@ -13,16 +18,19 @@ namespace SHEngine::Command {
 		void RegisterObject(Object* object);
 
 		//実行する
-		void Execute(std::vector<Object*> cmdObjs);
+		WaitFence Execute(std::vector<Object*> cmdObjs);
 
 		//最後に送ったFenceの値を出力
 		uint64_t GetLastSendFence();
 
-		//そのフェンス
+		//そのフェンスが完了しているか確認
 		bool CheckFinishedJob(uint64_t fence);
 
-		//作業
+		// そのフェンスが完了するまで待つ
 		void WaitForFence(uint64_t fence);
+
+		// そのフェンスが完了するまで待つ(別のキューのフェンスも可、GPU側で待機)
+		void WaitForFence(const WaitFence& waitFence);
 
 		//完全にGPUの処理が終わるのを待つ
 		void StopGPU();

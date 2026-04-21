@@ -11,30 +11,28 @@
 class WAVData : public AudioData {
 public:
 
-	WAVData() = default;
+	WAVData(IXAudio2* xAudio, std::string filePath);
 	~WAVData() = default;
 
-	/**
-	 * @brief WAVファイルの読み込み
-	 * 
-	 * 指定されたパスからWAVファイルを読み込み、音声データとフォーマット情報を取得する。
-	 * 
-	 * @param filepath 読み込むWAVファイルのパス
-	 */
-	void Load(const std::filesystem::path& filepath) override;
-
-	/**
-	 * @brief WAV音声の再生
-	 * 
-	 * 読み込んだWAV音声データをXAudio2で再生する。
-	 * 
-	 * @param xAudio XAudio2インスタンス
-	 * @param isLoop ループ再生するかどうか
-	 * @return 再生ハンドル
-	 */
-	int Play(IXAudio2* xAudio, bool isLoop) override;
-
 private:
+
+	// チャンクヘッダ
+	struct ChunkHeader {
+		char id[4];   // チャンク毎のID
+		int32_t size; // チャンクサイズ
+	};
+
+	// RIFFヘッダチャンク
+	struct RiffHeader {
+		ChunkHeader chunk; // RIFF
+		char type[4];  // WAVE
+	};
+
+	// FMTチャンク
+	struct FormatChunk {
+		ChunkHeader chunk; // fmt
+		WAVEFORMATEX fmt;  // 波形フォーマット
+	};
 
 };
 

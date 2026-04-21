@@ -11,14 +11,15 @@ namespace SHEngine::Screen {
 
 		static void SetDevice(DXDevice* device) { device_ = device; }
 
-		/// @brief レンダーターゲットの切り替えや、画面のクリア
-		/// @param cmdObject コマンドオブジェクト
-		/// @param isClear 画面をクリアするかどうか
-		virtual void PreDraw(Command::Object* cmdObject, bool isClear) = 0;
+		/// @brief 画面をClearColorで塗りつぶす
+		virtual void Clear(Command::Object* cmdObject) = 0;
+
+		/// @brief RenderTargetのBarrierを張る
+		virtual void ToRenderTarget(Command::Object* cmdObject) = 0;
 
 		/// @brief 描画後の処理（Presentや、OffScreen用テクスチャへのコピーなど）
 		/// @param cmdObject コマンドオブジェト
-		virtual void PostDraw(Command::Object* cmdObject) = 0;
+		virtual void ToPresent(Command::Object* cmdObject) = 0;
 
 		/// @brief バリアをピクセルシェーダーで使用できるようにする
 		/// @param cmdObject コマンドオブジェクト
@@ -35,6 +36,12 @@ namespace SHEngine::Screen {
 
 		// @brief RTVの数を取得する
 		virtual int GetRTVNum() { return 1; };
+
+		// @brief RTVのCPUHandleを取得する。
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() = 0;
+
+		// @brief DSVのCPUHandleを取得する。
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle() = 0;
 
 	protected:
 
