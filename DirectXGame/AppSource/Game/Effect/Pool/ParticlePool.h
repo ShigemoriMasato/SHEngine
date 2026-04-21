@@ -25,11 +25,14 @@ public:
 	//パーティクルの描画
 	void Draw(CmdObj* cmdObj);
 
+	//パーティクルの共通要素に関する操作
+	void DrawImGui();
+
 	const Pool& GetPool() const { return pool_; }
 
 private:
 
-	constexpr static inline int kThreadGroupSize_ = 1024;
+	constexpr static inline int kThreadGroupSize_ = 256;
 
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 
@@ -42,7 +45,7 @@ private:
 
 	std::unique_ptr<SHEngine::Renderer> renderer_;
 
-	float size_ = 1.0f;
+	float size_ = 0.02f;
 	struct Camera {
 		Matrix4x4 vpMatrix;
 		Matrix4x4 billboardMatrix;

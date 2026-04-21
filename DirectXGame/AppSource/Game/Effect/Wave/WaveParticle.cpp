@@ -1,4 +1,5 @@
 #include "WaveParticle.h"
+#include <imgui/imgui.h>
 
 void WaveParticle::Initialize(const Pool& pool, const uint32_t id) {
 	emitter_ = std::make_unique<SHEngine::ComputeObject>("WaveParticle Emitter");
@@ -30,4 +31,19 @@ void WaveParticle::Update(CmdObj* compute) {
 	emitter_->SetThreadGroupSize(int(config_.emitNum / 1024) + 1);
 	emitter_->Execute(compute);
 	update_->Execute(compute);
+}
+
+void WaveParticle::DrawImGui() {
+#ifdef USE_IMGUI
+	ImGui::Begin("WaveParticle");
+	ImGui::DragFloat("Speed", &config_.speed, 0.0f, 10.0f);
+	ImGui::DragFloat("Seed", &config_.seed, 0.0f, 100.0f);
+	ImGui::DragFloat("LifeTime", &config_.lifeTime, 0.1f, 5.0f);
+	ImGui::SliderInt("EmitNum", &config_.emitNum, 1, 10000);
+	speed_->CopyBuffer(&config_.speed, sizeof(float));
+	seed_->CopyBuffer(&config_.seed, sizeof(float));
+	lifeTime_->CopyBuffer(&config_.lifeTime, sizeof(float));
+	emitNum_->CopyBuffer(&config_.emitNum, sizeof(int));
+	ImGui::End();
+#endif
 }

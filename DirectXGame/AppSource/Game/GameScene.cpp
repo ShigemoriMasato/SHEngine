@@ -83,18 +83,6 @@ std::unique_ptr<IScene> GameScene::Update() {
 	}
 	auto key = keyCoating_->GetKeyStates();
 
-	if (key.at(Key::Left)) {
-	}
-
-	if (key.at(Key::Right)) {
-	}
-
-	if (key.at(Key::Down)) {
-	}
-
-	if (key.at(Key::HardDrop)) {
-	}
-
 	if (key.at(Key::Debug1)) {
 		return std::make_unique<GameScene>();
 	}
@@ -145,6 +133,13 @@ void GameScene::Draw() {
 	ImGui::Begin("Input Debug");
 	Vector2 cursor = input_->GetCursorPos();
 	ImGui::Text("Cursor Pos: (%.1f, %.1f)", cursor.x, cursor.y);
+	ImGui::End();
+
+	ImGui::Begin("FPS");
+	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
+	float fps = 1.0f / deltaTime;
+	ImGui::Text("FPS: %.1f", fps);
+	ImGui::Text("DeltaTime: %.4f sec", deltaTime);
 	ImGui::End();
 #endif
 

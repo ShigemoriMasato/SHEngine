@@ -10,11 +10,11 @@ cbuffer ParticleNum : register(b0)
 [numthreads(1024, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    if (DTid.x >= maxNum)
+    uint index = DTid.x;
+    if (index >= maxNum)
     {
         return;
     }
-    uint index = DTid.x;
     
     //FreeListの初期化
     freeList[index] = index;

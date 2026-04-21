@@ -17,8 +17,6 @@ struct ColorBuffer
     float4 color;
 };
 StructuredBuffer<ColorBuffer> colors : register(t0);
-Texture2D<float4> textures[] : register(t8);
-SamplerState gSampler : register(s0);
 
 PSOutput main(PSInput input)
 {

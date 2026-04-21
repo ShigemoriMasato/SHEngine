@@ -38,26 +38,15 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix)
 	update_->ResetCommandList();
 	direct_->ResetCommandList();
 
-	//前フレームの描画処理が終わるまで待つ
-	for (uint32_t i = 0; i < 6; ++i) {
-		engine_->WaitFence(drawFence_, SHEngine::Command::Type::Direct, i);
-	}
-
-	//あらゆるパーティクルの更新を行う
+	//パーティクルの更新処理
 	waveParticle_->Update(compute_[0].get());
 
-	//Commandを実行
-	for (size_t i = 0; i < compute_.size(); ++i) {
-		computeFence_[i] = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, uint32_t(i), {compute_[i].get()});
-	}
-	//次の更新処理を0で行うので、0のキューが全てのGPU処理が終わるまで待つ
-	for (size_t i = 0; i < computeFence_.size(); ++i) {
-		engine_->WaitFence(computeFence_[i], SHEngine::Command::Type::Compute, 0);
+	//Queueに登録して実行
+	for (int i = 0; i < 6; ++i) {
+		computeFence_[i] = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, i, { compute_[i].get() });
 	}
 
-	//最後に実行
 	particlePool_->Update(vpMatrix, billboardMatrix, update_.get());
-	engine_->ExecuteCommand(SHEngine::Command::Type::Compute, 0, { update_.get() });
 }
 
 void Effect::Draw(SHEngine::Screen::IDisplay* display) {
@@ -65,6 +54,12 @@ void Effect::Draw(SHEngine::Screen::IDisplay* display) {
 	direct_->SetRenderTarget(display, true);
 	particlePool_->Draw(direct_.get());
 
-	//この描画処理が終わる前にCSが走らないようにFenceを取得しておく
-	drawFence_ = engine_->ExecuteCommand(SHEngine::Command::Type::Direct, 0, { direct_.get() });
+	//更新処理の後にこの関数を呼び出す
+	for (auto& computeFence : computeFence_) {
+		engine_->WaitFence(computeFence, SHEngine::Command::Type::Direct);
+	}
+	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, 0, { direct_.get() });
+
+	particlePool_->DrawImGui();
+	waveParticle_->DrawImGui();
 }

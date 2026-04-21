@@ -9,6 +9,8 @@ public:
 	void Initialize(const Pool& pool, const uint32_t id);
 	void Update(CmdObj* compute);
 
+	void DrawImGui();
+
 private:
 
 	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;

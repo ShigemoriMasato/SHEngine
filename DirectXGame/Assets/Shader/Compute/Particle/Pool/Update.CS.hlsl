@@ -25,6 +25,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
+    wvp[index] = vpMatrix;
+    return;
+    
     if (type[index] == 0)
     {
         wvp[index] = float4x4(0, 0, 0, 0,
