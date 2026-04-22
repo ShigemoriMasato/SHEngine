@@ -13,9 +13,9 @@ namespace SHEngine::PSO {
 	class CSPSOManager {
 	public:
 
-		void Initialize(DXDevice* device);
+		void Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC>);
 		
-		void SetPSO(CmdObj* cmdObj, int cbv, int srv, int uav, std::string computeShaderName);
+		void SetPSO(CmdObj* cmdObj, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName);
 
 	private:
 
@@ -23,14 +23,18 @@ namespace SHEngine::PSO {
 			int cbv;
 			int srv;
 			int uav;
+			bool useTexture;
+			uint32_t samplerID;
 			std::string computeShaderName;
 			bool operator==(const Config& other) const {
-				return cbv == other.cbv && srv == other.srv && uav == other.uav;
-			}
+				return cbv == other.cbv && srv == other.srv && uav == other.uav && useTexture == other.useTexture && samplerID == other.samplerID;
+			 }
 			bool operator<(const Config& other) const {
 				if (cbv != other.cbv) return cbv < other.cbv;
 				if (srv != other.srv) return srv < other.srv;
 				if (uav != other.uav) return uav < other.uav;
+				if (useTexture != other.useTexture) return useTexture < other.useTexture;
+				if (samplerID != other.samplerID) return samplerID < other.samplerID;
 				return computeShaderName < other.computeShaderName;
 			}
 		};

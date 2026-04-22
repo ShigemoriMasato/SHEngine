@@ -22,6 +22,11 @@ void Tetris::Update(float deltaTime) {
 	auto key = keys_->GetKeyStates();
 	deletedLine_ = 0;
 
+	if (gameOver_) {
+		blockRender_->Update(deltaTime);
+		return;
+	}
+
 	if (!blockRender_->GetIsEffecting()) {
 		player_->SetDownTime(downInterval_);
 

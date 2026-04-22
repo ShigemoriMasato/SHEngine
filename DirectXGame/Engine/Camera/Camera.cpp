@@ -77,5 +77,5 @@ Matrix4x4 Camera::GetBillboardMatrix() const {
 	for (int i = 0; i < 3; ++i) {
 		billboardMatrix.m[3][i] = 0.0f;
 	}
-	return billboardMatrix;
+	return billboardMatrix.Inverse();
 }

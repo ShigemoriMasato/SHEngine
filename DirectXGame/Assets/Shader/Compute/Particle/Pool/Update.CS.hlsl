@@ -16,7 +16,7 @@ cbuffer Size : register(b2)
     float size;
 };
 
-[numthreads(1024, 1, 1)]
+[numthreads(256, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint index = DTid.x;

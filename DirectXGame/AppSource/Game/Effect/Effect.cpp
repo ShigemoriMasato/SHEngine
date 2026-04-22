@@ -1,7 +1,8 @@
 #include "Effect.h"
 
-void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* engine) {
+void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* engine, SHEngine::TextureManager* textureManager) {
 	engine_ = engine;
+	textureManager_ = textureManager;
 
 	computeFence_.resize(6);
 	compute_.resize(6);
@@ -25,12 +26,13 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 
 	//実行中に他のパーティクルの初期化(CPUだけ)を行う
 	waveParticle_ = std::make_unique<WaveParticle>();
-	waveParticle_->Initialize(pool, 1);
+	uint32_t textureID = textureManager_->LoadTexture("WaveParticle.png");
+	waveParticle_->Initialize(textureID, pool, 1);
 
 	compute_[0]->WaitForGPUIdle();
 }
 
-void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix) {
+void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
 	//全部のコマンドリストをリセット
 	for (const auto& compute : compute_) {
 		compute->ResetCommandList();
@@ -39,14 +41,14 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix)
 	direct_->ResetCommandList();
 
 	//パーティクルの更新処理
-	waveParticle_->Update(compute_[0].get());
+	waveParticle_->Update(compute_[0].get(), deltaTime);
 
 	//Queueに登録して実行
 	for (int i = 0; i < 6; ++i) {
 		computeFence_[i] = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, i, { compute_[i].get() });
 	}
 
-	particlePool_->Update(vpMatrix, billboardMatrix, update_.get());
+	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime);
 }
 
 void Effect::Draw(SHEngine::Screen::IDisplay* display) {

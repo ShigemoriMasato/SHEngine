@@ -1,19 +1,19 @@
 #include "CSPSOManager.h"
 
-void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device) {
+void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers) {
 	device_ = device;
 	rootSignature_ = std::make_unique<CSRootSignature>();
-	rootSignature_->Initialize(device);
+	rootSignature_->Initialize(device, samplers);
 	shaderShelf_ = std::make_unique<CSShaderShelf>();
 	shaderShelf_->Initialize(device);
 	pso_.clear();
 }
 
-void SHEngine::PSO::CSPSOManager::SetPSO(CmdObj* cmdObj, int cbv, int srv, int uav, std::string computeShaderName) {
+void SHEngine::PSO::CSPSOManager::SetPSO(CmdObj* cmdObj, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName) {
 
-	Config config{ cbv, srv, uav, computeShaderName };
+	Config config{ cbv, srv, uav, useTexture, samplerID, computeShaderName };
 	ID3D12PipelineState* pipelineState = nullptr;
-	auto rootSignature = rootSignature_->GetRootSignature(cbv, srv, uav);
+	auto rootSignature = rootSignature_->GetRootSignature(cbv, srv, uav, useTexture, samplerID);
 	const auto& it = pso_.find(config);
 
 	if (it != pso_.end()) {

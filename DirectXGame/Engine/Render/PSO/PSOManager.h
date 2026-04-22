@@ -61,6 +61,13 @@ namespace SHEngine::PSO {
 		 */
 		ShaderShelf* GetShaderShelf() const { return shaderShelf_.get(); }
 
+		/**
+		 * @brief ブレンドステートシェルフの取得
+		 *
+		 * @return ブレンドステートシェルフのポインタ
+		 */
+		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> GetSamplers() const { return rootSignatureShelf_->GetSamplers(); }
+
 	private:
 
 		/**

@@ -42,6 +42,12 @@ namespace SHEngine::PSO {
 		 */
 		void SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config);
 
+		/**
+		 * @brief サンプラー記述子を取得
+		 * @return サンプラー記述子のマップ
+		 */
+		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> GetSamplers() const { return psoManager_->GetSamplers(); }
+
 	private:
 
 		/// @brief PSOマネージャー

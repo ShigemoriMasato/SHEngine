@@ -49,7 +49,7 @@ void GameScene::Initialize() {
 	gameOverText->SetDrawData(gameOverdd);
 
 	auto planeDrawData = drawDataManager_->GetDrawData(modelManager_->GetNodeModelData(1).drawDataIndex);
-	effect_->Initialize(planeDrawData, engine_);
+	effect_->Initialize(planeDrawData, engine_, textureManager_);
 
 	gameoverMat = Matrix::MakeAffineMatrix(
 		Vector3(1.0f, 1.0f, 1.0f),
@@ -71,7 +71,7 @@ std::unique_ptr<IScene> GameScene::Update() {
 
 	tetris_->Update(deltaTime);
 
-	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix());
+	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
 
 	//線を消したときのやつ
 	int deleteNum = tetris_->IsLineDeleted();

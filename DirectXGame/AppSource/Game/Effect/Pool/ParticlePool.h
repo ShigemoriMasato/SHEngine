@@ -20,7 +20,7 @@ public:
 	void Initialize(SHEngine::DrawData& planeDrawData, const int kMaxParticleNum, CmdObj* cmdObj);
 
 	//全てのWorldMatrixにcamera行列をかけて、GPUに転送する
-	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, CmdObj* cmdObj);
+	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime);
 
 	//パーティクルの描画
 	void Draw(CmdObj* cmdObj);
@@ -45,7 +45,7 @@ private:
 
 	std::unique_ptr<SHEngine::Renderer> renderer_;
 
-	float size_ = 0.02f;
+	float size_ = 0.2f;
 	struct Camera {
 		Matrix4x4 vpMatrix;
 		Matrix4x4 billboardMatrix;

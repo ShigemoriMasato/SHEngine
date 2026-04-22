@@ -26,12 +26,12 @@ void InitializeScene::Initialize() {
 		};
 
 	windowSet.first->Initialize(desc, engine_->GetHInstance());
-	windowSet.second = engine_->MakeWindow(windowSet.first.get(), 0x508888ff);
+	windowSet.second = engine_->MakeWindow(windowSet.first.get(), 0xffffffff);
 
 	input_->SetWindow(windowSet.first->GetHwnd());
 
 	commonData_->display = std::make_unique<MainDisplay>();
-	commonData_->display->Initialize(desc.width, desc.height, 0x888850ff, textureManager_, input_);
+	commonData_->display->Initialize(desc.width, desc.height, 0x050505ff, textureManager_, input_);
 
 	std::vector<VertexData> vertices = {
 		{{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},

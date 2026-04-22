@@ -158,6 +158,12 @@ namespace SHEngine::PSO {
 		 */
 		ID3D12RootSignature* GetRootSignature(const RootSignatureConfig& config);
 
+		/**
+		 * @brief サンプラー記述子を取得
+		 * @return サンプラー記述子のマップ
+		 */
+		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> GetSamplers() const { return samplers_; }
+
 	private:
 
 		/**

@@ -7,8 +7,9 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	update_ = std::make_unique<SHEngine::ComputeObject>("Pool Update");
 	renderer_ = std::make_unique<SHEngine::Renderer>(planeDrawData);
 
-	pool_.freeList = container_->Create(BufferType::UAV, sizeof(uint32_t), kMaxParticleNum); // freeList
-	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(uint32_t), 1); // freeListIndex
+	pool_.freeList = container_->Create(BufferType::UAV, sizeof(uint32_t), kMaxParticleNum, 1); // freeList
+	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(uint32_t), 1, 1); // freeListIndex
+
 	pool_.position = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum); // world
 	pool_.color = container_->Create(BufferType::SRV_UAV, sizeof(Vector4), kMaxParticleNum); // color
 	pool_.type = container_->Create(BufferType::SRV_UAV, sizeof(uint32_t), kMaxParticleNum); // type
@@ -25,28 +26,26 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	initialize_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_);
 
 	renderer_->SetVS("Game/GPUParticle.VS.hlsl");
-	renderer_->SetPS("White.PS.hlsl");
+	renderer_->SetPS("Game/GPUParticle.PS.hlsl");
 	renderer_->SetGPUBuffer(pool_.position, ShaderType::VERTEX_SHADER , BufferType::SRV);
 	renderer_->SetGPUBuffer(pool_.type, ShaderType::VERTEX_SHADER , BufferType::SRV);
 	renderer_->SetGPUBuffer(sizeBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->SetGPUBuffer(vpMatrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	renderer_->SetGPUBuffer(pool_.type, ShaderType::PIXEL_SHADER, BufferType::SRV);
 	renderer_->instanceNum_ = kMaxParticleNum;
 
 	initialize_->Execute(cmdObj);
 
 	pool_.maxParticleNum = kMaxParticleNum;
-
-	//めんどくさいので適当にdeltatimeぶち込んどく
-	float deltaTime = 1.0f / 60.0f;
-	pool_.deltaTime->CopyBuffer(&deltaTime, sizeof(deltaTime));
 }
 
-void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, CmdObj* cmdObj) {
+void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
 	camera_.vpMatrix = vpMatrix;
 	camera_.billboardMatrix = billboardMatrix;
 	vpMatrixBuffer_->CopyBuffer(&camera_, sizeof(camera_));
 	sizeBuffer_->CopyBuffer(&size_, sizeof(size_));
+	pool_.deltaTime->CopyBuffer(&deltaTime, sizeof(float));
 }
 
 void ParticlePool::Draw(CmdObj* cmdObj) {

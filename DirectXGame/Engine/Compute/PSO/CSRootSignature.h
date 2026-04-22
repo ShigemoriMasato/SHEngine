@@ -1,14 +1,15 @@
 #pragma once
 #include <Core/DXDevice.h>
+#include <Render/PSO/Shelf/RootSignatureShelf.h>
 
 namespace SHEngine::PSO {
 
 	class CSRootSignature {
 	public:
 
-		void Initialize(DXDevice* device);
+		void Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers);
 
-		ID3D12RootSignature* GetRootSignature(int cbv, int srv, int uav);
+		ID3D12RootSignature* GetRootSignature(int cbv, int srv, int uav, bool useTexture, uint32_t samplerID);
 
 	private:
 
@@ -32,7 +33,7 @@ namespace SHEngine::PSO {
 		DXDevice* device_ = nullptr;
 
 		std::map<RSConfig, RS> rootSignatures_;
-
+		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers_;
 	};
 
 }
