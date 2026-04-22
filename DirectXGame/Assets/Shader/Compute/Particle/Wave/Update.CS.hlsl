@@ -88,12 +88,12 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float decay = 1.0f - (waves[i].lifetime / waves[i].maxlifetime);
             float intensity = (1.0f - abs(diff) / range) * waves[i].intensity * decay;
             pos += float3(0, intensity, 0);
-            col += waves[i].color * intensity * 0.1f;
+            col += waves[i].color * intensity;
         }
     }
     
     //Textureを読み込んで、色がついていたら描画する
-    float2 uv = pos.xz / fieldSize.xz;
+    float2 uv = (pos.xz + fieldSize.xz / 2.0f) / fieldSize.xz;
     float4 texColor = textures[textureID].SampleLevel(gSampler, uv, 0.0f);
     if (texColor.r > 0.1f)
     {

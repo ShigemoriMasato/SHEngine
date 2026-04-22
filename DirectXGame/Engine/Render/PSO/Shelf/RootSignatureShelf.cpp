@@ -23,7 +23,7 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 	base.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 	base.ShaderRegister = 0;
 	base.RegisterSpace = 0;
-	base.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	base.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	D3D12_STATIC_SAMPLER_DESC def = base;
 	samplers_[SamplerID::Default] = def;

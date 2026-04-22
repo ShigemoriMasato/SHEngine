@@ -20,13 +20,17 @@ namespace SHEngine::PSO {
 			int cbvNum = 0;
 			int srvNum = 0;
 			int uavNum = 0;
+			bool useTexture;
+			uint32_t samplerID;
 			bool operator==(const RSConfig& other) const {
-				return cbvNum == other.cbvNum && srvNum == other.srvNum && uavNum == other.uavNum;
+				return cbvNum == other.cbvNum && srvNum == other.srvNum && uavNum == other.uavNum && useTexture == other.useTexture && samplerID == other.samplerID;
 			}
 			bool operator<(const RSConfig& other) const {
 				if (cbvNum != other.cbvNum) return cbvNum < other.cbvNum;
 				if (srvNum != other.srvNum) return srvNum < other.srvNum;
-				return uavNum < other.uavNum;
+				if(uavNum != other.uavNum) return uavNum < other.uavNum;
+				if (useTexture != other.useTexture) return useTexture < other.useTexture;
+				return samplerID < other.samplerID;
 			}
 		};
 

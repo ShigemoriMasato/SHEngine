@@ -44,6 +44,8 @@ void InitializeScene::Initialize() {
 	commonData_->cmdObject = engine_->CreateCommandObject(SHEngine::Command::Type::Direct);
 	engine_->ImGuiActivate(windowSet.first.get(), commonData_->cmdObject.get());
 
+	textureManager_->LoadAllTextures();
+
 	//KeyManager
 #pragma region 長いので折りたたみ
 	commonData_->keyManager = std::make_unique<KeyManager>();

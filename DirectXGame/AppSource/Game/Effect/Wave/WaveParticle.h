@@ -68,6 +68,7 @@ private:
 		Vector3 fieldSize = { 10.0f, 0.0f, 10.0f };
 		Vector3 position;
 		Vector3 rotate;
+		Vector3 scale = { 1.0f, 1.0f, 1.0f };
 		Vector3 color = { 1.0f, 1.0f, 1.0f };
 	}config_;
 

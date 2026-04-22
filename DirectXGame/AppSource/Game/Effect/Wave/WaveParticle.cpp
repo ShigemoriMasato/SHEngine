@@ -74,6 +74,7 @@ void WaveParticle::DrawImGui() {
 	ImGui::DragFloat3("FieldSize", &config_.fieldSize.x, 0.1f);
 	ImGui::DragFloat3("Position", &config_.position.x, 0.1f);
 	ImGui::DragFloat3("Rotate", &config_.rotate.x, 0.1f);
+	ImGui::DragFloat3("Scale", &config_.scale.x, 0.1f);
 	ImGui::ColorEdit3("Color", &config_.color.x);
 
 	ImGui::Separator();
@@ -130,6 +131,7 @@ void WaveParticle::Load() {
 	config_.position = binaryManager_.Reverse<Vector3>();
 	config_.rotate = binaryManager_.Reverse<Vector3>();
 	config_.color = binaryManager_.Reverse<Vector3>();
+	config_.scale = binaryManager_.Reverse<Vector3>();
 }
 
 void WaveParticle::Save() {
@@ -141,6 +143,7 @@ void WaveParticle::Save() {
 	binaryManager_.Register(&config_.position);
 	binaryManager_.Register(&config_.rotate);
 	binaryManager_.Register(&config_.color);
+	binaryManager_.Register(&config_.scale);
 	binaryManager_.Write(fileName_);
 }
 
@@ -149,7 +152,7 @@ void WaveParticle::CopyConfig() {
 	emitData_.lifeTime = config_.lifeTime;
 	emitData_.emitNum = config_.emitNum;
 	emitData_.fieldSize = config_.fieldSize;
-	Matrix4x4 parentMatrix = MakeRotationMatrix(config_.rotate) * MakeTranslationMatrix(config_.position);
+	Matrix4x4 parentMatrix = MakeScaleMatrix(config_.scale) * MakeRotationMatrix(config_.rotate) * MakeTranslationMatrix(config_.position);
 	updateData_.parentMatrix = parentMatrix;
 	updateData_.lifeTime = config_.lifeTime;
 	updateData_.color = config_.color;
