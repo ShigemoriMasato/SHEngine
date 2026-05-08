@@ -107,12 +107,12 @@ void GameScene::Draw() {
 	if (tetris_->IsGameOver()) {
 		Matrix4x4 wvp = gameoverMat * worldCamera_->GetVPMatrix();
 		gameOverText->CopyBufferData(0, &wvp, sizeof(Matrix4x4));
-		gameOverText->Draw(cmdObj);
+		//gameOverText->Draw(cmdObj);
 	}
 	display->PostDraw(cmdObj);
 
 #ifdef SH_RELEASE
-
+	postEffectConfig_.output = window;
 	postEffect_->Draw(postEffectConfig_);
 	cmdObj->SetRenderTarget(window, false);
 
@@ -133,6 +133,17 @@ void GameScene::Draw() {
 	ImGui::Begin("Input Debug");
 	Vector2 cursor = input_->GetCursorPos();
 	ImGui::Text("Cursor Pos: (%.1f, %.1f)", cursor.x, cursor.y);
+	bool mouseButtons[3];
+	for (int i = 0; i < 3; i++) {
+		mouseButtons[i] = input_->GetMouseButtonState()[i] & 0x80;
+		ImGui::Text("|| Button %d: %s", i, mouseButtons[i] ? "Pressed" : "Released");
+
+		if (i != 2) {
+			ImGui::SameLine();
+		}
+	}
+	float mouseWheel = input_->GetMouseWheel();
+	ImGui::Text("Mouse Wheel: %.1f", mouseWheel);
 	ImGui::End();
 
 	ImGui::Begin("FPS");

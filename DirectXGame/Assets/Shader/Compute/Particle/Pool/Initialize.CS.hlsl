@@ -17,7 +17,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     }
     
     //FreeListの初期化
-    freeList[index] = index;
+    freeList[index] = maxNum - 1 - index;
     if (DTid.x == 0)//同時に書き込まないようにするため
     {
         freeListIndex[0] = maxNum - 1;

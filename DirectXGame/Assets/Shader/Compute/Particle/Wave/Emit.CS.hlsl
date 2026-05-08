@@ -5,6 +5,7 @@ cbuffer CSData : register(b0)
     float lifetime;
     int emitNum;
     uint seed;
+    uint textureID;
 };
 cbuffer ID : register(b1)
 {
@@ -17,7 +18,10 @@ RWStructuredBuffer<uint> type : register(u2);
 RWStructuredBuffer<float3> positions : register(u3);
 RWStructuredBuffer<float3> velocities : register(u4);
 RWStructuredBuffer<float> lifetimes : register(u5);
-RWStructuredBuffer<uint> isUse : register(u6);
+RWStructuredBuffer<int> isUse : register(u6);
+
+Texture2D<float4> textures[] : register(t8);
+SamplerState gSampler : register(s0);
 
 uint Hash(uint x)
 {
@@ -44,6 +48,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
+    uint state = seed ^ index;
+    float3 position = float3(Rand(state), Rand(state), Rand(state));
+    float2 uv = position.xz;
+    float4 texColor = textures[textureID].SampleLevel(gSampler, uv, 0);
+    // テクスチャの色が暗い場合はパーティクルを発生させない
+    if (texColor.r < 0.1f)
+    {
+        return;
+    }
+    
     int freeIndex;
     InterlockedAdd(freeListIndex[0], -1, freeIndex);
     if (freeIndex < 0)
@@ -52,10 +66,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
-    uint state = seed ^ index;
     uint particleIndex = freeList[freeIndex];
     
-    positions[particleIndex] = float3(Rand(state), Rand(state), Rand(state)) * fieldSize - fieldSize * 0.5;
+    positions[particleIndex] = position * fieldSize - fieldSize * 0.5;
     velocities[particleIndex] = normalize(float3(Rand(state), Rand(state), Rand(state)) * fieldSize - fieldSize * 0.5) * speed;
     lifetimes[particleIndex] = lifetime;
     type[particleIndex] = id;

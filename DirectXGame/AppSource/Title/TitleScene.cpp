@@ -69,7 +69,7 @@ void TitleScene::Draw() {
 #ifdef SH_RELEASE
 
 	postEffect_->Draw(postEffectConfig_);
-	cmdObj->SetRenderTarget(window, false);
+	cmdObj->SetRenderTarget(window->GetCurrentDisplay(), false);
 
 #else
 

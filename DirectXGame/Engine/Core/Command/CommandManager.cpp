@@ -9,14 +9,11 @@ void Manager::Initialize(DXDevice* device) {
 	//=========================================
 	//コマンドキューの生成
 	//=========================================
-	auto& directQueue = queue_[Type::Direct].emplace_back();
+	auto& directQueue = queue_[Type::Direct];
 	directQueue = std::make_unique<Queue>(device, Type::Direct);
 
-	queue_[Type::Compute].resize(6);
-	for (int i = 0; i < 6; ++i) {
-		auto& computeQueue = queue_[Type::Compute][i];
-		computeQueue = std::make_unique<Queue>(device, Type::Compute);
-	}
+	auto& computeQueue = queue_[Type::Compute];
+	computeQueue = std::make_unique<Queue>(device, Type::Compute);
 
 	//=========================================
 	//コマンドオブジェクトの初期化
@@ -25,41 +22,42 @@ void Manager::Initialize(DXDevice* device) {
 	objects_[Type::Compute].resize(6);
 }
 
-std::unique_ptr<Object> SHEngine::Command::Manager::CreateCommandObject(Type type, int index, int listNum) {
+std::unique_ptr<Object> SHEngine::Command::Manager::CreateCommandObject(Type type, int listNum) {
 	QueueChecker(type);
 
-	auto queue = queue_[type][index].get();
+	auto queue = queue_[type].get();
 	std::unique_ptr<Object> commandObject = std::make_unique<Object>(device_, this, type, queue, listNum);
 
 	queue->RegisterObject(commandObject.get());
 
-	objects_[type][index].push_back(commandObject.get());
+	objects_[type].push_back(commandObject.get());
 
 	return std::move(commandObject);
 }
 
-SHEngine::Command::WaitFence SHEngine::Command::Manager::Execute(Type type, int index, std::vector<CmdObj*> cmdObj) {
+SHEngine::Command::WaitFence SHEngine::Command::Manager::Execute(Type type, std::vector<CmdObj*> cmdObj) {
 	QueueChecker(type);
 
-	auto& cmdQueue = queue_[type][index];
+	auto& cmdQueue = queue_[type];
 	return cmdQueue->Execute(cmdObj);
 }
 
 void SHEngine::Command::Manager::ReleaseObject(Queue* queue, Object* obj) {
 	for (auto& [type, queues] : queue_) {
-		for (const auto& q : queues) {
-			if (q.get() == queue) {
-				auto& objects = objects_[type][&q - &queues[0]];
-				objects.erase(std::remove(objects.begin(), objects.end(), obj), objects.end());
-				return;
+		if (queues.get() == queue) {
+			for (int i = 0; i < objects_[type].size(); ++i) {
+				if (objects_[type][i] == obj) {
+					objects_[type].erase(objects_[type].begin() + i);
+					return;
+				}
 			}
 		}
 	}
 }
 
-void SHEngine::Command::Manager::WaitFence(const SHEngine::Command::WaitFence& waitFence, Type type, int index) {
+void SHEngine::Command::Manager::WaitFence(const SHEngine::Command::WaitFence& waitFence, Type type) {
 	QueueChecker(type);
-	auto& cmdQueue = queue_[type][index];
+	auto& cmdQueue = queue_[type];
 	cmdQueue->WaitForFence(waitFence);
 }
 

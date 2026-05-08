@@ -25,7 +25,7 @@ void SceneManager::Draw() {
 		currentScene_->Draw();
 	}
 
-	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, 0, { commonData_->cmdObject.get() });
+	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, { commonData_->cmdObject.get() });
 	commonData_->mainWindow.second->Present();
 }
 

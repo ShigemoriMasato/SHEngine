@@ -3,6 +3,7 @@
 #include <Render/Renderer.h>
 #include <Game/Effect/Pool/ParticlePool.h>
 #include <Tool/Binary/BinaryManager.h>
+#include <random>
 
 struct WaveData {
 	Vector3 position{};
@@ -32,19 +33,21 @@ private:
 	void Load();
 	void Save();
 
-	void CopyConfig();
+	void CopyConfig(float deltaTime);
 
 	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
 
-	std::unique_ptr<SHEngine::ComputeObject> emitter_ = nullptr;
-	std::unique_ptr<SHEngine::ComputeObject> update_ = nullptr;
+	std::vector<std::unique_ptr<SHEngine::ComputeObject>> emitter_;
+	std::vector<std::unique_ptr<SHEngine::ComputeObject>> update_;
 
-	SHEngine::GPUBuffer* updateBuffer_ = nullptr;
-	SHEngine::GPUBuffer* emitBuffer_ = nullptr;
+	std::vector<SHEngine::GPUBuffer*> updateBuffer_;
+	std::vector<SHEngine::GPUBuffer*> emitBuffer_;
 	SHEngine::GPUBuffer* waveBuffer_ = nullptr;
 
 	BinaryManager binaryManager_{};
 	std::string fileName_ = "WaveParticleConfig.bin";
+
+	int maxParticleNum_ = 0;
 
 	struct EmitData {
 		Vector3 fieldSize;
@@ -52,13 +55,15 @@ private:
 		float lifeTime;
 		int emitNum;
 		uint32_t seed;
+		uint32_t textureID;
+		uint32_t executeOffset;
 	}emitData_;
 	struct UpdateData {
 		Matrix4x4 parentMatrix;
 		float lifeTime;
 		Vector3 color;
 		Vector3 fieldSize;
-		uint32_t textureID;
+		uint32_t executeOffset;
 	}updateData_;
 
 	struct Config {
@@ -74,4 +79,7 @@ private:
 
 	std::vector<WaveData> waves_;
 	constexpr static inline int kMaxWaveNum_ = 16;
+
+	std::mt19937 randomEngine_{ std::random_device{}() };
+	std::uniform_int_distribution<uint32_t> randomDist_{ 0, UINT32_MAX };
 };

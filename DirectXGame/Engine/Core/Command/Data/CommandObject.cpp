@@ -8,7 +8,12 @@ using namespace SHEngine::Command;
 SHEngine::Command::Object::Object(DXDevice* device, Manager* manager, Type type, Queue* queue, int listNum) {
 	device_ = device;
 
-	// コマンドリストを3つ作成
+	if (listNum <= 0) {
+		assert(false && "CommandObjectのコマンドリストの数は1以上でなければなりません。");
+		listNum = 1;
+	}
+
+	// コマンドリストを作成
 	commandLists_.resize(listNum);
 	for (auto& cmdList : commandLists_) {
 		cmdList.Initialize(device_, type);

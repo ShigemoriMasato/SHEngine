@@ -16,7 +16,6 @@ cbuffer CSData : register(b3)
     float lifetime;
     float3 color;
     float3 fieldSize;
-    uint textureID;
 };
 
 struct Wave
@@ -47,9 +46,6 @@ RWStructuredBuffer<float> lifetimes : register(u6);
 RWStructuredBuffer<float3> positions : register(u7);
 RWStructuredBuffer<uint> isUse : register(u8);
 
-Texture2D<float4> textures[] : register(t8);
-SamplerState gSampler : register(s0);
-
 [numthreads(256, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
@@ -65,6 +61,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
+    type[index] = id;
     positions[index] += velocities[index] * deltaTime;
     
     //波の処理
@@ -92,20 +89,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
         }
     }
     
-    //Textureを読み込んで、色がついていたら描画する
-    float2 uv = (pos.xz + fieldSize.xz / 2.0f) / fieldSize.xz;
-    float4 texColor = textures[textureID].SampleLevel(gSampler, uv, 0.0f);
-    if (texColor.r > 0.1f)
-    {
-        type[index] = id;
-    
-        outPositions[index] = mul(float4(pos, 1.0f), parentMatrix).xyz;
-        colors[index] = float4(col, float(lifetimes[index] / lifetime));     
-    }
-    else
-    {
-        type[index] = 0;
-    }
+    //出力先に値を書き込む
+    float alpha = abs(float(lifetimes[index] / (lifetime * 0.5f)) - 1);
+    colors[index] = float4(col, alpha);
+    outPositions[index] = mul(float4(pos, 1), parentMatrix).xyz;
     
     lifetimes[index] -= deltaTime;
     if (lifetimes[index] <= 0.0f)

@@ -17,10 +17,10 @@ private:
 	SHEngine::Engine* engine_ = nullptr;
 	SHEngine::TextureManager* textureManager_ = nullptr;
 
-	std::vector<std::unique_ptr<CmdObj>> compute_ = {};
+	std::unique_ptr<CmdObj> compute_ = {};
 	std::unique_ptr<CmdObj> update_ = nullptr;
 	std::unique_ptr<CmdObj> direct_ = nullptr;
-	std::vector<SHEngine::Command::WaitFence> computeFence_{};
+	SHEngine::Command::WaitFence computeFence_{};
 
 	std::unique_ptr<ParticlePool> particlePool_ = nullptr;
 

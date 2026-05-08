@@ -100,9 +100,9 @@ void Engine::PostDraw() {
 
 }
 
-void SHEngine::Engine::WaitFence(Command::WaitFence& waitFence, Command::Type type, int index) {
+void SHEngine::Engine::WaitFence(Command::WaitFence& waitFence, Command::Type type) {
 	if(waitFence.fence && waitFence.value) {
-		cmdManager_->WaitFence(waitFence, type, index);
+		cmdManager_->WaitFence(waitFence, type);
 	}
 }
 

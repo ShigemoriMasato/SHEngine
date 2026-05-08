@@ -45,7 +45,9 @@ void DebugCamera::Update(bool enableInput) {
 			float speed = spherical_.x * 0.2f;
 			center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * speed * MakeRotationMatrix(rotation_);
 		} else {
-			spherical_ += Vector3(mouseWheel * 0.05f, mouseMove.y * speed_, -mouseMove.x * speed_);
+			float moved = mouseWheel * 0.05f;
+			float adjust = abs(moved) > 5.0f ? 1.0f : moved / 5.0f; // 距離が近いほど速度を遅くする
+			spherical_ += Vector3(moved * adjust, mouseMove.y * speed_, -mouseMove.x * speed_);
 		}
 	}
 

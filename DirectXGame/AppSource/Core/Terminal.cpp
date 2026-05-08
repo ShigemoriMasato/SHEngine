@@ -20,10 +20,8 @@ void Terminal::Run() {
 
 	}
 
-	engine_->StopGPU(SHEngine::Command::Type::Direct, 0);
-	for (int i = 0; i < 6; ++i) {
-		engine_->StopGPU(SHEngine::Command::Type::Compute, i);
-	}
+	engine_->StopGPU(SHEngine::Command::Type::Direct);
+	engine_->StopGPU(SHEngine::Command::Type::Compute);
 }
 
 bool Terminal::IsLoop() const {

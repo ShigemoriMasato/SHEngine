@@ -4,22 +4,18 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 	engine_ = engine;
 	textureManager_ = textureManager;
 
-	computeFence_.resize(6);
-	compute_.resize(6);
-	for (int i = 0; i < 6; ++i) {
-		compute_[i] = engine_->CreateCommandObject(SHEngine::Command::Type::Compute, i);
-	}
-	update_ = engine_->CreateCommandObject(SHEngine::Command::Type::Compute, 0);
+	compute_ = engine_->CreateCommandObject(SHEngine::Command::Type::Compute);
+	update_ = engine_->CreateCommandObject(SHEngine::Command::Type::Compute);
 	direct_ = engine_->CreateCommandObject(SHEngine::Command::Type::Direct);
 
-	compute_[0]->ResetCommandList();
+	compute_->ResetCommandList();
 
 	particlePool_ = std::make_unique<ParticlePool>();
-	// 1048576個分のメモリを確保する
-	particlePool_->Initialize(planeDrawData, int(std::pow(2, 20)), compute_[0].get());
+	// 16777216個分のメモリを確保する
+	particlePool_->Initialize(planeDrawData, int(std::pow(2, 24)), compute_.get());
 
 	//0にInitialize用のShaderが入っているため、実行して終わるまで待つ
-	engine_->ExecuteCommand(SHEngine::Command::Type::Compute, 0, { compute_[0].get() });
+	engine_->ExecuteCommand(SHEngine::Command::Type::Compute, { compute_.get() });
 
 	//このプールを使用してパーティクルを発生させる
 	auto pool = particlePool_->GetPool();
@@ -29,24 +25,20 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 	uint32_t textureID = textureManager_->LoadTexture("WaveParticle.png");
 	waveParticle_->Initialize(textureID, pool, 1);
 
-	compute_[0]->WaitForGPUIdle();
+	compute_->WaitForGPUIdle();
 }
 
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
 	//全部のコマンドリストをリセット
-	for (const auto& compute : compute_) {
-		compute->ResetCommandList();
-	}
+	compute_->ResetCommandList();
 	update_->ResetCommandList();
 	direct_->ResetCommandList();
 
 	//パーティクルの更新処理
-	waveParticle_->Update(compute_[0].get(), deltaTime);
+	waveParticle_->Update(compute_.get(), deltaTime);
 
 	//Queueに登録して実行
-	for (int i = 0; i < 6; ++i) {
-		computeFence_[i] = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, i, { compute_[i].get() });
-	}
+	computeFence_ = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, { compute_.get() });
 
 	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime);
 }
@@ -57,10 +49,8 @@ void Effect::Draw(SHEngine::Screen::IDisplay* display) {
 	particlePool_->Draw(direct_.get());
 
 	//更新処理の後にこの関数を呼び出す
-	for (auto& computeFence : computeFence_) {
-		engine_->WaitFence(computeFence, SHEngine::Command::Type::Direct);
-	}
-	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, 0, { direct_.get() });
+	engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);
+	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, { direct_.get() });
 
 	particlePool_->DrawImGui();
 	waveParticle_->DrawImGui();

@@ -25,27 +25,27 @@ namespace SHEngine {
 		// エンジン側の終了命令
 		bool IsLoop();
 
-	// Inputとコマンドの更新
-	void BeginFrame();
-	// コマンドのクローズ
-	void PostDraw();
+		// Inputとコマンドの更新
+		void BeginFrame();
+		// コマンドのクローズ
+		void PostDraw();
 
-	void WaitFence(Command::WaitFence& waitFence, Command::Type type, int index = 0);
+		void WaitFence(Command::WaitFence& waitFence, Command::Type type);
 
-	// コマンドの実行(Signalも送る)
-	Command::WaitFence ExecuteCommand(Command::Type type, int index = 0, std::vector<CmdObj*> cmdObjs = {}) {
-		return cmdManager_->Execute(type, index, cmdObjs);
-	}
-
-		void StopGPU(Command::Type type, int index = 0) {
-			cmdManager_->StopGPU(type, index);
+		// コマンドの実行(Signalも送る)
+		Command::WaitFence ExecuteCommand(Command::Type type, std::vector<CmdObj*> cmdObjs = {}) {
+			return cmdManager_->Execute(type, cmdObjs);
 		}
 
-	// ImGuiの有効化
-	void ImGuiActivate(Screen::WindowsAPI* window, Command::Object* cmdObj);
+		void StopGPU(Command::Type type) {
+			cmdManager_->StopGPU(type);
+		}
 
-	// ImGuiの描画
-	void DrawImGui();
+		// ImGuiの有効化
+		void ImGuiActivate(Screen::WindowsAPI* window, Command::Object* cmdObj);
+
+		// ImGuiの描画
+		void DrawImGui();
 
 	public: // Getter
 		TextureManager* GetTextureManager() { return textureManager_.get(); }
@@ -56,8 +56,8 @@ namespace SHEngine {
 		FPSObserver* GetFPSObserver() { return fpsObserver_.get(); }
 		float GetDeltaTime() { return fpsObserver_->GetDeltatime(); }
 
-		std::unique_ptr<Command::Object> CreateCommandObject(Command::Type type, int index = 0, int listNum = 3) {
-			return cmdManager_->CreateCommandObject(type, index, listNum);
+		std::unique_ptr<Command::Object> CreateCommandObject(Command::Type type, int listNum = 3) {
+			return cmdManager_->CreateCommandObject(type, listNum);
 		}
 
 		std::unique_ptr<Screen::SwapChain> MakeWindow(Screen::WindowsAPI* windowsApi, uint32_t clearColor);
@@ -80,12 +80,12 @@ namespace SHEngine {
 		std::unique_ptr<Input> input_;
 		std::unique_ptr<FPSObserver> fpsObserver_;
 
-private: // その他系
-	HINSTANCE hInstance_;
-	MSG msg_{};
-	bool imguiDrew_ = true;
-	FrameCounter frameCounter_;
-	Logger logger_;
-};
+	private: // その他系
+		HINSTANCE hInstance_;
+		MSG msg_{};
+		bool imguiDrew_ = true;
+		FrameCounter frameCounter_;
+		Logger logger_;
+	};
 
 } // namespace SHEngine
