@@ -5,7 +5,7 @@
 $proj    = Resolve-Path "DirectXGame.vcxproj"
 $filters = "$proj.filters"
 
-echo BeginFilterAdjustment
+Write-Output BeginFilterAdjustment
 
 try {
     # プロジェクトルート
@@ -84,4 +84,4 @@ catch {
     Write-Error $_.Exception.Message
 }
 
-echo EndFilterAdjustment
+Write-Output EndFilterAdjustment
