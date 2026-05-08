@@ -16,8 +16,8 @@ if (!(Test-Path $DestDir)) {
     New-Item -ItemType Directory -Path $DestDir | Out-Null
 }
 
-# .h / .hpp を再帰取得
-Get-ChildItem -Path $SourceDir -Recurse -Include *.h, *.hpp -File | ForEach-Object {
+# .h / .hpp / .inl を再帰取得
+Get-ChildItem -Path $SourceDir -Recurse -Include *.h, *.hpp, *.inl -File | ForEach-Object {
 
     # 元ファイルのフルパス
     $srcPath = $_.FullName
@@ -35,6 +35,7 @@ Get-ChildItem -Path $SourceDir -Recurse -Include *.h, *.hpp -File | ForEach-Obje
     }
 
     # コピー
+    Write-Host $srcPath "->" $destPath
     Copy-Item -Path $srcPath -Destination $destPath -Force
 }
 

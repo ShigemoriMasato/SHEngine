@@ -16,7 +16,22 @@ rem .h .hppの再配置
 powershell -ExecutionPolicy Bypass -NoProfile ^
   -File "Scripts/CopyHeader.ps1" ^
   -SourceDir "externals/src/DirectXTex/DirectXTex" ^
-  -DescDir "externals/DirectXTex"
+  -DestDir "externals/header/DirectXTex"
+
+powershell -ExecutionPolicy Bypass -NoProfile ^
+  -File "Scripts/CopyHeader.ps1" ^
+  -SourceDir "externals/src/ForImGui/ImGui" ^
+  -DestDir "externals/header/imgui"
+
+powershell -ExecutionPolicy Bypass -NoProfile ^
+  -File "Scripts/CopyHeader.ps1" ^
+  -SourceDir "externals/src/spdlog" ^
+  -DestDir "externals/header/spdlog"
+
+powershell -ExecutionPolicy Bypass -NoProfile ^
+  -File "Scripts/CopyHeader.ps1" ^
+  -SourceDir "externals/src/nlohmann" ^
+  -DestDir "externals/header/nlohmann"
 
 rem filterを作成
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts/FilterAdjust.ps1"
