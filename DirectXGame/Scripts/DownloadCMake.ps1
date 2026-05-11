@@ -12,7 +12,6 @@ return $null -ne $cmd
 function Install-CMake {
 param([string]$Version)
 
-```
 Write-Host "CMake が見つからないためインストールを開始します..."
 
 $url = "https://github.com/Kitware/CMake/releases/download/v$Version/cmake-$Version-windows-x86_64.msi"
@@ -25,7 +24,6 @@ Write-Host "Install..."
 Start-Process msiexec.exe -Wait -ArgumentList "/i `"$installer`" /qn"
 
 Remove-Item $installer -Force
-```
 
 }
 
@@ -35,7 +33,6 @@ if (Test-Path $default) {
 return $default
 }
 
-```
 # 念のため探索
 $found = Get-ChildItem "C:\Program Files" -Recurse -Filter cmake.exe -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($found) {
@@ -43,14 +40,12 @@ if ($found) {
 }
 
 return $null
-```
 
 }
 
 function Add-ToPath {
 param([string]$PathToAdd)
 
-```
 $currentUserPath = [Environment]::GetEnvironmentVariable("Path", "User")
 
 if ($currentUserPath -like "*$PathToAdd*") {
@@ -65,7 +60,6 @@ $newPath = "$currentUserPath;$PathToAdd"
 
 # 現在のセッションにも反映
 $env:Path += ";$PathToAdd"
-```
 
 }
 

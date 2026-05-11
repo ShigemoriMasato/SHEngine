@@ -1,0 +1,2359 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "CMakeLists.txt:88 (find_program)"
+    mode: "program"
+    variable: "CCACHE_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ccache"
+    candidate_directories:
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+    searched_directories:
+      - "C:/Program Files/Oculus/Support/oculus-runtime/ccache.com"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/ccache.exe"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/ccache"
+      - "C:/Windows/System32/ccache.com"
+      - "C:/Windows/System32/ccache.exe"
+      - "C:/Windows/System32/ccache"
+      - "C:/Windows/ccache.com"
+      - "C:/Windows/ccache.exe"
+      - "C:/Windows/ccache"
+      - "C:/Windows/System32/wbem/ccache.com"
+      - "C:/Windows/System32/wbem/ccache.exe"
+      - "C:/Windows/System32/wbem/ccache"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/ccache.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/ccache.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/ccache"
+      - "C:/Windows/System32/OpenSSH/ccache.com"
+      - "C:/Windows/System32/OpenSSH/ccache.exe"
+      - "C:/Windows/System32/OpenSSH/ccache"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/ccache.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/ccache.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/ccache"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/ccache.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/ccache.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/ccache"
+      - "C:/Program Files/dotnet/ccache.com"
+      - "C:/Program Files/dotnet/ccache.exe"
+      - "C:/Program Files/dotnet/ccache"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/ccache.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/ccache.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/ccache"
+      - "C:/Program Files/Git/cmd/ccache.com"
+      - "C:/Program Files/Git/cmd/ccache.exe"
+      - "C:/Program Files/Git/cmd/ccache"
+      - "C:/msys64/mingw64/bin/ccache.com"
+      - "C:/msys64/mingw64/bin/ccache.exe"
+      - "C:/msys64/mingw64/bin/ccache"
+      - "C:/msys64/usr/local/bin/ccache.com"
+      - "C:/msys64/usr/local/bin/ccache.exe"
+      - "C:/msys64/usr/local/bin/ccache"
+      - "C:/msys64/usr/bin/ccache.com"
+      - "C:/msys64/usr/bin/ccache.exe"
+      - "C:/msys64/usr/bin/ccache"
+      - "C:/msys64/bin/ccache.com"
+      - "C:/msys64/bin/ccache.exe"
+      - "C:/msys64/bin/ccache"
+      - "C:/msys64/opt/bin/ccache.com"
+      - "C:/msys64/opt/bin/ccache.exe"
+      - "C:/msys64/opt/bin/ccache"
+      - "C:/Program Files/PowerShell/7-preview/preview/ccache.com"
+      - "C:/Program Files/PowerShell/7-preview/preview/ccache.exe"
+      - "C:/Program Files/PowerShell/7-preview/preview/ccache"
+      - "C:/Program Files/doxygen/bin/ccache.com"
+      - "C:/Program Files/doxygen/bin/ccache.exe"
+      - "C:/Program Files/doxygen/bin/ccache"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/ccache.com"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/ccache.exe"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/ccache"
+      - "C:/Program Files/PowerShell/7/ccache.com"
+      - "C:/Program Files/PowerShell/7/ccache.exe"
+      - "C:/Program Files/PowerShell/7/ccache"
+      - "C:/Program Files/CMake/bin/ccache.com"
+      - "C:/Program Files/CMake/bin/ccache.exe"
+      - "C:/Program Files/CMake/bin/ccache"
+      - "C:/Program Files/vcpkg/ccache.com"
+      - "C:/Program Files/vcpkg/ccache.exe"
+      - "C:/Program Files/vcpkg/ccache"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/ccache.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/ccache.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/ccache"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/ccache.com"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/ccache.exe"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/ccache"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/ccache.com"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/ccache.exe"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/ccache"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/ccache.com"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/ccache.exe"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/ccache"
+      - "C:/Users/k024g/.dotnet/tools/ccache.com"
+      - "C:/Users/k024g/.dotnet/tools/ccache.exe"
+      - "C:/Users/k024g/.dotnet/tools/ccache"
+      - "C:/Users/k024g/mingw64/bin/ccache.com"
+      - "C:/Users/k024g/mingw64/bin/ccache.exe"
+      - "C:/Users/k024g/mingw64/bin/ccache"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/ccache.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/ccache.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/ccache"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/ccache.com"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/ccache.exe"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/ccache"
+      - "C:/Program Files/MeCab/bin/ccache.com"
+      - "C:/Program Files/MeCab/bin/ccache.exe"
+      - "C:/Program Files/MeCab/bin/ccache"
+      - "C:/Program Files/Graphviz/bin/ccache.com"
+      - "C:/Program Files/Graphviz/bin/ccache.exe"
+      - "C:/Program Files/Graphviz/bin/ccache"
+      - "C:/tool/vcpkg/ccache.com"
+      - "C:/tool/vcpkg/ccache.exe"
+      - "C:/tool/vcpkg/ccache"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    message: |
+      The system is: Windows - 10.0.26100 - AMD64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:468 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:506 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCCompilerId.c.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeCCompilerId.c.in"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+      26/05/11 11:34:28 にビルドを開始しました。
+      
+      ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdC\\CompilerIdC.vcxproj" (既定のターゲット)。
+      PrepareForBuild:
+        ディレクトリ "Debug\\" を作成しています。
+        構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+        ディレクトリ "Debug\\CompilerIdC.tlog\\" を作成しています。
+      InitializeBuildStatus:
+        "AlwaysCreate" が指定されたため "Debug\\CompilerIdC.tlog\\unsuccessfulbuild" を作成しています。
+        "Debug\\CompilerIdC.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+      VcpkgTripletSelection:
+        Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+        Using normalized configuration "Release"
+      ClCompile:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc145.pdb" /external:W0 /Gd /TC /FC /errorReport:queue CMakeCCompilerId.c
+        CMakeCCompilerId.c
+      Link:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdC.lib" /MACHINE:X64 Debug\\CMakeCCompilerId.obj
+        CompilerIdC.vcxproj -> C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdC\\CompilerIdC.exe
+      AppLocalFromInstalled:
+        pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\tool\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdC\\CompilerIdC.exe" "C:\\tool\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdC.tlog\\CompilerIdC.write.1u.tlog" "Debug\\vcpkg.applocal.log"
+      PostBuildEvent:
+        for %%i in (cl.exe) do @echo CMAKE_C_COMPILER=%%~$PATH:i
+        :VCEnd
+        CMAKE_C_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe
+      FinalizeBuildStatus:
+        ファイル "Debug\\CompilerIdC.tlog\\unsuccessfulbuild" を削除しています。
+        "Debug\\CompilerIdC.tlog\\CompilerIdC.lastbuildstate" のタッチ タスクを実行しています。
+      プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdC\\CompilerIdC.vcxproj" (既定のターゲット) のビルドが完了しました。
+      
+      ビルドに成功しました。
+          0 個の警告
+          0 エラー
+      
+      経過時間 00:00:01.39
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
+      
+      The C compiler identification is MSVC, found in:
+        C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/4.3.2/CompilerIdC/CompilerIdC.exe
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:103 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:104 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lld-link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/lld-link.com"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/lld-link.exe"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/lld-link"
+      - "C:/Windows/System32/lld-link.com"
+      - "C:/Windows/System32/lld-link.exe"
+      - "C:/Windows/System32/lld-link"
+      - "C:/Windows/lld-link.com"
+      - "C:/Windows/lld-link.exe"
+      - "C:/Windows/lld-link"
+      - "C:/Windows/System32/wbem/lld-link.com"
+      - "C:/Windows/System32/wbem/lld-link.exe"
+      - "C:/Windows/System32/wbem/lld-link"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link"
+      - "C:/Windows/System32/OpenSSH/lld-link.com"
+      - "C:/Windows/System32/OpenSSH/lld-link.exe"
+      - "C:/Windows/System32/OpenSSH/lld-link"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/lld-link.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/lld-link.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/lld-link"
+      - "C:/Program Files/dotnet/lld-link.com"
+      - "C:/Program Files/dotnet/lld-link.exe"
+      - "C:/Program Files/dotnet/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link"
+      - "C:/Program Files/Git/cmd/lld-link.com"
+      - "C:/Program Files/Git/cmd/lld-link.exe"
+      - "C:/Program Files/Git/cmd/lld-link"
+      - "C:/msys64/mingw64/bin/lld-link.com"
+      - "C:/msys64/mingw64/bin/lld-link.exe"
+      - "C:/msys64/mingw64/bin/lld-link"
+      - "C:/msys64/usr/local/bin/lld-link.com"
+      - "C:/msys64/usr/local/bin/lld-link.exe"
+      - "C:/msys64/usr/local/bin/lld-link"
+      - "C:/msys64/usr/bin/lld-link.com"
+      - "C:/msys64/usr/bin/lld-link.exe"
+      - "C:/msys64/usr/bin/lld-link"
+      - "C:/msys64/bin/lld-link.com"
+      - "C:/msys64/bin/lld-link.exe"
+      - "C:/msys64/bin/lld-link"
+      - "C:/msys64/opt/bin/lld-link.com"
+      - "C:/msys64/opt/bin/lld-link.exe"
+      - "C:/msys64/opt/bin/lld-link"
+      - "C:/Program Files/PowerShell/7-preview/preview/lld-link.com"
+      - "C:/Program Files/PowerShell/7-preview/preview/lld-link.exe"
+      - "C:/Program Files/PowerShell/7-preview/preview/lld-link"
+      - "C:/Program Files/doxygen/bin/lld-link.com"
+      - "C:/Program Files/doxygen/bin/lld-link.exe"
+      - "C:/Program Files/doxygen/bin/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/lld-link"
+      - "C:/Program Files/PowerShell/7/lld-link.com"
+      - "C:/Program Files/PowerShell/7/lld-link.exe"
+      - "C:/Program Files/PowerShell/7/lld-link"
+      - "C:/Program Files/CMake/bin/lld-link.com"
+      - "C:/Program Files/CMake/bin/lld-link.exe"
+      - "C:/Program Files/CMake/bin/lld-link"
+      - "C:/Program Files/vcpkg/lld-link.com"
+      - "C:/Program Files/vcpkg/lld-link.exe"
+      - "C:/Program Files/vcpkg/lld-link"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/lld-link.com"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/lld-link.exe"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/lld-link"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.com"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.exe"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/lld-link"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/lld-link.com"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/lld-link.exe"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/lld-link"
+      - "C:/Users/k024g/.dotnet/tools/lld-link.com"
+      - "C:/Users/k024g/.dotnet/tools/lld-link.exe"
+      - "C:/Users/k024g/.dotnet/tools/lld-link"
+      - "C:/Users/k024g/mingw64/bin/lld-link.com"
+      - "C:/Users/k024g/mingw64/bin/lld-link.exe"
+      - "C:/Users/k024g/mingw64/bin/lld-link"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/lld-link"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/lld-link.com"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/lld-link.exe"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/lld-link"
+      - "C:/Program Files/MeCab/bin/lld-link.com"
+      - "C:/Program Files/MeCab/bin/lld-link.exe"
+      - "C:/Program Files/MeCab/bin/lld-link"
+      - "C:/Program Files/Graphviz/bin/lld-link.com"
+      - "C:/Program Files/Graphviz/bin/lld-link.exe"
+      - "C:/Program Files/Graphviz/bin/lld-link"
+      - "C:/tool/vcpkg/lld-link.com"
+      - "C:/tool/vcpkg/lld-link.exe"
+      - "C:/tool/vcpkg/lld-link"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "program"
+    variable: "CMAKE_MT"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mt"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/mt.com"
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/mt.exe"
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/mt"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/mt.com"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/mt.exe"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/mt"
+      - "C:/Windows/System32/mt.com"
+      - "C:/Windows/System32/mt.exe"
+      - "C:/Windows/System32/mt"
+      - "C:/Windows/mt.com"
+      - "C:/Windows/mt.exe"
+      - "C:/Windows/mt"
+      - "C:/Windows/System32/wbem/mt.com"
+      - "C:/Windows/System32/wbem/mt.exe"
+      - "C:/Windows/System32/wbem/mt"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt"
+      - "C:/Windows/System32/OpenSSH/mt.com"
+      - "C:/Windows/System32/OpenSSH/mt.exe"
+      - "C:/Windows/System32/OpenSSH/mt"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/mt.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/mt.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/mt"
+      - "C:/Program Files/dotnet/mt.com"
+      - "C:/Program Files/dotnet/mt.exe"
+      - "C:/Program Files/dotnet/mt"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/mt.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/mt.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/mt"
+      - "C:/Program Files/Git/cmd/mt.com"
+      - "C:/Program Files/Git/cmd/mt.exe"
+      - "C:/Program Files/Git/cmd/mt"
+      - "C:/msys64/mingw64/bin/mt.com"
+      - "C:/msys64/mingw64/bin/mt.exe"
+      - "C:/msys64/mingw64/bin/mt"
+      - "C:/msys64/usr/local/bin/mt.com"
+      - "C:/msys64/usr/local/bin/mt.exe"
+      - "C:/msys64/usr/local/bin/mt"
+      - "C:/msys64/usr/bin/mt.com"
+      - "C:/msys64/usr/bin/mt.exe"
+      - "C:/msys64/usr/bin/mt"
+      - "C:/msys64/bin/mt.com"
+      - "C:/msys64/bin/mt.exe"
+      - "C:/msys64/bin/mt"
+      - "C:/msys64/opt/bin/mt.com"
+      - "C:/msys64/opt/bin/mt.exe"
+      - "C:/msys64/opt/bin/mt"
+      - "C:/Program Files/PowerShell/7-preview/preview/mt.com"
+      - "C:/Program Files/PowerShell/7-preview/preview/mt.exe"
+      - "C:/Program Files/PowerShell/7-preview/preview/mt"
+      - "C:/Program Files/doxygen/bin/mt.com"
+      - "C:/Program Files/doxygen/bin/mt.exe"
+      - "C:/Program Files/doxygen/bin/mt"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/mt.com"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/mt.exe"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/mt"
+      - "C:/Program Files/PowerShell/7/mt.com"
+      - "C:/Program Files/PowerShell/7/mt.exe"
+      - "C:/Program Files/PowerShell/7/mt"
+      - "C:/Program Files/CMake/bin/mt.com"
+      - "C:/Program Files/CMake/bin/mt.exe"
+      - "C:/Program Files/CMake/bin/mt"
+      - "C:/Program Files/vcpkg/mt.com"
+      - "C:/Program Files/vcpkg/mt.exe"
+      - "C:/Program Files/vcpkg/mt"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/mt.com"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/mt.exe"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/mt"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/mt.com"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/mt.exe"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/mt"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/mt.com"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/mt.exe"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/mt"
+      - "C:/Users/k024g/.dotnet/tools/mt.com"
+      - "C:/Users/k024g/.dotnet/tools/mt.exe"
+      - "C:/Users/k024g/.dotnet/tools/mt"
+      - "C:/Users/k024g/mingw64/bin/mt.com"
+      - "C:/Users/k024g/mingw64/bin/mt.exe"
+      - "C:/Users/k024g/mingw64/bin/mt"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/mt.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/mt.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/mt"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/mt.com"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/mt.exe"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/mt"
+      - "C:/Program Files/MeCab/bin/mt.com"
+      - "C:/Program Files/MeCab/bin/mt.exe"
+      - "C:/Program Files/MeCab/bin/mt"
+      - "C:/Program Files/Graphviz/bin/mt.com"
+      - "C:/Program Files/Graphviz/bin/mt.exe"
+      - "C:/Program Files/Graphviz/bin/mt"
+      - "C:/tool/vcpkg/mt.com"
+      - "C:/tool/vcpkg/mt.exe"
+      - "C:/tool/vcpkg/mt"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lib"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lib.com"
+    found: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lib.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:468 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:506 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+      26/05/11 11:34:30 にビルドを開始しました。
+      
+      ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (既定のターゲット)。
+      PrepareForBuild:
+        ディレクトリ "Debug\\" を作成しています。
+        構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+        ディレクトリ "Debug\\CompilerIdCXX.tlog\\" を作成しています。
+      InitializeBuildStatus:
+        "AlwaysCreate" が指定されたため "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild" を作成しています。
+        "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+      VcpkgTripletSelection:
+        Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+        Using normalized configuration "Release"
+      ClCompile:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc145.pdb" /external:W0 /Gd /TP /FC /errorReport:queue CMakeCXXCompilerId.cpp
+        CMakeCXXCompilerId.cpp
+      Link:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
+        CompilerIdCXX.vcxproj -> C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdCXX\\CompilerIdCXX.exe
+      AppLocalFromInstalled:
+        pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\tool\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdCXX\\CompilerIdCXX.exe" "C:\\tool\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.write.1u.tlog" "Debug\\vcpkg.applocal.log"
+      PostBuildEvent:
+        for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
+        :VCEnd
+        CMAKE_CXX_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe
+      FinalizeBuildStatus:
+        ファイル "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild" を削除しています。
+        "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate" のタッチ タスクを実行しています。
+      プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\4.3.2\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (既定のターゲット) のビルドが完了しました。
+      
+      ビルドに成功しました。
+          0 個の警告
+          0 エラー
+      
+      経過時間 00:00:01.46
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+      
+      The CXX compiler identification is MSVC, found in:
+        C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/4.3.2/CompilerIdCXX/CompilerIdCXX.exe
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:104 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lld-link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/lld-link.com"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/lld-link.exe"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/lld-link"
+      - "C:/Windows/System32/lld-link.com"
+      - "C:/Windows/System32/lld-link.exe"
+      - "C:/Windows/System32/lld-link"
+      - "C:/Windows/lld-link.com"
+      - "C:/Windows/lld-link.exe"
+      - "C:/Windows/lld-link"
+      - "C:/Windows/System32/wbem/lld-link.com"
+      - "C:/Windows/System32/wbem/lld-link.exe"
+      - "C:/Windows/System32/wbem/lld-link"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link"
+      - "C:/Windows/System32/OpenSSH/lld-link.com"
+      - "C:/Windows/System32/OpenSSH/lld-link.exe"
+      - "C:/Windows/System32/OpenSSH/lld-link"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/lld-link.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/lld-link.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/lld-link"
+      - "C:/Program Files/dotnet/lld-link.com"
+      - "C:/Program Files/dotnet/lld-link.exe"
+      - "C:/Program Files/dotnet/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link"
+      - "C:/Program Files/Git/cmd/lld-link.com"
+      - "C:/Program Files/Git/cmd/lld-link.exe"
+      - "C:/Program Files/Git/cmd/lld-link"
+      - "C:/msys64/mingw64/bin/lld-link.com"
+      - "C:/msys64/mingw64/bin/lld-link.exe"
+      - "C:/msys64/mingw64/bin/lld-link"
+      - "C:/msys64/usr/local/bin/lld-link.com"
+      - "C:/msys64/usr/local/bin/lld-link.exe"
+      - "C:/msys64/usr/local/bin/lld-link"
+      - "C:/msys64/usr/bin/lld-link.com"
+      - "C:/msys64/usr/bin/lld-link.exe"
+      - "C:/msys64/usr/bin/lld-link"
+      - "C:/msys64/bin/lld-link.com"
+      - "C:/msys64/bin/lld-link.exe"
+      - "C:/msys64/bin/lld-link"
+      - "C:/msys64/opt/bin/lld-link.com"
+      - "C:/msys64/opt/bin/lld-link.exe"
+      - "C:/msys64/opt/bin/lld-link"
+      - "C:/Program Files/PowerShell/7-preview/preview/lld-link.com"
+      - "C:/Program Files/PowerShell/7-preview/preview/lld-link.exe"
+      - "C:/Program Files/PowerShell/7-preview/preview/lld-link"
+      - "C:/Program Files/doxygen/bin/lld-link.com"
+      - "C:/Program Files/doxygen/bin/lld-link.exe"
+      - "C:/Program Files/doxygen/bin/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/lld-link"
+      - "C:/Program Files/PowerShell/7/lld-link.com"
+      - "C:/Program Files/PowerShell/7/lld-link.exe"
+      - "C:/Program Files/PowerShell/7/lld-link"
+      - "C:/Program Files/CMake/bin/lld-link.com"
+      - "C:/Program Files/CMake/bin/lld-link.exe"
+      - "C:/Program Files/CMake/bin/lld-link"
+      - "C:/Program Files/vcpkg/lld-link.com"
+      - "C:/Program Files/vcpkg/lld-link.exe"
+      - "C:/Program Files/vcpkg/lld-link"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/lld-link.com"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/lld-link.exe"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/lld-link"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.com"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.exe"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/lld-link"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/lld-link.com"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/lld-link.exe"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/lld-link"
+      - "C:/Users/k024g/.dotnet/tools/lld-link.com"
+      - "C:/Users/k024g/.dotnet/tools/lld-link.exe"
+      - "C:/Users/k024g/.dotnet/tools/lld-link"
+      - "C:/Users/k024g/mingw64/bin/lld-link.com"
+      - "C:/Users/k024g/mingw64/bin/lld-link.exe"
+      - "C:/Users/k024g/mingw64/bin/lld-link"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/lld-link"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/lld-link.com"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/lld-link.exe"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/lld-link"
+      - "C:/Program Files/MeCab/bin/lld-link.com"
+      - "C:/Program Files/MeCab/bin/lld-link.exe"
+      - "C:/Program Files/MeCab/bin/lld-link"
+      - "C:/Program Files/Graphviz/bin/lld-link.com"
+      - "C:/Program Files/Graphviz/bin/lld-link.exe"
+      - "C:/Program Files/Graphviz/bin/lld-link"
+      - "C:/tool/vcpkg/lld-link.com"
+      - "C:/tool/vcpkg/lld-link.exe"
+      - "C:/tool/vcpkg/lld-link"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineRCCompiler.cmake:40 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Windows-MSVC.cmake:592 (enable_language)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Windows-MSVC.cmake:565 (__windows_compiler_msvc_enable_rc)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Windows-MSVC-C.cmake:5 (__windows_compiler_msvc)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeCInformation.cmake:48 (include)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    mode: "program"
+    variable: "CMAKE_RC_COMPILER"
+    description: "RC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "rc"
+    candidate_directories:
+      - "C:/Program Files/Oculus/Support/oculus-runtime/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/msys64/mingw64/bin/"
+      - "C:/msys64/usr/local/bin/"
+      - "C:/msys64/usr/bin/"
+      - "C:/msys64/bin/"
+      - "C:/msys64/opt/bin/"
+      - "C:/Program Files/PowerShell/7-preview/preview/"
+      - "C:/Program Files/doxygen/bin/"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/vcpkg/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/k024g/.dotnet/tools/"
+      - "C:/Users/k024g/mingw64/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/"
+      - "C:/Program Files/MeCab/bin/"
+      - "C:/Program Files/Graphviz/bin/"
+      - "C:/tool/vcpkg/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files (x86)/Assimp/bin/"
+      - "C:/Program Files (x86)/Assimp/sbin/"
+      - "C:/Program Files (x86)/Assimp/"
+    searched_directories:
+      - "C:/Program Files/Oculus/Support/oculus-runtime/rc.com"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/rc.exe"
+      - "C:/Program Files/Oculus/Support/oculus-runtime/rc"
+      - "C:/Windows/System32/rc.com"
+      - "C:/Windows/System32/rc.exe"
+      - "C:/Windows/System32/rc"
+      - "C:/Windows/rc.com"
+      - "C:/Windows/rc.exe"
+      - "C:/Windows/rc"
+      - "C:/Windows/System32/wbem/rc.com"
+      - "C:/Windows/System32/wbem/rc.exe"
+      - "C:/Windows/System32/wbem/rc"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc"
+      - "C:/Windows/System32/OpenSSH/rc.com"
+      - "C:/Windows/System32/OpenSSH/rc.exe"
+      - "C:/Windows/System32/OpenSSH/rc"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/rc.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/rc.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR/rc"
+      - "C:/Program Files/dotnet/rc.com"
+      - "C:/Program Files/dotnet/rc.exe"
+      - "C:/Program Files/dotnet/rc"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/rc.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/rc.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/rc"
+      - "C:/Program Files/Git/cmd/rc.com"
+      - "C:/Program Files/Git/cmd/rc.exe"
+      - "C:/Program Files/Git/cmd/rc"
+      - "C:/msys64/mingw64/bin/rc.com"
+      - "C:/msys64/mingw64/bin/rc.exe"
+      - "C:/msys64/mingw64/bin/rc"
+      - "C:/msys64/usr/local/bin/rc.com"
+      - "C:/msys64/usr/local/bin/rc.exe"
+      - "C:/msys64/usr/local/bin/rc"
+      - "C:/msys64/usr/bin/rc.com"
+      - "C:/msys64/usr/bin/rc.exe"
+      - "C:/msys64/usr/bin/rc"
+      - "C:/msys64/bin/rc.com"
+      - "C:/msys64/bin/rc.exe"
+      - "C:/msys64/bin/rc"
+      - "C:/msys64/opt/bin/rc.com"
+      - "C:/msys64/opt/bin/rc.exe"
+      - "C:/msys64/opt/bin/rc"
+      - "C:/Program Files/PowerShell/7-preview/preview/rc.com"
+      - "C:/Program Files/PowerShell/7-preview/preview/rc.exe"
+      - "C:/Program Files/PowerShell/7-preview/preview/rc"
+      - "C:/Program Files/doxygen/bin/rc.com"
+      - "C:/Program Files/doxygen/bin/rc.exe"
+      - "C:/Program Files/doxygen/bin/rc"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/rc.com"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/rc.exe"
+      - "C:/Program Files/Microsoft SQL Server/170/Tools/Binn/rc"
+      - "C:/Program Files/PowerShell/7/rc.com"
+      - "C:/Program Files/PowerShell/7/rc.exe"
+      - "C:/Program Files/PowerShell/7/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Program Files/vcpkg/rc.com"
+      - "C:/Program Files/vcpkg/rc.exe"
+      - "C:/Program Files/vcpkg/rc"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/rc.com"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/rc.exe"
+      - "C:/Users/k024g/AppData/Local/Microsoft/WindowsApps/rc"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/rc.com"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/rc.exe"
+      - "C:/Users/k024g/AppData/Local/Programs/Microsoft VS Code/bin/rc"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/rc.com"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/rc.exe"
+      - "C:/Users/k024g/AppData/Local/GitHubDesktop/bin/rc"
+      - "C:/Users/k024g/.dotnet/tools/rc.com"
+      - "C:/Users/k024g/.dotnet/tools/rc.exe"
+      - "C:/Users/k024g/.dotnet/tools/rc"
+      - "C:/Users/k024g/mingw64/bin/rc.com"
+      - "C:/Users/k024g/mingw64/bin/rc.exe"
+      - "C:/Users/k024g/mingw64/bin/rc"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/rc.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/rc.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/SDK/ScopeCppSDK/vc15/VC/bin/rc"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/rc.com"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/rc.exe"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/rc"
+      - "C:/Program Files/MeCab/bin/rc.com"
+      - "C:/Program Files/MeCab/bin/rc.exe"
+      - "C:/Program Files/MeCab/bin/rc"
+      - "C:/Program Files/Graphviz/bin/rc.com"
+      - "C:/Program Files/Graphviz/bin/rc.exe"
+      - "C:/Program Files/Graphviz/bin/rc"
+      - "C:/tool/vcpkg/rc.com"
+      - "C:/tool/vcpkg/rc.exe"
+      - "C:/tool/vcpkg/rc"
+      - "C:/Program Files/bin/rc.com"
+      - "C:/Program Files/bin/rc.exe"
+      - "C:/Program Files/bin/rc"
+      - "C:/Program Files/sbin/rc.com"
+      - "C:/Program Files/sbin/rc.exe"
+      - "C:/Program Files/sbin/rc"
+      - "C:/Program Files/rc.com"
+      - "C:/Program Files/rc.exe"
+      - "C:/Program Files/rc"
+      - "C:/Program Files (x86)/bin/rc.com"
+      - "C:/Program Files (x86)/bin/rc.exe"
+      - "C:/Program Files (x86)/bin/rc"
+      - "C:/Program Files (x86)/sbin/rc.com"
+      - "C:/Program Files (x86)/sbin/rc.exe"
+      - "C:/Program Files (x86)/sbin/rc"
+      - "C:/Program Files (x86)/rc.com"
+      - "C:/Program Files (x86)/rc.exe"
+      - "C:/Program Files (x86)/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Program Files/CMake/sbin/rc.com"
+      - "C:/Program Files/CMake/sbin/rc.exe"
+      - "C:/Program Files/CMake/sbin/rc"
+      - "C:/Program Files/CMake/rc.com"
+      - "C:/Program Files/CMake/rc.exe"
+      - "C:/Program Files/CMake/rc"
+      - "C:/Program Files (x86)/Assimp/bin/rc.com"
+      - "C:/Program Files (x86)/Assimp/bin/rc.exe"
+      - "C:/Program Files (x86)/Assimp/bin/rc"
+      - "C:/Program Files (x86)/Assimp/sbin/rc.com"
+      - "C:/Program Files (x86)/Assimp/sbin/rc.exe"
+      - "C:/Program Files (x86)/Assimp/sbin/rc"
+      - "C:/Program Files (x86)/Assimp/rc.com"
+      - "C:/Program Files (x86)/Assimp/rc.exe"
+      - "C:/Program Files (x86)/Assimp/rc"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\msys64\\mingw64\\bin"
+        - "C:\\msys64\\usr\\local\\bin"
+        - "C:\\msys64\\usr\\bin"
+        - "C:\\msys64\\bin"
+        - "C:\\msys64\\opt\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Oculus\\Support\\oculus-runtime"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\vcpkg"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7-preview\\preview"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\k024g\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\k024g\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Users\\k024g\\mingw64\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\SDK\\ScopeCppSDK\\vc15\\VC\\bin"
+        - "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\MeCab\\bin"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+        - "C:\\Program Files\\Graphviz\\bin"
+        - "C:\\tool\\vcpkg"
+        - "C:\\Users\\k024g\\.dotnet\\tools"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/Assimp"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/Assimp"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-lv65xy"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-lv65xy"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-lv65xy'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_97b65.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:32 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-lv65xy\\cmTC_97b65.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-lv65xy\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_97b65.dir\\Debug\\cmTC_97b65.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_97b65.dir\\Debug\\cmTC_97b65.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_97b65.dir\\Debug\\cmTC_97b65.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_97b65.dir\\Debug\\\\" /Fd"cmTC_97b65.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCCompilerABI.c"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_97b65.dir\\Debug\\\\" /Fd"cmTC_97b65.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCCompilerABI.c"
+          CMakeCCompilerABI.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-lv65xy\\Debug\\cmTC_97b65.exe" /INCREMENTAL /ILK:"cmTC_97b65.dir\\Debug\\cmTC_97b65.ilk" /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-lv65xy/Debug/cmTC_97b65.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-lv65xy/Debug/cmTC_97b65.lib" /MACHINE:X64  /machine:x64 cmTC_97b65.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_97b65.vcxproj -> C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-lv65xy\\Debug\\cmTC_97b65.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\tool\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-lv65xy\\Debug\\cmTC_97b65.exe" "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_97b65.dir\\Debug\\cmTC_97b65.tlog\\cmTC_97b65.write.1u.tlog" "cmTC_97b65.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          ファイル "cmTC_97b65.dir\\Debug\\cmTC_97b65.tlog\\unsuccessfulbuild" を削除しています。
+          "cmTC_97b65.dir\\Debug\\cmTC_97b65.tlog\\cmTC_97b65.lastbuildstate" のタッチ タスクを実行しています。
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-lv65xy\\cmTC_97b65.vcxproj" (既定のターゲット) のビルドが完了しました。
+        
+        ビルドに成功しました。
+            0 個の警告
+            0 エラー
+        
+        経過時間 00:00:01.29
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'C': C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    message: |
+      Running the C compiler's linker: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.50.35730.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-aviphw"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-aviphw"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-aviphw'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_6902e.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:34 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-aviphw\\cmTC_6902e.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-aviphw\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_6902e.dir\\Debug\\cmTC_6902e.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_6902e.dir\\Debug\\cmTC_6902e.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_6902e.dir\\Debug\\cmTC_6902e.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_6902e.dir\\Debug\\\\" /Fd"cmTC_6902e.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCXXCompilerABI.cpp"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_6902e.dir\\Debug\\\\" /Fd"cmTC_6902e.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCXXCompilerABI.cpp"
+          CMakeCXXCompilerABI.cpp
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-aviphw\\Debug\\cmTC_6902e.exe" /INCREMENTAL /ILK:"cmTC_6902e.dir\\Debug\\cmTC_6902e.ilk" /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-aviphw/Debug/cmTC_6902e.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-aviphw/Debug/cmTC_6902e.lib" /MACHINE:X64  /machine:x64 cmTC_6902e.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_6902e.vcxproj -> C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-aviphw\\Debug\\cmTC_6902e.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\tool\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-aviphw\\Debug\\cmTC_6902e.exe" "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_6902e.dir\\Debug\\cmTC_6902e.tlog\\cmTC_6902e.write.1u.tlog" "cmTC_6902e.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          ファイル "cmTC_6902e.dir\\Debug\\cmTC_6902e.tlog\\unsuccessfulbuild" を削除しています。
+          "cmTC_6902e.dir\\Debug\\cmTC_6902e.tlog\\cmTC_6902e.lastbuildstate" のタッチ タスクを実行しています。
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-aviphw\\cmTC_6902e.vcxproj" (既定のターゲット) のビルドが完了しました。
+        
+        ビルドに成功しました。
+            0 個の警告
+            0 エラー
+        
+        経過時間 00:00:01.33
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'CXX': C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:107 (PROJECT)"
+    message: |
+      Running the CXX compiler's linker: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.50.35730.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckIncludeFile.cmake:174 (try_compile)"
+      - "contrib/zlib/CMakeLists.txt:35 (check_include_file)"
+    checks:
+      - "Looking for sys/types.h"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ijxfzu"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ijxfzu"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp-6.0.5/cmake-modules"
+    buildResult:
+      variable: "HAVE_SYS_TYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ijxfzu'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_52f30.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:37 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\cmTC_52f30.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_52f30.dir\\Debug\\cmTC_52f30.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_52f30.dir\\Debug\\cmTC_52f30.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_52f30.dir\\Debug\\cmTC_52f30.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_52f30.dir\\Debug\\\\" /Fd"cmTC_52f30.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\CheckIncludeFile.c"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_52f30.dir\\Debug\\\\" /Fd"cmTC_52f30.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\CheckIncludeFile.c"
+          CheckIncludeFile.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\Debug\\cmTC_52f30.exe" /INCREMENTAL /ILK:"cmTC_52f30.dir\\Debug\\cmTC_52f30.ilk" /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ijxfzu/Debug/cmTC_52f30.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ijxfzu/Debug/cmTC_52f30.lib" /MACHINE:X64  /machine:x64 cmTC_52f30.dir\\Debug\\CheckIncludeFile.obj
+          cmTC_52f30.vcxproj -> C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\Debug\\cmTC_52f30.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\tool\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\Debug\\cmTC_52f30.exe" "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_52f30.dir\\Debug\\cmTC_52f30.tlog\\cmTC_52f30.write.1u.tlog" "cmTC_52f30.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          ファイル "cmTC_52f30.dir\\Debug\\cmTC_52f30.tlog\\unsuccessfulbuild" を削除しています。
+          "cmTC_52f30.dir\\Debug\\cmTC_52f30.tlog\\cmTC_52f30.lastbuildstate" のタッチ タスクを実行しています。
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ijxfzu\\cmTC_52f30.vcxproj" (既定のターゲット) のビルドが完了しました。
+        
+        ビルドに成功しました。
+            0 個の警告
+            0 エラー
+        
+        経過時間 00:00:01.34
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckIncludeFile.cmake:174 (try_compile)"
+      - "contrib/zlib/CMakeLists.txt:36 (check_include_file)"
+    checks:
+      - "Looking for stdint.h"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-t6bvgn"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-t6bvgn"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp-6.0.5/cmake-modules"
+    buildResult:
+      variable: "HAVE_STDINT_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-t6bvgn'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_ff9ab.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:39 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\cmTC_ff9ab.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_ff9ab.dir\\Debug\\cmTC_ff9ab.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_ff9ab.dir\\Debug\\cmTC_ff9ab.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_ff9ab.dir\\Debug\\cmTC_ff9ab.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_ff9ab.dir\\Debug\\\\" /Fd"cmTC_ff9ab.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\CheckIncludeFile.c"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_ff9ab.dir\\Debug\\\\" /Fd"cmTC_ff9ab.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\CheckIncludeFile.c"
+          CheckIncludeFile.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\Debug\\cmTC_ff9ab.exe" /INCREMENTAL /ILK:"cmTC_ff9ab.dir\\Debug\\cmTC_ff9ab.ilk" /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-t6bvgn/Debug/cmTC_ff9ab.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-t6bvgn/Debug/cmTC_ff9ab.lib" /MACHINE:X64  /machine:x64 cmTC_ff9ab.dir\\Debug\\CheckIncludeFile.obj
+          cmTC_ff9ab.vcxproj -> C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\Debug\\cmTC_ff9ab.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\tool\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\Debug\\cmTC_ff9ab.exe" "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_ff9ab.dir\\Debug\\cmTC_ff9ab.tlog\\cmTC_ff9ab.write.1u.tlog" "cmTC_ff9ab.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          ファイル "cmTC_ff9ab.dir\\Debug\\cmTC_ff9ab.tlog\\unsuccessfulbuild" を削除しています。
+          "cmTC_ff9ab.dir\\Debug\\cmTC_ff9ab.tlog\\cmTC_ff9ab.lastbuildstate" のタッチ タスクを実行しています。
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-t6bvgn\\cmTC_ff9ab.vcxproj" (既定のターゲット) のビルドが完了しました。
+        
+        ビルドに成功しました。
+            0 個の警告
+            0 エラー
+        
+        経過時間 00:00:01.33
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckIncludeFile.cmake:174 (try_compile)"
+      - "contrib/zlib/CMakeLists.txt:37 (check_include_file)"
+    checks:
+      - "Looking for stddef.h"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-wy9xsi"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-wy9xsi"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp-6.0.5/cmake-modules"
+    buildResult:
+      variable: "HAVE_STDDEF_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-wy9xsi'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_5a741.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:40 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\cmTC_5a741.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_5a741.dir\\Debug\\cmTC_5a741.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_5a741.dir\\Debug\\cmTC_5a741.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_5a741.dir\\Debug\\cmTC_5a741.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_5a741.dir\\Debug\\\\" /Fd"cmTC_5a741.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\CheckIncludeFile.c"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_5a741.dir\\Debug\\\\" /Fd"cmTC_5a741.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\CheckIncludeFile.c"
+          CheckIncludeFile.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\Debug\\cmTC_5a741.exe" /INCREMENTAL /ILK:"cmTC_5a741.dir\\Debug\\cmTC_5a741.ilk" /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-wy9xsi/Debug/cmTC_5a741.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-wy9xsi/Debug/cmTC_5a741.lib" /MACHINE:X64  /machine:x64 cmTC_5a741.dir\\Debug\\CheckIncludeFile.obj
+          cmTC_5a741.vcxproj -> C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\Debug\\cmTC_5a741.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\tool\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\Debug\\cmTC_5a741.exe" "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_5a741.dir\\Debug\\cmTC_5a741.tlog\\cmTC_5a741.write.1u.tlog" "cmTC_5a741.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          ファイル "cmTC_5a741.dir\\Debug\\cmTC_5a741.tlog\\unsuccessfulbuild" を削除しています。
+          "cmTC_5a741.dir\\Debug\\cmTC_5a741.tlog\\cmTC_5a741.lastbuildstate" のタッチ タスクを実行しています。
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-wy9xsi\\cmTC_5a741.vcxproj" (既定のターゲット) のビルドが完了しました。
+        
+        ビルドに成功しました。
+            0 個の警告
+            0 エラー
+        
+        経過時間 00:00:01.29
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckTypeSize.cmake:348 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckTypeSize.cmake:481 (__check_type_size_impl)"
+      - "contrib/zlib/CMakeLists.txt:55 (check_type_size)"
+    checks:
+      - "Check size of off64_t"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ew7i8i"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ew7i8i"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp-6.0.5/cmake-modules"
+    buildResult:
+      variable: "HAVE_OFF64_T"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-ew7i8i'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_3eedf.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:42 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_3eedf.dir\\Debug\\cmTC_3eedf.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_3eedf.dir\\Debug\\cmTC_3eedf.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_3eedf.dir\\Debug\\cmTC_3eedf.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _LARGEFILE64_SOURCE=1 /D HAVE_SYS_TYPES_H /D HAVE_STDINT_H /D HAVE_STDDEF_H /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_3eedf.dir\\Debug\\\\" /Fd"cmTC_3eedf.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _LARGEFILE64_SOURCE=1 /D HAVE_SYS_TYPES_H /D HAVE_STDINT_H /D HAVE_STDDEF_H /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_3eedf.dir\\Debug\\\\" /Fd"cmTC_3eedf.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c"
+          OFF64_T.c
+        C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(29,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+        C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(30,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+        C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(31,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+        C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(32,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+        C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(33,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj" (既定のターゲット) のビルドが終了しました -- 失敗。
+        
+        ビルドに失敗しました。
+        
+        "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj" (既定のターゲット) (1) ->
+        (ClCompile ターゲット) -> 
+          C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(29,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+          C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(30,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+          C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(31,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+          C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(32,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+          C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\OFF64_T.c(33,12): error C2065: 'off64_t': 定義されていない識別子です。 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-ew7i8i\\cmTC_3eedf.vcxproj]
+        
+            0 個の警告
+            5 エラー
+        
+        経過時間 00:00:00.27
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckFunctionExists.cmake:167 (try_compile)"
+      - "contrib/zlib/CMakeLists.txt:64 (check_function_exists)"
+    checks:
+      - "Looking for fseeko"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-u1wid8"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-u1wid8"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp-6.0.5/cmake-modules"
+    buildResult:
+      variable: "HAVE_FSEEKO"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-u1wid8'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_2fc21.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:42 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\cmTC_2fc21.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_2fc21.dir\\Debug\\cmTC_2fc21.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_2fc21.dir\\Debug\\cmTC_2fc21.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_2fc21.dir\\Debug\\cmTC_2fc21.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=fseeko /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_2fc21.dir\\Debug\\\\" /Fd"cmTC_2fc21.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\CheckFunctionExists.c"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=fseeko /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_2fc21.dir\\Debug\\\\" /Fd"cmTC_2fc21.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\CheckFunctionExists.c"
+          CheckFunctionExists.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\Debug\\cmTC_2fc21.exe" /INCREMENTAL /ILK:"cmTC_2fc21.dir\\Debug\\cmTC_2fc21.ilk" /NOLOGO /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\tool\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-u1wid8/Debug/cmTC_2fc21.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-u1wid8/Debug/cmTC_2fc21.lib" /MACHINE:X64  /machine:x64 cmTC_2fc21.dir\\Debug\\CheckFunctionExists.obj
+        CheckFunctionExists.obj : error LNK2019: 未解決の外部シンボル fseeko が関数 main で参照されました [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\cmTC_2fc21.vcxproj]
+        C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\Debug\\cmTC_2fc21.exe : fatal error LNK1120: 1 件の未解決の外部参照 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\cmTC_2fc21.vcxproj]
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\cmTC_2fc21.vcxproj" (既定のターゲット) のビルドが終了しました -- 失敗。
+        
+        ビルドに失敗しました。
+        
+        "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\cmTC_2fc21.vcxproj" (既定のターゲット) (1) ->
+        (Link ターゲット) -> 
+          CheckFunctionExists.obj : error LNK2019: 未解決の外部シンボル fseeko が関数 main で参照されました [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\cmTC_2fc21.vcxproj]
+          C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\Debug\\cmTC_2fc21.exe : fatal error LNK1120: 1 件の未解決の外部参照 [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-u1wid8\\cmTC_2fc21.vcxproj]
+        
+            0 個の警告
+            2 エラー
+        
+        経過時間 00:00:00.39
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckIncludeFile.cmake:174 (try_compile)"
+      - "contrib/zlib/CMakeLists.txt:72 (check_include_file)"
+    checks:
+      - "Looking for unistd.h"
+    directories:
+      source: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-vqcvn5"
+      binary: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-vqcvn5"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp-6.0.5/cmake-modules"
+    buildResult:
+      variable: "Z_HAVE_UNISTD_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/assimp/CMakeFiles/CMakeScratch/TryCompile-vqcvn5'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_2a724.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild のバージョン 18.5.4+cb4e32d21 (.NET Framework)
+        26/05/11 11:34:43 にビルドを開始しました。
+        
+        ノード 1 上のプロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\cmTC_2a724.vcxproj" (既定のターゲット)。
+        PrepareForBuild:
+          構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+          ディレクトリ "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\Debug\\" を作成しています。
+          ディレクトリ "cmTC_2a724.dir\\Debug\\cmTC_2a724.tlog\\" を作成しています。
+        InitializeBuildStatus:
+          "AlwaysCreate" が指定されたため "cmTC_2a724.dir\\Debug\\cmTC_2a724.tlog\\unsuccessfulbuild" を作成しています。
+          "cmTC_2a724.dir\\Debug\\cmTC_2a724.tlog\\unsuccessfulbuild" のタッチ タスクを実行しています。
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\tool\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_2a724.dir\\Debug\\\\" /Fd"cmTC_2a724.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\CheckIncludeFile.c"
+          Microsoft(R) C/C++ Optimizing Compiler Version 19.50.35730 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\tool\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_2a724.dir\\Debug\\\\" /Fd"cmTC_2a724.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\CheckIncludeFile.c"
+          CheckIncludeFile.c
+        C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\CheckIncludeFile.c(1,10): error C1083: include ファイルを開けません。'unistd.h':No such file or directory [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\cmTC_2a724.vcxproj]
+        プロジェクト "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\cmTC_2a724.vcxproj" (既定のターゲット) のビルドが終了しました -- 失敗。
+        
+        ビルドに失敗しました。
+        
+        "C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\cmTC_2a724.vcxproj" (既定のターゲット) (1) ->
+        (ClCompile ターゲット) -> 
+          C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\CheckIncludeFile.c(1,10): error C1083: include ファイルを開けません。'unistd.h':No such file or directory [C:\\Users\\k024g\\source\\repos\\CG2\\SHEngine\\DirectXGame\\externals\\src\\assimp\\CMakeFiles\\CMakeScratch\\TryCompile-vqcvn5\\cmTC_2a724.vcxproj]
+        
+            0 個の警告
+            1 エラー
+        
+        経過時間 00:00:00.25
+        
+      exitCode: 1
+...

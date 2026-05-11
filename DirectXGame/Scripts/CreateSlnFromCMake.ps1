@@ -3,10 +3,17 @@ param(
     [string]$SourceDir,
     [Parameter(Mandatory = $true)]
     [string]$BuildDir,
-    [string]$Generator = "Visual Studio 18 2026",
+    [string]$Generator = "Ninja",
     [string]$Platform  = "x64",
     [string]$Config    = "Release"
 )
+
+# MSYS排除
+$env:PATH = ($env:PATH -split ';' | Where-Object { $_ -notlike "*msys64*" }) -join ';'
+
+# MSVC強制
+$env:CC  = "cl.exe"
+$env:CXX = "cl.exe"
 
 # --- ログ出力 ---
 Write-Host "Building" $SourceDir
@@ -46,14 +53,14 @@ Push-Location $BuildDir
 
 $cmakeArgs = @(
 $SourceDir,
-"-G", $Generator,
-"-A", $Platform
+"-G", $Generator
+# "-A", $Platform
 )
 
 Write-Host "Args:"
 $cmakeArgs | ForEach-Object { Write-Host "[$_]" }
 
-& cmake @cmakeArgs
+& "C:\Program Files\CMake\bin\cmake.exe" @cmakeArgs
 if ($LASTEXITCODE -ne 0) {
 Write-Error "CMake Generate に失敗しました"
 Pop-Location
