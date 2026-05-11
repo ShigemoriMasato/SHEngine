@@ -47,12 +47,16 @@ powershell -ExecutionPolicy Bypass -NoProfile ^
 powershell -ExecutionPolicy Bypass -NoProfile ^
   -File "Scripts/CopyHeader.ps1" ^
   -SourceDir "externals/src/freetype-VER-2-14-3/include" ^
-  -DestDir "externals/header/freetype"
+  -DestDir "externals/header/"
 
 powershell -ExecutionPolicy Bypass -NoProfile ^
   -File "Scripts/CopyHeader.ps1" ^
   -SourceDir "externals/src/assimp-6.0.5/include/assimp" ^
   -DestDir "externals/header/assimp"
+
+rem Release用の.libをDevelopment用にコピーして使用できるようにする
+powershell -ExecutionPolicy Bypass -NoProfile ^
+  -File "Scripts/CreateDev.ps1" ^
 
 rem filterを作成
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts/FilterAdjust.ps1"

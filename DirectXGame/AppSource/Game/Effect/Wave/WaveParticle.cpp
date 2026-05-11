@@ -121,8 +121,24 @@ void WaveParticle::DrawImGui() {
 #else
 
 	static WaveData testWave = {};
-	testWave.color = { 0.0f, 1.0f, 1.0f };
-	testWave.speed = 36.0f;
+	static std::vector<Vector3> colorPallete = {
+		{1.0f, 0.0f, 0.0f},
+		{1.0f, 0.5f, 0.0f},
+		{1.0f, 1.0f, 0.0f},
+		{0.5f, 1.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{0.0f, 1.0f, 0.5f},
+		{0.0f, 1.0f, 1.0f},
+		{0.0f, 0.5f, 1.0f},
+		{0.0f, 0.0f, 1.0f},
+		{0.5f, 0.0f, 1.0f},
+		{1.0f, 0.0f, 1.0f},
+		{1.0f, 0.0f, 0.5f},
+	};
+	static int colorIndex = 0;
+	colorIndex = (colorIndex) % colorPallete.size();
+	testWave.color = colorPallete[colorIndex];
+	testWave.speed = 24.0f;
 	testWave.intensity = 1.0f;
 	testWave.lifetime = 0.0f;
 	testWave.decayRate = 0.1f;
@@ -131,7 +147,8 @@ void WaveParticle::DrawImGui() {
 
 	static float timer = 0.0f;
 	timer += 0.016f;
-	if (timer >= 1.0f) {
+	if (timer >= 0.5f) {
+		colorIndex++;
 		timer = 0.0f;
 		AddWave(testWave);
 	}

@@ -5,6 +5,7 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "xinput.lib")
+#pragma comment(lib, "User32.lib")
 
 using XC = XBoxController;
 using namespace SHEngine;
