@@ -13,6 +13,11 @@ namespace SHEngine {
 	class TextureData {
 	public:
 
+		enum class Type {
+			Normal,
+			DDS,
+		};
+
 		TextureData() = default;
 		~TextureData() = default;
 
@@ -24,6 +29,7 @@ namespace SHEngine {
 		ID3D12Resource* GetResource() const { return textureResource_.Get(); }
 		std::pair<uint32_t, uint32_t> GetSize() const { return { width_, height_ }; }
 		Vector4 GetClearColor() const { return clearColor_; }
+		Type GetType() const { return type_; }
 
 	private:
 
@@ -49,6 +55,8 @@ namespace SHEngine {
 
 		SRVHandle srvHandle_{};
 		Vector4 clearColor_{};
+
+		Type type_ = Type::Normal;
 
 		TextureManager* textureManager_ = nullptr;
 	};

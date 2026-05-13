@@ -117,17 +117,17 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	//VertexShader
 	registerIndex = 0;
 	for (int i = 0; i < config.cbvNums.first; ++i) {
-		rootParameters.emplace_back();
-		rootParameters.back().ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-		rootParameters.back().ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;    //VertexShaderで使う
-		rootParameters.back().Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;    //VertexShaderで使う
+		param.Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
 	}
 	registerIndex = 0;
 	for (int i = 0; i < config.cbvNums.second; ++i) {
-		rootParameters.emplace_back();
-		rootParameters.back().ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-		rootParameters.back().ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
-		rootParameters.back().Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
+		param.Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
 	}
 
 	// === SRV ===
@@ -141,11 +141,11 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-		rootParameters.emplace_back();
-		rootParameters.back().ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
-		rootParameters.back().ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
-		rootParameters.back().DescriptorTable.pDescriptorRanges = &range;						//テーブルの中身
-		rootParameters.back().DescriptorTable.NumDescriptorRanges = 1;							//テーブルの数
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;						//テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;							//テーブルの数
 	}
 
 	//PixelShader
@@ -158,25 +158,131 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-		rootParameters.emplace_back();
-		rootParameters.back().ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
-		rootParameters.back().ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                 //PixelShaderで使う
-		rootParameters.back().DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
-		rootParameters.back().DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                 //PixelShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
 	}
 
-	// === Texture ===
+	// === UAV ===
+	//VertexShader
+	std::vector< D3D12_DESCRIPTOR_RANGE> vertexUavRanges;
+	vertexUavRanges.resize(config.uavNums.first);
+	for (int i = 0; i < config.uavNums.first; ++i) {
+		auto& range = vertexUavRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;						//テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;							//テーブルの数
+	}
+
+	//PixelShader
+	std::vector< D3D12_DESCRIPTOR_RANGE> pixelUavRanges;
+	pixelUavRanges.resize(config.uavNums.second);
+	for (int i = 0; i < config.uavNums.second; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = pixelUavRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                 //PixelShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
+	// === 2DTexture ===
+	//VertexShader
+	std::vector< D3D12_DESCRIPTOR_RANGE> vertexTexture2DRanges;
+	vertexTexture2DRanges.resize(config.textureNums.first);
+	for (int i = 0; i < config.textureNums.first; ++i) {
+		auto& range = vertexTexture2DRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;						//テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;							//テーブルの数
+	}
+
+	//PixelShader
+	std::vector< D3D12_DESCRIPTOR_RANGE> pixelTexture2DRanges;
+	pixelTexture2DRanges.resize(config.textureNums.second);
+	for (int i = 0; i < config.textureNums.second; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = pixelTexture2DRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                 //PixelShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
+	// === DDS ===
+	//VertexShader
+	std::vector< D3D12_DESCRIPTOR_RANGE> vertexDDSRanges;
+	vertexDDSRanges.resize(config.ddsNums.first);
+	for (int i = 0; i < config.ddsNums.first; ++i) {
+		auto& range = vertexDDSRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;						//テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;							//テーブルの数
+	}
+
+	//PixelShader
+	std::vector< D3D12_DESCRIPTOR_RANGE> pixelDDSRanges;
+	pixelDDSRanges.resize(config.ddsNums.second);
+	for (int i = 0; i < config.ddsNums.second; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = pixelDDSRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                 //PixelShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
+	// === TextureList ===
 	D3D12_DESCRIPTOR_RANGE textureDescriptor[1] = {};
-	textureDescriptor[0].BaseShaderRegister = 8;
-	textureDescriptor[0].NumDescriptors = 1024;
-	textureDescriptor[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	textureDescriptor[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	if (config.useTexture) {
-		rootParameters.emplace_back();
-		rootParameters.back().ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;           //SRVを使う
-		rootParameters.back().ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                       //全Shaderから見れる
-		rootParameters.back().DescriptorTable.pDescriptorRanges = textureDescriptor;                //テーブルの中身
-		rootParameters.back().DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);    //テーブルの数
+		textureDescriptor[0].BaseShaderRegister = 8;
+		textureDescriptor[0].NumDescriptors = 1024;
+		textureDescriptor[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		textureDescriptor[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;           //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                       //全Shaderから見れる
+		param.DescriptorTable.pDescriptorRanges = textureDescriptor;                //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);    //テーブルの数
 	}
 
 	descriptionRootSignature.NumParameters = UINT(rootParameters.size());

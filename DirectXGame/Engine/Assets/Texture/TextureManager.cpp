@@ -19,11 +19,11 @@ void TextureManager::Initialize(DXDevice* device, Command::Manager* manager) {
 	cmdObject_->WaitForGPUIdle();
 	cmdObject_->ResetCommandList();
 
+	logger_ = getLogger("Engine");
+
 	LoadTexture("Assets/.EngineResource/Texture/white1x1.png");
 	LoadTexture("Assets/.EngineResource/Texture/uvChecker.png");
 	errorTextureHandle_ = LoadTexture("Assets/.EngineResource/Texture/error.png");
-
-	logger_ = getLogger("Engine");
 }
 
 void TextureManager::AllTextureClear() {

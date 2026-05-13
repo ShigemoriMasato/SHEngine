@@ -23,12 +23,26 @@ FPSObserver::FPSObserver(bool isFix, double targetFps) {
     // 高精度タイマーの設定
     timeBeginPeriod(1);
 
-    logger_ = getLogger("FPS", LoggerFlag::UseDebugString);
+    logger_ = getLogger("Engine", LoggerFlag::UseDebugString);
 }
 
 FPSObserver::~FPSObserver() {
     // 高精度タイマーの解除
     timeEndPeriod(1);
+
+    //平均FPSをログに出力
+    double average = 0;
+    int dataNum = 0;
+    for (const auto& time : recordData_) {
+        average += time;
+        if (time == 0.0) {
+            break;
+        }
+        dataNum++;
+    }
+    average /= dataNum;
+
+    logger_->info("Average FPS: {}", 1.0 / average);
 }
 
 void FPSObserver::SetTargetFPS(double targetFps, FPSType type) {
@@ -75,6 +89,14 @@ void FPSObserver::TimeAdjustment(FPSType type) {
     if (deltatime_[int(type)] > 0.1f) {
         deltatime_[int(type)] = 0.1f; // 最大値を設定して極端な値を防ぐ
 	}
+
+    //CPUのFPSを指定された頻度で記録する
+    if (type == FPSType::CPU) {
+        if (frameCount_ % recordFrequency_ == 0) {
+            recordData_[recordIndex_] = deltatime_[int(FPSType::CPU)];
+            recordIndex_ = ++recordIndex_ % recordNum_;
+        }
+    }
 
     // 次のフレームの開始時間を設定
     timeStart = timeEnd;

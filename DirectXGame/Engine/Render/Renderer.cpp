@@ -28,7 +28,18 @@ void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
 		int(gpuBuffers_[BufferType::SRV][ShaderType::VERTEX_SHADER].size()),
 		int(gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER].size())
 	};
-	//UAVはいつかやる
+	config.rootConfig.uavNums = {
+		int(gpuBuffers_[BufferType::UAV][ShaderType::VERTEX_SHADER].size()),
+		int(gpuBuffers_[BufferType::UAV][ShaderType::PIXEL_SHADER].size())
+	};
+	config.rootConfig.textureNums = {
+		int(gpuBuffers_[BufferType::Texture2D][ShaderType::VERTEX_SHADER].size()),
+		int(gpuBuffers_[BufferType::Texture2D][ShaderType::PIXEL_SHADER].size())
+	};
+	config.rootConfig.ddsNums = {
+		int(gpuBuffers_[BufferType::DDSTexture][ShaderType::VERTEX_SHADER].size()),
+		int(gpuBuffers_[BufferType::DDSTexture][ShaderType::PIXEL_SHADER].size())
+	};
 	config.rootConfig.useTexture = isUseTexture_;
 
 	config.vs = vs_;
@@ -75,6 +86,18 @@ void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
 		uav->TransitionBarrier(D3D12_RESOURCE_STATE_GENERIC_READ);
 		uav->Flush(cmdObj);
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, uav->GetGPUDescriptorHandle(BufferType::UAV));
+	}
+	for (const auto& texture2D : gpuBuffers_[BufferType::Texture2D][ShaderType::VERTEX_SHADER]) {
+		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, texture2D->GetGPUDescriptorHandle(BufferType::Texture2D));
+	}
+	for (const auto& texture2D : gpuBuffers_[BufferType::Texture2D][ShaderType::PIXEL_SHADER]) {
+		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, texture2D->GetGPUDescriptorHandle(BufferType::Texture2D));
+	}
+	for (const auto& DDStexture : gpuBuffers_[BufferType::DDSTexture][ShaderType::VERTEX_SHADER]) {
+		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, DDStexture->GetGPUDescriptorHandle(BufferType::DDSTexture));
+	}
+	for (const auto& DDStexture : gpuBuffers_[BufferType::DDSTexture][ShaderType::PIXEL_SHADER]) {
+		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, DDStexture->GetGPUDescriptorHandle(BufferType::DDSTexture));
 	}
 
 	if (isUseTexture_) {

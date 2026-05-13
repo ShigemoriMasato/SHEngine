@@ -34,6 +34,9 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix,
 	update_->ResetCommandList();
 	direct_->ResetCommandList();
 
+	static Logger logger = getLogger("Command");
+	logger->info(compute_->Log());
+
 	//パーティクルの更新処理
 	waveParticle_->Update(compute_.get(), deltaTime);
 

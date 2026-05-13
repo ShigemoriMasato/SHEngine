@@ -43,13 +43,12 @@ void DXList::Initialize(DXDevice* device, Type type) {
 	assert(SUCCEEDED(hr) && "Failed to close Command List");
 }
 
-bool DXList::CanExecute() {
+bool DXList::CanExecute() const {
 	for (const auto& [queue, fence] : executed_) {
 		if (!queue->CheckFinishedJob(fence)) {
 			return false;
 		}
 	}
-	executed_.clear();
 	return true;
 }
 

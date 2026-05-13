@@ -38,7 +38,7 @@ bool Object::CanExecute() {
 }
 
 void SHEngine::Command::Object::WaitForGPUIdle() {
-	for(auto& cmdList : commandLists_) {
+	for (auto& cmdList : commandLists_) {
 		cmdList.WaitForCanExecute();
 	}
 }
@@ -55,7 +55,7 @@ void SHEngine::Command::Object::SetRenderTarget(Screen::IDisplay* display, bool 
 	display->ToRenderTarget(this);
 
 	cmdList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
-	
+
 	//ViewPortとScissorRectの設定
 	D3D12_VIEWPORT viewPort{};
 	viewPort.TopLeftX = 0;
@@ -75,13 +75,13 @@ void SHEngine::Command::Object::SetRenderTarget(Screen::IDisplay* display, bool 
 
 	cmdList->RSSetScissorRects(1, &scissorRect);
 
-	if(clear) {
+	if (clear) {
 		display->Clear(this);
 	}
 }
 
 void SHEngine::Command::Object::ResetCommandList() {
-	if(state_ == State::Open) {
+	if (state_ == State::Open) {
 		// コマンドリストが開いている場合はリセットするとエラーになるのでリセットしない
 		return;
 	}
@@ -91,7 +91,7 @@ void SHEngine::Command::Object::ResetCommandList() {
 }
 
 void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdLists) {
-	if(state_ == State::Close) {
+	if (state_ == State::Close) {
 		//実行できるようにリセットする
 		ResetCommandList();
 	}
@@ -103,7 +103,14 @@ void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdList
 
 std::string SHEngine::Command::Object::Log() const {
 	std::string ans;
+	bool currentCmdListState = commandLists_[currentIndex_ % uint32_t(commandLists_.size())].CanExecute();
+	bool nextCmdListState = commandLists_[(currentIndex_ + 1) % uint32_t(commandLists_.size())].CanExecute();
+	bool prevCmdListState = commandLists_[(currentIndex_ - 1) % uint32_t(commandLists_.size())].CanExecute();
+
 	ans = "CommandObject - Type: " + std::to_string(static_cast<int>(type_)) +
-		", CurrentDXListIndex: " + std::to_string(currentIndex_ % uint32_t(commandLists_.size()));
+		", CurrentIndex: " + std::to_string(currentIndex_ % uint32_t(commandLists_.size())) +
+		", PrevState: " + (prevCmdListState ? "Finished" : "Processing") +
+		", CurrentState: " + (currentCmdListState ? "Finished" : "Processing") +
+		", NextState: " + (nextCmdListState ? "Finished" : "Processing");
 	return ans;
 }

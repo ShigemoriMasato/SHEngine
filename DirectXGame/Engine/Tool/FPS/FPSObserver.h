@@ -90,10 +90,17 @@ private:
      */
     void PreciseSleep(double seconds, FPSType type);
 
-    /// @brief ロガー
-    std::shared_ptr<spdlog::logger> logger_;
     /// @brief フレームカウント
 	uint32_t frameCount_ = 0;
 	// @brief フレームが連続で落ちた回数
 	uint32_t droppedFrameCount_ = 0;
+
+private: //ログ関連
+
+    /// @brief ロガー
+    Logger logger_;
+    static inline const int recordNum_ = 16;
+    static inline const int recordFrequency_ = 60;
+    std::array<double, recordNum_> recordData_;
+    int recordIndex_ = 0;
 };

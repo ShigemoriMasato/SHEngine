@@ -31,8 +31,6 @@ namespace SHEngine::PSO {
 		MinLinearMipmapLinear = 1 << 12,   ///< 縮小時リニア+ミップマップリニア
 
 		ClampClamp_MinMagNearest = 1 << 13,  ///< S座標・T座標共に
-
-		Count                ///< サンプラーIDの総数
 	};
 
 	/**
@@ -69,7 +67,10 @@ namespace SHEngine::PSO {
 	struct RootSignatureConfig {
 		std::pair<int, int> cbvNums{};                         ///< 定数バッファ数<Vertex, Pixel>
 		std::pair<int, int> srvNums{};                         ///< シェーダーリソース数<Vertex, Pixel>（上限8）
-		bool useTexture = false;                                ///< テクスチャを使用するか
+		std::pair<int, int> uavNums{};
+		std::pair<int, int> textureNums{};
+		std::pair<int, int> ddsNums{};
+		bool useTexture = false;                                ///< テクスチャ配列を使用するか
 		uint32_t samplers = uint32_t(SamplerID::Default);        ///< サンプラーIDのビットマスク
 
 		/**

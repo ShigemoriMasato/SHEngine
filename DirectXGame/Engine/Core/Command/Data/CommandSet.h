@@ -20,7 +20,7 @@ namespace SHEngine::Command {
 		void Initialize(DXDevice* device, Type type);
 
 		/// @brief コマンドを積めるかどうか
-		bool CanExecute();
+		bool CanExecute() const;
 		/// @brief コマンドを積めるようになるまで待機する
 		void WaitForCanExecute();
 		/// @brief コマンドを実行できる状態にして渡す

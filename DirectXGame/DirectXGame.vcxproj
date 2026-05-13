@@ -194,6 +194,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Title\Title\Title.cpp" />
     <ClCompile Include="AppSource\Title\WaterWave\WaterWave.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Effect.cpp" />
+    <ClCompile Include="AppSource\Test\DDS\DDSTest.cpp" />
     <ClCompile Include="Engine\Assets\Audio\Data\PlayData.cpp" />
     <ClCompile Include="Engine\Assets\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Compute\PSO\CSPSOManager.cpp" />
@@ -257,6 +258,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Scene\SceneManager.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Pool\ParticlePool.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Wave\WaveParticle.cpp" />
+    <ClCompile Include="AppSource\Test\TestScene.cpp" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Common\MainDisplay.h" />
@@ -277,6 +279,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Title\Title\Title.h" />
     <ClInclude Include="AppSource\Title\WaterWave\WaterWave.h" />
     <ClInclude Include="AppSource\Game\Effect\Effect.h" />
+    <ClInclude Include="AppSource\Test\DDS\DDSTest.h" />
     <ClInclude Include="Engine\Assets\Audio\Data\PlayData.h" />
     <ClInclude Include="Engine\Assets\Model\ModelManager.h" />
     <ClInclude Include="Engine\Compute\PSO\CSPSOManager.h" />
@@ -328,6 +331,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Core\ImGuiWrapper.h" />
     <ClInclude Include="AppSource\Game\Effect\Pool\ParticlePool.h" />
     <ClInclude Include="AppSource\Game\Effect\Wave\WaveParticle.h" />
+    <ClInclude Include="AppSource\Test\TestScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

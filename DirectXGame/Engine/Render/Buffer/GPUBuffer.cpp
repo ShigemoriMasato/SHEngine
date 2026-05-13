@@ -115,6 +115,15 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num,
 	}
 }
 
+SHEngine::GPUBuffer::GPUBuffer(TextureData* textureData) {
+	sizeInBytes_ = 0;
+	bufferType_ = uint8_t(textureData->GetType() == TextureData::Type::Normal ? BufferType::Texture2D : BufferType::DDSTexture);
+
+	descriptorHandles_[BufferType(bufferType_)].push_back(textureData->GetGPUHandle());
+	//リソースはTextureDataが管理しているものを使うので、ここではダミーのリソースを作っておく
+	resources_.resize(1);
+}
+
 D3D12_GPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetGPUDescriptorHandle(BufferType type) const {
 	auto it = descriptorHandles_.find(type);
 	assert(it != descriptorHandles_.end());

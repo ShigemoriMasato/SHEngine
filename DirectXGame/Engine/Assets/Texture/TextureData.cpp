@@ -4,21 +4,31 @@
 #include <Assets/Texture/TextureManager.h>
 #include <Utility/DirectUtilFuncs.h>
 #include <Utility/Color.h>
+#include <filesystem>
 
 using namespace Microsoft::WRL;
 using namespace SHEngine;
 
 namespace {
 	DirectX::ScratchImage CreateMipImages(const std::string& filePath) {
-		//テクスチャファイルを読んでプログラムで扱えるようにする
+		//DDSファイルかどうかの判定
+		std::filesystem::path path(filePath);
+		bool isDDS = path.extension() == ".dds" || path.extension() == ".DDS";
+
 		DirectX::ScratchImage image{};
-		std::wstring filePathW = ConvertString(filePath);
-		HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+		HRESULT hr = S_OK;
+		if (isDDS) {
+			hr = DirectX::LoadFromDDSFile(ConvertString(filePath).c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
+		} else {
+			hr = DirectX::LoadFromWICFile(ConvertString(filePath).c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+		}
+
+		//成功したかどうかの判断
 		assert(SUCCEEDED(hr) && "Failed to Open TextureFile");
 
 		DirectX::ScratchImage mipImages{};
-		//ミニマップの作成(画像サイズが最小の場合、作成手順を飛ばす)
-		if (image.GetMetadata().mipLevels > 1) {
+		//ミニマップの作成(画像サイズが最小の場合または既に圧縮済みの場合、作成手順を飛ばす)
+		if (image.GetMetadata().mipLevels > 1 && !DirectX::IsCompressed(image.GetMetadata().format)) {
 			hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
 			assert(SUCCEEDED(hr));
 		} else {
@@ -268,6 +278,11 @@ ComPtr<ID3D12Resource> TextureData::Create(uint32_t width, uint32_t height, std:
 }
 
 ComPtr<ID3D12Resource> TextureData::Create(std::string filePath, ID3D12Device* device, SRVManager* srvManager, ID3D12GraphicsCommandList* cmdList) {
+	std::filesystem::path path(filePath);
+	if (path.extension() == ".dds") {
+		type_ = Type::DDS;
+	}
+
 	//TextureResourceを作成
 	DirectX::ScratchImage mipImages = CreateMipImages(filePath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -277,12 +292,16 @@ ComPtr<ID3D12Resource> TextureData::Create(std::string filePath, ID3D12Device* d
 	//画像サイズの取得
 	width_ = static_cast<uint32_t>(metadata.width);
 	height_ = static_cast<uint32_t>(metadata.height);
-
+	
 	//metadataをもとにSRVの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	if (type_ == Type::DDS) {
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+	} else {
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	}
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	//SRVを作成するDescriptorHeapの場所を決める
@@ -294,7 +313,7 @@ ComPtr<ID3D12Resource> TextureData::Create(std::string filePath, ID3D12Device* d
 	//テクスチャデータをアップロードするためのリソースを作成し、コマンドリストにコピーコマンドを記録する
 	ComPtr<ID3D12Resource> intermediateResource;
 	intermediateResource.Attach(UploadTextureData(textureResource_.Get(), mipImages, device, cmdList));
-	
+
 	textureResource_->SetName(LPCWSTR(ConvertString("LoadTexture : " + std::to_string(debugTextureCount++)).c_str()));
 
 	return intermediateResource;

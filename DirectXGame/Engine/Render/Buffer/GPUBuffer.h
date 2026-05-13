@@ -1,6 +1,7 @@
 #pragma once
 #include <Core/DXDevice.h>
 #include <Core/Command/CommandManager.h>
+#include <Assets/Texture/TextureData.h>
 
 enum class BufferType : uint8_t {
 	CBV = 1 << 0,
@@ -11,6 +12,10 @@ enum class BufferType : uint8_t {
 	//CBV_UAV = 0b101,		使えないやつ
 	SRV_UAV = 0b110,
 	//CBV_SRV_UAV = 0b111,	使えないやつ
+
+	Texture = 0b1000,
+	Texture2D = 0b1001,
+	DDSTexture = 0b1010,
 };
 
 uint8_t operator&(uint8_t a, BufferType b);
@@ -29,6 +34,9 @@ namespace SHEngine {
 		// @param num バッファの数（デフォルトは1）
 		// @param bufferNum バッファの数（デフォルトは3、スワップチェーンのバッファ数に合わせる）
 		GPUBuffer(BufferType bufferType, size_t size, uint32_t num = 1, uint32_t bufferNum = 3);
+
+		// @brief Texture用のGPUBufferの作成
+		GPUBuffer(TextureData* textureData);
 
 		// @brief GPUBufferへデータコピーをするときの値を変更する。Flush時に実際にGPUへコピーされる。UAVバッファにはコピーできない。
 		void CopyBuffer(const void* data, size_t dataSize);
