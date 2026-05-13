@@ -84,7 +84,6 @@ void Engine::BeginFrame() {
 	input_->Update();
 	fpsObserver_->TimeAdjustment();
 	AudioManager::GetInstance()->Update();
-	textureManager_->UploadResources();
 	if (imGuiWrapper_) {
 		imGuiWrapper_->NewFrame();
 		imguiDrew_ = false;

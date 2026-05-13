@@ -91,6 +91,8 @@ public:
 	Matrix4x4 GetTransformMatrix() const { return transformMatrix_; }
 	Matrix4x4 GetProjectionMatrix() const { return projectionMatrix_; }
 
+	virtual Vector3 GetPosition() const { return position_; }
+
 protected:
 
 	Vector3 position_ = { 0.0f, 0.0f, 0.0f };

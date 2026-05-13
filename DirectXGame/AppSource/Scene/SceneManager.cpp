@@ -21,6 +21,8 @@ void SceneManager::Update() {
 }
 
 void SceneManager::Draw() {
+	engine_->GetTextureManager()->UploadResources();
+
 	if (currentScene_) {
 		currentScene_->Draw();
 	}
