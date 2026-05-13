@@ -133,7 +133,7 @@ std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
 	commonData_->cmdObject->ResetCommandList();
 
-	return std::make_unique<TestScene>();
+	//return std::make_unique<TestScene>();
 	return std::make_unique<GameScene>();
 
 	return nullptr;

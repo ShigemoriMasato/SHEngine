@@ -17,8 +17,7 @@ private:
 	SHEngine::Engine* engine_ = nullptr;
 	SHEngine::TextureManager* textureManager_ = nullptr;
 
-	std::unique_ptr<CmdObj> compute_ = {};
-	std::unique_ptr<CmdObj> update_ = nullptr;
+	std::unique_ptr<CmdObj> compute_ = nullptr;
 	std::unique_ptr<CmdObj> direct_ = nullptr;
 	SHEngine::Command::WaitFence computeFence_{};
 

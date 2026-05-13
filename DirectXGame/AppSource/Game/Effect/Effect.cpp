@@ -5,14 +5,13 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 	textureManager_ = textureManager;
 
 	compute_ = engine_->CreateCommandObject(SHEngine::Command::Type::Compute);
-	update_ = engine_->CreateCommandObject(SHEngine::Command::Type::Compute);
 	direct_ = engine_->CreateCommandObject(SHEngine::Command::Type::Direct);
 
 	compute_->ResetCommandList();
 
 	particlePool_ = std::make_unique<ParticlePool>();
 	// 16777216個分のメモリを確保する
-	particlePool_->Initialize(planeDrawData, int(std::pow(2, 24)), compute_.get());
+	particlePool_->Initialize(planeDrawData, int(std::pow(2, 20)), compute_.get());
 
 	//0にInitialize用のShaderが入っているため、実行して終わるまで待つ
 	engine_->ExecuteCommand(SHEngine::Command::Type::Compute, { compute_.get() });
@@ -31,13 +30,13 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
 	//全部のコマンドリストをリセット
 	compute_->ResetCommandList();
-	update_->ResetCommandList();
 	direct_->ResetCommandList();
 
 	static Logger logger = getLogger("Command");
 	logger->info(compute_->Log());
 
 	//パーティクルの更新処理
+	waveParticle_->Update(compute_.get(), deltaTime);
 	waveParticle_->Update(compute_.get(), deltaTime);
 
 	//Queueに登録して実行

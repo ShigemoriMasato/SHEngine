@@ -62,6 +62,8 @@ std::unique_ptr<IScene> GameScene::Update() {
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
 	commonData_->cmdObject->ResetCommandList();
 
+	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
+
 	input_->Update();
 	commonData_->keyManager->Update();
 	keyCoating_->Update(deltaTime);
@@ -70,8 +72,6 @@ std::unique_ptr<IScene> GameScene::Update() {
 	gameCamera_->Update(deltaTime);
 
 	tetris_->Update(deltaTime);
-
-	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
 
 	//線を消したときのやつ
 	int deleteNum = tetris_->IsLineDeleted();
