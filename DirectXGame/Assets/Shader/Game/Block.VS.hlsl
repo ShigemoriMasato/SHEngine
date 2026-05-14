@@ -10,10 +10,8 @@ struct VSInput
 struct ParticleData
 {
     float4x4 world;
-    float4x4 vp;
-    uint color;
-    uint outlineColor;
-    uint1x2 pad;
+    float4x4 wvp;
+    uint colorID;
 };
 
 float4 ConvertColor(uint color)
@@ -29,13 +27,25 @@ float4 ConvertColor(uint color)
 
 StructuredBuffer<ParticleData> data : register(t0);
 
+float absOne(float value)
+{
+    if (value > 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
 VSOutput main(VSInput input, uint instance : SV_InstanceID)
 {
     VSOutput output;
-    output.position = mul(input.position, mul(data[instance].world, data[instance].vp));
+    output.position = mul(input.position, data[instance].wvp);
     output.texCoord = input.texcoord;
-    output.color = ConvertColor(data[instance].color);
-    output.outlineColor = ConvertColor(data[instance].outlineColor);
-    output.normal = normalize(mul(input.normal, (float3x3) data[instance].world));
+    output.normal = mul(input.normal, (float3x3) data[instance].world);
+    output.world = mul(input.position, data[instance].world).xyz;
+    output.colorID = data[instance].colorID;
     return output;
 }

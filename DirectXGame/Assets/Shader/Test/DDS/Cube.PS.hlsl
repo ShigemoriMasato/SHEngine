@@ -11,12 +11,12 @@ struct PSOutput
     float4 color : SV_TARGET;
 };
 
-TextureCube<float4> textures : register(t0);
+TextureCube<float4> texture : register(t0);
 SamplerState gSampler : register(s0);
 
 PSOutput main(PSInput input)
 {
     PSOutput output;
-    output.color = textures.Sample(gSampler, input.texCoord);
+    output.color = texture.Sample(gSampler, input.texCoord);
     return output;
 }

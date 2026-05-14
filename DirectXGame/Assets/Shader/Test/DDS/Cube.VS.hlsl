@@ -22,7 +22,7 @@ VSOutput main(VSInput input)
     VSOutput output;
     output.position = mul(input.position, wvp);
     // -0.5 ~ 0.5の立方体が来る想定なので、二倍して-1~1の範囲にする
-    output.texCoord = input.position.xyz * 2;
+    output.texCoord = input.position.xyz;
     output.normal = input.normal;
 	return output;
 }

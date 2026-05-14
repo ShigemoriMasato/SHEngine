@@ -10,7 +10,7 @@ namespace SHEngine {
 
 		static void SetPSOEditor(PSO::Editor* psoEditor, D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle) { psoEditor_ = psoEditor; textureStartHandle_ = textureStartHandle; }
 
-		Renderer(DrawData& drwaData);
+		Renderer(const DrawData& drwaData);
 
 		/// <summary>
 		/// GPUBufferをセットする。register順。
@@ -35,6 +35,10 @@ namespace SHEngine {
 		void SetTopology(D3D12_PRIMITIVE_TOPOLOGY topology) { topology_ = topology; }
 		// @brief スワップチェーン用かどうかをセットする。デフォルトはfalse。
 		void SetUseTexture(bool use) { isUseTexture_ = use; }
+		// @brief Samplerの設定
+		void SetSampler(uint32_t samplerFlag) { samplerFlag_ = samplerFlag; }
+		// @brief Samplerの設定
+		void SetSampler(PSO::SamplerID samplerFlag) { samplerFlag_ = uint32_t(samplerFlag); }
 
 		// @brief 指定された設定を基に描画コマンドを発行する。
 		void Draw(CmdObj* cmdObj);
@@ -62,6 +66,8 @@ namespace SHEngine {
 		bool isSwapChain_ = false;
 		/// @brief 画像を使用するかどうか
 		bool isUseTexture_ = false;
+		/// @brief Samplerフラグ
+		uint32_t samplerFlag_ = uint32_t(PSO::SamplerID::Default);
 
 		static inline PSO::Editor* psoEditor_ = nullptr;
 		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};

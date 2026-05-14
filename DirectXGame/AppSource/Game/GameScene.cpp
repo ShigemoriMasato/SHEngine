@@ -29,7 +29,8 @@ void GameScene::Initialize() {
 	auto model = modelManager_->GetNodeModelData(0);	//Cube
 	DrawData drawData = drawDataManager_->GetDrawData(model.drawDataIndex);
 
-	tetris_->Initialize(keyCoating_.get(), worldCamera_, drawData);
+	auto ddsTexture = textureManager_->GetTextureData(textureManager_->LoadTexture("rostock_laage_airport_4k.dds"));
+	tetris_->Initialize(keyCoating_.get(), worldCamera_, drawData, ddsTexture);
 
 	//PostEffectの初期化
 	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);

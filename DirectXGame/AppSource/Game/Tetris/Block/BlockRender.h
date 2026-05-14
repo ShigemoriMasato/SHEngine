@@ -1,7 +1,7 @@
 #pragma once
 #include <Camera/Camera.h>
 #include <Game/Tetris/Data.h>
-#include <Render/RenderObject.h>
+#include <Render/Renderer.h>
 #include <Utility/DataStructures.h>
 #include "Delete/DeleteEffect.h"
 
@@ -11,7 +11,7 @@ public:
 	BlockRender() = default;
 	~BlockRender();
 
-	void Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const SHEngine::DrawData& drawData);
+	void Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const SHEngine::DrawData& drawData, SHEngine::TextureData* ddsTexture);
 
 	void Update(float deltaTime);
 
@@ -35,24 +35,34 @@ private:
 
 	Logger logger_;
 
-	std::map<int, std::pair<uint32_t, uint32_t>> colorMap_{};
+	struct ColorMap {
+		Vector4 color;
+		Vector4 outlineColor;
+	};
+	std::vector<ColorMap> colorMap_{};
 	Camera* camera_ = nullptr;
 
 	//Field->Wall->Hold->Next
-	std::unique_ptr<SHEngine::RenderObject> blockObject_ = nullptr;
+	std::unique_ptr<SHEngine::BufferContainer> container_;
+	std::unique_ptr<SHEngine::Renderer> blockRenderer_;
+	SHEngine::GPUBuffer* vsBuffer_;
+	SHEngine::GPUBuffer* colorMapBuffer_;
+	SHEngine::GPUBuffer* psBuffer_;
 	std::vector<Transform> blockTransforms_{};
-	std::vector<std::pair<uint32_t, uint32_t>> blockColors_{};
 
 
 	struct VSData {
-		Matrix4x4 worldMatrix = Matrix4x4::Identity();
-		Matrix4x4 vpMatrix = Matrix4x4::Identity();
-		uint32_t color = 0;
-		uint32_t outlineColor = 0;
-		uint64_t padding = 0;
+		Matrix4x4 world = Matrix4x4::Identity();
+		Matrix4x4 wvp = Matrix4x4::Identity();
+		uint32_t colorID;
+	};
+	struct PSData {
+		Vector3 cameraPos;
+		float strength = 0.5f;
 	};
 	int vertexDataIndex_ = -1;
-	std::vector<VSData> vertexDatas_{};
+	std::vector<VSData> vsData_{};
+	PSData psData_{};
 
 	//表示するフィールドサイズ
 	uint32_t fieldWidth_ = 0;
@@ -71,7 +81,7 @@ private://Binary保存
 	void Load();
 
 	std::unique_ptr<BinaryManager> binaryManager_ = nullptr;
-	const std::string fileName_ = "TetrisBlockRenderData.sg";
+	static inline const std::string fileName_ = "TetrisBlockRenderData.sg";
 	
 	Vector3 holdBasePosition_ = Vector3(-11.0f, 6.0f, 0.0f);
 	Vector3 nextBasePosition_ = Vector3(11.0f, 6.0f, 0.0f);

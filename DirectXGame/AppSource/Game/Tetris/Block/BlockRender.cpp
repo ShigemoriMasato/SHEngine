@@ -2,6 +2,7 @@
 #include <imgui/imgui.h>
 #include <algorithm>
 #include <Game/Tetris/Mino/Tetrimino.h>
+#include <Utility/Color.h>
 
 using namespace SHEngine;
 
@@ -9,7 +10,7 @@ BlockRender::~BlockRender() {
 	Save();
 }
 
-void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const DrawData& drawData) {
+void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const DrawData& drawData, SHEngine::TextureData* ddsTexture) {
 	logger_ = getLogger("Tetris");
 
 	fieldWidth_ = fieldWidth;
@@ -27,18 +28,26 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 	blockNum += 4 * 5;
 
 	//GPU準備
-	blockObject_ = std::make_unique<RenderObject>("Tetris Block");
-	blockObject_->Initialize();
+	blockRenderer_ = std::make_unique<SHEngine::Renderer>(drawData);
+	container_ = std::make_unique<SHEngine::BufferContainer>();
+	blockRenderer_->SetVS("Game/Block.VS.hlsl");
+	blockRenderer_->SetPS("Game/Block.PS.hlsl");
 
-	blockObject_->psoConfig_.vs = "Game/Block.VS.hlsl";
-	blockObject_->psoConfig_.ps = "Game/Block.PS.hlsl";
+	vsBuffer_ = container_->Create(BufferType::SRV, sizeof(VSData), blockNum);
+	//数適当
+	colorMapBuffer_ = container_->Create(BufferType::SRV, sizeof(ColorMap), 32);
+	psBuffer_ = container_->Create(BufferType::CBV, sizeof(PSData));
+	auto ddsBuffer = container_->Create(ddsTexture);
 
-	blockObject_->SetDrawData(drawData);
-	vertexDataIndex_ = blockObject_->CreateSRV(sizeof(VSData), blockNum, ShaderType::VERTEX_SHADER, "BlockRender::VSData");
-	blockObject_->instanceNum_ = blockNum;
+	blockRenderer_->SetGPUBuffer(vsBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
+	blockRenderer_->SetGPUBuffer(psBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	blockRenderer_->SetGPUBuffer(colorMapBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	blockRenderer_->SetGPUBuffer(ddsBuffer, ShaderType::PIXEL_SHADER, BufferType::DDSTexture);
+
+	blockRenderer_->instanceNum_ = blockNum;
 
 	//CPU準備
-	vertexDatas_.resize(blockNum);
+	vsData_.resize(blockNum);
 
 	//Binary
 	binaryManager_ = std::make_unique<BinaryManager>();
@@ -46,32 +55,31 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 
 	//座標の初期化
 	blockTransforms_.resize(blockNum);
-	blockColors_.resize(blockNum);
 	uint32_t index = 0;
 	//Field
 	for (int i = 0; i < int(fieldHeight_); ++i) {
 		for (int j = 0; j < int((fieldWidth_)); ++j) {
-			blockColors_[index] = colorMap_[0];
+			vsData_[index].colorID = 0;
 			blockTransforms_[index].position = Vector3(float(j - int(fieldWidth_) / 2), float(i - int(fieldHeight_) / 2), 0.0f);
 			++index;
 		}
 	}
 
 	//Wall
-	uint32_t wallIndex = 8; //灰色
+	constexpr uint32_t wallIndex = 8; //灰色
 	for (int i = 0; i < int(fieldHeight_); ++i) {
 		//左
-		blockColors_[index] = colorMap_[wallIndex];
+		vsData_[index].colorID = wallIndex;
 		blockTransforms_[index].position = Vector3(float(-int(fieldWidth_) / 2 - 1), float(i - int(fieldHeight_) / 2), 0.0f);
 		++index;
 		//右
-		blockColors_[index] = colorMap_[wallIndex];
+		vsData_[index].colorID = wallIndex;
 		blockTransforms_[index].position = Vector3(float(fieldWidth_ / 2), float(i - int(fieldHeight_) / 2), 0.0f);
 		++index;
 	}
 	for (int i = 0; i < int(fieldWidth_) + 2; ++i) {
 		//下
-		blockColors_[index] = colorMap_[wallIndex];
+		vsData_[index].colorID = wallIndex;
 		blockTransforms_[index].position = Vector3(float(i - int(fieldWidth_) / 2 - 1), float(-int(fieldHeight_) / 2 - 1), 0.0f);
 		++index;
 	}
@@ -104,17 +112,20 @@ void BlockRender::Update(float deltaTime) {
 	}
 
 	for (size_t i = 0; i < blockTransforms_.size(); ++i) {
-		VSData& data = vertexDatas_[i];
-		data.worldMatrix = Matrix::MakeAffineMatrix(blockTransforms_[i].scale, blockTransforms_[i].rotate, blockTransforms_[i].position);
-		data.vpMatrix = camera_->GetVPMatrix();
-		data.color = blockColors_[i].first;
-		data.outlineColor = blockColors_[i].second;
+		VSData& data = vsData_[i];
+		data.world = Matrix::MakeAffineMatrix(blockTransforms_[i].scale, blockTransforms_[i].rotate, blockTransforms_[i].position);
+		data.wvp = data.world * camera_->GetVPMatrix();
 	}
-	blockObject_->CopyBufferData(vertexDataIndex_, vertexDatas_.data(), sizeof(VSData) * vertexDatas_.size());
+	vsBuffer_->CopyBuffer(vsData_.data(), sizeof(VSData) * vsData_.size());
+
+	colorMapBuffer_->CopyBuffer(colorMap_.data(), sizeof(ColorMap) * colorMap_.size());
+
+	psData_.cameraPos = camera_->GetPosition();
+	psBuffer_->CopyBuffer(&psData_, sizeof(psData_));
 }
 
 void BlockRender::SetStageData(std::vector<std::vector<int>> fieldData, const MovableMino& mino) {
-	if(fieldData.empty()) {
+	if (fieldData.empty()) {
 		logger_->warn("BlockRender::SetStageData() fieldData is empty");
 		return;
 	}
@@ -125,7 +136,7 @@ void BlockRender::SetStageData(std::vector<std::vector<int>> fieldData, const Mo
 
 	for (int i = 0; i < int(fieldHeight_); ++i) {
 		for (int j = 0; j < int(fieldWidth_); ++j) {
-			blockColors_[i * fieldWidth_ + j] = colorMap_[fieldData[i][j]];
+			vsData_[i * fieldWidth_ + j].colorID = fieldData[i][j];
 		}
 	}
 
@@ -135,7 +146,7 @@ void BlockRender::SetStageData(std::vector<std::vector<int>> fieldData, const Mo
 		if (x < 0 || x >= int(fieldWidth_) || y < 0 || y >= int(fieldHeight_)) {
 			continue;
 		}
-		blockColors_[y * fieldWidth_ + x] = colorMap_[mino.minoType];
+		vsData_[y * fieldWidth_ + x].colorID = mino.minoType;
 	}
 }
 
@@ -144,11 +155,11 @@ void BlockRender::SetHoldMino(std::vector<std::pair<int, int>> blockPos, int col
 	uint32_t startIndex = fieldWidth_ * fieldHeight_ + (fieldHeight_ * 2) + (fieldWidth_ + 2);
 	for (i = 0; i < int(blockPos.size()); ++i) {
 		blockTransforms_[startIndex + i].position = holdBasePosition_ + Vector3(float(blockPos[i].first), float(blockPos[i].second), 0.0f);
-		blockColors_[startIndex + i] = colorMap_[colorID];
+		vsData_[startIndex + i].colorID = colorID;
 	}
 
-	for(i; i < 4; ++i) {
-		blockColors_[startIndex + i] = colorMap_[0];
+	for (i; i < 4; ++i) {
+		vsData_[startIndex + i].colorID = 0;
 	}
 }
 
@@ -164,22 +175,21 @@ void BlockRender::SetNextMino(std::vector<std::pair<int, int>> blockPos, int col
 	int minoCount = -1;
 
 	for (size_t i = 0; i < blockPos.size(); ++i) {
-		if(i % 4 == 0) {
+		if (i % 4 == 0) {
 			++minoCount;
 		}
 
 		blockTransforms_[startIndex + i].position = nextBasePosition_ + nextGap_ * float(minoCount) + Vector3(float(blockPos[i].first), float(blockPos[i].second), 0.0f);
-		blockColors_[startIndex + i] = colorMap_[colorID];
+		vsData_[startIndex + i].colorID = colorID;
 	}
 }
 
 void BlockRender::SetBlock(int x, int y, int configIndex) {
 	int index = y * fieldWidth_ + x;
-	if (colorMap_.find(configIndex) == colorMap_.end()) {
-		logger_->warn("BlockRender::SetBlock() configIndex {} not found in colorMap", configIndex);
-	}
+	assert(colorMap_.size() > configIndex);
+	configIndex = std::min(int(colorMap_.size() - 1), configIndex);
 
-	blockColors_[index] = colorMap_[configIndex];
+	vsData_[index].colorID = configIndex;
 }
 
 void BlockRender::SetBlock(std::vector<std::vector<int>> allConfigIndices, MovableMino movableMino) {
@@ -233,7 +243,7 @@ void BlockRender::BeginDeleteEffect(std::vector<int> fillLines, std::vector<std:
 }
 
 void BlockRender::Draw(CmdObj* cmdObj) {
-	blockObject_->Draw(cmdObj);
+	blockRenderer_->Draw(cmdObj);
 }
 
 void BlockRender::DrawImGui() {
@@ -264,13 +274,11 @@ void BlockRender::DrawImGui() {
 		}
 
 		//色編集
-		Vector4 colorBuffer = ConvertColor(colorMap_[colorMapEditID_].first);
-		ImGui::ColorEdit4("Color", &colorBuffer.x);
-		colorMap_[colorMapEditID_].first = ConvertColor(colorBuffer);
+		ImGui::ColorEdit4("Color", &colorMap_[colorMapEditID_].color.x);
 
-		colorBuffer = ConvertColor(colorMap_[colorMapEditID_].second);
-		ImGui::ColorEdit4("OutlineColor", &colorBuffer.x);
-		colorMap_[colorMapEditID_].second = ConvertColor(colorBuffer);
+		ImGui::ColorEdit4("OutlineColor", &colorMap_[colorMapEditID_].outlineColor.x);
+
+		ImGui::DragFloat("Reflect", &psData_.strength, 0.01f, 0.0f, 1.0f);
 	}
 	ImGui::End();
 #endif
@@ -284,32 +292,32 @@ void BlockRender::Save() {
 	binaryManager_->Register<Vector3>(&nextBasePosition_);
 	binaryManager_->Register<Vector3>(&nextGap_);
 
-	for (const auto& [id, colors] : colorMap_) {
-		binaryManager_->Register<int>(&id);
-		binaryManager_->Register<uint32_t>(&colors.first);
-		binaryManager_->Register<uint32_t>(&colors.second);
+	for (int i = 0; i < colorMap_.size(); ++i) {
+		binaryManager_->Register<int>(&i);
+		binaryManager_->Register<Vector4>(&colorMap_[i].color);
+		binaryManager_->Register<Vector4>(&colorMap_[i].outlineColor);
 	}
 
 	binaryManager_->Write(fileName_);
 }
 
 void BlockRender::Load() {
+	colorMap_.resize(int(Tetrimino::Count));
+
 	if (!binaryManager_->Boot(fileName_)) {
 		//ファイルを開けなかった場合は初期値を入力
-		colorMap_ = {
-		{ int(Tetrimino::Type::None), {0x00000, 0x00000000} }, // 空白		Air
-		{ int(Tetrimino::Type::S), {0x00ff00ff, 0xffffffff} }, // 赤			S
-		{ int(Tetrimino::Type::Z), {0xff0000ff, 0xffffffff} }, // 緑			Z
-		{ int(Tetrimino::Type::T), {0xff00ffff, 0xffffffff} }, // 紫			T
-		{ int(Tetrimino::Type::O), {0xffff00ff, 0xffffffff} }, // 黄			O
-		{ int(Tetrimino::Type::I), {0x00ffffff, 0xffffffff} }, // 水色		I
-		{ int(Tetrimino::Type::L), {0x0000ffff, 0xffffffff} }, // 青			L
-		{ int(Tetrimino::Type::J), {0xff8000ff, 0xffffffff} }, // オレンジ	J
-		{ int(Tetrimino::Type::Wall), {0x808080ff, 0x000000ff} }, // 灰色	Wall
-		{ int(Tetrimino::Type::Del), {0xffffffff, 0xffffffff} },// 白		DeleteEffect
-		{ int(Tetrimino::Type::Hold), {0x000000ff, 0xffffffff} },
-		{ int(Tetrimino::Type::Next), {0x000000ff, 0xffffffff} }
-		};
+		colorMap_[int(Tetrimino::Type::None)] = { ConvertColor(0x00000), ConvertColor(0x00000000) }; // 空白			Air
+		colorMap_[int(Tetrimino::Type::S)] = { ConvertColor(0x00ff00ff), ConvertColor(0xffffffff) }; // 赤			S
+		colorMap_[int(Tetrimino::Type::Z)] = { ConvertColor(0xff0000ff), ConvertColor(0xffffffff) }; // 緑			Z
+		colorMap_[int(Tetrimino::Type::T)] = { ConvertColor(0xff00ffff), ConvertColor(0xffffffff) }; // 紫			T
+		colorMap_[int(Tetrimino::Type::O)] = { ConvertColor(0xffff00ff), ConvertColor(0xffffffff) }; // 黄			O
+		colorMap_[int(Tetrimino::Type::I)] = { ConvertColor(0x00ffffff), ConvertColor(0xffffffff) }; // 水色			I
+		colorMap_[int(Tetrimino::Type::L)] = { ConvertColor(0x0000ffff), ConvertColor(0xffffffff) }; // 青			L
+		colorMap_[int(Tetrimino::Type::J)] = { ConvertColor(0xff8000ff), ConvertColor(0xffffffff) }; // オレンジ		J
+		colorMap_[int(Tetrimino::Type::Wall)] = { ConvertColor(0x808080ff), ConvertColor(0x000000ff) }; // 灰色		Wall
+		colorMap_[int(Tetrimino::Type::Del)] = { ConvertColor(0xffffffff), ConvertColor(0xffffffff) };// 白			DeleteEffect
+		colorMap_[int(Tetrimino::Type::Hold)] = { ConvertColor(0x000000ff), ConvertColor(0xffffffff) };
+		colorMap_[int(Tetrimino::Type::Next)] = { ConvertColor(0x000000ff), ConvertColor(0xffffffff) };
 		return;
 	}
 
@@ -319,13 +327,8 @@ void BlockRender::Load() {
 
 	for (int i = 0; i < int(Tetrimino::Count); ++i) {
 		int id = binaryManager_->Reverse<int>();
-		uint32_t color = binaryManager_->Reverse<uint32_t>();
-		uint32_t outlineColor = binaryManager_->Reverse<uint32_t>();
-
-		//未設定な場合は上書きしない
-		if(color == 0 && outlineColor == 0) {
-			continue;
-		}
+		Vector4 color = binaryManager_->Reverse<Vector4>();
+		Vector4 outlineColor = binaryManager_->Reverse<Vector4>();
 
 		colorMap_[static_cast<int>(i)] = { color, outlineColor };
 	}

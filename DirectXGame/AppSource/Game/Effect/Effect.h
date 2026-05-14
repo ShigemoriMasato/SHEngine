@@ -2,6 +2,7 @@
 #include "Pool/ParticlePool.h"
 #include "Wave/WaveParticle.h"
 #include <SHEngine.h>
+#include "Subject/Subject.h"
 
 class Effect {
 public:
@@ -24,4 +25,7 @@ private:
 	std::unique_ptr<ParticlePool> particlePool_ = nullptr;
 
 	std::unique_ptr<WaveParticle> waveParticle_ = nullptr;
+
+
+	std::unique_ptr<Subject> subject_;
 };

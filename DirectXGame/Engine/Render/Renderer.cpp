@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include <Render/Screen/IDisplay.h>
 
-SHEngine::Renderer::Renderer(DrawData& drawData) : drawData_(drawData) {
+SHEngine::Renderer::Renderer(const DrawData& drawData) : drawData_(drawData) {
 }
 
 void SHEngine::Renderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType) {
@@ -41,6 +41,7 @@ void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
 		int(gpuBuffers_[BufferType::DDSTexture][ShaderType::PIXEL_SHADER].size())
 	};
 	config.rootConfig.useTexture = isUseTexture_;
+	config.rootConfig.samplers = samplerFlag_;
 
 	config.vs = vs_;
 	config.ps = ps_;

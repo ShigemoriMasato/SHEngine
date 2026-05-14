@@ -4,6 +4,7 @@
 #include <Game/Tetris/Mino/Tetrimino.h>
 #include <Game/KeyCoating/KeyCoating.h>
 #include <Game/Tetris/Player/Player.h>
+#include <Assets/Texture/TextureData.h>
 
 class Tetris {
 public:
@@ -11,7 +12,7 @@ public:
 	Tetris() = default;
 	~Tetris() = default;
 
-	void Initialize(KeyCoating* keys, Camera* camera, const SHEngine::DrawData& drawData);
+	void Initialize(KeyCoating* keys, Camera* camera, const SHEngine::DrawData& drawData, SHEngine::TextureData* ddsTexture);
 	void Update(float deltaTime);
 	void Draw(CmdObj* cmdObj);
 	void DrawImGui();

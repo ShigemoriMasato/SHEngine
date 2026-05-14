@@ -134,9 +134,10 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	//VertexShader
 	std::vector< D3D12_DESCRIPTOR_RANGE> vertexSrvRanges;
 	vertexSrvRanges.resize(config.srvNums.first);
+	int srvVSRegister = 0;			//いろんな奴と共用するので変数で明示化する
 	for (int i = 0; i < config.srvNums.first; ++i) {
 		auto& range = vertexSrvRanges[i];
-		range.BaseShaderRegister = i;
+		range.BaseShaderRegister = srvVSRegister++;
 		range.NumDescriptors = 1;
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -151,9 +152,10 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	//PixelShader
 	std::vector< D3D12_DESCRIPTOR_RANGE> pixelSrvRanges;
 	pixelSrvRanges.resize(config.srvNums.second);
+	int srvPSRegister = 0;			//いろんな奴と共用するので変数で明示化する
 	for (int i = 0; i < config.srvNums.second; ++i) {
 		D3D12_DESCRIPTOR_RANGE& range = pixelSrvRanges[i];
-		range.BaseShaderRegister = i;
+		range.BaseShaderRegister = srvPSRegister++;
 		range.NumDescriptors = 1;
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -206,7 +208,7 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	vertexTexture2DRanges.resize(config.textureNums.first);
 	for (int i = 0; i < config.textureNums.first; ++i) {
 		auto& range = vertexTexture2DRanges[i];
-		range.BaseShaderRegister = i;
+		range.BaseShaderRegister = srvVSRegister++;
 		range.NumDescriptors = 1;
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -223,7 +225,7 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	pixelTexture2DRanges.resize(config.textureNums.second);
 	for (int i = 0; i < config.textureNums.second; ++i) {
 		D3D12_DESCRIPTOR_RANGE& range = pixelTexture2DRanges[i];
-		range.BaseShaderRegister = i;
+		range.BaseShaderRegister = srvPSRegister++;
 		range.NumDescriptors = 1;
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -241,7 +243,7 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	vertexDDSRanges.resize(config.ddsNums.first);
 	for (int i = 0; i < config.ddsNums.first; ++i) {
 		auto& range = vertexDDSRanges[i];
-		range.BaseShaderRegister = i;
+		range.BaseShaderRegister = srvVSRegister++;
 		range.NumDescriptors = 1;
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -258,7 +260,7 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	pixelDDSRanges.resize(config.ddsNums.second);
 	for (int i = 0; i < config.ddsNums.second; ++i) {
 		D3D12_DESCRIPTOR_RANGE& range = pixelDDSRanges[i];
-		range.BaseShaderRegister = i;
+		range.BaseShaderRegister = srvPSRegister++;
 		range.NumDescriptors = 1;
 		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;

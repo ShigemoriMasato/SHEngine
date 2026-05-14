@@ -32,7 +32,7 @@ VSOutput main(VSInput input, uint id : SV_InstanceID)
     
     if (type[id] == 0)
     {
-        output.position = float4(0, 0, 0, 1);
+        output.position = float4(0, 0, 0, 0);
         output.normal = float3(0, 0, 0);
         output.texCoord = float2(0, 0);
         output.instanceID = id;
