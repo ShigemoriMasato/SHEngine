@@ -34,7 +34,7 @@ void GameScene::Initialize() {
 
 	//PostEffectの初期化
 	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
-	postEffect_->Initialize(textureManager_, pedd, true);		//描画だけするやつなのでコピーオンリー
+	postEffect_->Initialize(textureManager_, pedd);		//描画だけするやつなのでコピーオンリー
 	postEffectConfig_.cmdObj = commonData_->cmdObject.get();
 	postEffectConfig_.origin = commonData_->display->GetDisplay();
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
@@ -119,6 +119,7 @@ void GameScene::Draw() {
 
 #else
 
+	postEffect_->Draw(postEffectConfig_);
 	cmdObj->SetRenderTarget(window);
 
 #endif
@@ -153,6 +154,33 @@ void GameScene::Draw() {
 	ImGui::Text("FPS: %.1f", fps);
 	ImGui::Text("DeltaTime: %.4f sec", deltaTime);
 	ImGui::End();
+
+	ImGui::Begin("PostEffect");
+	static bool grayScale = false;
+	static bool vignette = false;
+	ImGui::Checkbox("GrayScale", &grayScale);
+	if (grayScale) {
+		static Grayscale config;
+		ImGui::PushID("GrayScale");
+		ImGui::DragFloat("intensity", &config.intensity, 0.01f);
+		ImGui::PopID();
+		postEffect_->CopyBuffer(PostEffectJob::GrayScale, config);
+	}
+	ImGui::Checkbox("Vignette", &vignette);
+	if (vignette) {
+		static Vignette config;
+		ImGui::PushID("Vignette");
+		ImGui::DragFloat("Strength", &config.intensity, 0.01f);
+		ImGui::DragFloat("lerpWidth", &config.radius, 0.01f);
+		ImGui::DragFloat("softness", &config.softness, 0.01f);
+		ImGui::PopID();
+		postEffect_->CopyBuffer(PostEffectJob::Vignette, config);
+	}
+	ImGui::End();
+
+	postEffectConfig_.jobs_ =
+		uint32_t(grayScale) << 1 |
+		uint32_t(vignette) << 2;
 #endif
 
 	engine_->DrawImGui();

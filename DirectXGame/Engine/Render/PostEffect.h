@@ -5,14 +5,8 @@
 
 enum class PostEffectJob : uint32_t {
 	None = 0,
-	BlurV = 1 << 0,
-	BlurH = 1 << 1,
-	Fade = 1 << 2,
-	Glitch = 1 << 3,
-	GrayScale = 1 << 4,
-	GridTransition = 1 << 5,
-	SlowMotion = 1 << 6,
-	HeavyBlur = 1 << 7,
+	GrayScale = 1 << 1,
+	Vignette = 1 << 2,
 };
 
 uint32_t operator|(PostEffectJob a, PostEffectJob b);

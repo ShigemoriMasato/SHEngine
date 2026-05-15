@@ -38,14 +38,8 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 	createPostEffectObject(PostEffectJob::None, "Simple");
 
 	if (!copyOnly) {
-		createPostEffectObject(PostEffectJob::BlurV, "BlurVert");
-		createPostEffectObject(PostEffectJob::BlurH, "BlurHori");
-		createPostEffectObject(PostEffectJob::Fade, "Fade");
-		createPostEffectObject(PostEffectJob::Glitch, "Glitch");
 		createPostEffectObject(PostEffectJob::GrayScale, "GrayScale");
-		createPostEffectObject(PostEffectJob::GridTransition, "GridTransition");
-		createPostEffectObject(PostEffectJob::SlowMotion, "SlowMotion");
-		createPostEffectObject(PostEffectJob::HeavyBlur, "Blur");
+		createPostEffectObject(PostEffectJob::Vignette, "Vignette");
 
 		//PostEffect用Displayの初期化
 		intermediateDisplay_ = std::make_unique<SHEngine::Screen::MultiDisplay>();

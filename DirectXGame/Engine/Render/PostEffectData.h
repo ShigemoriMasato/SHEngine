@@ -17,6 +17,12 @@ struct Grayscale {
 	float intensity = 0.0f; // グレースケール強度
 };
 
+struct Vignette {
+	float intensity;
+	float radius;
+	float softness;
+};
+
 struct Fade {
 	Vector3 color = { 0.0f, 0.0f, 0.0f };	// フェードカラー（White時は{1,1,1}）
 	float alpha = 0.0f;						// フェードの透明度 (0.0 - 1.0)
