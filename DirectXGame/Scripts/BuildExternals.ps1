@@ -1,16 +1,14 @@
-param(
+﻿param(
     [string]$ProjectPath,
     [string]$Platform = "x64"
 )
 
-# --- vswhere のパス（通常ここにある） ---
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 
 if (!(Test-Path $vswhere)) {
-    throw "vswhere.exe が見つかりません"
+    throw "Not Found vswhere.exe"
 }
 
-# --- Preview(Insider)のVisual StudioからMSBuildを探す ---
 $msbuildPath = & $vswhere `
     -latest `
     -prerelease `
@@ -18,12 +16,11 @@ $msbuildPath = & $vswhere `
     -find MSBuild\**\Bin\MSBuild.exe
 
 if (-not $msbuildPath) {
-    throw "MSBuild が見つかりません（Preview環境含む）"
+    throw "Not Found MSBuild"
 }
 
 Write-Host "MSBuild Path: $msbuildPath"
 
-# --- 共通ビルド関数 ---
 function Build-Project {
     param(
         [string]$Configuration
@@ -42,7 +39,6 @@ function Build-Project {
     }
 }
 
-# --- Debug / Release 両方ビルド ---
 Build-Project "Debug"
 Build-Project "Release"
 

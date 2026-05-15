@@ -1,21 +1,15 @@
-# ============================
-# DirectXGame.vcxproj.filters 生成スクリプト（完全版）
-# ============================
-
+﻿
 $proj    = Resolve-Path "DirectXGame.vcxproj"
 $filters = "$proj.filters"
 
 Write-Output BeginFilterAdjustment
 
 try {
-    # プロジェクトルート
     $root = (Split-Path $proj).TrimEnd('\')
 
-    # 対象ファイル取得
     $files = Get-ChildItem $root -Recurse -File |
              Where-Object { $_.Extension -match '\.(cpp|c|h|hpp)$' }
 
-    # すべてのフィルター（中間階層含む）を収集
     $filterSet = New-Object System.Collections.Generic.HashSet[string]
 
     foreach ($f in $files) {
@@ -30,11 +24,9 @@ try {
         }
     }
 
-    # ===== XML 構築 =====
     $xml = @()
     $xml += '<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">'
 
-    # --- Filter 定義（全階層） ---
     $xml += '  <ItemGroup>'
     foreach ($filter in $filterSet | Sort-Object) {
         $guid = [guid]::NewGuid().ToString()
@@ -76,7 +68,6 @@ try {
 
     $xml += '</Project>'
 
-    # UTF-8 BOM 付きで保存（VS 安定）
     $utf8bom = New-Object System.Text.UTF8Encoding $true
     [System.IO.File]::WriteAllLines($filters, $xml, $utf8bom)
 }
