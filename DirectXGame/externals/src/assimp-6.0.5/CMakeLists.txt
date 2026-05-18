@@ -1,3 +1,44 @@
+# ============================
+# Output Directory Setup
+# ============================
+
+function(set_output_dirs target)
+
+    set(BASE_DIR "${CMAKE_SOURCE_DIR}/../../")
+
+    foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER ${CONFIG} CONFIG_UPPER)
+
+        # ============================
+        # exe / dll（.lib以外）
+        # ============================
+        set_target_properties(${target} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER}
+            "${BASE_DIR}/else/${PROJECT_NAME}/${target}/${CONFIG}"
+        )
+
+        # ============================
+        # 静的ライブラリ (.lib)
+        # ============================
+        set_target_properties(${target} PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER}
+            "${BASE_DIR}/Lib/${CONFIG}"
+        )
+
+        # ============================
+        # 中間生成物（obj / pdb）
+        # ============================
+        set_target_properties(${target} PROPERTIES
+            COMPILE_PDB_OUTPUT_DIRECTORY_${CONFIG_UPPER}
+            "${BASE_DIR}/else/obj/${PROJECT_NAME}/${target}/${CONFIG}"
+
+            PDB_OUTPUT_DIRECTORY_${CONFIG_UPPER}
+            "${BASE_DIR}/else/obj/${PROJECT_NAME}/${target}/${CONFIG}"
+        )
+    endforeach()
+
+endfunction()
+
 # Open Asset Import Library (assimp)
 # ----------------------------------------------------------------------
 # Copyright (c) 2006-2026, assimp team

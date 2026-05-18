@@ -2,6 +2,14 @@
 
 cd /d "%~dp0DirectXGame"
 
+rem powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CMakeIntro.ps1"
+
+echo ==== Create Slution From Library Source ====
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\src\assimp-6.0.5" -BuildDir "externals\generated\Project\assimp"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\src\freetype-VER-2-14-3" -BuildDir "externals\generated\Project\freetype"
+
+pause
+
 echo ===== Create .lib =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\DirectXTex\DirectXTex_Desktop_2022_Win10.sln" -Platform x64
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\ForImGui\ForImGui.slnx" -Platform x64

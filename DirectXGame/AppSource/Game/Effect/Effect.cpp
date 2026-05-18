@@ -57,7 +57,7 @@ void Effect::Draw(SHEngine::Screen::IDisplay* display) {
 	subject_->Draw(direct_.get());
 
 	//更新処理の後にこの関数を呼び出す
-	engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);
+	//engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);
 	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, { direct_.get() });
 
 	particlePool_->DrawImGui();

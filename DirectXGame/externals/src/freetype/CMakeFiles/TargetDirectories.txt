@@ -1,5 +1,0 @@
-C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/freetype/CMakeFiles/freetype.dir
-C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/freetype/CMakeFiles/PACKAGE.dir
-C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/freetype/CMakeFiles/INSTALL.dir
-C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/freetype/CMakeFiles/ALL_BUILD.dir
-C:/Users/k024g/source/repos/CG2/SHEngine/DirectXGame/externals/src/freetype/CMakeFiles/ZERO_CHECK.dir
