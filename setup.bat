@@ -2,13 +2,15 @@
 
 cd /d "%~dp0DirectXGame"
 
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeChecker.ps1"
+
+pause
+
 echo === Init Directory ===
 set "GENERATE_DIR=externals/generated/"
 if exist "%GENERATE_DIR%" (
  rmdir /s /q "%GENERATE_DIR%"
 )
-
-rem powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CMakeIntro.ps1"
 
 echo ==== Create Slution From Library Source ====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\src\assimp-6.0.5" -BuildDir "externals\generated\Project\assimp"

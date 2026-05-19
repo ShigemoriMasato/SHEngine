@@ -1,192 +1,78 @@
-# ============================
-# CMake Setup Script (Robust)
-# ============================
+# ====================================================================
+# CMake 4.3.2 自動インストールスクリプト (Windows 64bit用)
+# ====================================================================
 
+# エラーが発生したら処理を即座に中断する設定
 $ErrorActionPreference = "Stop"
 
-# ============================
-# Utility
-# ============================
+# 1. 設定情報の定義
+$version = "4.3.2"
+$url = "https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-windows-x86_64.zip"
+$installParentDir = "C:\Program Files\CMake"                         # インストール先の親フォルダ
+$installDir = Join-Path $installParentDir "cmake-$version-windows-x86_64" # 実際の展開先
+$zipPath = Join-Path $env:TEMP "cmake-$version.zip"                   # 一時ダウンロード先
 
-function Find-CMakePath {
-
-    Write-Host "Attempting to find CMake executable..."
-
-    # ① レジストリ
-    try {
-        $reg = Get-ItemProperty "HKLM:\SOFTWARE\Kitware\CMake" -ErrorAction Stop
-        $installDir = $reg.InstallDir
-        $exePath = Join-Path $installDir "bin\cmake.exe"
-        Write-Host "Checking registry path: $exePath"
-
-        if (Test-Path $exePath) {
-            Write-Host "Found in registry: $exePath"
-            return $exePath
-        }
-    } catch {}
-
-    Write-Host "Not found in registry."
-
-    # ② Program Files
-    $paths = @(
-        "C:\Program Files\CMake\bin\cmake.exe",
-        "C:\Program Files (x86)\CMake\bin\cmake.exe"
-    )
-
-    foreach ($p in $paths) {
-        if (Test-Path $p) {
-            Write-Host "Found in Program Files: $p"
-            return $p
-        }
-    }
-    Write-Host "Not found in standard Program Files locations."
-
-    # ③ Visual Studio内蔵（これが今回重要）
-    $vsPath = "C:\Program Files\Microsoft Visual Studio"
-    if (Test-Path $vsPath) {
-        $found = Get-ChildItem $vsPath -Recurse -Filter cmake.exe -ErrorAction SilentlyContinue |
-                 Select-Object -First 1
-
-        if ($found) {
-            return $found.FullName
-        }
-    }
-    Write-Host "Not found in Visual Studio locations."
-
-    # ④ PATH fallback
-    $cmd = Get-Command cmake -ErrorAction SilentlyContinue
-    if ($cmd) {
-        return $cmd.Source
-    }
-
-    Write-Host "CMake executable not found."
-    return $null
+# 管理者権限のチェック
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $isAdmin) {
+    Write-Error "環境変数を書き換えるため、このスクリプトは【管理者権限】で実行する必要があります。PowerShellを管理者として開き直してください。"
+    exit
 }
 
-function Get-CMakeVersion {
-    Write-Host "Getting CMake version..."
-    try {
-        $cmakePath = Find-CMakePath
-        Write-Host "Finished Find-CMakePath: $cmakePath"
-        if (-not $cmakePath) { 
-            Write-Host "CMake executable not found for version check."
-            return $null 
-        }
-
-        $versionOutput = & "$cmakePath" --version
-        $firstLine = $versionOutput.Split("`n")[0]
-        Write-Host "Version output: $firstLine"
-        if ($firstLine -match "cmake version ([\d\.]+)") {
-            return $matches[1]
-        }
-    } catch {}
-    return $null
-}
-
-function Get-LatestCMakeInfo {
-    $url = "https://api.github.com/repos/Kitware/CMake/releases/latest"
-    $response = Invoke-RestMethod -Uri $url
-
-    $version = $response.tag_name.TrimStart("v")
-
-    $asset = $response.assets | Where-Object {
-        $_.name -like "*windows-x86_64.msi"
-    } | Select-Object -First 1
-
-    if (-not $asset) {
-        throw "Failed to find Windows installer asset."
-    }
-
-    return @{
-        Version = $version
-        Url     = $asset.browser_download_url
-    }
-}
-
-function Add-ToSystemPath {
-    param([string]$newPath)
-
-    $machinePath = [Environment]::GetEnvironmentVariable("Path", "Machine")
-
-    if ($machinePath -notlike "*$newPath*") {
-        Write-Host "Adding to system PATH..."
-
-        $updatedPath = "$machinePath;$newPath"
-        [Environment]::SetEnvironmentVariable("Path", $updatedPath, "Machine")
-    }
-
-    # 現在セッションにも反映
-    if ($env:Path -notlike "*$newPath*") {
-        $env:Path += ";$newPath"
-    }
-
-    Write-Host "CMake installed. Please restart .bat file to use the updated PATH."
-    pause
-    exit 0
-}
-
-# ============================
-# Install / Update
-# ============================
-
-function Install-CMake {
-    param(
-        [string]$url,
-        [string]$version
-    )
-
-    Write-Host "Installing CMake $version ..."
-
-    $installerPath = "$env:TEMP\cmake_$version.msi"
-
-    Invoke-WebRequest -Uri $url -OutFile $installerPath
-
-    Start-Process msiexec.exe -Wait -ArgumentList "/i `"$installerPath`" /quiet /norestart"
-
-    Remove-Item $installerPath -Force
-
-    # PATH登録（確実にやる）
-    Add-ToSystemPath "C:\Program Files\CMake\bin"
-
-    Write-Host "CMake installation completed."
-}
-
-# ============================
-# Main
-# ============================
-
-Write-Host "=== CMake Setup ==="
-
-$currentVersion = Get-CMakeVersion
-
-if ($currentVersion) {
-    Write-Host "Current version: $currentVersion"
+# 2. すでに同じバージョンが入っていないかチェック
+if (Test-Path (Join-Path $installDir "bin\cmake.exe")) {
+    Write-Host "[INFO] CMake $version はすでに $installDir にインストールされています。" -ForegroundColor Green
 } else {
-    Write-Host "CMake not found."
+    # 3. ダウンロード処理
+    Write-Host "[INFO] CMake $version をダウンロード中..." -ForegroundColor Cyan
+    Write-Host "URL: $url" -ForegroundColor Gray
+    Invoke-WebRequest -Uri $url -OutFile $zipPath -UserAgent "Mozilla/5.0"
+
+    # 4. 展開先のフォルダを綺麗に準備
+    if (-not (Test-Path $installParentDir)) {
+        New-Item -ItemType Directory -Path $installParentDir | Out-Null
+    }
+    if (Test-Path $installDir) {
+        Remove-Item -Recurse -Force $installDir
+    }
+
+    # 5. ZIPの展開
+    Write-Host "[INFO] アーカイブをコピー・展開中..." -ForegroundColor Cyan
+    Expand-Archive -Path $zipPath -DestinationPath $installParentDir -Force
+
+    # 後片付け（一時フォルダのZIPを削除）
+    Remove-Item -Force $zipPath
+    Write-Host "[INFO] 展開完了: $installDir" -ForegroundColor Green
 }
 
-$latestInfo = Get-LatestCMakeInfo
-$latestVersion = $latestInfo.Version
-$latestUrl     = $latestInfo.Url
+# 6. 環境変数 (PATH) への追加処理
+$binPath = Join-Path $installDir "bin"
+Write-Host "[INFO] 環境変数 (PATH) のチェックと設定中..." -ForegroundColor Cyan
 
-Write-Host "Latest version:  $latestVersion"
+# システム全体のPATHを取得
+$target = [EnvironmentVariableTarget]::Machine
+$oldPath = [Environment]::GetEnvironmentVariable("Path", $target)
 
-if (-not $currentVersion) {
-    Install-CMake -url $latestUrl -version $latestVersion
-}
-elseif ($currentVersion -ne $latestVersion) {
-    Write-Host "Updating CMake..."
-    Install-CMake -url $latestUrl -version $latestVersion
-}
-else {
-    Write-Host "CMake is up to date."
-}
-
-# 最終確認
-$finalVersion = Get-CMakeVersion
-
-if ($finalVersion) {
-    Write-Host "Ready: CMake $finalVersion"
+# 重複していなければ末尾に追加
+if ($oldPath -split ';' -contains $binPath) {
+    Write-Host "[INFO] すでに PATH に登録されています。" -ForegroundColor Yellow
 } else {
-    Write-Host "Warning: CMake installed but not detected."
+    # 古いバージョンのCMakeのPATHが残っていたら紛らわしいので、一応綺麗にする（任意）
+    # ※もし必要なら手動で古いPATHを削ってください
+    $newPath = $oldPath + ";" + $binPath
+    [Environment]::GetEnvironmentVariable("Path", $target)
+    [Environment]::SetEnvironmentVariable("Path", $newPath, $target)
+    
+    # 現在のPowerShellセッションのPATHにも即時反映
+    $env:Path += ";$binPath"
+    Write-Host "[SUCCESS] システムの PATH に $binPath を追加しました！" -ForegroundColor Green
+}
+
+# 7. 最終確認
+Write-Host "`n=== インストール確認 ===" -ForegroundColor Cyan
+if (Get-Command cmake -ErrorAction SilentlyContinue) {
+    cmake --version
+    Write-Host "`n[COMPLETE] すべての工程が正常に完了しました！" -ForegroundColor Green
+} else {
+    Write-Host "[WARNING] インストールはできましたが、PATHの反映にはPowerShellやPCの再起動が必要な場合があります。" -ForegroundColor Yellow
 }
