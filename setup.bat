@@ -2,19 +2,24 @@
 
 cd /d "%~dp0DirectXGame"
 
+echo === Init Directory ===
+set "GENERATE_DIR=externals/generated/"
+if exist "%GENERATE_DIR%" (
+ rmdir /s /q "%GENERATE_DIR%"
+)
+
 rem powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CMakeIntro.ps1"
 
 echo ==== Create Slution From Library Source ====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\src\assimp-6.0.5" -BuildDir "externals\generated\Project\assimp"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\src\freetype-VER-2-14-3" -BuildDir "externals\generated\Project\freetype"
 
-pause
 
 echo ===== Create .lib =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\DirectXTex\DirectXTex_Desktop_2022_Win10.sln" -Platform x64
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\ForImGui\ForImGui.slnx" -Platform x64
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\freetype\freetype.slnx" -Platform x64
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\assimp\assimp.slnx" -Platform x64
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\freetype\freetype.slnx" -Platform x64
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\assimp\assimp.slnx" -Platform x64
 
 echo ===== Copy Header =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\DirectXTex\DirectXTex" -DestDir "externals\header\DirectXTex"

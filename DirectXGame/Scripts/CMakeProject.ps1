@@ -36,7 +36,7 @@ Write-Host "Generating Visual Studio solution..."
 Write-Host "Generator : $generator"
 Write-Host "Toolset   : $toolset"
 
-cmake -S "$SourceDir" -B "$BuildDir" -G "$generator" -T "$toolset" -A x64
+cmake -S "$SourceDir" -B "$BuildDir" -G "$generator" -T "$toolset" -A x64 -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded$<$<CONFIG:Debug>:Debug>" -DBUILD_SHARED_LIBS=OFF -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG="$PWD/externals/generated/Lib/Debug" -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE="$PWD/externals/generated/Lib/Release"
 
 if ($LASTEXITCODE -ne 0) {
     throw "CMake generation failed (toolset=$toolset)"
