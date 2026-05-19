@@ -170,6 +170,7 @@ void GameScene::Draw() {
 	if (vignette) {
 		static Vignette config;
 		ImGui::PushID("Vignette");
+		ImGui::ColorEdit4("Color", &config.color.x);
 		ImGui::DragFloat("Strength", &config.intensity, 0.01f);
 		ImGui::DragFloat("lerpWidth", &config.radius, 0.01f);
 		ImGui::DragFloat("softness", &config.softness, 0.01f);

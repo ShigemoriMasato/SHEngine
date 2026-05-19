@@ -10,6 +10,7 @@ SamplerState gSampler : register(s0);
  
 cbuffer Data : register(b1)
 {
+    float4 color; // 色
     float intensity; // 減光の強さ (0.0 ~ 1.0)
     float radius; // 明るさが保たれる半径 (0.0 ~ 1.0)
     float softness; // グラデーションの滑らかさ (0.0 ~ 1.0)
@@ -29,9 +30,9 @@ float4 main(PixelShaderInput input) : SV_TARGET
     // 強さ適用（反転して暗くする）
     vignette = lerp(1.0, vignette, intensity);
 
-    float4 color = textures[textureIndex].Sample(gSampler, uv);
+    float4 texColor = textures[textureIndex].Sample(gSampler, uv);
 
-    color.rgb *= vignette;
+    texColor = lerp(color, texColor, vignette);
 
-    return color;
+    return texColor;
 }

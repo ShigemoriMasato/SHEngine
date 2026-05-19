@@ -43,6 +43,7 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -So
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\nlohmann" -DestDir "externals\header\nlohmann"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\freetype_clone\include" -DestDir "externals\header"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\\assimp_clone\include\assimp" -DestDir "externals\header\assimp"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\\assimp\include\assimp" -DestDir "externals\header\assimp"
 
 echo ===== Create Development .lib =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CreateDev.ps1"

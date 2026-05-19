@@ -18,6 +18,7 @@ struct Grayscale {
 };
 
 struct Vignette {
+	Vector4 color = { 0.0f, 0.0f, 0.0f, 1.0f };	// ビネットカラー
 	float intensity;
 	float radius;
 	float softness;
