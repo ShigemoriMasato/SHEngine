@@ -2,7 +2,7 @@
 $ErrorActionPreference = "SilentlyContinue"
 
 # 基準となるバージョンを定義
-$TargetVersionStr = "4.3.2"
+$TargetVersionStr = "4.2"
 $TargetVersion = [version]$TargetVersionStr
 
 Write-Host "=== CMake バージョンチェック ===" -ForegroundColor Cyan
@@ -43,9 +43,7 @@ Write-Host "【重要】CMake $TargetVersionStr 以上の導入が必要です�
 Write-Host "お手数ですが、『CMakeRegister.bat』を起動してインストールを行ってください。" -ForegroundColor Cyan
 Write-Host "--------------------------------------------------`n" -ForegroundColor DarkCyan
 
-# キー入力を待機（pause の再現）
-Write-Host "続行するには、キーボードの任意のキーを押してください . . . " -NoNewline
-[void]$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+Pause
 
 # セッションを閉じる（呼び出し元のウィンドウごと落とす）
 Stop-Process -Id $PID
