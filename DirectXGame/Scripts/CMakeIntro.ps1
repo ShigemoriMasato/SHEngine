@@ -1,4 +1,4 @@
-# ====================================================================
+﻿# ====================================================================
 # CMake 4.3.2 自動インストールスクリプト (Windows 64bit用)
 # ====================================================================
 
@@ -59,9 +59,9 @@ if ($oldPath -split ';' -contains $binPath) {
 } else {
     # 古いバージョンのCMakeのPATHが残っていたら紛らわしいので、一応綺麗にする（任意）
     # ※もし必要なら手動で古いPATHを削ってください
-    $newPath = $oldPath + ";" + $binPath
     [Environment]::GetEnvironmentVariable("Path", $target)
-    [Environment]::SetEnvironmentVariable("Path", $newPath, $target)
+    # Windows標準の外部コマンドで、システム環境変数にPATHを強制追加する
+    setx /M PATH "$oldPath;$binPath"
     
     # 現在のPowerShellセッションのPATHにも即時反映
     $env:Path += ";$binPath"
@@ -76,3 +76,5 @@ if (Get-Command cmake -ErrorAction SilentlyContinue) {
 } else {
     Write-Host "[WARNING] インストールはできましたが、PATHの反映にはPowerShellやPCの再起動が必要な場合があります。" -ForegroundColor Yellow
 }
+
+Pause
