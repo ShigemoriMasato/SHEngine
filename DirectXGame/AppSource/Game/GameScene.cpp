@@ -158,6 +158,7 @@ void GameScene::Draw() {
 	ImGui::Begin("PostEffect");
 	static bool grayScale = false;
 	static bool vignette = false;
+	static bool boxBlur = false;
 	ImGui::Checkbox("GrayScale", &grayScale);
 	if (grayScale) {
 		static Grayscale config;
@@ -177,11 +178,21 @@ void GameScene::Draw() {
 		ImGui::PopID();
 		postEffect_->CopyBuffer(PostEffectJob::Vignette, config);
 	}
+	ImGui::Checkbox("BoxBlur", &boxBlur);
+	if (boxBlur) {
+		static Blur config;
+		ImGui::PushID("BoxBlur");
+		ImGui::SliderInt("Width", reinterpret_cast<int*>(&config.blurWidth), 1, 30);
+		ImGui::SliderInt("Height", reinterpret_cast<int*>(&config.blurHeight), 1, 30);
+		ImGui::PopID();
+		postEffect_->CopyBuffer(PostEffectJob::BoxBlur, config);
+	}
 	ImGui::End();
 
 	postEffectConfig_.jobs_ =
 		uint32_t(grayScale) << 1 |
-		uint32_t(vignette) << 2;
+		uint32_t(vignette) << 2 |
+		uint32_t(boxBlur) << 3;
 #endif
 
 	engine_->DrawImGui();

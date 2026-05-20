@@ -58,7 +58,7 @@ PSOutput main(PSInput input)
     float3 reflectedVector = reflect(cameraToPosition, input.normal);
     float3 texColor = texture.Sample(gSampler, reflectedVector).rgb;
     
-    output.color.rgb = lerp(output.color.rgb, texColor, strength);
+    output.color.rgb += texColor * strength;
     
     if(output.color.a < 0.02f)
     {

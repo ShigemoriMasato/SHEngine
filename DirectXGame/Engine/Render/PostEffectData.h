@@ -2,15 +2,8 @@
 #include <Utility/Vector.h>
 
 struct Blur {
-	float intensity = 0.0f; // ブラー強度
-	float kernelSize = 0.0f; // カーネルサイズ
-	int radius = 0;
-	float pad;
-};
-
-struct HeavyBlur {
-	float intensity = 0.0f; // ヘビーブラー強度
-	float kernelSize = 1;         // ブラーのパス数
+	uint32_t blurWidth = 1;					// ブラーの幅（ピクセル単位）
+	uint32_t blurHeight = 1;					// ブラーの高さ（ピクセル単位）
 };
 
 struct Grayscale {
@@ -49,11 +42,4 @@ struct Glitch {
 	float scanlineIntensity = 0.0f;			// スキャンライン強度 (0.0 - 1.0)
 	float blockIntensity = 0.0f;			// ブロックノイズ強度 (0.0 - 1.0)
 	float time = 0.0f;						// 時間パラメータ（アニメーション用
-};
-
-struct ConstantScanline {
-	float intensity = 0.3f;					// 走査線の強度 (0.0 - 1.0)
-	float speed = 1.0f;						// 走査線の移動速度
-	float lineWidth = 0.002f;				// 走査線の幅
-	float time = 0.0f;						// 時間パラメータ（アニメーション用）
 };

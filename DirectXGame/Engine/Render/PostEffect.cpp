@@ -40,6 +40,7 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 	if (!copyOnly) {
 		createPostEffectObject(PostEffectJob::GrayScale, "GrayScale");
 		createPostEffectObject(PostEffectJob::Vignette, "Vignette");
+		createPostEffectObject(PostEffectJob::BoxBlur, "BoxBlur");
 
 		//PostEffect用Displayの初期化
 		intermediateDisplay_ = std::make_unique<SHEngine::Screen::MultiDisplay>();
