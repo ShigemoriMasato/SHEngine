@@ -440,3 +440,5 @@ FodyWeavers.xsd
 DirectXGame.vcxproj.filters
 # externalsをビルドしたときに発生するHeaderのコピーを除外
 DirectXGame/externals/header/
+# DirectXTexnのシェーダーコンパイル後の生成ファイル
+*.inc

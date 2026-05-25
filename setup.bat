@@ -1,5 +1,7 @@
 @echo off
 
+pause
+
 cd /d "%~dp0DirectXGame"
 
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeChecker.ps1"
@@ -21,6 +23,9 @@ if exist "%PROJ_DIR%" (
  echo Deleted %PROJ_DIR% !!
 )
 
+echo === only spdlog ready for debug ===
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\spdlog" -DestDir "externals\header\spdlog"
+
 echo === Clone ===
 git clone --branch v6.0.5 --depth 1 --recurse-submodules --shallow-submodules https://github.com/assimp/assimp.git "externals/generated/Project/assimp_clone/"
 git clone --branch VER-2-14-3 --depth 1 https://github.com/freetype/freetype.git "externals/generated/Project/freetype_clone/"
@@ -39,7 +44,6 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1"
 echo ===== Copy Header =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\DirectXTex\DirectXTex" -DestDir "externals\header\DirectXTex"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\ForImGui\ImGui" -DestDir "externals\header\imgui"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\spdlog" -DestDir "externals\header\spdlog"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\nlohmann" -DestDir "externals\header\nlohmann"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\freetype_clone\include" -DestDir "externals\header"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\\assimp_clone\include\assimp" -DestDir "externals\header\assimp"
