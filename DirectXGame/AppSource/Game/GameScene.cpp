@@ -57,6 +57,9 @@ void GameScene::Initialize() {
 		Vector3(),
 		Vector3(0.0f, 0.0f, -5.0f)
 	);
+
+	subject_ = std::make_unique<Subject>();
+	subject_->Initialize(engine_);
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
@@ -64,6 +67,8 @@ std::unique_ptr<IScene> GameScene::Update() {
 	commonData_->cmdObject->ResetCommandList();
 
 	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
+
+	subject_->Update(worldCamera_->GetVPMatrix());
 
 	input_->Update();
 	commonData_->keyManager->Update();
@@ -110,6 +115,9 @@ void GameScene::Draw() {
 		gameOverText->CopyBufferData(0, &wvp, sizeof(Matrix4x4));
 		//gameOverText->Draw(cmdObj);
 	}
+
+	subject_->Draw(cmdObj);
+
 	display->PostDraw(cmdObj);
 
 #ifdef SH_RELEASE

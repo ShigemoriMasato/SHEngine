@@ -25,9 +25,6 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 	waveParticle_->Initialize(textureID, pool, 1);
 
 	compute_->WaitForGPUIdle();
-
-	subject_ = std::make_unique<Subject>();
-	subject_->Initialize(engine);
 }
 
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
@@ -44,16 +41,12 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix,
 	computeFence_ = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, { compute_.get() });
 
 	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime);
-
-	subject_->Update(vpMatrix);
 }
 
 void Effect::Draw(SHEngine::Screen::IDisplay* display) {
 	//描画
 	direct_->SetRenderTarget(display, true);
 	particlePool_->Draw(direct_.get());
-
-	subject_->Draw(direct_.get());
 
 	//更新処理の後にこの関数を呼び出す
 	//engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);

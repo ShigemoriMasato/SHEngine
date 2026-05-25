@@ -5,6 +5,7 @@
 #include <Render/PostEffect.h>
 #include <Game/Camera/GameCamera.h>
 #include <Game/Effect/Effect.h>
+#include <Game/Effect/Subject/Subject.h>
 
 class GameScene : public IScene {
 public:
@@ -32,4 +33,5 @@ private:
 
 	PostEffectConfig postEffectConfig_{};
 
+	std::unique_ptr<Subject> subject_ = nullptr;
 };

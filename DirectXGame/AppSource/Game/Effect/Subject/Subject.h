@@ -2,6 +2,8 @@
 #include <SHEngine.h>
 #include <Render/Renderer.h>
 #include <Camera/Camera.h>
+#include "Animation.h"
+#include "HitEffect.h"
 
 class Subject {
 public:
@@ -12,9 +14,13 @@ public:
 
 private:
 
+	SHEngine::Engine* engine_;
+
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 
 	std::unique_ptr<SHEngine::Renderer> cube_;
 	SHEngine::GPUBuffer* wvp_;
 
+	std::unique_ptr<Animation_Sub> animation_;
+	std::unique_ptr<HitEffect> hitEffect_;
 };

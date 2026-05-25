@@ -26,6 +26,4 @@ private:
 
 	std::unique_ptr<WaveParticle> waveParticle_ = nullptr;
 
-
-	std::unique_ptr<Subject> subject_;
 };

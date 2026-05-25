@@ -1,6 +1,8 @@
 #include "Subject.h"
 
 void Subject::Initialize(SHEngine::Engine* engine) {
+	engine_ = engine;
+
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 
 	auto tm = engine->GetTextureManager();
@@ -19,13 +21,27 @@ void Subject::Initialize(SHEngine::Engine* engine) {
 	cube_->SetPS("Test/DDS/Cube.PS.hlsl");
 	cube_->SetGPUBuffer(wvp_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	cube_->SetGPUBuffer(ddsBuffer, ShaderType::PIXEL_SHADER, BufferType::DDSTexture);
+
+	animation_ = std::make_unique<Animation_Sub>();
+	animation_->Initialize(engine_);
+
+	hitEffect_ = std::make_unique<HitEffect>();
+	hitEffect_->Initialize(engine_);
 }
 
 void Subject::Update(const Matrix4x4& vpMat) {
+	float deltatime = engine_->GetDeltaTime();
 	Matrix4x4 wvp = Matrix::MakeScaleMatrix({512, 512, 512}) * vpMat;
 	wvp_->CopyBuffer(&wvp, sizeof(wvp));
+
+	animation_->Update(deltatime, vpMat);
+	hitEffect_->Update(deltatime, vpMat);
 }
 
 void Subject::Draw(CmdObj* cmdObj) {
+	animation_->Draw(cmdObj);
+
 	cube_->Draw(cmdObj);
+
+	hitEffect_->Draw(cmdObj);
 }

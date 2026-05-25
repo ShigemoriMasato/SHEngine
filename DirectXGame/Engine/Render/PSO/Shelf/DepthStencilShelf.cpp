@@ -18,7 +18,7 @@ DepthStencilShelf::DepthStencilShelf() {
 	depthStencilDescs_[int(DepthStencilID::Default)] = defaultDesc;
 
 	D3D12_DEPTH_STENCIL_DESC transparentDesc{};
-	transparentDesc.DepthEnable = true;	//深度バッファを使う
+	transparentDesc.DepthEnable = false;	//深度バッファを使う
 	transparentDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;	//深度地を書き込まない
 	transparentDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;	//深度値の比較方法
 
