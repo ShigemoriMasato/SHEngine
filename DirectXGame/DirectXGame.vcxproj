@@ -175,6 +175,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppSource\Game\Effect\Subject\Animation.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\WorldCursor.cpp" />
     <ClCompile Include="AppSource\Common\MainDisplay.cpp" />
@@ -262,6 +263,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Effect\Wave\WaveParticle.cpp" />
     <ClCompile Include="AppSource\Test\TestScene.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Subject.cpp" />
+    <ClInclude Include="AppSource\Game\Effect\Subject\Animation.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Common\MainDisplay.h" />
@@ -316,6 +318,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Assets\Fonts\FontLoader.cpp" />
     <ClCompile Include="Engine\Render\Screen\IDisplay.cpp" />
     <ClCompile Include="Engine\Core\ImGuiWrapper.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Subject\HitEffect.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Utility\src\Operator.cpp" />
     <ClCompile Include="Engine\Utility\src\MatrixFactory.cpp" />
@@ -338,6 +341,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Game\Effect\Wave\WaveParticle.h" />
     <ClInclude Include="AppSource\Test\TestScene.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\Subject.h" />
+    <ClInclude Include="AppSource\Game\Effect\Subject\HitEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

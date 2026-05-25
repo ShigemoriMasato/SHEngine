@@ -33,3 +33,4 @@ private:
 	const float life_ = 1.0f;
 	const float spawnInterval_ = life_ + 1.0f;
 };
+

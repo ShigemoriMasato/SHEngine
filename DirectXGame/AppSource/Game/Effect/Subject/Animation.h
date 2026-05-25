@@ -11,6 +11,8 @@ public:
 
 private:
 
+	SHEngine::Engine* engine_ = nullptr;
+
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 	std::unique_ptr<SHEngine::Renderer> renderer_;
 
