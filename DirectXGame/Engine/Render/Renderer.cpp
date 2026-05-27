@@ -59,7 +59,7 @@ void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
 
 	int rootIndex = 0;
 	for (const auto& cbv : gpuBuffers_[BufferType::CBV][ShaderType::VERTEX_SHADER]) {
-		cbv->TransitionBarrier(D3D12_RESOURCE_STATE_GENERIC_READ);
+		cbv->TransitionBarrier(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 		cbv->Flush(cmdObj);
 		cmdList->SetGraphicsRootConstantBufferView(rootIndex++, cbv->GetGPUDescriptorHandle(BufferType::CBV).ptr);
 	}
@@ -69,12 +69,12 @@ void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
 		cmdList->SetGraphicsRootConstantBufferView(rootIndex++, cbv->GetGPUDescriptorHandle(BufferType::CBV).ptr);
 	}
 	for (const auto& srv : gpuBuffers_[BufferType::SRV][ShaderType::VERTEX_SHADER]) {
-		srv->TransitionBarrier(D3D12_RESOURCE_STATE_GENERIC_READ);
+		srv->TransitionBarrier(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 		srv->Flush(cmdObj);
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, srv->GetGPUDescriptorHandle(BufferType::SRV));
 	}
 	for (const auto& srv : gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER]) {
-		srv->TransitionBarrier(D3D12_RESOURCE_STATE_GENERIC_READ);
+		srv->TransitionBarrier(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 		srv->Flush(cmdObj);
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, srv->GetGPUDescriptorHandle(BufferType::SRV));
 	}
@@ -106,4 +106,12 @@ void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
 	}
 
 	cmdList->DrawIndexedInstanced(drawData_.indexNum, instanceNum_, 0, 0, 0);
+
+	//SRVのなかで、UAVが含まれるPSResourceはCommonに直しておく
+	for (const auto& srv : gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER]) {
+		if (srv->GetBufferType() & uint8_t(BufferType::UAV)) {
+			srv->TransitionBarrier(D3D12_RESOURCE_STATE_COMMON);
+			srv->Flush(cmdObj);
+		}
+	}
 }

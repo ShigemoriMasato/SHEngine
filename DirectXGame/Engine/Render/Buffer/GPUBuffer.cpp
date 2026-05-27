@@ -155,7 +155,7 @@ void SHEngine::GPUBuffer::Flush(CmdObj* cmdObj) {
 	}
 
 	//同じだった場合の処理と過去の状態の更新は関数内に含まれている
-	Func::InsertBarrier(cmdObj->GetCommandList(), currentState_[bufferIndex], nextState_, resources_[bufferIndex].res.Get());
+	Func::InsertBarrier(cmdObj->GetCommandList(), nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
 }
 
 BufferType operator|(BufferType a, BufferType b) {

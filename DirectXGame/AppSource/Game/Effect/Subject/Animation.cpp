@@ -8,9 +8,6 @@ void Animation_Sub::Initialize(SHEngine::Engine* engine) {
 	modelData_ = mm->GetSkinningModelData(mm->LoadModel("SneekWalk"));
 	auto drawData = ddm->GetDrawData(modelData_.drawDataIndex);
 
-	auto modelData = mm->GetSkinningModelData(mm->LoadModel("SneekWalk"));
-	auto drawData = ddm->GetDrawData(modelData.drawDataIndex);
-
 	renderer_ = std::make_unique<SHEngine::Renderer>(drawData);
 	renderer_->SetVS("Skinning.VS.hlsl");
 	renderer_->SetPS("White.PS.hlsl");

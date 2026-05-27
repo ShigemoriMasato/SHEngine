@@ -32,5 +32,15 @@ private:
 	float timer_ = 0.0f;
 	const float life_ = 1.0f;
 	const float spawnInterval_ = life_ + 1.0f;
+
+private://Donut
+
+	std::unique_ptr<SHEngine::Renderer> d_renderer_;
+	struct VSData {
+		Matrix4x4 wvp;
+		Matrix3x3 uvMatrix;
+	}d_vsData_;
+	SHEngine::GPUBuffer* d_vsBuffer_;
+	SHEngine::GPUBuffer* d_colorBuffer_;
 };
 

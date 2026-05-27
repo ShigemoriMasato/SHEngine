@@ -306,16 +306,16 @@ void BlockRender::Load() {
 
 	if (!binaryManager_->Boot(fileName_)) {
 		//ファイルを開けなかった場合は初期値を入力
-		colorMap_[int(Tetrimino::Type::None)] = { ConvertColor(0x00000), ConvertColor(0x00000000) }; // 空白			Air
-		colorMap_[int(Tetrimino::Type::S)] = { ConvertColor(0x00ff00ff), ConvertColor(0xffffffff) }; // 赤			S
-		colorMap_[int(Tetrimino::Type::Z)] = { ConvertColor(0xff0000ff), ConvertColor(0xffffffff) }; // 緑			Z
-		colorMap_[int(Tetrimino::Type::T)] = { ConvertColor(0xff00ffff), ConvertColor(0xffffffff) }; // 紫			T
-		colorMap_[int(Tetrimino::Type::O)] = { ConvertColor(0xffff00ff), ConvertColor(0xffffffff) }; // 黄			O
-		colorMap_[int(Tetrimino::Type::I)] = { ConvertColor(0x00ffffff), ConvertColor(0xffffffff) }; // 水色			I
-		colorMap_[int(Tetrimino::Type::L)] = { ConvertColor(0x0000ffff), ConvertColor(0xffffffff) }; // 青			L
-		colorMap_[int(Tetrimino::Type::J)] = { ConvertColor(0xff8000ff), ConvertColor(0xffffffff) }; // オレンジ		J
-		colorMap_[int(Tetrimino::Type::Wall)] = { ConvertColor(0x808080ff), ConvertColor(0x000000ff) }; // 灰色		Wall
-		colorMap_[int(Tetrimino::Type::Del)] = { ConvertColor(0xffffffff), ConvertColor(0xffffffff) };// 白			DeleteEffect
+		colorMap_[int(Tetrimino::Type::None)] = { ConvertColor(0x00000), ConvertColor(0x00000000) }; //		空白		Air
+		colorMap_[int(Tetrimino::Type::S)] = { ConvertColor(0x00ff00ff), ConvertColor(0xffffffff) }; //		赤		S
+		colorMap_[int(Tetrimino::Type::Z)] = { ConvertColor(0xff0000ff), ConvertColor(0xffffffff) }; //		緑		Z
+		colorMap_[int(Tetrimino::Type::T)] = { ConvertColor(0xff00ffff), ConvertColor(0xffffffff) }; //		紫		T
+		colorMap_[int(Tetrimino::Type::O)] = { ConvertColor(0xffff00ff), ConvertColor(0xffffffff) }; //		黄		O
+		colorMap_[int(Tetrimino::Type::I)] = { ConvertColor(0x00ffffff), ConvertColor(0xffffffff) }; //		水色		I
+		colorMap_[int(Tetrimino::Type::L)] = { ConvertColor(0x0000ffff), ConvertColor(0xffffffff) }; //		青		L
+		colorMap_[int(Tetrimino::Type::J)] = { ConvertColor(0xff8000ff), ConvertColor(0xffffffff) }; //		オレンジ	J
+		colorMap_[int(Tetrimino::Type::Wall)] = { ConvertColor(0x808080ff), ConvertColor(0x000000ff) }; //	灰色		Wall
+		colorMap_[int(Tetrimino::Type::Del)] = { ConvertColor(0xffffffff), ConvertColor(0xffffffff) };//	白		DeleteEffect
 		colorMap_[int(Tetrimino::Type::Hold)] = { ConvertColor(0x000000ff), ConvertColor(0xffffffff) };
 		colorMap_[int(Tetrimino::Type::Next)] = { ConvertColor(0x000000ff), ConvertColor(0xffffffff) };
 		return;

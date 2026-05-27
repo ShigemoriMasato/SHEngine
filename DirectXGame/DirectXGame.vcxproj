@@ -175,13 +175,11 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AppSource\Game\Effect\Subject\Animation.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\WorldCursor.cpp" />
     <ClCompile Include="AppSource\Common\MainDisplay.cpp" />
     <ClCompile Include="AppSource\Game\Camera\GameCamera.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Animation.cpp" />
-    <ClCompile Include="AppSource\Game\Effect\Subject\HitEffect.cpp" />
     <ClCompile Include="AppSource\Game\GameScene.cpp" />
     <ClCompile Include="AppSource\Game\KeyCoating\KeyCoating.cpp" />
     <ClCompile Include="AppSource\Game\Tetris\Block\BlockRender.cpp" />
@@ -263,13 +261,11 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Effect\Wave\WaveParticle.cpp" />
     <ClCompile Include="AppSource\Test\TestScene.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Subject.cpp" />
-    <ClInclude Include="AppSource\Game\Effect\Subject\Animation.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Common\MainDisplay.h" />
     <ClInclude Include="AppSource\Game\Camera\GameCamera.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\Animation.h" />
-    <ClInclude Include="AppSource\Game\Effect\Subject\HitEffect.h" />
     <ClInclude Include="AppSource\Game\GameScene.h" />
     <ClInclude Include="AppSource\Game\KeyCoating\KeyCoating.h" />
     <ClInclude Include="AppSource\Game\Tetris\Block\BlockRender.h" />
