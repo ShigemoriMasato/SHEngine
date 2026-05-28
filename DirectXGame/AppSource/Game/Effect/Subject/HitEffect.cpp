@@ -1,5 +1,113 @@
 #include "HitEffect.h"
+#include <numbers>
 #include <Utility/MatrixFactory.h>
+
+namespace {
+
+	void CreateRingMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, float outerRadius, float innerRadius, uint32_t division) {
+		vertices.clear();
+		indices.clear();
+
+		if (division < 3) {
+			return;
+		}
+
+		if (innerRadius >= outerRadius) {
+			return;
+		}
+
+		//=========================
+		//頂点数
+		//
+		//1分割につき
+		//外側1頂点
+		//内側1頂点
+		//=========================
+
+		vertices.reserve(division * 2);
+
+		//=========================
+		//Index数
+		//
+		//1分割 = 2Triangle
+		//2 * 3 = 6 index
+		//=========================
+
+		indices.reserve(division * 6);
+
+		//=========================
+		//Vertex生成
+		//=========================
+
+		for (uint32_t i = 0; i < division; ++i) {
+
+			float t = static_cast<float>(i) / division;
+			float angle = t * std::numbers::pi_v<float> * 2.0f;
+
+			float c = std::cos(angle);
+			float s = std::sin(angle);
+
+			Vector3 normal = { 0.0f, 1.0f, 0.0f };
+
+			//外周
+			vertices.push_back({
+				{ c * outerRadius, 0.0f, s * outerRadius, 1.0f },
+				{ t, 0.0f },
+				normal
+			});
+
+			//内周
+			vertices.push_back({
+				{ c * innerRadius, 0.0f, s * innerRadius, 1.0f },
+				{ t, 1.0f },
+				normal
+			});
+		}
+
+		//Index生成
+
+		for (uint32_t i = 0; i < division; ++i) {
+
+			uint32_t next = (i + 1) % division;
+
+			//頂点配置:
+			//
+			//outer = index * 2
+			//inner = index * 2 + 1
+			//
+
+			uint32_t outer0 = i * 2;
+			uint32_t inner0 = i * 2 + 1;
+
+			uint32_t outer1 = next * 2;
+			uint32_t inner1 = next * 2 + 1;
+
+			//=========================
+			//Triangle 1
+			//
+			//outer0
+			//outer1
+			//inner0
+			//=========================
+
+			indices.push_back(outer0);
+			indices.push_back(outer1);
+			indices.push_back(inner0);
+
+			//=========================
+			//Triangle 2
+			//
+			//inner0
+			//outer1
+			//inner1
+			//=========================
+
+			indices.push_back(inner0);
+			indices.push_back(outer1);
+			indices.push_back(inner1);
+		}
+	}
+}
 
 void HitEffect::Initialize(SHEngine::Engine* engine) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
@@ -9,7 +117,15 @@ void HitEffect::Initialize(SHEngine::Engine* engine) {
 	auto ddm = engine->GetDrawDataManager();
 
 	{
-		auto drawData = ddm->GetDrawData(mm->GetNodeModelData(1).drawDataIndex);
+		std::vector<VertexData> vertices;
+		std::vector<uint32_t> indices;
+		CreateRingMesh(vertices, indices, 1.0f, 0.5f, 32);
+
+		ddm->AddVertexBuffer(vertices);
+		ddm->AddIndexBuffer(indices);
+		int index = ddm->CreateDrawData();
+		auto drawData = ddm->GetDrawData(index);
+
 		int textureIndex = tm->LoadTexture("circle2.png");
 
 		wvp_ = container_->Create(BufferType::SRV, sizeof(Matrix4x4), spawnNum_);
@@ -32,7 +148,7 @@ void HitEffect::Initialize(SHEngine::Engine* engine) {
 		translate_ = Matrix::MakeTranslationMatrix({ -12, 5, 0 });
 		worlds_.resize(spawnNum_);
 	}
-	
+
 	{
 		auto modelData = mm->GetNodeModelData(mm->LoadModel("donut"));
 		auto drawData = ddm->GetDrawData(modelData.drawDataIndex);
@@ -76,8 +192,8 @@ void HitEffect::Update(float deltaTime, const Matrix4x4& vpMat) {
 
 
 	//Donut
-	float z = std::fmod(timer_ * 20, std::numbers::pi_v<float> * 2);
-	d_vsData_.wvp = Matrix::MakeScaleMatrix({ 6.f, 6.f, 6.f }) * Matrix::MakeRotationMatrix({std::numbers::pi_v<float> / 2.f, 0.f, z}) * translate_ * vpMat;
+	float z = std::fmod(timer_ * 20, std::numbers::pi_v<float> *2);
+	d_vsData_.wvp = Matrix::MakeScaleMatrix({ 6.f, 6.f, 6.f }) * Matrix::MakeRotationMatrix({ std::numbers::pi_v<float> / 2.f, 0.f, z }) * translate_ * vpMat;
 	d_vsData_.uvMatrix = Matrix3x3::Identity();
 
 	d_vsBuffer_->CopyBuffer(&d_vsData_, sizeof(d_vsData_));
