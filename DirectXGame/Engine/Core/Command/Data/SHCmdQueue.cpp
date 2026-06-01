@@ -3,17 +3,18 @@
 SHEngine::Command::Queue::Queue(DXDevice* device, Type type) {
 	//Queueの作成
 	D3D12_COMMAND_QUEUE_DESC desc{};
+	desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+	desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
 	switch (type) {
 	case Type::Direct:
 		desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;	// 描画コマンドは優先度を高くする
 		break;
 	case Type::Compute:
 		desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
 		break;
 	}
-	desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-	desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	HRESULT hr = device->GetDevice()->CreateCommandQueue(&desc, IID_PPV_ARGS(&commandQueue_));
 	assert(SUCCEEDED(hr) && "Failed to create CommandQueue");
 

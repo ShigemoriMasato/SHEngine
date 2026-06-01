@@ -34,6 +34,7 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	renderer_->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
 	renderer_->SetGPUBuffer(pool_.type, ShaderType::PIXEL_SHADER, BufferType::SRV);
 	renderer_->instanceNum_ = kMaxParticleNum;
+	renderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add);
 
 	initialize_->Execute(cmdObj);
 

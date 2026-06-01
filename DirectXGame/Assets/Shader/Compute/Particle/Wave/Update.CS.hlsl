@@ -46,7 +46,7 @@ RWStructuredBuffer<float> lifetimes : register(u6);
 RWStructuredBuffer<float3> positions : register(u7);
 RWStructuredBuffer<uint> isUse : register(u8);
 
-[numthreads(256, 1, 1)]
+[numthreads(64, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint index = DTid.x;

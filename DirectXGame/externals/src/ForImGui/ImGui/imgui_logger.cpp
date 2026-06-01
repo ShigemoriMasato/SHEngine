@@ -34,25 +34,31 @@ namespace {
 	std::shared_ptr<spdlog::logger> logger;
 }
 
-void imgui_logger::Initialize() {
+void imgui_logger::Initialize(bool isDebugString, bool isLogFile) {
 	std::vector<spdlog::sink_ptr> sinks;
 
-	//現在時刻を取得
-	auto now = std::chrono::system_clock::now();
-	auto t = std::chrono::system_clock::to_time_t(now);
-	std::tm tm;
-	localtime_s(&tm, &t);
+	if (isLogFile) {
+		//現在時刻を取得
+		auto now = std::chrono::system_clock::now();
+		auto t = std::chrono::system_clock::to_time_t(now);
+		std::tm tm;
+		localtime_s(&tm, &t);
 
-	//ログファイル名を生成
-	std::ostringstream fileName;
-	fileName << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S") << ".log";
+		//ログファイル名を生成
+		std::ostringstream fileName;
+		fileName << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S") << ".log";
 
-	//ログファイルのパスを生成
-	std::string logDir = "Logs/" + logName + "/" + fileName.str();
-	sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(logDir, true));
+		//ログファイルのパスを生成
+		std::string logDir = "Logs/" + logName + "/" + fileName.str();
+		sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(logDir, true));
 
-	//コンソールにも出力
-	sinks.push_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
+		archiveOldLogs("Logs/" + logName, 5);
+	}
+
+	if (isDebugString) {
+		//コンソールにも出力
+		sinks.push_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
+	}
 
 	//loggerを作成して登録
 	logger = std::make_shared<spdlog::logger>(logName, sinks.begin(), sinks.end());

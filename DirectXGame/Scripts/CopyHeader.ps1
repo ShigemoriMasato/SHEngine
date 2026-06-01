@@ -3,7 +3,7 @@
     [string]$DestDir   = "C:\dest"
 )
 
-$SourceDir = (Resolve-Path $SourceDir).Path
+$SourceDir = ((Resolve-Path $SourceDir).Path).TrimEnd('\')
 $resolved = Resolve-Path $DestDir -ErrorAction SilentlyContinue
 
 if ($resolved) {
@@ -26,6 +26,8 @@ Get-ChildItem -Path $SourceDir -Recurse -Include *.h, *.hpp, *.inl -File | ForEa
     if (!(Test-Path $destDirPath)) {
         New-Item -ItemType Directory -Path $destDirPath -Force | Out-Null
     }
+
+    write-host "relativePath: " $relativePath
 
     Write-Host $srcPath "->" $destPath
     Copy-Item -Path $srcPath -Destination $destPath -Force

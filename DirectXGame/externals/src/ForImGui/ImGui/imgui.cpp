@@ -4170,9 +4170,9 @@ void ImGui::GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeF
     *p_user_data = GImAllocatorUserData;
 }
 
-ImGuiContext* ImGui::CreateContext(ImFontAtlas* shared_font_atlas)
+ImGuiContext* ImGui::CreateContext(ImFontAtlas* shared_font_atlas, bool isDebugString, bool isLogFile)
 {
-    imgui_logger::Initialize();
+    imgui_logger::Initialize(isDebugString, isLogFile);
     ImGuiContext* prev_ctx = GetCurrentContext();
     ImGuiContext* ctx = IM_NEW(ImGuiContext)(shared_font_atlas);
     SetCurrentContext(ctx);

@@ -4,7 +4,7 @@
 
 using namespace Matrix;
 
-constexpr int splitNum = 4;
+constexpr int splitNum = 1;
 
 WaveParticle::~WaveParticle() {
 	Save();
@@ -43,8 +43,8 @@ void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32
 		update_[i]->SetGPUBuffers(BufferType::UAV, { pool.freeList, pool.freeListIndex, pool.position, pool.color, pool.type,
 			velocities, lifeTimes, positions, isUse });
 		update_[i]->SetGPUBuffers(BufferType::CBV, { pool.particleNum, pool.deltaTime, idBuffer, updateBuffer_[i], waveBuffer_ });
-		//Updateは全パーティクルを更新する必要があるため、256個ずつで処理をする。
-		update_[i]->SetThreadGroupSize(pool.maxParticleNum / 256 / splitNum);
+		//64個ずつで処理をする。
+		update_[i]->SetThreadGroupSize((pool.maxParticleNum / 64) / splitNum);
 	}
 
 	maxParticleNum_ = pool.maxParticleNum;
