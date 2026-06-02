@@ -8,6 +8,7 @@ enum class PostEffectJob : uint32_t {
 	GrayScale = 1 << 1,
 	Vignette = 1 << 2,
 	BoxBlur = 1 << 3,
+	GaussBlur = 1 << 4,
 };
 
 uint32_t operator|(PostEffectJob a, PostEffectJob b);

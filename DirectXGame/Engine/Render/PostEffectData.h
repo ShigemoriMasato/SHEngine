@@ -2,8 +2,12 @@
 #include <Utility/Vector.h>
 
 struct Blur {
-	uint32_t blurWidth = 1;					// ブラーの幅（ピクセル単位）
-	uint32_t blurHeight = 1;					// ブラーの高さ（ピクセル単位）
+	uint32_t kernelSize = 1;					// ブラーの幅（ピクセル単位）
+};
+
+struct GaussBlur {
+	uint32_t kernelSize = 3;					// ガウスカーネルのサイズ（奇数）
+	float sigma = 1.0f;						// ガウス分布の標準偏差
 };
 
 struct Grayscale {

@@ -167,6 +167,7 @@ void GameScene::Draw() {
 	static bool grayScale = false;
 	static bool vignette = false;
 	static bool boxBlur = false;
+	static bool gaussBlur = false;
 	ImGui::Checkbox("GrayScale", &grayScale);
 	if (grayScale) {
 		static Grayscale config;
@@ -190,17 +191,26 @@ void GameScene::Draw() {
 	if (boxBlur) {
 		static Blur config;
 		ImGui::PushID("BoxBlur");
-		ImGui::SliderInt("Width", reinterpret_cast<int*>(&config.blurWidth), 1, 30);
-		ImGui::SliderInt("Height", reinterpret_cast<int*>(&config.blurHeight), 1, 30);
+		ImGui::SliderInt("KernelSize", reinterpret_cast<int*>(&config.kernelSize), 1, 30);
 		ImGui::PopID();
 		postEffect_->CopyBuffer(PostEffectJob::BoxBlur, config);
+	}
+	ImGui::Checkbox("GaussBlur", &gaussBlur);
+	if (gaussBlur) {
+		static GaussBlur config;
+		ImGui::PushID("GaussBlur");
+		ImGui::SliderInt("KernelSize", reinterpret_cast<int*>(&config.kernelSize), 1, 15);
+		ImGui::DragFloat("Sigma", &config.sigma, 0.01f);
+		ImGui::PopID();
+		postEffect_->CopyBuffer(PostEffectJob::GaussBlur, config);
 	}
 	ImGui::End();
 
 	postEffectConfig_.jobs_ =
 		uint32_t(grayScale) << 1 |
 		uint32_t(vignette) << 2 |
-		uint32_t(boxBlur) << 3;
+		uint32_t(boxBlur) << 3 |
+		uint32_t(gaussBlur) << 4;
 #endif
 
 	engine_->DrawImGui();

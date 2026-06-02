@@ -10,8 +10,7 @@ SamplerState gSampler : register(s0);
  
 cbuffer Data : register(b1)
 {
-    uint blurWidth; // ブラーの幅
-    uint blurHeight; // ブラーの高さ
+    uint kernelSize; // ブラーの幅
 };
 
 float4 main(PixelShaderInput input) : SV_TARGET
@@ -23,14 +22,14 @@ float4 main(PixelShaderInput input) : SV_TARGET
     float width = (float) buff.x;
     float height = (float) buff.y;
     
-    float midW = blurWidth / 2;
-    float midH = blurHeight / 2;
+    float midW = kernelSize / 2;
+    float midH = kernelSize / 2;
     
     int2 centerPixel = int2(int(input.texcoord.x * width), int(input.texcoord.y * height));
     
-    for (int i = 0; i < blurHeight; i++)
+    for (int i = 0; i < kernelSize; i++)
     {
-        for (int j = 0; j < blurWidth; j++)
+        for (int j = 0; j < kernelSize; j++)
         {
             float x = input.texcoord.x * width + j - midW;
             float y = input.texcoord.y * height + i - midH;
@@ -44,6 +43,6 @@ float4 main(PixelShaderInput input) : SV_TARGET
     }
     
     // ブラーの平均を取る
-    output /= (blurWidth * blurHeight);
+    output /= (kernelSize * kernelSize);
     return output;
 }
