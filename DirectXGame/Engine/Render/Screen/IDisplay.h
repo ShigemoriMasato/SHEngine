@@ -43,6 +43,9 @@ namespace SHEngine::Screen {
 		// @brief DSVのCPUHandleを取得する。
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle() = 0;
 
+		// @brief ImGuiの描画
+		virtual void DrawImGui() {}
+
 	protected:
 
 		static inline DXDevice* device_ = nullptr;

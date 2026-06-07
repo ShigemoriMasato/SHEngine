@@ -1,6 +1,6 @@
 #pragma once
 #include <Render/RenderObject.h>
-#include <Render/Screen/MultiDisplay.h>
+#include <Render/Screen/Display.h>
 #include "PostEffectData.h"
 
 enum class PostEffectJob : uint32_t {
@@ -36,7 +36,7 @@ public:
 
 private:
 
-	std::unique_ptr<SHEngine::Screen::MultiDisplay> intermediateDisplay_ = nullptr;
+	std::unique_ptr<SHEngine::Screen::Display> intermediateDisplay_ = nullptr;
 	std::map<PostEffectJob, std::unique_ptr<SHEngine::RenderObject>> postEffectObjects_{};
 
 };

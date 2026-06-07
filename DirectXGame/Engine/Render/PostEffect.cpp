@@ -44,8 +44,8 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 		createPostEffectObject(PostEffectJob::GaussBlur, "GaussBlur");
 
 		//PostEffect用Displayの初期化
-		intermediateDisplay_ = std::make_unique<SHEngine::Screen::MultiDisplay>();
-		intermediateDisplay_->Initialize(1280, 720, 0xffffffff, textureManager);
+		intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
+		intermediateDisplay_->Initialize(textureManager, 1280, 720, 0xffffffff);
 	}
 }
 

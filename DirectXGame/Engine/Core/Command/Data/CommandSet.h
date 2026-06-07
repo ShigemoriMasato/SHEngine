@@ -19,12 +19,8 @@ namespace SHEngine::Command {
 		/// @brief 初期化
 		void Initialize(DXDevice* device, Type type);
 
-		/// @brief コマンドを積めるかどうか
-		bool CanExecute() const;
-		/// @brief コマンドを積めるようになるまで待機する
-		void WaitForCanExecute();
 		/// @brief コマンドを実行できる状態にして渡す
-		void Execute(Queue* queue, std::vector<ID3D12CommandList*>& cmdLists);
+		void Execute(std::vector<ID3D12CommandList*>& cmdLists);
 
 		/// @brief コマンドリストを取得
 		ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }

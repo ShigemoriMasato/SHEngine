@@ -2,8 +2,8 @@
 #include <imgui/imgui.h>
 
 void MainDisplay::Initialize(int width, int height, uint32_t clearColor, SHEngine::TextureManager* textureManager, SHEngine::Input* input) {
-	mainDisplay_ = std::make_unique<SHEngine::Screen::MultiDisplay>();
-	mainDisplay_->Initialize(width, height, clearColor, textureManager);
+	mainDisplay_ = std::make_unique<SHEngine::Screen::Display>();
+	mainDisplay_->Initialize(textureManager, width, height, clearColor);
 	input_ = input;
 }
 
@@ -39,6 +39,8 @@ void MainDisplay::DrawImGui() {
 	}
 
 	ImGui::End();
+
+	mainDisplay_->DrawImGui();
 
 #endif
 }

@@ -196,6 +196,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Title\WaterWave\WaterWave.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Effect.cpp" />
     <ClCompile Include="AppSource\Test\DDS\DDSTest.cpp" />
+    <ClCompile Include="Engine\Render\Command\DirectCommandContext.cpp" />
     <ClCompile Include="Engine\Assets\Audio\Data\PlayData.cpp" />
     <ClCompile Include="Engine\Assets\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Compute\PSO\CSPSOManager.cpp" />
@@ -214,7 +215,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\PostEffect.cpp" />
     <ClCompile Include="Engine\Render\Renderer.cpp" />
     <ClCompile Include="Engine\Render\RenderObject.cpp" />
-    <ClCompile Include="Engine\Render\Screen\ShadowMap.cpp" />
     <ClCompile Include="Engine\Tool\Binary\BinaryManager.cpp" />
     <ClCompile Include="Engine\Assets\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Assets\Audio\Data\AudioData.cpp" />
@@ -249,8 +249,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Utility\src\ConvertString.cpp" />
     <ClCompile Include="Engine\Utility\src\Easing.cpp" />
     <ClCompile Include="Engine\Utility\src\MyMath.cpp" />
-    <ClCompile Include="Engine\Render\Screen\MultiDisplay.cpp" />
-    <ClCompile Include="Engine\Render\Screen\SingleDisplay.cpp" />
+    <ClCompile Include="Engine\Render\Screen\Display.cpp" />
     <ClCompile Include="Engine\Render\Screen\WindowsAPI.cpp" />
     <ClCompile Include="Engine\Render\Screen\SwapChain.cpp" />
     <ClCompile Include="Engine\SHEngine.cpp" />
@@ -283,6 +282,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Title\WaterWave\WaterWave.h" />
     <ClInclude Include="AppSource\Game\Effect\Effect.h" />
     <ClInclude Include="AppSource\Test\DDS\DDSTest.h" />
+    <ClInclude Include="Engine\Render\Command\DirectCommandContext.h" />
     <ClInclude Include="Engine\Assets\Audio\Data\PlayData.h" />
     <ClInclude Include="Engine\Assets\Model\ModelManager.h" />
     <ClInclude Include="Engine\Compute\PSO\CSPSOManager.h" />
@@ -302,7 +302,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\PostEffectData.h" />
     <ClInclude Include="Engine\Render\Renderer.h" />
     <ClInclude Include="Engine\Render\RenderObject.h" />
-    <ClInclude Include="Engine\Render\Screen\ShadowMap.h" />
     <ClInclude Include="Engine\Tool\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Assets\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Tool\Binary\Value.h" />
@@ -312,7 +311,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Utility\Quaternion.h" />
     <ClCompile Include="Engine\Utility\src\SearchFile.cpp" />
     <ClCompile Include="Engine\Assets\Fonts\FontLoader.cpp" />
-    <ClCompile Include="Engine\Render\Screen\IDisplay.cpp" />
     <ClCompile Include="Engine\Core\ImGuiWrapper.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\HitEffect.cpp" />
     <ClCompile Include="main.cpp" />
@@ -323,8 +321,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Assets\Model\ModelLoader.cpp" />
     <ClInclude Include="Engine\Assets\Fonts\FontLoader.h" />
     <ClInclude Include="Engine\Render\Screen\IDisplay.h" />
-    <ClInclude Include="Engine\Render\Screen\MultiDisplay.h" />
-    <ClInclude Include="Engine\Render\Screen\SingleDisplay.h" />
+    <ClInclude Include="Engine\Render\Screen\Display.h" />
     <ClInclude Include="Engine\Render\Screen\WindowsAPI.h" />
     <ClInclude Include="Engine\Render\Screen\SwapChain.h" />
     <ClInclude Include="Engine\SHEngine.h" />

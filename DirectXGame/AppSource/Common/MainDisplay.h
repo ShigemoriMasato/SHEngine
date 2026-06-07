@@ -1,5 +1,5 @@
 #pragma once
-#include <Render/Screen/MultiDisplay.h>
+#include <Render/Screen/Display.h>
 #include <Input/Input.h>
 
 class MainDisplay {
@@ -20,7 +20,7 @@ public:
 
 private:
 
-	std::unique_ptr<SHEngine::Screen::MultiDisplay> mainDisplay_ = nullptr;
+	std::unique_ptr<SHEngine::Screen::Display> mainDisplay_ = nullptr;
 	SHEngine::Input* input_ = nullptr;
 
 	Vector2 cursorPos_ = { 0.0f, 0.0f };

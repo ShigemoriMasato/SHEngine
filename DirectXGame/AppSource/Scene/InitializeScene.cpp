@@ -9,8 +9,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #endif
 
 void InitializeScene::Initialize() {
-	auto& windowSet = commonData_->mainWindow;
-	windowSet.first = std::make_unique<SHEngine::Screen::WindowsAPI>();
+	auto windowsAPI = std::make_unique<SHEngine::Screen::WindowsAPI>();
 	SHEngine::Screen::WindowsAPI::WindowDesc desc;
 	desc.width = 1280;
 	desc.height = 720;
@@ -26,10 +25,11 @@ void InitializeScene::Initialize() {
 		return DefWindowProc(hwnd, msg, wparam, lparam);
 		};
 
-	windowSet.first->Initialize(desc, engine_->GetHInstance());
-	windowSet.second = engine_->MakeWindow(windowSet.first.get(), 0xffffffff);
+	windowsAPI->Initialize(desc, engine_->GetHInstance());
+	commonData_->window = std::make_unique<SHEngine::Screen::SwapChain>();
+	commonData_->window->Initialize(textureManager_, 0x050505ff, std::move(windowsAPI));
 
-	input_->SetWindow(windowSet.first->GetHwnd());
+	input_->SetWindow(commonData_->window->GetWindowsAPI()->GetHwnd());
 
 	commonData_->display = std::make_unique<MainDisplay>();
 	commonData_->display->Initialize(desc.width, desc.height, 0x050505ff, textureManager_, input_);
@@ -140,14 +140,14 @@ std::unique_ptr<IScene> InitializeScene::Update() {
 }
 
 void InitializeScene::Draw() {
-	auto swapChain = commonData_->mainWindow.second.get();
+	auto swapChain = commonData_->window.get();
 	auto display = commonData_->display.get();
 	auto cmdObj = commonData_->cmdObject.get();
 
 	display->PreDraw(cmdObj);
 	display->PostDraw(cmdObj);
 
-	swapChain->PreDraw(cmdObj);
+	cmdObj->SetRenderTarget(swapChain, false);
 	engine_->DrawImGui();
 	swapChain->ToPresent(cmdObj);
 }

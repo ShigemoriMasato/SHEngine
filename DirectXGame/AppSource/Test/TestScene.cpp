@@ -27,7 +27,7 @@ std::unique_ptr<IScene> TestScene::Update() {
 
 void TestScene::Draw() {
 	auto cmdObj = commonData_->cmdObject.get();
-	auto window = commonData_->mainWindow.second.get();
+	auto window = commonData_->window.get();
 	auto display = commonData_->display->GetDisplay();
 
 	cmdObj->SetRenderTarget(display);
@@ -39,7 +39,7 @@ void TestScene::Draw() {
 	display->ToPresent(cmdObj);
 
 
-	window->PreDraw(cmdObj);
+	cmdObj->SetRenderTarget(window, false);
 
 #ifdef USE_IMGUI
 

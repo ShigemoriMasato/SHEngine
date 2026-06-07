@@ -1,6 +1,7 @@
 #include "SwapChain.h"
+#include <Utility/DirectUtilFuncs.h>
 
-void SHEngine::Screen::SwapChain::Initialize(DXDevice* device, TextureManager* textureManager, Command::Manager* cmdManager, WindowsAPI* window, uint32_t clearColor) {
+void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Command::Manager* cmdManager, uint32_t clearColor, std::unique_ptr<WindowsAPI> window) {
     logger_ = getLogger("Engine");
 
     logger_->info("=== Start create SwapChain ===");
@@ -21,7 +22,7 @@ void SHEngine::Screen::SwapChain::Initialize(DXDevice* device, TextureManager* t
 	auto commandQueue = cmdManager->GetCommandQueue(Command::Type::Direct);
 
     //コマンドキュー、ウィンドウハンドル、設定を渡して生成する
-    HRESULT hr = device->GetDxgiFactory()->CreateSwapChainForHwnd(
+    HRESULT hr = device_->GetDxgiFactory()->CreateSwapChainForHwnd(
         commandQueue,		        		                                //コマンドキュー
         hwnd,			                                                    //ウィンドウハンドル
         &swapChainDesc,	        		                                    //設定
@@ -40,7 +41,7 @@ void SHEngine::Screen::SwapChain::Initialize(DXDevice* device, TextureManager* t
         assert(SUCCEEDED(hr));
 
         //Displayを初期化する
-        displays_[i] = std::make_unique<SingleDisplay>();
+        displays_[i] = std::make_unique<Display>();
 		displays_[i]->Initialize(textureManager, swapChainResources, clearColor);
     }
 
@@ -48,21 +49,29 @@ void SHEngine::Screen::SwapChain::Initialize(DXDevice* device, TextureManager* t
     logger_->info("=== Complete create SwapChain ===");
 
 	currentBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+
+	window_ = std::move(window);
 }
 
-void SHEngine::Screen::SwapChain::PreDraw(Command::Object* cmdObject, bool isClear) {
-	cmdObject->SetRenderTarget(GetCurrentDisplay(), isClear);
+void SHEngine::Screen::SwapChain::Clear(Command::Object* cmdObject) {
+	auto cmdList = cmdObject->GetCommandList();
+    float color[4];
+    Vector4 clearColor = displays_[currentBufferIndex_]->GetTextureData()->GetClearColor();
+    color[0] = clearColor.x;
+    color[1] = clearColor.y;
+    color[2] = clearColor.z;
+    color[3] = clearColor.w;
+	cmdList->ClearRenderTargetView(GetRTVHandle(), color, 0, nullptr);
+}
+
+void SHEngine::Screen::SwapChain::ToRenderTarget(Command::Object* cmdObject) {
+	displays_[currentBufferIndex_]->ToRenderTarget(cmdObject);
 }
 
 void SHEngine::Screen::SwapChain::ToPresent(Command::Object* cmdObject) {
-    displays_[currentBufferIndex_]->ToPresent(cmdObject);
+	displays_[currentBufferIndex_]->ToPresent(cmdObject);
 }
 
 void SHEngine::Screen::SwapChain::ToTexture(Command::Object* cmdObject) {
-    displays_[currentBufferIndex_]->ToTexture(cmdObject);
-}
-
-void SHEngine::Screen::SwapChain::Present() {
-    swapChain_->Present(1, 0);
-    currentBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+	displays_[currentBufferIndex_]->ToTexture(cmdObject);
 }

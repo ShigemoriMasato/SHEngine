@@ -43,27 +43,9 @@ void DXList::Initialize(DXDevice* device, Type type) {
 	assert(SUCCEEDED(hr) && "Failed to close Command List");
 }
 
-bool DXList::CanExecute() const {
-	for (const auto& [queue, fence] : executed_) {
-		if (!queue->CheckFinishedJob(fence)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-void DXList::WaitForCanExecute() {
-	for (const auto& [queue, fence] : executed_) {
-		queue->WaitForFence(fence);
-	}
-	executed_.clear();
-}
-
-void SHEngine::Command::DXList::Execute(Queue* queue, std::vector<ID3D12CommandList*>& cmdLists) {
+void SHEngine::Command::DXList::Execute(std::vector<ID3D12CommandList*>& cmdLists) {
 	commandList_->Close();
 	cmdLists.push_back(commandList_.Get());
-
-	executed_.push_back({ queue, queue->GetLastSendFence() + 1 });
 }
 
 void DXList::ResetCommandList() {

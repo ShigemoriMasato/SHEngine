@@ -5,7 +5,7 @@
 
 using namespace SHEngine::Command;
 
-SHEngine::Command::Object::Object(DXDevice* device, Manager* manager, Type type, Queue* queue, int listNum) {
+SHEngine::Command::Object::Object(DXDevice* device, Type type, Queue* queue, int listNum) {
 	device_ = device;
 
 	if (listNum <= 0) {
@@ -20,16 +20,12 @@ SHEngine::Command::Object::Object(DXDevice* device, Manager* manager, Type type,
 	}
 
 	// コマンドオブジェクトのタイプとキューインデックスを保存
-	queue_ = queue;
-	type_ = type;
-	manager_ = manager;
 
 	ResetCommandList();
 }
 
 Object::~Object() {
 	WaitForGPUIdle(); // すべてのコマンドが終了されるのを待つ
-	manager_->ReleaseObject(queue_, this); // Managerからも削除する
 }
 
 bool Object::CanExecute() {

@@ -1,5 +1,6 @@
-#include "SingleDisplay.h"
+#include "Display.h"
 #include <Utility/DirectUtilFuncs.h>
+#include <imgui/imgui.h>
 
 namespace {
 
@@ -40,7 +41,7 @@ namespace {
 
 }
 
-void SHEngine::Screen::SingleDisplay::Initialize(TextureManager* textureManager, int width, int height, uint32_t clearColor) {
+void SHEngine::Screen::Display::Initialize(TextureManager* textureManager, int width, int height, uint32_t clearColor, std::string windowName) {
     ID3D12Device* device = device_->GetDevice();
     DSVManager* dsvManager = device_->GetDSVManager();
     RTVManager* rtvManager = device_->GetRTVManager();
@@ -52,14 +53,14 @@ void SHEngine::Screen::SingleDisplay::Initialize(TextureManager* textureManager,
     width_ = width;
     height_ = height;
 
-    PrivateInitialize(textureManager);
+    PrivateInitialize(textureManager, windowName);
 
 	currentBarrier_ = D3D12_RESOURCE_STATE_PRESENT;
 
     isOffScreen_ = true;
 }
 
-void SHEngine::Screen::SingleDisplay::Initialize(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor) {
+void SHEngine::Screen::Display::Initialize(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor, std::string windowName) {
     rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
 	//スワップチェーンのリソースからテクスチャを作成
@@ -68,14 +69,75 @@ void SHEngine::Screen::SingleDisplay::Initialize(TextureManager* textureManager,
 	width_ = textureData_->GetSize().first;
 	height_ = textureData_->GetSize().second;
 
-    PrivateInitialize(textureManager);
+    PrivateInitialize(textureManager, windowName);
 
 	currentBarrier_ = D3D12_RESOURCE_STATE_PRESENT;
 
 	isOffScreen_ = false;
 }
 
-void SHEngine::Screen::SingleDisplay::PrivateInitialize(SHEngine::TextureManager* textureManager) {
+void SHEngine::Screen::Display::DrawImGui() {
+#ifdef USE_IMGUI
+
+	Vector2 aspectRatio = { static_cast<float>(width_) / height_, 1.0f };
+
+    ImGui::Begin(windowName_.c_str());
+
+	ImVec2 windowSize = ImGui::GetContentRegionAvail();
+    float ratio;
+    if (windowSize.x / windowSize.y > aspectRatio.x) {
+		ratio = windowSize.y / height_;
+    } else {
+		ratio = windowSize.x / width_;
+    }
+	ImVec2 imageSize = ImVec2(width_ * ratio, height_ * ratio);
+
+	ImGui::Image(ImTextureRef(textureData_->GetGPUHandle().ptr), imageSize);
+    ImGui::End();
+
+#endif // USE_IMGUI
+
+}
+
+Vector2 SHEngine::Screen::Display::GetCursorPos(Vector2 windowCursor) {
+#ifdef USE_IMGUI
+
+	ImGui::Begin(windowName_.c_str());
+    ImVec2 windowPos = ImGui::GetCursorPos();
+	ImVec2 windowSize = ImGui::GetContentRegionAvail();
+	ImGui::End();
+	//ウィンドウ基準のカーソル位置をImGui上の位置に変換
+	Vector2 imguiCursor;
+	imguiCursor.x = (windowCursor.x - windowPos.x) / windowSize.x * width_;
+	imguiCursor.y = (windowCursor.y - windowPos.y) / windowSize.y * height_;
+
+    imguiCursor = {
+        std::clamp(imguiCursor.x, 0.0f, static_cast<float>(width_)),
+        std::clamp(imguiCursor.y, 0.0f, static_cast<float>(height_))
+    };
+
+	return imguiCursor;
+
+#endif
+
+    return windowCursor;
+}
+
+bool SHEngine::Screen::Display::IsHovering() {
+	bool isHovering = true;
+
+#ifdef USE_IMGUI
+
+	ImGui::Begin(windowName_.c_str());
+	isHovering = ImGui::IsWindowHovered();
+	ImGui::End();
+
+#endif // USE_IMGUI
+
+	return isHovering;
+}
+
+void SHEngine::Screen::Display::PrivateInitialize(SHEngine::TextureManager* textureManager, std::string windowName) {
     ID3D12Device* device = device_->GetDevice();
     DSVManager* dsvManager = device_->GetDSVManager();
     RTVManager* rtvManager = device_->GetRTVManager();
@@ -97,21 +159,27 @@ void SHEngine::Screen::SingleDisplay::PrivateInitialize(SHEngine::TextureManager
     int dsTextureIndex = textureManager->CreateDepthTexture(row);
     depthTextureData_ = textureManager->GetTextureData(dsTextureIndex);
 
+	if (windowName != "") {
+		windowName_ = windowName;
+	} else {
+		static int displayCount = 0;
+		windowName_ = "NoName_" + std::format("{:02d}", displayCount++);
+	}
 }
 
-void SHEngine::Screen::SingleDisplay::Clear(Command::Object* cmdObject) {
+void SHEngine::Screen::Display::Clear(Command::Object* cmdObject) {
     Vector4 color = textureData_->GetClearColor();
     //レンダーターゲットと深度ステンシルをクリア
     cmdObject->GetCommandList()->ClearRenderTargetView(GetRTVHandle(), &color.x, 0, nullptr);
 	cmdObject->GetCommandList()->ClearDepthStencilView(GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-void SHEngine::Screen::SingleDisplay::ToRenderTarget(Command::Object* cmdObject) {
+void SHEngine::Screen::Display::ToRenderTarget(Command::Object* cmdObject) {
     TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
 
-void SHEngine::Screen::SingleDisplay::ToPresent(Command::Object* cmdObject) {
+void SHEngine::Screen::Display::ToPresent(Command::Object* cmdObject) {
     if (isOffScreen_) {
 		ToTexture(cmdObject);
     } else {
@@ -120,15 +188,15 @@ void SHEngine::Screen::SingleDisplay::ToPresent(Command::Object* cmdObject) {
     }
 }
 
-void SHEngine::Screen::SingleDisplay::ToTexture(Command::Object* cmdObject) {
+void SHEngine::Screen::Display::ToTexture(Command::Object* cmdObject) {
 	TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-void SHEngine::Screen::SingleDisplay::TransitionBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
+void SHEngine::Screen::Display::TransitionBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
 	SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentBarrier_, textureData_->GetResource());
 }
 
-void SHEngine::Screen::SingleDisplay::TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
+void SHEngine::Screen::Display::TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
 	SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentDepthBarrier_, depthTextureData_->GetResource());
 }

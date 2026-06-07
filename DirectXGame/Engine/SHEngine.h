@@ -60,8 +60,6 @@ namespace SHEngine {
 			return cmdManager_->CreateCommandObject(type, listNum);
 		}
 
-		std::unique_ptr<Screen::SwapChain> MakeWindow(Screen::WindowsAPI* windowsApi, uint32_t clearColor);
-
 		HINSTANCE GetHInstance() const { return hInstance_; }
 
 	private: // Engine内で完結するクラス

@@ -116,9 +116,3 @@ void SHEngine::Engine::DrawImGui() {
 		imGuiWrapper_->Render();
 	}
 }
-
-std::unique_ptr<Screen::SwapChain> SHEngine::Engine::MakeWindow(Screen::WindowsAPI* windowsApi, uint32_t clearColor) {
-	auto swapChain = std::make_unique<Screen::SwapChain>();
-	swapChain->Initialize(device_.get(), textureManager_.get(), cmdManager_.get(), windowsApi, clearColor);
-	return std::move(swapChain);
-}

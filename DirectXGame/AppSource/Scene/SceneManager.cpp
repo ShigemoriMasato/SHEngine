@@ -28,7 +28,7 @@ void SceneManager::Draw() {
 	}
 
 	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, { commonData_->cmdObject.get() });
-	commonData_->mainWindow.second->Present();
+	commonData_->window->ToPresent(commonData_->cmdObject.get());
 }
 
 bool SceneManager::IsLoop() const {

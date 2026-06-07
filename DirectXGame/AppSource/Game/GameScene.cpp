@@ -103,7 +103,7 @@ std::unique_ptr<IScene> GameScene::Update() {
 void GameScene::Draw() {
 	auto cmdObj = commonData_->cmdObject.get();
 	auto display = commonData_->display.get();
-	auto window = commonData_->mainWindow.second->GetCurrentDisplay();
+	auto window = commonData_->window.second->GetCurrentDisplay();
 
 	effect_->Draw(display->GetDisplay());
 
