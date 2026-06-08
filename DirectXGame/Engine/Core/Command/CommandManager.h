@@ -4,9 +4,6 @@
 #include <Core/Command/Data/CommandObject.h>
 #include <Core/Command/Data/SHCmdQueue.h>
 
-//コマンドオブジェクトのエイリアス
-using CmdObj = SHEngine::Command::Object;
-
 namespace SHEngine::Command {
 
 	class Manager {

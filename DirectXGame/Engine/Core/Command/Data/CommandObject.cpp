@@ -5,7 +5,7 @@
 
 using namespace SHEngine::Command;
 
-SHEngine::Command::Object::Object(DXDevice* device, Type type, Queue* queue, int listNum) {
+SHEngine::Command::Object::Object(DXDevice* device, Type type, int listNum) {
 	device_ = device;
 
 	if (listNum <= 0) {
@@ -88,25 +88,27 @@ void SHEngine::Command::Object::ResetCommandList() {
 
 void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdLists) {
 	if (state_ == State::Close) {
-		//実行できるようにリセットする
-		ResetCommandList();
+		//実行済みの状態であるため、関数を終了させる
+		return;
 	}
 
-	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].Execute(queue_, cmdLists);
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].Execute(cmdLists);
 
+	state_ = State::Close;
+}
+
+void SHEngine::Command::Object::Close() {
+	if (state_ == State::Close) {
+		//すでにクローズされている状態であるため、関数を終了させる
+		return;
+	}
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].GetCommandList()->Close();
 	state_ = State::Close;
 }
 
 std::string SHEngine::Command::Object::Log() const {
 	std::string ans;
-	bool currentCmdListState = commandLists_[currentIndex_ % uint32_t(commandLists_.size())].CanExecute();
-	bool nextCmdListState = commandLists_[(currentIndex_ + 1) % uint32_t(commandLists_.size())].CanExecute();
-	bool prevCmdListState = commandLists_[(currentIndex_ - 1) % uint32_t(commandLists_.size())].CanExecute();
-
 	ans = "CommandObject - Type: " + std::to_string(static_cast<int>(type_)) +
-		", CurrentIndex: " + std::to_string(currentIndex_ % uint32_t(commandLists_.size())) +
-		", PrevState: " + (prevCmdListState ? "Finished" : "Processing") +
-		", CurrentState: " + (currentCmdListState ? "Finished" : "Processing") +
-		", NextState: " + (nextCmdListState ? "Finished" : "Processing");
+		", CurrentIndex: " + std::to_string(currentIndex_ % uint32_t(commandLists_.size()));
 	return ans;
 }

@@ -2,6 +2,7 @@
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
 #include <filesystem>
+#include <pix3.h>
 
 using namespace SHEngine;
 
@@ -81,12 +82,14 @@ void ImGuiWrapper::NewFrame() {
 
 void ImGuiWrapper::Render() {
 #ifdef USE_IMGUI
+
+
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdObject_->GetCommandList());
 
 #endif
 }
-
+                                                                                                                                                                      
 void ImGuiWrapper::EndFrame() {
 #ifdef USE_IMGUI
 	ImGui::EndFrame();
