@@ -27,7 +27,7 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 		postEffectObject->Initialize();
 		postEffectObject->psoConfig_.vs = "PostEffect/PostEffect.VS.hlsl";
 		postEffectObject->psoConfig_.ps = "PostEffect/" + psPath + ".PS.hlsl";
-		postEffectObject->psoConfig_.rootConfig.samplers = uint32_t(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
+		postEffectObject->psoConfig_.rootConfig.samplers = uint32_t(SHEngine::PSO::SamplerID::MagNearest);
 		postEffectObject->SetUseTexture(true);
 		postEffectObject->SetDrawData(drawData);
 		postEffectObject->CreateCBV(sizeof(int), ShaderType::PIXEL_SHADER, "PostEffect::SourceTexture");

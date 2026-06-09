@@ -56,7 +56,7 @@ std::unique_ptr<IScene> TitleScene::Update() {
 
 void TitleScene::Draw() {
 	auto cmdObj = commonData_->cmdObject.get();
-	auto window = commonData_->window.second.get();
+	auto window = commonData_->window.get();
 	auto display = commonData_->display.get();
 
 	display->PreDraw(cmdObj);
@@ -73,7 +73,7 @@ void TitleScene::Draw() {
 
 #else
 
-	cmdObj->SetRenderTarget(window->GetCurrentDisplay());
+	cmdObj->SetRenderTarget(window);
 
 #endif
 

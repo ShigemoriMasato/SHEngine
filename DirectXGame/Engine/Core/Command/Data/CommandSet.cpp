@@ -4,7 +4,6 @@
 using namespace SHEngine::Command;
 
 SHEngine::Command::DXList::~DXList() {
-	WaitForCanExecute(); // コマンドリストが実行可能になるまで待機
 }
 
 void DXList::Initialize(DXDevice* device, Type type) {
@@ -49,8 +48,6 @@ void SHEngine::Command::DXList::Execute(std::vector<ID3D12CommandList*>& cmdList
 }
 
 void DXList::ResetCommandList() {
-	WaitForCanExecute(); // コマンドリストが実行可能になるまで待機
-
 	//コマンドリストとアロケータをリセット
 	HRESULT hr = commandAllocator_->Reset();
 	assert(SUCCEEDED(hr) && "Failed to reset Command Allocator");

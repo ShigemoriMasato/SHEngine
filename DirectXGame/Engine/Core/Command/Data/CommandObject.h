@@ -34,8 +34,11 @@ namespace SHEngine::Command {
 		/// @brief コマンドリストを取得
 		ID3D12GraphicsCommandList* GetCommandList() { return commandLists_[currentIndex_ % uint32_t(commandLists_.size())].GetCommandList(); }
 
-		// / @brief コマンドリストをクローズして、実行できる状態にする
+		/// @brief コマンドリストをクローズして、実行できる状態にする
 		void Close();
+
+		/// @brief このフレームで使用するコマンドリストのインデックスを取得
+		uint32_t GetCurrentID() const { return currentIndex_ % uint32_t(commandLists_.size()); }
 
 		/// @brief 現在の状態を簡単に文字列であらわす
 		std::string Log() const;

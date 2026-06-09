@@ -43,7 +43,7 @@ void InitializeScene::Initialize() {
 	commonData_->postEffectDrawDataIndex = drawDataManager_->CreateDrawData();
 
 	commonData_->cmdObject = engine_->CreateCommandObject(SHEngine::Command::Type::Direct);
-	engine_->ImGuiActivate(windowSet.first.get(), commonData_->cmdObject.get());
+	engine_->ImGuiActivate(commonData_->window->GetWindowsAPI(), commonData_->cmdObject.get());
 
 	textureManager_->LoadAllTextures();
 
