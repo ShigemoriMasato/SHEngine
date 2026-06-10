@@ -40,8 +40,26 @@ int FontLoader::Load(const std::string& filePath, int fontSize) {
 	//フォントデータを新規作成
 	fontBuffer = CreateFontBuffer(factPath.string(), fontSize);
 
+	// colorMapからScratchImageを作成する
+	DirectX::ScratchImage scratchImage;
+	HRESULT hr = scratchImage.Initialize2D(DXGI_FORMAT_R8G8B8A8_UNORM, atlas_width_, atlas_height_, 1, 1);
+	assert(SUCCEEDED(hr));
 
-	int textureID = textureManager_->CreateBitmapTexture(atlas_width_, atlas_height_, fontBuffer.atlasData);
+	const DirectX::Image* img = scratchImage.GetImage(0, 0, 0);
+
+	//データのコピー
+	const uint8_t* srcData = reinterpret_cast<const uint8_t*>(fontBuffer.atlasData.data());
+	uint8_t* destData = img->pixels;
+
+	size_t rowBytes = atlas_width_ * sizeof(uint32_t);
+
+	//行ごとにコピー
+	for (size_t y = 0; y < atlas_height_; ++y) {
+		std::memcpy(destData + y * rowBytes, srcData + y * rowBytes, rowBytes);
+	}
+
+
+	int textureID = textureManager_->CreateBitmapTexture(atlas_width_, atlas_height_, scratchImage);
 	fontBuffer.textureIndex = textureID;
 	fontIndex_[cacheFileName] = fontBuffer;
 

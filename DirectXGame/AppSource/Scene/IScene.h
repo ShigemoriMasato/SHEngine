@@ -16,6 +16,7 @@ public:
 		fontLoader_ = engine->GetFontLoader();
 		modelManager_ = engine->GetModelManager();
 		drawDataManager_ = engine->GetDrawDataManager();
+		directContext_ = engine->GetDirectCommandContext();
 		input_ = engine->GetInput();
 		engine_ = engine;
 		commonData_ = commonData;
@@ -29,6 +30,7 @@ protected:
 	SHEngine::FontLoader* fontLoader_ = nullptr;
 	SHEngine::ModelManager* modelManager_ = nullptr;
 	SHEngine::DrawDataManager* drawDataManager_ = nullptr;
+	SHEngine::DirectCommandContext* directContext_ = nullptr;
 
 	SHEngine::Input* input_ = nullptr;
 

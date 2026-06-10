@@ -6,25 +6,27 @@ using namespace SHEngine;
 void DirectCommandContext::Initialize(DXDevice* device, int initCmdObjNum) {
 	queue_ = std::make_unique<Command::Queue>(device, Command::Type::Direct);
 
+	//必ず一つ以上は作成する
+	initCmdObjNum = std::max(1, initCmdObjNum);
+
 	cmdObjects_.reserve(initCmdObjNum);
 	for (int i = 0; i < initCmdObjNum; i++) {
-		cmdObjects_.push_back(std::make_unique<Command::Object>(device, Command::Type::Direct));
+		cmdObjects_.push_back(std::make_unique<Command::Object>(device, Command::Type::Direct, 3));
 	}
 }
 
 void SHEngine::DirectCommandContext::BeginFrame() {
-	uint32_t cmdListIndex = cmdObjects_[currentCmdObjIndex_]->GetCurrentID();
-	queue_->WaitForFence(lastWaitFence_[cmdListIndex]);
 	currentCmdObjIndex_ = 0;
+	cmdObjects_[currentCmdObjIndex_]->ResetCommandList();
 }
 
-Command::WaitFence SHEngine::DirectCommandContext::GetFence() {
+Command::WaitFence SHEngine::DirectCommandContext::MiddleExecute() {
 	auto cmdObj = GetCurrentCmdObj();
 
 	// コマンドオブジェクトを次のものに切り替える
 	currentCmdObjIndex_++;
 	if (currentCmdObjIndex_ >= cmdObjects_.size()) {
-		auto& newCmdObj = cmdObjects_.emplace_back(std::make_unique<Command::Object>(device_, Command::Type::Direct, 3));
+		cmdObjects_.emplace_back(std::make_unique<Command::Object>(device_, Command::Type::Direct, 3));
 	}
 	cmdObjects_[currentCmdObjIndex_]->ResetCommandList();
 
@@ -35,7 +37,7 @@ Command::WaitFence SHEngine::DirectCommandContext::GetFence() {
 }
 
 void SHEngine::DirectCommandContext::EndFrame() {
-	auto fence = GetFence();
+	auto fence = MiddleExecute();
 
 	uint32_t cmdListIndex = cmdObjects_[currentCmdObjIndex_]->GetCurrentID();
 	lastWaitFence_[cmdListIndex] = fence;

@@ -62,26 +62,6 @@ namespace {
 		return resource;
 	}
 
-	[[nodiscard]]
-	ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) {
-		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-		HRESULT hr = DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
-		assert(SUCCEEDED(hr));
-		uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
-		ID3D12Resource* intermediateResource = Func::CreateBufferResource(device, intermediateSize);
-		UpdateSubresources(commandList, texture, intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
-
-		D3D12_RESOURCE_BARRIER barrier{};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = texture;
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		commandList->ResourceBarrier(1, &barrier);
-		return intermediateResource;
-	}
-
 }
 
 void TextureData::Release() {
@@ -192,7 +172,7 @@ void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVMana
 	textureResource_->SetName(LPCWSTR(ConvertString("DepthTexture : " + std::to_string(debugTextureCount++)).c_str()));
 }
 
-ComPtr<ID3D12Resource> TextureData::Create(uint32_t width, uint32_t height, std::vector<uint32_t> colorMap, ID3D12Device* device, SRVManager* srvManager, ID3D12GraphicsCommandList* cmdList) {
+void TextureData::Create(uint32_t width, uint32_t height, ID3D12Device* device, SRVManager* srvManager) {
 	//TextureResource
 	D3D12_RESOURCE_DESC desc{};
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -224,60 +204,11 @@ ComPtr<ID3D12Resource> TextureData::Create(uint32_t width, uint32_t height, std:
 	srvHandle_.UpdateHandle(srvManager, 0);
 	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
 
-	uint64_t uploadSize = 0;
-	device->GetCopyableFootprints(
-		&desc, 0, 1, 0,
-		nullptr, nullptr, nullptr,
-		&uploadSize
-	);
-
-	D3D12_HEAP_PROPERTIES uploadHeap{};
-	uploadHeap.Type = D3D12_HEAP_TYPE_UPLOAD;
-
-	D3D12_RESOURCE_DESC uploadDesc{};
-	uploadDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	uploadDesc.Width = uploadSize;
-	uploadDesc.Height = 1;
-	uploadDesc.DepthOrArraySize = 1;
-	uploadDesc.MipLevels = 1;
-	uploadDesc.SampleDesc.Count = 1;
-	uploadDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-	ComPtr<ID3D12Resource> intermediateResource;
-
-	device->CreateCommittedResource(
-		&uploadHeap,
-		D3D12_HEAP_FLAG_NONE,
-		&uploadDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&intermediateResource)
-	);
-
-	// colorMap から直接サブリソースを作ってアップロードする
-	assert(colorMap.size() == static_cast<size_t>(width) * static_cast<size_t>(height) && "colorMap size mismatch");
-	D3D12_SUBRESOURCE_DATA subresourceData{};
-	subresourceData.pData = colorMap.data();
-	subresourceData.RowPitch = static_cast<SIZE_T>(width) * sizeof(uint32_t);
-	subresourceData.SlicePitch = subresourceData.RowPitch * static_cast<SIZE_T>(height);
-
-	UpdateSubresources(cmdList, textureResource_.Get(), intermediateResource.Get(), 0, 0, 1, &subresourceData);
-
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = textureResource_.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	cmdList->ResourceBarrier(1, &barrier);
-
 	textureResource_->SetName(LPCWSTR(ConvertString("BitMapTexture : " + std::to_string(debugTextureCount++)).c_str()));
 
-	return intermediateResource;
 }
 
-ComPtr<ID3D12Resource> TextureData::Create(std::string filePath, ID3D12Device* device, SRVManager* srvManager, ID3D12GraphicsCommandList* cmdList) {
+DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* device, SRVManager* srvManager) {
 	std::filesystem::path path(filePath);
 	if (path.extension() == ".dds") {
 		type_ = Type::DDS;
@@ -310,11 +241,8 @@ ComPtr<ID3D12Resource> TextureData::Create(std::string filePath, ID3D12Device* d
 	//SRVを作成する
 	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
 
-	//テクスチャデータをアップロードするためのリソースを作成し、コマンドリストにコピーコマンドを記録する
-	ComPtr<ID3D12Resource> intermediateResource;
-	intermediateResource.Attach(UploadTextureData(textureResource_.Get(), mipImages, device, cmdList));
-
 	textureResource_->SetName(LPCWSTR(ConvertString("LoadTexture : " + std::to_string(debugTextureCount++)).c_str()));
 
-	return intermediateResource;
+	//テクスチャデータをアップロードするたに必要なデータを返す
+	return mipImages;
 }

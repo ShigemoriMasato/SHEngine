@@ -1,7 +1,7 @@
 #include "SwapChain.h"
 #include <Utility/DirectUtilFuncs.h>
 
-void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Command::Manager* cmdManager, uint32_t clearColor, std::unique_ptr<WindowsAPI> window) {
+void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, DirectCommandContext* directContext, uint32_t clearColor, std::unique_ptr<WindowsAPI> window) {
     logger_ = getLogger("Engine");
 
     logger_->info("=== Start create SwapChain ===");
@@ -19,7 +19,7 @@ void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Com
     swapChainDesc.BufferCount = bufferCount_;	//バッファの数
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;   	//モニタに映したら捨てる
 
-	auto commandQueue = cmdManager->GetCommandQueue(Command::Type::Direct);
+    auto commandQueue = directContext->GetCommandQueue();
 
     //コマンドキュー、ウィンドウハンドル、設定を渡して生成する
     HRESULT hr = device_->GetDxgiFactory()->CreateSwapChainForHwnd(

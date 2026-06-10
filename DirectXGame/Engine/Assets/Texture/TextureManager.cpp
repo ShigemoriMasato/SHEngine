@@ -6,18 +6,36 @@
 
 using namespace SHEngine;
 
-SHEngine::TextureManager::~TextureManager() {
-	cmdObject_->WaitForGPUIdle();
+namespace {
+
+	[[nodiscard]]
+	ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) {
+		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+		HRESULT hr = DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+		assert(SUCCEEDED(hr));
+		uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
+		ID3D12Resource* intermediateResource = Func::CreateBufferResource(device, intermediateSize);
+		UpdateSubresources(commandList, texture, intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
+
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = texture;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &barrier);
+		return intermediateResource;
+	}
+
 }
 
-void TextureManager::Initialize(DXDevice* device, Command::Manager* manager) {
-	device_ = device;
-	cmdObject_ = manager->CreateCommandObject(Command::Type::Texture, 1);
-	srvManager_ = device->GetSRVManager();
-	manager_ = manager;
+SHEngine::TextureManager::~TextureManager() {
+}
 
-	cmdObject_->WaitForGPUIdle();
-	cmdObject_->ResetCommandList();
+void TextureManager::Initialize(DXDevice* device) {
+	device_ = device;
+	srvManager_ = device->GetSRVManager();
 
 	logger_ = getLogger("Engine");
 
@@ -95,13 +113,16 @@ int TextureManager::LoadTexture(const std::string& filePath) {
 		return it->second;
 	}
 
-	auto cmdList = cmdObject_->GetCommandList();
-	intermediateResources_.push_back(textureData->Create(factFilePath, device_->GetDevice(), srvManager_, cmdList));
+	auto scratchImage = textureData->Create(factFilePath, device_->GetDevice(), srvManager_);
 	int offset = textureData->GetOffset();
+
+	uploadStandby_.emplace_back(offset, std::move(scratchImage));
+
 	textureData->textureManager_ = this;
 	textureDataList_[offset] = std::move(textureData);
 	CheckMaxCount(offset);
 	loadedTexturePaths_[factFilePath] = offset;
+
 	return offset;
 }
 
@@ -133,14 +154,16 @@ int SHEngine::TextureManager::CreateDepthTexture(ID3D12Resource* resource) {
 	return offset;
 }
 
-int TextureManager::CreateBitmapTexture(uint32_t width, uint32_t height, std::vector<uint32_t> colorMap) {
+int TextureManager::CreateBitmapTexture(uint32_t width, uint32_t height, DirectX::ScratchImage& scratchImage) {
 	auto textureData = std::make_unique<TextureData>();
-	auto cmdList = cmdObject_->GetCommandList();
-	auto data = textureData->Create(width, height, colorMap, device_->GetDevice(), srvManager_, cmdList);
-	intermediateResources_.push_back(data);
-	textureData->textureManager_ = this;
+	textureData->Create(width, height, device_->GetDevice(), srvManager_);
 	int offset = textureData->GetOffset();
+
+	uploadStandby_.emplace_back(offset, std::move(scratchImage));
+
+	textureData->textureManager_ = this;
 	textureDataList_[offset] = std::move(textureData);
+
 	return offset;
 }
 
@@ -164,20 +187,19 @@ TextureData* TextureManager::GetTextureData(int handle) {
 	return textureDataList_[handle].get();
 }
 
-void TextureManager::UploadResources() {
+void TextureManager::UploadResources(CmdObj* cmdObj) {
 	//中間リソースがなければ何もしない
-	if (intermediateResources_.empty()) {
+	if (uploadStandby_.empty()) {
 		return;
 	}
 
-	//実行
-	manager_->Execute(Command::Type::Texture, { cmdObject_.get() });
+	intermediateResources_.reserve(intermediateResources_.size() + uploadStandby_.size());
 
-	//コマンドリストをリセット
-	cmdObject_->ResetCommandList();
-
-	//中間リソースをクリア
-	intermediateResources_.clear();
+	for (auto& [offset, scratchImage] : uploadStandby_) {
+		auto textureData = textureDataList_[offset].get();
+		auto intermediateResource = UploadTextureData(textureData->GetResource(), scratchImage, device_->GetDevice(), cmdObj->GetCommandList());
+		intermediateResources_.push_back(intermediateResource);
+	}
 }
 
 void TextureManager::CheckMaxCount(int offset) {

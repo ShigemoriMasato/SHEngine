@@ -27,7 +27,7 @@ void InitializeScene::Initialize() {
 
 	windowsAPI->Initialize(desc, engine_->GetHInstance());
 	commonData_->window = std::make_unique<SHEngine::Screen::SwapChain>();
-	commonData_->window->Initialize(textureManager_, 0x050505ff, std::move(windowsAPI));
+	commonData_->window->Initialize(textureManager_, directContext_, 0x050505ff, std::move(windowsAPI));
 
 	input_->SetWindow(commonData_->window->GetWindowsAPI()->GetHwnd());
 
@@ -42,8 +42,7 @@ void InitializeScene::Initialize() {
 	drawDataManager_->AddVertexBuffer(vertices);
 	commonData_->postEffectDrawDataIndex = drawDataManager_->CreateDrawData();
 
-	commonData_->cmdObject = engine_->CreateCommandObject(SHEngine::Command::Type::Direct);
-	engine_->ImGuiActivate(commonData_->window->GetWindowsAPI(), commonData_->cmdObject.get());
+	engine_->ImGuiActivate(commonData_->window->GetWindowsAPI());
 
 	textureManager_->LoadAllTextures();
 
@@ -131,8 +130,6 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
-	commonData_->cmdObject->ResetCommandList();
-
 	//return std::make_unique<TestScene>();
 	return std::make_unique<GameScene>();
 
@@ -142,12 +139,12 @@ std::unique_ptr<IScene> InitializeScene::Update() {
 void InitializeScene::Draw() {
 	auto swapChain = commonData_->window.get();
 	auto display = commonData_->display.get();
-	auto cmdObj = commonData_->cmdObject.get();
+	auto cmdObj = directContext_->GetCurrentCmdObj();
 
 	display->PreDraw(cmdObj);
 	display->PostDraw(cmdObj);
 
 	cmdObj->SetRenderTarget(swapChain, false);
-	engine_->DrawImGui();
+	engine_->DrawImGui(cmdObj);
 	swapChain->ToPresent(cmdObj);
 }

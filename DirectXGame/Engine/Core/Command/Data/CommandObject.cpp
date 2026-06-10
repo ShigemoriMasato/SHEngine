@@ -16,12 +16,12 @@ SHEngine::Command::Object::Object(DXDevice* device, Type type, int listNum) {
 	// コマンドリストを作成
 	commandLists_.resize(listNum);
 	for (auto& cmdList : commandLists_) {
-		cmdList.Initialize(device_, type);
+		cmdList = std::make_unique<DXList>();
+		cmdList->Initialize(device_, type);
 	}
 
 	// コマンドオブジェクトのタイプとキューインデックスを保存
 
-	ResetCommandList();
 }
 
 Object::~Object() {
@@ -30,12 +30,12 @@ Object::~Object() {
 
 bool Object::CanExecute() {
 	// 現在のコマンドリストが実行可能かどうかを確認
-	return commandLists_[currentIndex_ % uint32_t(commandLists_.size())].CanExecute();
+	return commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->CanExecute();
 }
 
 void SHEngine::Command::Object::WaitForGPUIdle() {
 	for (auto& cmdList : commandLists_) {
-		cmdList.WaitForCanExecute();
+		cmdList->WaitFenceInCPU();
 	}
 }
 
@@ -82,7 +82,9 @@ void SHEngine::Command::Object::ResetCommandList() {
 		return;
 	}
 
-	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].ResetCommandList();
+	WaitFenceInCPU();
+
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->ResetCommandList();
 	state_ = State::Open;
 }
 
@@ -92,9 +94,17 @@ void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdList
 		return;
 	}
 
-	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].Execute(cmdLists);
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->Execute(cmdLists);
 
 	state_ = State::Close;
+}
+
+void SHEngine::Command::Object::SetFence(WaitFence fence) {
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->SetFence(fence);
+}
+
+void SHEngine::Command::Object::WaitFenceInCPU() {
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->WaitFenceInCPU();
 }
 
 void SHEngine::Command::Object::Close() {
@@ -102,7 +112,7 @@ void SHEngine::Command::Object::Close() {
 		//すでにクローズされている状態であるため、関数を終了させる
 		return;
 	}
-	commandLists_[currentIndex_ % uint32_t(commandLists_.size())].GetCommandList()->Close();
+	commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->GetCommandList()->Close();
 	state_ = State::Close;
 }
 

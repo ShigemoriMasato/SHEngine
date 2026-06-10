@@ -1,13 +1,14 @@
 #pragma once
 #include "Display.h"
 #include "WindowsAPI.h"
+#include <Render/Command/DirectCommandContext.h>
 
 namespace SHEngine::Screen {
 
 	class SwapChain : public IDisplay {
 	public:
 
-		void Initialize(TextureManager* textureManager, Command::Manager* cmdManager, uint32_t clearColor, std::unique_ptr<WindowsAPI> window);
+		void Initialize(TextureManager* textureManager, DirectCommandContext* directContext, uint32_t clearColor, std::unique_ptr<WindowsAPI> window);
 
 		/// @brief 画面をClearColorで塗りつぶす
 		void Clear(Command::Object* cmdObject) override;

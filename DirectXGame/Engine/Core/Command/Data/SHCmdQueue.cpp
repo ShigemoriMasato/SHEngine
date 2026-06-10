@@ -34,20 +34,10 @@ SHEngine::Command::Queue::~Queue() {
 	}
 }
 
-void SHEngine::Command::Queue::RegisterObject(Object* object) {
-	objects_.push_back(object);
-}
-
 SHEngine::Command::WaitFence SHEngine::Command::Queue::Execute(std::vector<Object*> cmdObjs) {
 	std::vector<ID3D12CommandList*> cmdLists;
-	if (cmdObjs.empty()) {
-		for (const auto& obj : objects_) {
-			obj->Execute(cmdLists);
-		}
-	} else {
-		for(const auto& obj : cmdObjs) {
-			obj->Execute(cmdLists);
-		}
+	for (const auto& obj : cmdObjs) {
+		obj->Execute(cmdLists);
 	}
 
 	commandQueue_->ExecuteCommandLists(UINT(cmdLists.size()), cmdLists.data());
@@ -55,7 +45,13 @@ SHEngine::Command::WaitFence SHEngine::Command::Queue::Execute(std::vector<Objec
 
 	WaitFence result = {};
 	result.fence = fence_.Get();
+	result.fenceEvent = fenceEvent_;
 	result.value = fenceValue_;
+
+	for (auto& obj : cmdObjs) {
+		obj->SetFence(result);
+	}
+
 	return result;
 }
 
@@ -67,21 +63,23 @@ bool SHEngine::Command::Queue::CheckFinishedJob(uint64_t fenceValue) {
 	return fence_->GetCompletedValue() < fenceValue;
 }
 
-void SHEngine::Command::Queue::WaitForFence(uint64_t fence) {
-	uint64_t currentFence = fence_->GetCompletedValue();
-	if (currentFence < fence) {
-		//完了していなければイベントをセットして待機
-		HRESULT hr = fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
-		assert(SUCCEEDED(hr) && "Failed to set event on completion");
-		WaitForSingleObject(fenceEvent_, INFINITE);
+void SHEngine::Command::Queue::WaitFenceInCPU(const WaitFence& fence) {
+	if (!(fence.fence->GetCompletedValue() >= fence.value)) {
+		return;
 	}
+
+	HRESULT hr = fence.fence->SetEventOnCompletion(fence.value, fence.fenceEvent);
+	assert(SUCCEEDED(hr));
+
+	WaitForSingleObject(fence.fenceEvent, INFINITE);
 }
 
-void SHEngine::Command::Queue::WaitForFence(const WaitFence& waitFence) {
-	commandQueue_->Wait(waitFence.fence, waitFence.value);
+void SHEngine::Command::Queue::WaitFenceInGPU(const WaitFence& fence) {
+	commandQueue_->Wait(fence.fence, fence.value);
 }
 
 void SHEngine::Command::Queue::StopGPU() {
 	commandQueue_->Signal(fence_.Get(), ++fenceValue_);
-	WaitForFence(fenceValue_);
+	WaitFence fence = { fence_.Get(), fenceEvent_, fenceValue_ };
+	WaitFenceInCPU(fence);
 }

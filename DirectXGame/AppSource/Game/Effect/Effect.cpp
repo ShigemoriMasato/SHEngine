@@ -1,11 +1,9 @@
 #include "Effect.h"
 
 void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* engine, SHEngine::TextureManager* textureManager) {
+	/*
 	engine_ = engine;
 	textureManager_ = textureManager;
-
-	compute_ = engine_->CreateCommandObject(SHEngine::Command::Type::Compute);
-	direct_ = engine_->CreateCommandObject(SHEngine::Command::Type::Direct);
 
 	compute_->ResetCommandList();
 
@@ -25,33 +23,34 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 	waveParticle_->Initialize(textureID, pool, 1);
 
 	compute_->WaitForGPUIdle();
+	*/
 }
 
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
-	//全部のコマンドリストをリセット
-	compute_->ResetCommandList();
-	direct_->ResetCommandList();
+	////全部のコマンドリストをリセット
+	//compute_->ResetCommandList();
+	//direct_->ResetCommandList();
 
-	static Logger logger = getLogger("Command");
+	//static Logger logger = getLogger("Command");
 
-	//パーティクルの更新処理
-	waveParticle_->Update(compute_.get(), deltaTime);
+	////パーティクルの更新処理
+	//waveParticle_->Update(compute_.get(), deltaTime);
 
-	//Queueに登録して実行
-	computeFence_ = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, { compute_.get() });
+	////Queueに登録して実行
+	//computeFence_ = engine_->ExecuteCommand(SHEngine::Command::Type::Compute, { compute_.get() });
 
-	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime);
+	//particlePool_->Update(vpMatrix, billboardMatrix, deltaTime);
 }
 
 void Effect::Draw(SHEngine::Screen::IDisplay* display) {
-	//描画
-	direct_->SetRenderTarget(display, true);
-	particlePool_->Draw(direct_.get());
+	////描画
+	//direct_->SetRenderTarget(display, true);
+	//particlePool_->Draw(direct_.get());
 
-	//更新処理の後にこの関数を呼び出す
-	//engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);
-	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, { direct_.get() });
+	////更新処理の後にこの関数を呼び出す
+	////engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);
+	//engine_->ExecuteCommand(SHEngine::Command::Type::Direct, { direct_.get() });
 
-	particlePool_->DrawImGui();
-	waveParticle_->DrawImGui();
+	//particlePool_->DrawImGui();
+	//waveParticle_->DrawImGui();
 }

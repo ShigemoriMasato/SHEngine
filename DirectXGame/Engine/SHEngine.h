@@ -13,6 +13,7 @@
 #include <Compute/PSO/CSPSOManager.h>
 #include <Assets/Audio/AudioManager.h>
 #include <Core/FrameCounter.h>
+#include <Render/Command/DirectCommandContext.h>
 
 namespace SHEngine {
 
@@ -32,39 +33,30 @@ namespace SHEngine {
 
 		void WaitFence(Command::WaitFence& waitFence, Command::Type type);
 
-		// コマンドの実行(Signalも送る)
-		Command::WaitFence ExecuteCommand(Command::Type type, std::vector<CmdObj*> cmdObjs = {}) {
-			return cmdManager_->Execute(type, cmdObjs);
-		}
-
 		void StopGPU(Command::Type type) {
-			cmdManager_->StopGPU(type);
+			directCmdContext_->StopGPU();
 		}
 
 		// ImGuiの有効化
-		void ImGuiActivate(Screen::WindowsAPI* window, Command::Object* cmdObj);
+		void ImGuiActivate(Screen::WindowsAPI* window);
 
 		// ImGuiの描画
-		void DrawImGui();
+		void DrawImGui(CmdObj* cmdObj);
 
 	public: // Getter
 		TextureManager* GetTextureManager() { return textureManager_.get(); }
 		FontLoader* GetFontLoader() { return fontLoader_.get(); }
 		ModelManager* GetModelManager() { return modelManager_.get(); }
 		DrawDataManager* GetDrawDataManager() { return drawDataManager_.get(); }
+		DirectCommandContext* GetDirectCommandContext() { return directCmdContext_.get(); }
 		Input* GetInput() { return input_.get(); }
 		FPSObserver* GetFPSObserver() { return fpsObserver_.get(); }
 		float GetDeltaTime() { return fpsObserver_->GetDeltatime(); }
-
-		std::unique_ptr<Command::Object> CreateCommandObject(Command::Type type, int listNum = 3) {
-			return cmdManager_->CreateCommandObject(type, listNum);
-		}
 
 		HINSTANCE GetHInstance() const { return hInstance_; }
 
 	private: // Engine内で完結するクラス
 		std::unique_ptr<DXDevice> device_;
-		std::unique_ptr<Command::Manager> cmdManager_;
 		std::unique_ptr<ImGuiWrapper> imGuiWrapper_;
 		std::unique_ptr<PSO::Editor> psoEditor_;
 		std::unique_ptr<PSO::CSPSOManager> csPsoManager_;
@@ -74,6 +66,7 @@ namespace SHEngine {
 		std::unique_ptr<FontLoader> fontLoader_;
 		std::unique_ptr<ModelManager> modelManager_;
 		std::unique_ptr<DrawDataManager> drawDataManager_;
+		std::unique_ptr<DirectCommandContext> directCmdContext_;
 
 		std::unique_ptr<Input> input_;
 		std::unique_ptr<FPSObserver> fpsObserver_;

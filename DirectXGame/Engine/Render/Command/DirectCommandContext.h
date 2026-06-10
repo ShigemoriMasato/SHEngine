@@ -9,16 +9,23 @@ namespace SHEngine {
 
 		void Initialize(DXDevice* device, int initCmdObjNum = 3);
 
+		/// @brief コマンドオブジェクトを取得する。Fenceを取得するごとに切り替わるので、都度取得して使用すること。
 		CmdObj* GetCurrentCmdObj() { return cmdObjects_[currentCmdObjIndex_].get(); }
 
 		/// @brief コマンドを積むためのコマンドオブジェクトを準備する
 		void BeginFrame();
 
-		/// @brief コマンドを実行して、GPUが処理を終えるのを待つためのフェンスを返す
-		Command::WaitFence GetFence();
+		/// @brief コマンドを実行して、CmdObjを切り替え。GPUが処理を終えるのを待つためのフェンスを返す
+		Command::WaitFence MiddleExecute();
 
 		/// @brief コマンドを実行する
 		void EndFrame();
+
+		// @brief コマンドキューの生ポインタの取得
+		ID3D12CommandQueue* GetCommandQueue() { return queue_->GetQueue(); }
+
+		// @brief GPUの処理がすべて終わるのを待つ
+		void StopGPU() { queue_->StopGPU(); }
 
 	private:
 

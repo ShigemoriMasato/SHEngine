@@ -32,7 +32,7 @@ namespace SHEngine::Command {
 		Screen::IDisplay* GetRenderTarget() const { return renderTarget_; }
 
 		/// @brief コマンドリストを取得
-		ID3D12GraphicsCommandList* GetCommandList() { return commandLists_[currentIndex_ % uint32_t(commandLists_.size())].GetCommandList(); }
+		ID3D12GraphicsCommandList* GetCommandList() { return commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->GetCommandList(); }
 
 		/// @brief コマンドリストをクローズして、実行できる状態にする
 		void Close();
@@ -50,8 +50,12 @@ namespace SHEngine::Command {
 		/// @brief CommandListを実行する
 		void Execute(std::vector<ID3D12CommandList*>& cmdLists);
 
+		void SetFence(WaitFence fence);
+
+		void WaitFenceInCPU();
+
 		Type type_;
-		std::vector<DXList> commandLists_;
+		std::vector<std::unique_ptr<DXList>> commandLists_;
 		DXDevice* device_ = nullptr;
 
 		//コマンドリストの状態管理

@@ -35,7 +35,6 @@ void GameScene::Initialize() {
 	//PostEffectの初期化
 	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
 	postEffect_->Initialize(textureManager_, pedd);		//描画だけするやつなのでコピーオンリー
-	postEffectConfig_.cmdObj = commonData_->cmdObject.get();
 	postEffectConfig_.origin = commonData_->display->GetDisplay();
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
@@ -64,7 +63,6 @@ void GameScene::Initialize() {
 
 std::unique_ptr<IScene> GameScene::Update() {
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
-	commonData_->cmdObject->ResetCommandList();
 
 	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
 
@@ -101,9 +99,9 @@ std::unique_ptr<IScene> GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	auto cmdObj = commonData_->cmdObject.get();
+	auto cmdObj = directContext_->GetCurrentCmdObj();
 	auto display = commonData_->display.get();
-	auto window = commonData_->window.second->GetCurrentDisplay();
+	auto window = commonData_->window.get();
 
 	effect_->Draw(display->GetDisplay());
 
@@ -213,7 +211,6 @@ void GameScene::Draw() {
 		uint32_t(gaussBlur) << 4;
 #endif
 
-	engine_->DrawImGui();
+	engine_->DrawImGui(cmdObj);
 	window->ToPresent(cmdObj);
-
 }

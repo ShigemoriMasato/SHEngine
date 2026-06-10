@@ -9,6 +9,12 @@ namespace SHEngine::Command {
 		Compute
 	};
 
+	struct WaitFence {
+		ID3D12Fence* fence;
+		HANDLE fenceEvent;
+		UINT64 value = 0;
+	};
+
 	class Queue;
 
 	class DXList {
@@ -22,6 +28,15 @@ namespace SHEngine::Command {
 		/// @brief コマンドを実行できる状態にして渡す
 		void Execute(std::vector<ID3D12CommandList*>& cmdLists);
 
+		/// @brief フェンスの情報をセットする
+		void SetFence(WaitFence fence) { currentFence_ = fence; }
+
+		/// @brief コマンドを積めるかどうか
+		bool CanExecute();
+
+		/// @brief GPUの処理がすべて終わるのをCPU側で待機する
+		void WaitFenceInCPU();
+
 		/// @brief コマンドリストを取得
 		ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
 
@@ -29,10 +44,13 @@ namespace SHEngine::Command {
 
 	private:
 
-		DXDevice* device_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
 
 		std::vector<std::pair<Queue*, uint64_t>> executed_;		//実行中のキューとフェンス。実行できるかのチェック用
+
+		ID3D12DescriptorHeap* srvHeap_ = nullptr;	//SRV用のヒープ
+
+		WaitFence currentFence_;	//現在のフェンスの情報
 	};
 }

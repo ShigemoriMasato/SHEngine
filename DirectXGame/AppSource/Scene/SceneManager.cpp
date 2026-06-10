@@ -21,14 +21,13 @@ void SceneManager::Update() {
 }
 
 void SceneManager::Draw() {
-	engine_->GetTextureManager()->UploadResources();
+	engine_->GetTextureManager()->UploadResources(engine_->GetDirectCommandContext()->GetCurrentCmdObj());
 
 	if (currentScene_) {
 		currentScene_->Draw();
 	}
 
-	engine_->ExecuteCommand(SHEngine::Command::Type::Direct, { commonData_->cmdObject.get() });
-	commonData_->window->ToPresent(commonData_->cmdObject.get());
+	commonData_->window->ToPresent(engine_->GetDirectCommandContext()->GetCurrentCmdObj());
 }
 
 bool SceneManager::IsLoop() const {

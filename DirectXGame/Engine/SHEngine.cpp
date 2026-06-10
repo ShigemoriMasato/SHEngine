@@ -32,11 +32,11 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	device_ = std::make_unique<DXDevice>();
 	device_->Initialize();
 
-	cmdManager_ = std::make_unique<Command::Manager>();
-	cmdManager_->Initialize(device_.get());
+	directCmdContext_ = std::make_unique<DirectCommandContext>();
+	directCmdContext_->Initialize(device_.get());
 
 	textureManager_ = std::make_unique<TextureManager>();
-	textureManager_->Initialize(device_.get(), cmdManager_.get());
+	textureManager_->Initialize(device_.get());
 
 	fontLoader_ = std::make_unique<FontLoader>();
 	fontLoader_->Initialize(textureManager_.get());
@@ -80,6 +80,7 @@ bool Engine::IsLoop() {
 }
 
 void Engine::BeginFrame() {
+	directCmdContext_->BeginFrame();
 	input_->Update();
 	fpsObserver_->TimeAdjustment();
 	AudioManager::GetInstance()->Update();
@@ -90,6 +91,7 @@ void Engine::BeginFrame() {
 }
 
 void Engine::PostDraw() {
+	directCmdContext_->EndFrame();
 
 	if (!imguiDrew_) {
 		imGuiWrapper_->EndFrame();
@@ -99,20 +101,14 @@ void Engine::PostDraw() {
 	frameCounter_.Update();
 }
 
-void SHEngine::Engine::WaitFence(Command::WaitFence& waitFence, Command::Type type) {
-	if(waitFence.fence && waitFence.value) {
-		cmdManager_->WaitFence(waitFence, type);
-	}
-}
-
-void SHEngine::Engine::ImGuiActivate(Screen::WindowsAPI* window, Command::Object* cmdObj) {
+void SHEngine::Engine::ImGuiActivate(Screen::WindowsAPI* window) {
 	imGuiWrapper_ = std::make_unique<ImGuiWrapper>();
-	imGuiWrapper_->Initialize(device_.get(), cmdManager_.get(), window, cmdObj);
+	imGuiWrapper_->Initialize(device_.get(), directCmdContext_.get(), window);
 	imGuiWrapper_->NewFrame();
 }
 
-void SHEngine::Engine::DrawImGui() {
+void SHEngine::Engine::DrawImGui(CmdObj* cmdObj) {
 	if (imGuiWrapper_) {
-		imGuiWrapper_->Render();
+		imGuiWrapper_->Render(cmdObj);
 	}
 }

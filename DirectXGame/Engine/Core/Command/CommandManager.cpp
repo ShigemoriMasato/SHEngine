@@ -26,9 +26,7 @@ std::unique_ptr<Object> SHEngine::Command::Manager::CreateCommandObject(Type typ
 	QueueChecker(type);
 
 	auto queue = queue_[type].get();
-	std::unique_ptr<Object> commandObject = std::make_unique<Object>(device_, this, type, queue, listNum);
-
-	queue->RegisterObject(commandObject.get());
+	std::unique_ptr<Object> commandObject = std::make_unique<Object>(device_, type, listNum);
 
 	objects_[type].push_back(commandObject.get());
 
@@ -58,7 +56,7 @@ void SHEngine::Command::Manager::ReleaseObject(Queue* queue, Object* obj) {
 void SHEngine::Command::Manager::WaitFence(const SHEngine::Command::WaitFence& waitFence, Type type) {
 	QueueChecker(type);
 	auto& cmdQueue = queue_[type];
-	cmdQueue->WaitForFence(waitFence);
+	cmdQueue->WaitFenceInGPU(waitFence);
 }
 
 void SHEngine::Command::Manager::QueueChecker(Type type) {

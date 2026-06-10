@@ -3,19 +3,11 @@
 
 namespace SHEngine::Command {
 
-	struct WaitFence {
-		ID3D12Fence* fence;
-		UINT64 value;
-	};
-
 	class Queue {
 	public:
 
 		Queue(DXDevice* device, Type type);
 		~Queue();
-
-		//CommandObjectの登録
-		void RegisterObject(Object* object);
 
 		//実行する
 		WaitFence Execute(std::vector<Object*> cmdObjs);
@@ -27,10 +19,10 @@ namespace SHEngine::Command {
 		bool CheckFinishedJob(uint64_t fence);
 
 		// そのフェンスが完了するまで待つ
-		void WaitForFence(uint64_t fence);
+		void WaitFenceInCPU(const WaitFence& fence);
 
 		// そのフェンスが完了するまで待つ(別のキューのフェンスも可、GPU側で待機)
-		void WaitForFence(const WaitFence& waitFence);
+		void WaitFenceInGPU(const WaitFence& waitFence);
 
 		//完全にGPUの処理が終わるのを待つ
 		void StopGPU();
@@ -42,8 +34,6 @@ namespace SHEngine::Command {
 
 		//コマンドキュー
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
-
-		std::vector<Object*> objects_;
 
 		/// @brief 現在のフェンス値
 		UINT64 fenceValue_ = 0;

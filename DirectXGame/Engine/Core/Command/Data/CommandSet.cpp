@@ -7,8 +7,6 @@ SHEngine::Command::DXList::~DXList() {
 }
 
 void DXList::Initialize(DXDevice* device, Type type) {
-	device_ = device;
-
 	D3D12_COMMAND_LIST_TYPE commandListType{};
 
 	switch (type) {
@@ -21,14 +19,14 @@ void DXList::Initialize(DXDevice* device, Type type) {
 	}
 
 	// コマンドアロケータの作成
-	HRESULT hr = device_->GetDevice()->CreateCommandAllocator(
+	HRESULT hr = device->GetDevice()->CreateCommandAllocator(
 		commandListType,
 		IID_PPV_ARGS(&commandAllocator_)
 	);
 	assert(SUCCEEDED(hr) && "Failed to create Command Allocator");
 
 	// コマンドリストの作成
-	hr = device_->GetDevice()->CreateCommandList(
+	hr = device->GetDevice()->CreateCommandList(
 		0,
 		commandListType,
 		commandAllocator_.Get(),
@@ -40,6 +38,9 @@ void DXList::Initialize(DXDevice* device, Type type) {
 	// コマンドリストは初期状態で記録モードなので閉じておく
 	hr = commandList_->Close();
 	assert(SUCCEEDED(hr) && "Failed to close Command List");
+
+	//リセット時にSRVヒープをセットするために保存しておく
+	srvHeap_ = device->GetSRVManager()->GetHeap();
 }
 
 void SHEngine::Command::DXList::Execute(std::vector<ID3D12CommandList*>& cmdLists) {
@@ -47,7 +48,24 @@ void SHEngine::Command::DXList::Execute(std::vector<ID3D12CommandList*>& cmdList
 	cmdLists.push_back(commandList_.Get());
 }
 
+bool SHEngine::Command::DXList::CanExecute() {
+	return currentFence_.fence->GetCompletedValue() >= currentFence_.value;
+}
+
+void SHEngine::Command::DXList::WaitFenceInCPU() {
+	if (!CanExecute()) {
+		return;
+	}
+
+	HRESULT hr = currentFence_.fence->SetEventOnCompletion(currentFence_.value, currentFence_.fenceEvent);
+	assert(SUCCEEDED(hr));
+
+	WaitForSingleObject(currentFence_.fenceEvent, INFINITE);
+}
+
 void DXList::ResetCommandList() {
+	WaitFenceInCPU();
+
 	//コマンドリストとアロケータをリセット
 	HRESULT hr = commandAllocator_->Reset();
 	assert(SUCCEEDED(hr) && "Failed to reset Command Allocator");
@@ -55,6 +73,5 @@ void DXList::ResetCommandList() {
 	assert(SUCCEEDED(hr) && "Failed to reset Command List");
 
 	//Heapのセット
-	auto srvHeap = device_->GetSRVManager()->GetHeap();
-	commandList_->SetDescriptorHeaps(1, &srvHeap);
+	commandList_->SetDescriptorHeaps(1, &srvHeap_);
 }

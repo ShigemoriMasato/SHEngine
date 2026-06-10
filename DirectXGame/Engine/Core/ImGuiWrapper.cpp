@@ -6,7 +6,7 @@
 
 using namespace SHEngine;
 
-void ImGuiWrapper::Initialize(DXDevice* device, Command::Manager* manager, Screen::WindowsAPI* window, Command::Object* cmdObject) {
+void ImGuiWrapper::Initialize(DXDevice* device, DirectCommandContext* directContext, Screen::WindowsAPI* window) {
 	logger_ = getLogger("ImGui", LoggerFlag::UseDebugString);
 
 #ifdef USE_IMGUI
@@ -24,7 +24,7 @@ void ImGuiWrapper::Initialize(DXDevice* device, Command::Manager* manager, Scree
 	initInfo.Device = device->GetDevice();
 	initInfo.NumFramesInFlight = bufferNum_;
 	initInfo.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	initInfo.CommandQueue = manager->GetCommandQueue(Command::Type::Direct);
+	initInfo.CommandQueue = directContext->GetCommandQueue();
 	initInfo.SrvDescriptorHeap = device->GetSRVManager()->GetHeap();
 
 	srvHandles_.resize(bufferNum_);
@@ -38,7 +38,6 @@ void ImGuiWrapper::Initialize(DXDevice* device, Command::Manager* manager, Scree
 	ImGui_ImplDX12_Init(&initInfo);
 
 	device_ = device;
-	cmdObject_ = cmdObject;
 
 	logger_->info("ImGui Activate");
 
@@ -80,12 +79,12 @@ void ImGuiWrapper::NewFrame() {
 #endif
 }
 
-void ImGuiWrapper::Render() {
+void ImGuiWrapper::Render(CmdObj* cmdObj) {
 #ifdef USE_IMGUI
 
 
 	ImGui::Render();
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdObject_->GetCommandList());
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdObj->GetCommandList());
 
 #endif
 }

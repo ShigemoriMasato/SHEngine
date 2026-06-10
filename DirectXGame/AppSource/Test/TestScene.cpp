@@ -14,7 +14,6 @@ void TestScene::Initialize() {
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
-	commonData_->cmdObject->ResetCommandList();
 	debugCamera_->Update();
 
 	grid_->Update(debugCamera_->GetCenter(), debugCamera_->GetVPMatrix());
@@ -26,7 +25,7 @@ std::unique_ptr<IScene> TestScene::Update() {
 }
 
 void TestScene::Draw() {
-	auto cmdObj = commonData_->cmdObject.get();
+	auto cmdObj = directContext_->GetCurrentCmdObj();
 	auto window = commonData_->window.get();
 	auto display = commonData_->display->GetDisplay();
 
@@ -51,6 +50,6 @@ void TestScene::Draw() {
 #endif
 
 	commonData_->display->DrawImGui();
-	engine_->DrawImGui();
+	engine_->DrawImGui(cmdObj);
 	window->ToPresent(cmdObj);
 }

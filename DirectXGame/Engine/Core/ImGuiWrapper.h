@@ -3,16 +3,17 @@
 #include <Core/Command/CommandManager.h>
 #include <Render/Screen/WindowsAPI.h>
 #include <imgui/imgui.h>
+#include <Render/Command/DirectCommandContext.h>
 
 namespace SHEngine {
 	class ImGuiWrapper {
 	public:
 
-		void Initialize(DXDevice* device, Command::Manager* manager, Screen::WindowsAPI* window, Command::Object* cmdObject);
+		void Initialize(DXDevice* device, DirectCommandContext* directContext, Screen::WindowsAPI* window);
 
 		void NewFrame();
 
-		void Render();
+		void Render(CmdObj* cmdObj);
 
 		void EndFrame();
 
@@ -29,8 +30,6 @@ namespace SHEngine {
 
 		DXDevice* device_;
 		std::vector<SRVHandle> srvHandles_;
-
-		Command::Object* cmdObject_;
 
 		constexpr static int bufferNum_ = 3;
 	};

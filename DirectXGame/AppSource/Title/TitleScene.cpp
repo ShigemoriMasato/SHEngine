@@ -24,7 +24,6 @@ void TitleScene::Initialize() {
 	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
 	postEffect_ = std::make_unique<PostEffect>();
 	postEffect_->Initialize(textureManager_, pedd, true);		//描画だけする
-	postEffectConfig_.cmdObj = commonData_->cmdObject.get();
 	postEffectConfig_.origin = commonData_->display->GetDisplay();
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
@@ -34,8 +33,6 @@ void TitleScene::Initialize() {
 }
 
 std::unique_ptr<IScene> TitleScene::Update() {
-	commonData_->cmdObject->ResetCommandList();
-
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
 	input_->Update();
 	commonData_->keyManager->Update();
@@ -55,7 +52,7 @@ std::unique_ptr<IScene> TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-	auto cmdObj = commonData_->cmdObject.get();
+	auto cmdObj = directContext_->GetCurrentCmdObj();
 	auto window = commonData_->window.get();
 	auto display = commonData_->display.get();
 
@@ -68,6 +65,7 @@ void TitleScene::Draw() {
 
 #ifdef SH_RELEASE
 
+	postEffectConfig_.cmdObj = cmdObj;
 	postEffect_->Draw(postEffectConfig_);
 	cmdObj->SetRenderTarget(window->GetCurrentDisplay(), false);
 
@@ -85,7 +83,7 @@ void TitleScene::Draw() {
 	camera_->DrawImGui();
 #endif
 
-	engine_->DrawImGui();
+	engine_->DrawImGui(cmdObj);
 	window->ToPresent(cmdObj);
 
 }

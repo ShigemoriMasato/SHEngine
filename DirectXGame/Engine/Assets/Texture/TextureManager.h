@@ -30,7 +30,7 @@ namespace SHEngine {
 		 * @param CmdListManager コマンドリストマネージャー
 		 * @param cmdObj コマンドオブジェクト(渡した後使用不可能になるため気を付けること)
 		 */
-		void Initialize(DXDevice* device, Command::Manager* manager);
+		void Initialize(DXDevice* device);
 
 		/**
 		 * @brief 全てのテクスチャをクリア
@@ -85,7 +85,7 @@ namespace SHEngine {
 		 * @param colorMap カラーマップ（RGBA形式の32ビットカラーの配列）
 		 * @return テクスチャハンドル
 		 */
-		int CreateBitmapTexture(uint32_t width, uint32_t height, std::vector<uint32_t> colorMap);
+		int CreateBitmapTexture(uint32_t width, uint32_t height, DirectX::ScratchImage& scratchImage);
 
 		/**
 		 * @brief テクスチャを削除
@@ -122,7 +122,7 @@ namespace SHEngine {
 			return textureDataList_[handle]->textureResource_;
 		}
 
-		void UploadResources();
+		void UploadResources(CmdObj* cmdObj);
 
 	private:
 
@@ -134,10 +134,6 @@ namespace SHEngine {
 
 		/// @brief DirectX12デバイスへのポインタ
 		DXDevice* device_ = nullptr;
-		/// @brief コマンドリスト
-		std::unique_ptr<Command::Object> cmdObject_ = nullptr;
-		/// @brief コマンドマネージャーへのポインタ
-		Command::Manager* manager_;
 		/// @brief SRVマネージャーへのポインタ
 		SRVManager* srvManager_ = nullptr;
 
@@ -149,6 +145,8 @@ namespace SHEngine {
 
 		/// @brief 中間リソース
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> intermediateResources_;
+		/// テクスチャのアップロードに使用する素材のリスト（ハンドル、ScratchImageのペア）
+		std::vector<std::pair<int, DirectX::ScratchImage>> uploadStandby_;
 		/// @brief 読み込んだテクスチャパスのマップ（ファイルパス → ハンドル）
 		std::unordered_map<std::string, int> loadedTexturePaths_;
 
