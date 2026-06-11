@@ -7,7 +7,7 @@ namespace SHEngine {
 	class DirectCommandContext {
 	public:
 
-		void Initialize(DXDevice* device, int initCmdObjNum = 3);
+		void Initialize(DXDevice* device, int initCmdObjNum = 1);
 
 		/// @brief コマンドオブジェクトを取得する。Fenceを取得するごとに切り替わるので、都度取得して使用すること。
 		CmdObj* GetCurrentCmdObj() { return cmdObjects_[currentCmdObjIndex_].get(); }

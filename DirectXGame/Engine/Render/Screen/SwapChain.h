@@ -13,6 +13,9 @@ namespace SHEngine::Screen {
 		/// @brief 画面をClearColorで塗りつぶす
 		void Clear(Command::Object* cmdObject) override;
 
+		/// @brief 描画後の処理（Present）
+		void Present();
+
 		/// @brief RenderTargetのBarrierを張る
 		void ToRenderTarget(Command::Object* cmdObject) override;
 

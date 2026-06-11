@@ -200,6 +200,12 @@ void TextureManager::UploadResources(CmdObj* cmdObj) {
 		auto intermediateResource = UploadTextureData(textureData->GetResource(), scratchImage, device_->GetDevice(), cmdObj->GetCommandList());
 		intermediateResources_.push_back(intermediateResource);
 	}
+
+	uploadStandby_.clear();
+}
+
+void SHEngine::TextureManager::ClearIntermediateResource() {
+	intermediateResources_.clear();
 }
 
 void TextureManager::CheckMaxCount(int offset) {

@@ -4,6 +4,7 @@
 using namespace SHEngine::Command;
 
 SHEngine::Command::DXList::~DXList() {
+	WaitFenceInCPU();
 }
 
 void DXList::Initialize(DXDevice* device, Type type) {
@@ -44,16 +45,19 @@ void DXList::Initialize(DXDevice* device, Type type) {
 }
 
 void SHEngine::Command::DXList::Execute(std::vector<ID3D12CommandList*>& cmdLists) {
-	commandList_->Close();
 	cmdLists.push_back(commandList_.Get());
 }
 
 bool SHEngine::Command::DXList::CanExecute() {
+	if (!currentFence_.fence) {
+		return true;
+	}
+
 	return currentFence_.fence->GetCompletedValue() >= currentFence_.value;
 }
 
 void SHEngine::Command::DXList::WaitFenceInCPU() {
-	if (!CanExecute()) {
+	if (CanExecute()) {
 		return;
 	}
 

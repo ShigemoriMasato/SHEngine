@@ -20,8 +20,7 @@ SHEngine::Command::Object::Object(DXDevice* device, Type type, int listNum) {
 		cmdList->Initialize(device_, type);
 	}
 
-	// コマンドオブジェクトのタイプとキューインデックスを保存
-
+	type_ = type;
 }
 
 Object::~Object() {
@@ -94,7 +93,10 @@ void SHEngine::Command::Object::Execute(std::vector<ID3D12CommandList*>& cmdList
 		return;
 	}
 
-	commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->Execute(cmdLists);
+	Close();
+
+	uint32_t index = currentIndex_ % uint32_t(commandLists_.size());
+	commandLists_[index]->Execute(cmdLists);
 
 	state_ = State::Close;
 }

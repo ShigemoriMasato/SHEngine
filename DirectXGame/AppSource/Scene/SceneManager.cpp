@@ -10,6 +10,8 @@ void SceneManager::Initialize(SHEngine::Engine* engine) {
 
 void SceneManager::Update() {
 	if (nextScene_) {
+		engine_->StopGPU();
+		engine_->GetTextureManager()->ClearIntermediateResource();
 		nextScene_->Ready(engine_, commonData_.get());
 		nextScene_->Initialize();
 		currentScene_ = std::move(nextScene_);
@@ -27,7 +29,8 @@ void SceneManager::Draw() {
 		currentScene_->Draw();
 	}
 
-	commonData_->window->ToPresent(engine_->GetDirectCommandContext()->GetCurrentCmdObj());
+	engine_->GetDirectCommandContext()->EndFrame();
+	commonData_->window->Present();
 }
 
 bool SceneManager::IsLoop() const {

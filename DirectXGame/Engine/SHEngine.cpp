@@ -91,8 +91,6 @@ void Engine::BeginFrame() {
 }
 
 void Engine::PostDraw() {
-	directCmdContext_->EndFrame();
-
 	if (!imguiDrew_) {
 		imGuiWrapper_->EndFrame();
 		imguiDrew_ = true;

@@ -124,6 +124,8 @@ namespace SHEngine {
 
 		void UploadResources(CmdObj* cmdObj);
 
+		void ClearIntermediateResource();
+
 	private:
 
 		/**

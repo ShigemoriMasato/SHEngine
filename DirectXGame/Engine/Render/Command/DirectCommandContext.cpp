@@ -13,6 +13,10 @@ void DirectCommandContext::Initialize(DXDevice* device, int initCmdObjNum) {
 	for (int i = 0; i < initCmdObjNum; i++) {
 		cmdObjects_.push_back(std::make_unique<Command::Object>(device, Command::Type::Direct, 3));
 	}
+
+	lastWaitFence_.resize(3);
+
+	device_ = device;
 }
 
 void SHEngine::DirectCommandContext::BeginFrame() {
@@ -21,7 +25,9 @@ void SHEngine::DirectCommandContext::BeginFrame() {
 }
 
 Command::WaitFence SHEngine::DirectCommandContext::MiddleExecute() {
+	// コマンドオブジェクトを実行して、フェンスを取得する
 	auto cmdObj = GetCurrentCmdObj();
+	auto fence = queue_->Execute({ cmdObj });
 
 	// コマンドオブジェクトを次のものに切り替える
 	currentCmdObjIndex_++;
@@ -30,10 +36,7 @@ Command::WaitFence SHEngine::DirectCommandContext::MiddleExecute() {
 	}
 	cmdObjects_[currentCmdObjIndex_]->ResetCommandList();
 
-	// コマンドオブジェクトを実行して、フェンスを取得する
-	cmdObj->Close();
-	auto cmdList = cmdObj->GetCommandList();
-	return queue_->Execute({ cmdObj });
+	return fence;
 }
 
 void SHEngine::DirectCommandContext::EndFrame() {

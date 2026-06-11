@@ -105,7 +105,7 @@ void GameScene::Draw() {
 
 	effect_->Draw(display->GetDisplay());
 
-	display->PreDraw(cmdObj, false);
+	display->PreDraw(cmdObj, true);
 
 	tetris_->Draw(cmdObj);
 	if (tetris_->IsGameOver()) {

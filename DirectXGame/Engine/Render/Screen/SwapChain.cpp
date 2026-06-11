@@ -64,6 +64,11 @@ void SHEngine::Screen::SwapChain::Clear(Command::Object* cmdObject) {
 	cmdList->ClearRenderTargetView(GetRTVHandle(), color, 0, nullptr);
 }
 
+void SHEngine::Screen::SwapChain::Present() {
+	swapChain_->Present(1, 0);
+    currentBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+}
+
 void SHEngine::Screen::SwapChain::ToRenderTarget(Command::Object* cmdObject) {
 	displays_[currentBufferIndex_]->ToRenderTarget(cmdObject);
 }

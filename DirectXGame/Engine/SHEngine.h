@@ -33,7 +33,7 @@ namespace SHEngine {
 
 		void WaitFence(Command::WaitFence& waitFence, Command::Type type);
 
-		void StopGPU(Command::Type type) {
+		void StopGPU() {
 			directCmdContext_->StopGPU();
 		}
 
