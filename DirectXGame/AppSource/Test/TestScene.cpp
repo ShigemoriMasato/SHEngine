@@ -27,7 +27,7 @@ std::unique_ptr<IScene> TestScene::Update() {
 void TestScene::Draw() {
 	auto cmdObj = directContext_->GetCurrentCmdObj();
 	auto window = commonData_->window.get();
-	auto display = commonData_->display->GetDisplay();
+	auto display = commonData_->display.get();
 
 	cmdObj->SetRenderTarget(display);
 

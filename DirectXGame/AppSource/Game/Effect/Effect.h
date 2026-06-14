@@ -7,7 +7,7 @@
 class Effect {
 public:
 
-	void Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* engine, SHEngine::TextureManager* textureManager);
+	void Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* engine);
 
 	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime);
 
@@ -18,10 +18,8 @@ private:
 	SHEngine::Engine* engine_ = nullptr;
 	SHEngine::TextureManager* textureManager_ = nullptr;
 
-	std::unique_ptr<SHEngine::Command::Object> compute_ = nullptr;
-	std::unique_ptr<SHEngine::Command::Object> direct_ = nullptr;
-	SHEngine::Command::WaitFence computeFence_{};
-
+	SHEngine::ComputeCommandContext* compute_;
+	SHEngine::DirectCommandContext* direct_;
 	std::unique_ptr<ParticlePool> particlePool_ = nullptr;
 
 	std::unique_ptr<WaveParticle> waveParticle_ = nullptr;

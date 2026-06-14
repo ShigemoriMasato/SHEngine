@@ -61,7 +61,7 @@ public:
 	KeyManager() = default;
 	~KeyManager() = default;
 
-	void Initialize(SHEngine::Input* input, MainDisplay* display);
+	void Initialize(SHEngine::Input* input, SHEngine::Screen::Display* display);
 	void Update();
 
 	std::unordered_map<Key, bool> GetKeyStates() const { return resultKeyFlags_; }
@@ -75,7 +75,7 @@ public:
 
 private:
 
-	MainDisplay* display_ = nullptr;
+	SHEngine::Screen::Display* display_ = nullptr;
 	SHEngine::Input* input_ = nullptr;
 
 	//スティックの種類

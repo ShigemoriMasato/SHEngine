@@ -24,7 +24,7 @@ void TitleScene::Initialize() {
 	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
 	postEffect_ = std::make_unique<PostEffect>();
 	postEffect_->Initialize(textureManager_, pedd, true);		//描画だけする
-	postEffectConfig_.origin = commonData_->display->GetDisplay();
+	postEffectConfig_.origin = commonData_->display.get();
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
@@ -56,12 +56,12 @@ void TitleScene::Draw() {
 	auto window = commonData_->window.get();
 	auto display = commonData_->display.get();
 
-	display->PreDraw(cmdObj);
+	cmdObj->SetRenderTarget(display);
 	
 	waterWave_->Draw(cmdObj);
 	title_->Draw(cmdObj);
 
-	display->PostDraw(cmdObj);
+	display->ToTexture(cmdObj);
 
 #ifdef SH_RELEASE
 

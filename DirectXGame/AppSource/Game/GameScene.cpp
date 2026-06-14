@@ -35,7 +35,7 @@ void GameScene::Initialize() {
 	//PostEffectの初期化
 	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
 	postEffect_->Initialize(textureManager_, pedd);		//描画だけするやつなのでコピーオンリー
-	postEffectConfig_.origin = commonData_->display->GetDisplay();
+	postEffectConfig_.origin = commonData_->display.get();
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
 	gameOverText = std::make_unique<RenderObject>("GameOverText");
@@ -49,7 +49,7 @@ void GameScene::Initialize() {
 	gameOverText->SetDrawData(gameOverdd);
 
 	auto planeDrawData = drawDataManager_->GetDrawData(modelManager_->GetNodeModelData(1).drawDataIndex);
-	effect_->Initialize(planeDrawData, engine_, textureManager_);
+	effect_->Initialize(planeDrawData, engine_);
 
 	gameoverMat = Matrix::MakeAffineMatrix(
 		Vector3(1.0f, 1.0f, 1.0f),
@@ -99,13 +99,14 @@ std::unique_ptr<IScene> GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	auto cmdObj = directContext_->GetCurrentCmdObj();
 	auto display = commonData_->display.get();
 	auto window = commonData_->window.get();
 
-	effect_->Draw(display->GetDisplay());
+	effect_->Draw(display);
 
-	display->PreDraw(cmdObj, true);
+	auto cmdObj = directContext_->GetCurrentCmdObj();
+
+	cmdObj->SetRenderTarget(display);
 
 	tetris_->Draw(cmdObj);
 	if (tetris_->IsGameOver()) {
@@ -116,7 +117,7 @@ void GameScene::Draw() {
 
 	subject_->Draw(cmdObj);
 
-	display->PostDraw(cmdObj);
+	display->ToTexture(cmdObj);
 
 #ifdef SH_RELEASE
 	postEffectConfig_.output = window;
@@ -213,4 +214,6 @@ void GameScene::Draw() {
 
 	engine_->DrawImGui(cmdObj);
 	window->ToPresent(cmdObj);
+
+	engine_->GetComputeCommandContext()->EndFrame();
 }

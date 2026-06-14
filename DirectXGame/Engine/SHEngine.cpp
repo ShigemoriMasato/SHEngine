@@ -35,6 +35,9 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	directCmdContext_ = std::make_unique<DirectCommandContext>();
 	directCmdContext_->Initialize(device_.get());
 
+	computeCmdContext_ = std::make_unique<ComputeCommandContext>();
+	computeCmdContext_->Initialize(device_.get());
+
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(device_.get());
 
@@ -81,6 +84,7 @@ bool Engine::IsLoop() {
 
 void Engine::BeginFrame() {
 	directCmdContext_->BeginFrame();
+	computeCmdContext_->BeginFrame();
 	input_->Update();
 	fpsObserver_->TimeAdjustment();
 	AudioManager::GetInstance()->Update();

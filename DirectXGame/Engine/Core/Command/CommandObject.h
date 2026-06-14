@@ -13,7 +13,7 @@ namespace SHEngine::Command {
 
 		Object(DXDevice* device, Type type, int listNum);
 		~Object();
-
+		
 		/// @brief コマンドを積めるかどうか
 		bool CanExecute();
 

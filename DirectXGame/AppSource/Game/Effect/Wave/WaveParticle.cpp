@@ -4,7 +4,7 @@
 
 using namespace Matrix;
 
-constexpr int splitNum = 1;
+constexpr int splitNum = 8;
 
 WaveParticle::~WaveParticle() {
 	Save();
@@ -51,7 +51,7 @@ void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32
 
 	//Loadとかする
 	Load();
-	emitData_.textureID = textureID;
+	emitData_.textureID = 0;
 
 	//メモリ確保
 	waves_.resize(kMaxWaveNum_);

@@ -196,6 +196,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Title\WaterWave\WaterWave.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Effect.cpp" />
     <ClCompile Include="AppSource\Test\DDS\DDSTest.cpp" />
+    <ClCompile Include="Engine\Compute\ComputeCommandContext.cpp" />
+    <ClCompile Include="Engine\Core\Command\ICommandContext.cpp" />
     <ClCompile Include="Engine\Render\Command\DirectCommandContext.cpp" />
     <ClCompile Include="Engine\Assets\Audio\Data\PlayData.cpp" />
     <ClCompile Include="Engine\Assets\Model\ModelManager.cpp" />
@@ -281,6 +283,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Title\WaterWave\WaterWave.h" />
     <ClInclude Include="AppSource\Game\Effect\Effect.h" />
     <ClInclude Include="AppSource\Test\DDS\DDSTest.h" />
+    <ClInclude Include="Engine\Compute\ComputeCommandContext.h" />
+    <ClInclude Include="Engine\Core\Command\ICommandContext.h" />
     <ClInclude Include="Engine\Render\Command\DirectCommandContext.h" />
     <ClInclude Include="Engine\Assets\Audio\Data\PlayData.h" />
     <ClInclude Include="Engine\Assets\Model\ModelManager.h" />

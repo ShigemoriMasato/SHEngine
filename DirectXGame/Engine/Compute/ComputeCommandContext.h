@@ -3,12 +3,15 @@
 
 namespace SHEngine {
 
-	class DirectCommandContext : public ICommandContext {
+	class ComputeCommandContext : public ICommandContext {
 	public:
 
 		void Initialize(DXDevice* device, int initCmdObjNum = 2);
 
 	private:
 
+
+
 	};
+
 }
