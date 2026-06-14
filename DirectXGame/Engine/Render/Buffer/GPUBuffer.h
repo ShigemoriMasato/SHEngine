@@ -1,6 +1,6 @@
 #pragma once
 #include <Core/DXDevice.h>
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 #include <Assets/Texture/TextureData.h>
 
 enum class BufferType : uint8_t {
@@ -18,6 +18,13 @@ enum class BufferType : uint8_t {
 	DDSTexture = 0b1010,
 };
 
+enum class BufferNum : uint8_t {
+	MatchSwapChain,
+	Single,
+	Double,
+	Triple,
+};
+
 uint8_t operator&(uint8_t a, BufferType b);
 uint8_t operator~(BufferType a);
 
@@ -33,7 +40,7 @@ namespace SHEngine {
 		// @param size バッファのサイズ（バイト単位）
 		// @param num バッファの数（デフォルトは1）
 		// @param bufferNum バッファの数（デフォルトは3、スワップチェーンのバッファ数に合わせる）
-		GPUBuffer(BufferType bufferType, size_t size, uint32_t num = 1, uint32_t bufferNum = 3);
+		GPUBuffer(BufferType bufferType, size_t size, uint32_t num = 1, BufferNum bufferNum = BufferNum::MatchSwapChain);
 
 		// @brief Texture用のGPUBufferの作成
 		GPUBuffer(TextureData* textureData);

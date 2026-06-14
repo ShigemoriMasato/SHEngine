@@ -7,8 +7,8 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	update_ = std::make_unique<SHEngine::ComputeObject>("Pool Update");
 	renderer_ = std::make_unique<SHEngine::Renderer>(planeDrawData);
 
-	pool_.freeList = container_->Create(BufferType::UAV, sizeof(uint32_t), kMaxParticleNum, 1); // freeList
-	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(uint32_t), 1, 1); // freeListIndex
+	pool_.freeList = container_->Create(BufferType::UAV, sizeof(uint32_t), kMaxParticleNum, BufferNum::Single); // freeList
+	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(uint32_t), 1, BufferNum::Single); // freeListIndex
 
 	pool_.position = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum); // world
 	pool_.color = container_->Create(BufferType::SRV_UAV, sizeof(Vector4), kMaxParticleNum); // color

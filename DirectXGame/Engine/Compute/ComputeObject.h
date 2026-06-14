@@ -1,6 +1,6 @@
 #pragma once
 #include <Tool/Logger/Logger.h>
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 #include <Compute/PSO/CSPSOManager.h>
 #include <Render/Buffer/BufferContainer.h>
 

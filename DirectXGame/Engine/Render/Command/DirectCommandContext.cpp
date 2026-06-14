@@ -7,7 +7,7 @@ void DirectCommandContext::Initialize(DXDevice* device, int initCmdObjNum) {
 	queue_ = std::make_unique<Command::Queue>(device, Command::Type::Direct);
 
 	//必ず一つ以上は作成する
-	initCmdObjNum = std::max(1, initCmdObjNum);
+	initCmdObjNum = std::max(2, initCmdObjNum);
 
 	cmdObjects_.reserve(initCmdObjNum);
 	for (int i = 0; i < initCmdObjNum; i++) {
@@ -19,9 +19,15 @@ void DirectCommandContext::Initialize(DXDevice* device, int initCmdObjNum) {
 	device_ = device;
 }
 
+CmdObj* SHEngine::DirectCommandContext::GetCurrentCmdObj() {
+	auto cmdObj = cmdObjects_[currentCmdObjIndex_].get();
+	cmdObj->ResetCommandList();
+	return cmdObj;
+}
+
 void SHEngine::DirectCommandContext::BeginFrame() {
-	currentCmdObjIndex_ = 0;
-	cmdObjects_[currentCmdObjIndex_]->ResetCommandList();
+	int currentCmdListIndex = cmdObjects_[currentCmdObjIndex_]->GetCurrentID();
+	queue_->WaitFenceInCPU(lastWaitFence_[currentCmdListIndex]);
 }
 
 Command::WaitFence SHEngine::DirectCommandContext::MiddleExecute() {
@@ -44,4 +50,6 @@ void SHEngine::DirectCommandContext::EndFrame() {
 
 	uint32_t cmdListIndex = cmdObjects_[currentCmdObjIndex_]->GetCurrentID();
 	lastWaitFence_[cmdListIndex] = fence;
+
+	currentCmdObjIndex_ = 0;
 }

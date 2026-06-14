@@ -1,5 +1,4 @@
 #include "CommandObject.h"
-#include <Core/Command/CommandManager.h>
 #include <Render/Screen/IDisplay.h>
 #include <Utility/DirectUtilFuncs.h>
 
@@ -24,7 +23,7 @@ SHEngine::Command::Object::Object(DXDevice* device, Type type, int listNum) {
 }
 
 Object::~Object() {
-	WaitForGPUIdle(); // すべてのコマンドが終了されるのを待つ
+	WaitForAllCommandListIdle(); // すべてのコマンドが終了されるのを待つ
 }
 
 bool Object::CanExecute() {
@@ -32,7 +31,7 @@ bool Object::CanExecute() {
 	return commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->CanExecute();
 }
 
-void SHEngine::Command::Object::WaitForGPUIdle() {
+void SHEngine::Command::Object::WaitForAllCommandListIdle() {
 	for (auto& cmdList : commandLists_) {
 		cmdList->WaitFenceInCPU();
 	}

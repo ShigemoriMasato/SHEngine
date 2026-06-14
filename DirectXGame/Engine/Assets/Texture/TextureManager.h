@@ -1,7 +1,7 @@
 #pragma once
 #include "TextureData.h"
 #include <Core/DXDevice.h>
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 #include <map>
 #include <unordered_map>
 #include <memory>
@@ -145,8 +145,11 @@ namespace SHEngine {
 		/// @brief テクスチャデータのマップ（ハンドル → TextureData）
 		std::map<int, std::unique_ptr<TextureData>> textureDataList_;
 
+		struct Resource {
+			Microsoft::WRL::ComPtr<ID3D12Resource> res;
+		};
 		/// @brief 中間リソース
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> intermediateResources_;
+		std::vector<Resource> intermediateResources_;
 		/// テクスチャのアップロードに使用する素材のリスト（ハンドル、ScratchImageのペア）
 		std::vector<std::pair<int, DirectX::ScratchImage>> uploadStandby_;
 		/// @brief 読み込んだテクスチャパスのマップ（ファイルパス → ハンドル）

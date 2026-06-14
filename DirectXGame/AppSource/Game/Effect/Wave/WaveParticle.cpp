@@ -12,10 +12,10 @@ WaveParticle::~WaveParticle() {
 
 void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32_t id) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
-	auto positions = container_->Create(BufferType::UAV, sizeof(Vector3), pool.maxParticleNum, 1); // position
-	auto velocities = container_->Create(BufferType::UAV, sizeof(Vector3), pool.maxParticleNum, 1); // velocity
-	auto lifeTimes = container_->Create(BufferType::UAV, sizeof(float), pool.maxParticleNum, 1); // lifeTime
-	auto isUse = container_->Create(BufferType::UAV, sizeof(uint32_t), pool.maxParticleNum, 1); // isUse
+	auto positions = container_->Create(BufferType::UAV, sizeof(Vector3), pool.maxParticleNum, BufferNum::Single); // position
+	auto velocities = container_->Create(BufferType::UAV, sizeof(Vector3), pool.maxParticleNum, BufferNum::Single); // velocity
+	auto lifeTimes = container_->Create(BufferType::UAV, sizeof(float), pool.maxParticleNum, BufferNum::Single); // lifeTime
+	auto isUse = container_->Create(BufferType::UAV, sizeof(uint32_t), pool.maxParticleNum, BufferNum::Single); // isUse
 	waveBuffer_ = container_->Create(BufferType::CBV, sizeof(WaveData) * kMaxWaveNum_, 1); // 波の情報を入れるバッファ
 	auto idBuffer = container_->Create(BufferType::CBV, sizeof(uint32_t), 1); // idBuffer
 	idBuffer->CopyBuffer(&id, sizeof(uint32_t));
@@ -26,8 +26,8 @@ void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32
 	emitter_.resize(splitNum);
 
 	for (int i = 0; i < splitNum; ++i) {
-		updateBuffer_[i] = container_->Create(BufferType::CBV, sizeof(UpdateData), 1, 1); // UpdateのCBV
-		emitBuffer_[i] = container_->Create(BufferType::CBV, sizeof(EmitData), 1, 1); // EmitのCBV
+		updateBuffer_[i] = container_->Create(BufferType::CBV, sizeof(UpdateData), 1, BufferNum::Single); // UpdateのCBV
+		emitBuffer_[i] = container_->Create(BufferType::CBV, sizeof(EmitData), 1, BufferNum::Single); // EmitのCBV
 
 		emitter_[i] = std::make_unique<SHEngine::ComputeObject>("WaveParticle Emitter");
 		update_[i] = std::make_unique<SHEngine::ComputeObject>("WaveParticle Update");

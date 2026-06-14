@@ -64,6 +64,10 @@ bool SHEngine::Command::Queue::CheckFinishedJob(uint64_t fenceValue) {
 }
 
 void SHEngine::Command::Queue::WaitFenceInCPU(const WaitFence& fence) {
+	if(!fence.fence || !fence.fenceEvent) {
+		return;
+	}
+
 	if (!(fence.fence->GetCompletedValue() >= fence.value)) {
 		return;
 	}

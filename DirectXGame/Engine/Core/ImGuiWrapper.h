@@ -1,6 +1,6 @@
 #pragma once
 #include <Core/DXDevice.h>
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 #include <Render/Screen/WindowsAPI.h>
 #include <imgui/imgui.h>
 #include <Render/Command/DirectCommandContext.h>

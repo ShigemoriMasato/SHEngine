@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 #include <Assets/Texture/TextureData.h>
 
 namespace SHEngine::Screen {

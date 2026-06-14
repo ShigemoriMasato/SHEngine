@@ -2,7 +2,7 @@
 #include <Assets/Fonts/FontLoader.h>
 #include <Assets/Model/ModelManager.h>
 #include <Assets/Texture/TextureManager.h>
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 #include <Core/DXDevice.h>
 #include <Core/ImGuiWrapper.h>
 #include <Input/Input.h>
@@ -56,6 +56,8 @@ namespace SHEngine {
 		HINSTANCE GetHInstance() const { return hInstance_; }
 
 	private: // Engine内で完結するクラス
+		D3DResourceLeakChecker resourceLeakChecker_;
+
 		std::unique_ptr<DXDevice> device_;
 		std::unique_ptr<ImGuiWrapper> imGuiWrapper_;
 		std::unique_ptr<PSO::Editor> psoEditor_;

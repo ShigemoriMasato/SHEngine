@@ -1,6 +1,6 @@
 #include "FrameCounter.h"
 #include <Render/Buffer/GPUBuffer.h>
-#include <Core/Command/Data/CommandObject.h>
+#include <Core/Command/CommandObject.h>
 
 using namespace SHEngine;
 

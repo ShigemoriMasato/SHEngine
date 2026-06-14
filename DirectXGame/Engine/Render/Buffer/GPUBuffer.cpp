@@ -2,20 +2,25 @@
 #include <Utility/DirectUtilFuncs.h>
 #include <DirectXTex/d3dx12.h>
 
-SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num, uint32_t bufferNum) {
+SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num, BufferNum bufferNum) {
 	sizeInBytes_ = size * num;
 	UINT alignmentSize = (sizeInBytes_ + 255) & ~255;
 
-	resources_.reserve(bufferNum);
-	mappedData_.reserve(bufferNum);
-	currentState_.resize(bufferNum, D3D12_RESOURCE_STATE_COMMON);
+	uint32_t castedBufferNum = uint32_t(bufferNum);
+	if (bufferNum == BufferNum::MatchSwapChain) {
+		castedBufferNum = device_->GetBufferCount();
+	}
+
+	resources_.reserve(castedBufferNum);
+	mappedData_.reserve(castedBufferNum);
+	currentState_.resize(castedBufferNum, D3D12_RESOURCE_STATE_COMMON);
 
 	bufferType_ = uint8_t(bufferType);
 
 	//UAVが含まれている場合はDEFAULT、そうでない場合はUPLOADにする。UAVバッファはGPUから書き込むこともあるため、CPUからのアクセスができないヒープタイプにする必要がある。
 	auto heapType = ((uint8_t(bufferType) & BufferType::UAV) ? D3D12_HEAP_TYPE_DEFAULT : D3D12_HEAP_TYPE_UPLOAD);
 
-	for (uint32_t i = 0; i < bufferNum; ++i) {
+	for (uint32_t i = 0; i < castedBufferNum; ++i) {
 		//頂点リソース用のヒープの設定
 		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 		uploadHeapProperties.Type = heapType;
@@ -59,13 +64,13 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num,
 	assert(bufferType_ & 0b111);	//SRV/CBV/UAVのどれかが指定されていること
 
 	if (HasBuffer(BufferType::CBV)) {
-		for (uint32_t i = 0; i < bufferNum; ++i) {
+		for (uint32_t i = 0; i < castedBufferNum; ++i) {
 			descriptorHandles_[BufferType::CBV].push_back(static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>(resources_[i].res->GetGPUVirtualAddress()));
 		}
 	}
 
 	if (HasBuffer(BufferType::SRV)) {
-		for (uint32_t i = 0; i < bufferNum; ++i) {
+		for (uint32_t i = 0; i < castedBufferNum; ++i) {
 			auto& res = resources_[i].res;
 
 			// SRVハンドルの取得
@@ -90,7 +95,7 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num,
 	}
 
 	if (HasBuffer(BufferType::UAV)) {
-		for (uint32_t i = 0; i < bufferNum; ++i) {
+		for (uint32_t i = 0; i < castedBufferNum; ++i) {
 			auto& res = resources_[i].res;
 
 			// UAVハンドルの取得

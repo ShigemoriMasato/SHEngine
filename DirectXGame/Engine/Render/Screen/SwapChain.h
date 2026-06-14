@@ -60,8 +60,6 @@ namespace SHEngine::Screen {
 
 		int currentBufferIndex_ = 0;	//現在のバッファのインデックス
 
-		static constexpr int bufferCount_ = 3;	//バッファ数
-
 		std::unique_ptr<WindowsAPI> window_ = nullptr;
 	};
 

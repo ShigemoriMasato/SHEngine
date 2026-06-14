@@ -8,8 +8,6 @@ namespace SHEngine::Screen {
 
 namespace SHEngine::Command {
 
-	class Manager;
-
 	class Object {
 	public:
 
@@ -22,9 +20,6 @@ namespace SHEngine::Command {
 		/// @brief コマンドリストをリセットして、コマンドを積める状態にする(実行できる状態でなかったら実行できるまで待つ)
 		void ResetCommandList();
 
-		/// @brief GPUの処理がすべて終わるのを待機する
-		void WaitForGPUIdle();
-
 		/// @brief RenderTargetを設定する。
 		void SetRenderTarget(Screen::IDisplay* display, bool clear = true);
 
@@ -33,9 +28,6 @@ namespace SHEngine::Command {
 
 		/// @brief コマンドリストを取得
 		ID3D12GraphicsCommandList* GetCommandList() { return commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->GetCommandList(); }
-
-		/// @brief コマンドリストをクローズして、実行できる状態にする
-		void Close();
 
 		/// @brief このフレームで使用するコマンドリストのインデックスを取得
 		uint32_t GetCurrentID() const { return currentIndex_ % uint32_t(commandLists_.size()); }
@@ -46,6 +38,12 @@ namespace SHEngine::Command {
 	private:
 
 		friend class Queue;
+
+		/// @brief コマンドリストをクローズして、実行できる状態にする
+		void Close();
+
+		/// @brief GPUの処理がすべて終わるのを待機する
+		void WaitForAllCommandListIdle();
 
 		/// @brief CommandListを実行する
 		void Execute(std::vector<ID3D12CommandList*>& cmdLists);
@@ -62,7 +60,7 @@ namespace SHEngine::Command {
 		enum class State {
 			Close,		// コマンドリストがクローズされている状態。コマンドを積めない
 			Open,		// コマンドリストがオープンされている状態。コマンドを積める
-		} state_;
+		} state_ = State::Close;
 
 		//描画先の管理
 		Screen::IDisplay* renderTarget_ = nullptr;

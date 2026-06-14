@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <Core/DXDevice.h>
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 
 namespace SHEngine::Screen {
 

@@ -198,7 +198,9 @@ void TextureManager::UploadResources(CmdObj* cmdObj) {
 	for (auto& [offset, scratchImage] : uploadStandby_) {
 		auto textureData = textureDataList_[offset].get();
 		auto intermediateResource = UploadTextureData(textureData->GetResource(), scratchImage, device_->GetDevice(), cmdObj->GetCommandList());
-		intermediateResources_.push_back(intermediateResource);
+		Resource res;
+		res.res.Attach(intermediateResource);
+		intermediateResources_.push_back(res);
 	}
 
 	uploadStandby_.clear();

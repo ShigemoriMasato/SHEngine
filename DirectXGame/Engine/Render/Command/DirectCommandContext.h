@@ -1,16 +1,16 @@
 #pragma once
-#include <Core/Command/Data/CommandObject.h>
-#include <Core/Command/Data/SHCmdQueue.h>
+#include <Core/Command/CommandObject.h>
+#include <Core/Command/SHCmdQueue.h>
 
 namespace SHEngine {
 
 	class DirectCommandContext {
 	public:
 
-		void Initialize(DXDevice* device, int initCmdObjNum = 1);
+		void Initialize(DXDevice* device, int initCmdObjNum = 2);
 
 		/// @brief コマンドオブジェクトを取得する。Fenceを取得するごとに切り替わるので、都度取得して使用すること。
-		CmdObj* GetCurrentCmdObj() { return cmdObjects_[currentCmdObjIndex_].get(); }
+		CmdObj* GetCurrentCmdObj();
 
 		/// @brief コマンドを積むためのコマンドオブジェクトを準備する
 		void BeginFrame();

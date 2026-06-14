@@ -1,6 +1,6 @@
 #pragma once
 #include "DrawDataManager.h"
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 #include <Utility/Color.h>
 #include <Camera/Camera.h>
 #include <Render/PSO/PSOEditor.h>

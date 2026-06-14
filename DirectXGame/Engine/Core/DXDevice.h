@@ -72,6 +72,8 @@ namespace SHEngine {
 
 		IDxcBlob* CompileShader(const std::string& filePath, ShaderType shaderType);
 
+		int GetBufferCount() const { return bufferCount; }
+
 	private:
 
 		/// @brief DirectX12デバッグコントローラー
@@ -89,6 +91,8 @@ namespace SHEngine {
 		std::unique_ptr<RTVManager> rtvManager_;
 		/// @brief DSVディスクリプタヒープマネージャー
 		std::unique_ptr<DSVManager> dsvManager_;
+
+		const int bufferCount = 3;	// バッファ数（フレームバッファリングのため）
 
 	private:
 

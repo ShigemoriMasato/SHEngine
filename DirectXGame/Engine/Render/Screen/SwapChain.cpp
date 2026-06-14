@@ -9,6 +9,8 @@ void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Dir
     HWND hwnd = window->GetHwnd();
     auto [width, height] = window->GetWindowSize();
 
+	int bufferCount = device_->GetBufferCount();
+
     //スワップチェーンを生成する
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
     swapChainDesc.Width = width;	                        //ウィンドウ幅
@@ -16,7 +18,7 @@ void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Dir
     swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;      	    //色の形式
     swapChainDesc.SampleDesc.Count = 1;	                            //マルチサンプルしない
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	//描画のターゲットとして利用する
-    swapChainDesc.BufferCount = bufferCount_;	//バッファの数
+    swapChainDesc.BufferCount = bufferCount;	//バッファの数
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;   	//モニタに映したら捨てる
 
     auto commandQueue = directContext->GetCommandQueue();
@@ -34,8 +36,8 @@ void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Dir
     logger_->info("Complete create SwapChain");
 
     ID3D12Resource* swapChainResources;
-	displays_.resize(bufferCount_);
-    for (int i = 0; i < bufferCount_; i++) {
+	displays_.resize(bufferCount);
+    for (int i = 0; i < bufferCount; i++) {
         //SwapChainからResourceを取得する
         hr = swapChain_->GetBuffer(i, IID_PPV_ARGS(&swapChainResources));
         assert(SUCCEEDED(hr));

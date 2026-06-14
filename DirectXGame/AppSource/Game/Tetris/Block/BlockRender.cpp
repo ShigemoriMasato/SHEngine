@@ -30,8 +30,8 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 	//GPU準備
 	blockRenderer_ = std::make_unique<SHEngine::Renderer>(drawData);
 	container_ = std::make_unique<SHEngine::BufferContainer>();
-	blockRenderer_->SetVS("Game/Block.VS.hlsl");
-	blockRenderer_->SetPS("Game/Block.PS.hlsl");
+	blockRenderer_->SetVS("Game/ReflectBlock.VS.hlsl");
+	blockRenderer_->SetPS("Game/ReflectBlock.PS.hlsl");
 
 	vsBuffer_ = container_->Create(BufferType::SRV, sizeof(VSData), blockNum);
 	//数適当

@@ -1,7 +1,7 @@
 #pragma once
 #include <Compute/PSO/CSRootSignature.h>
 #include <Compute/PSO/CSShaderShelf.h>
-#include <Core/Command/CommandManager.h>
+#include <Core/Command/CommandObject.h>
 
 namespace SHEngine::PSO {
 	//CSPSOManagerはComputeShader用のPSOを管理するクラス
