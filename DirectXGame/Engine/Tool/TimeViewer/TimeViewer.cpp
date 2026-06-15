@@ -1,0 +1,90 @@
+#include "TimeViewer.h"
+#include <Utility/ConvertString.h>
+
+void TimeViewer::Initialize(SHEngine::Engine* engine) {
+	auto ddm = engine->GetDrawDataManager();
+	auto mm = engine->GetModelManager();
+	drawData_ = ddm->GetDrawData(mm->GetNodeModelData(1).drawDataIndex);
+
+	orthoCamera_.SetProjectionMatrix(OrthographicDesc());
+	orthoCamera_.MakeMatrix();
+
+	Load();
+}
+
+void TimeViewer::Add(std::string name, double time) {
+	const auto& it = texts_.find(name);
+	//すでにあるならテキストを更新して終わり
+	if (it != texts_.end()) {
+		it->second->SetText(std::format(L"{}: {:.2f} ms", ConvertString(name), time * 1000.0));
+		return;
+	}
+
+	//なければ新しく作る
+	auto text = std::make_unique<SHEngine::Text>();
+	text->Initialize(drawData_, "Assets/Fonts/YDWbananaslipplus.otf", 64, name);
+	text->SetText(std::format(L"{}: {:.2f} ms", ConvertString(name), time * 1000.0));
+
+	texts_[name] = std::move(text);
+}
+
+void TimeViewer::Draw(CmdObj* cmdObj) {
+	//座標の更新をする
+	float offsetY = 0;
+	Transform transform;
+	transform.scale = { scale_, -scale_, 1.0f };
+	for (auto& [name, text] : texts_) {
+		transform.position = { offset_.x, offset_.y + offsetY, 0.0f };
+		offsetY += interval_;
+		text->SetTransform(transform);
+		text->SetColor(color_);
+
+		text->Update(orthoCamera_.GetVPMatrix());
+	}
+
+	//描画
+	for (auto& [name, text] : texts_) {
+		text->Draw(cmdObj);
+	}
+}
+
+void TimeViewer::DrawImGui() {
+#ifdef USE_IMGUI
+
+	ImGui::Begin("TimeViewer");
+
+	ImGui::DragFloat("Scale", &scale_, 0.01f);
+	ImGui::DragFloat("Interval", &interval_, 1.0f);
+	ImGui::DragFloat2("Offset", &offset_.x, 0.1f);
+	ImGui::ColorEdit4("Color", &color_.x);
+
+	ImGui::End();
+
+#endif // USE_IMGUI
+
+}
+
+void TimeViewer::Save() {
+	BinaryManager binManager;
+	const std::string fileName = "TimeViewerConfig.bin";
+
+	binManager.Register(&scale_);
+	binManager.Register(&interval_);
+	binManager.Register(&offset_);
+	binManager.Register(&color_);
+	binManager.Write(fileName);
+}
+
+void TimeViewer::Load() {
+	BinaryManager binManager;
+	const std::string fileName = "TimeViewerConfig.bin";
+
+	if (!binManager.Boot(fileName)) {
+		return;
+	}
+
+	scale_ = binManager.Reverse<float>();
+	interval_ = binManager.Reverse<float>();
+	offset_ = binManager.Reverse<Vector2>();
+	color_ = binManager.Reverse<Vector4>();
+}

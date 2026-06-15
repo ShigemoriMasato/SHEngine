@@ -30,6 +30,8 @@ void SceneManager::Draw() {
 	}
 
 	engine_->GetDirectCommandContext()->EndFrame();
+	engine_->GetComputeCommandContext()->EndFrame();
+
 	commonData_->window->Present();
 }
 

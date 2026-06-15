@@ -12,7 +12,6 @@ namespace SHEngine {
 		Text(int maxCharNum = 128) : maxCharNum_(maxCharNum) {};
 
 		void Initialize(DrawData& planeDrawData, const std::string& fontPath, int fontSize = 64, std::string debugName = "");
-		void Initialize(int fontID);
 
 		void SetText(const std::wstring& text);
 		void SetSize(float size);

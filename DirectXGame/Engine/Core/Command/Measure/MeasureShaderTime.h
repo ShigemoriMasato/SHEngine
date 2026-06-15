@@ -17,27 +17,30 @@ namespace SHEngine {
 
 		void End(CmdObj* cmdObj);
 
-		double GetTimeStampResult(int index);
+		double GetTimeStampResult(std::string name);
 
 	private:
-
-		void CreateTimeStamp(CmdObj* cmdObj, std::string name);
-
-		int PutTimeStamp(CmdObj* cmdObj, int handle);
 
 		struct TimeStamp {
 			std::string name;
 
-			int startHandle;
-			int endHandle;
+			int startHandle = -1;
+			int endHandle = -1;
 
 			double time = 0.0;
 
-			std::vector<std::unique_ptr<TimeStamp>> children;
+			std::vector<std::unique_ptr<TimeStamp>> children{};
+			TimeStamp* parent = nullptr;
 		};
 
-		TimeStamp root_;
+		TimeStamp* FindTimeStamp(const std::string& name, TimeStamp* current = nullptr);
 
+		void PutTimeStamp(CmdObj* cmdObj, int handle);
+
+		std::unique_ptr<TimeStamp> root_;
+		TimeStamp* current_ = nullptr;
+
+		int nextHandle_ = 0;
 		const int queryCount_ = 256;
 		uint64_t frequency_ = 0;
 
@@ -50,7 +53,7 @@ namespace SHEngine {
 
 		std::vector<Com<ID3D12Resource>> readBackBuffers_;
 		std::vector<uint64_t*> mappedBuffers_;
-		std::vector<std::vector<double>> timeStampResults_;
+		std::vector<uint64_t> timeStampResults_;
 
 		Logger logger_;
 

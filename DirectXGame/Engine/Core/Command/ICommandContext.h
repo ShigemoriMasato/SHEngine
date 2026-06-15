@@ -1,6 +1,7 @@
 #pragma once
 #include <Core/Command/CommandObject.h>
 #include <Core/Command/SHCmdQueue.h>
+#include "Measure/MeasureShaderTime.h"
 
 namespace SHEngine {
 
@@ -31,6 +32,14 @@ namespace SHEngine {
 
 		void WaitFenceInCPU(const Command::WaitFence& waitFence) { queue_->WaitFenceInCPU(waitFence); }
 
+	public:// 計測関係
+
+		void BeginTimeStamp(std::string name);
+
+		void EndTimeStamp();
+
+		double GetTimeStampResult(std::string name);
+
 	protected:
 
 		void PrivateInitialize(DXDevice* device, Command::Type type, int initCmdObjNum = 2);
@@ -48,6 +57,8 @@ namespace SHEngine {
 		DXDevice* device_ = nullptr;
 
 		Command::Type type_ = Command::Type::Direct;
+
+		std::unique_ptr<MeasureShaderTime> measureShaderTime_ = nullptr;
 
 	};
 }

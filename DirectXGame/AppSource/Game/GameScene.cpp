@@ -59,12 +59,20 @@ void GameScene::Initialize() {
 
 	subject_ = std::make_unique<Subject>();
 	subject_->Initialize(engine_);
+
+	timeViewer_ = std::make_unique<TimeViewer>();
+	timeViewer_->Initialize(engine_);
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
 
+	engine_->GetComputeCommandContext()->BeginTimeStamp("Particle");
 	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
+	engine_->GetComputeCommandContext()->EndTimeStamp();
+
+	timeViewer_->Add("Particle", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle"));
+	timeViewer_->Add("FPS", deltaTime);
 
 	subject_->Update(worldCamera_->GetVPMatrix());
 
@@ -117,6 +125,8 @@ void GameScene::Draw() {
 
 	subject_->Draw(cmdObj);
 
+	timeViewer_->Draw(cmdObj);
+
 	display->ToTexture(cmdObj);
 
 #ifdef SH_RELEASE
@@ -139,6 +149,7 @@ void GameScene::Draw() {
 	manualCamera_->MakeMatrix();
 	tetris_->DrawImGui();
 	gameCamera_->DrawImGui();
+	timeViewer_->DrawImGui();
 
 	ImGui::Begin("Input Debug");
 	Vector2 cursor = input_->GetCursorPos();
@@ -206,6 +217,12 @@ void GameScene::Draw() {
 	}
 	ImGui::End();
 
+
+	double gpuTime = engine_->GetComputeCommandContext()->GetTimeStampResult("Particle");
+	ImGui::Begin("GPU Time");
+	ImGui::Text("Particle Effect GPU Time: %.3f ms", gpuTime * 1000.0);
+	ImGui::End();
+
 	postEffectConfig_.jobs_ =
 		uint32_t(grayScale) << 1 |
 		uint32_t(vignette) << 2 |
@@ -215,6 +232,4 @@ void GameScene::Draw() {
 
 	engine_->DrawImGui(cmdObj);
 	window->ToPresent(cmdObj);
-
-	engine_->GetComputeCommandContext()->EndFrame();
 }
