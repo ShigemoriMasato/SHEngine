@@ -10,7 +10,7 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 
 	particlePool_ = std::make_unique<ParticlePool>();
 	// 16777216個分のメモリを確保する
-	particlePool_->Initialize(planeDrawData, int(15000000), cmdObj);
+	particlePool_->Initialize(planeDrawData, int(150000), cmdObj);
 
 	compute_->MiddleExecute();
 
@@ -23,7 +23,7 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 }
 
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
-	static Logger logger = getLogger("Command");
+	static Logger logger = GetLogger("Command");
 
 	auto cmdObj = compute_->GetCurrentCmdObj();
 

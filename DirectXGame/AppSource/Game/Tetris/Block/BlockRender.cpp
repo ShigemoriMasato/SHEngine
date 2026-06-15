@@ -11,7 +11,7 @@ BlockRender::~BlockRender() {
 }
 
 void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const DrawData& drawData, SHEngine::TextureData* ddsTexture) {
-	logger_ = getLogger("Tetris");
+	logger_ = GetLogger("Tetris");
 
 	fieldWidth_ = fieldWidth;
 	fieldHeight_ = fieldHeight;

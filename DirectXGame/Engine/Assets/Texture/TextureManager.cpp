@@ -37,7 +37,7 @@ void TextureManager::Initialize(DXDevice* device) {
 	device_ = device;
 	srvManager_ = device->GetSRVManager();
 
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 
 	LoadTexture("Assets/.EngineResource/Texture/white1x1.png");
 	LoadTexture("Assets/.EngineResource/Texture/uvChecker.png");

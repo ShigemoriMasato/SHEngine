@@ -120,6 +120,7 @@ void GameScene::Draw() {
 	display->ToTexture(cmdObj);
 
 #ifdef SH_RELEASE
+	postEffectConfig_.cmdObj = cmdObj;
 	postEffectConfig_.output = window;
 	postEffect_->Draw(postEffectConfig_);
 	cmdObj->SetRenderTarget(window, false);

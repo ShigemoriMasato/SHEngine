@@ -23,7 +23,7 @@ FPSObserver::FPSObserver(bool isFix, double targetFps) {
     // 高精度タイマーの設定
     timeBeginPeriod(1);
 
-    logger_ = getLogger("Engine", LoggerFlag::UseDebugString);
+    logger_ = GetLogger("Engine", LoggerFlag::UseDebugString);
 }
 
 FPSObserver::~FPSObserver() {

@@ -7,7 +7,7 @@
 using namespace SHEngine;
 
 void ImGuiWrapper::Initialize(DXDevice* device, DirectCommandContext* directContext, Screen::WindowsAPI* window) {
-	logger_ = getLogger("ImGui", LoggerFlag::UseDebugString);
+	logger_ = GetLogger("ImGui", LoggerFlag::UseDebugString);
 
 #ifdef USE_IMGUI
 	IMGUI_CHECKVERSION();

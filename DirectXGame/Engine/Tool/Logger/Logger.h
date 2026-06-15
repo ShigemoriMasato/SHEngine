@@ -29,5 +29,5 @@ enum LoggerFlag : uint32_t {
  * @param flag ロガーフラグ（デフォルト: MakeFile | UseDebugString）
  * @return Logger
  */
-Logger getLogger(const std::string& name, uint32_t flag = MakeFile | UseDebugString);
+Logger GetLogger(const std::string& name, uint32_t flag = MakeFile | UseDebugString);
 

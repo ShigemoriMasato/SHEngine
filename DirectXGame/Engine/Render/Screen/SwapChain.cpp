@@ -2,7 +2,7 @@
 #include <Utility/DirectUtilFuncs.h>
 
 void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, DirectCommandContext* directContext, uint32_t clearColor, std::unique_ptr<WindowsAPI> window) {
-    logger_ = getLogger("Engine");
+    logger_ = GetLogger("Engine");
 
     logger_->info("=== Start create SwapChain ===");
 

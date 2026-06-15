@@ -24,7 +24,7 @@ SHEngine::Engine::~Engine() {
 void Engine::Initialize(HINSTANCE hInstance) {
 	SetUnhandledExceptionFilter(ClashHandler);
 
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 	logger_->info("Begin Engine Initialize");
 
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);

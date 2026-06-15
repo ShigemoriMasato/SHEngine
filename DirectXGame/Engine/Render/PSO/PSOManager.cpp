@@ -14,7 +14,7 @@ Manager::Manager(DXDevice* device) {
 	inputLayoutShelf_ = std::make_unique<InputLayoutShelf>();
 	binaryManager_ = std::make_unique<BinaryManager>();
 
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 
 	device_ = device->GetDevice();
 

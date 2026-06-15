@@ -7,7 +7,7 @@ void DrawDataManager::Initialize(DXDevice* device) {
 	device_ = device;
 	drawDataList_.clear();
 	resources_.clear();
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 	logger_->info("DrawDataManager Initialized");
 }
 

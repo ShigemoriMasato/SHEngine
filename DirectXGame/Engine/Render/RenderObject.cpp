@@ -7,7 +7,7 @@ using namespace SHEngine;
 
 DXDevice* RenderObject::device_ = nullptr;
 PSO::Editor* RenderObject::psoEditor_ = nullptr;
-Logger RenderObject::logger_ = getLogger("Engine");
+Logger RenderObject::logger_ = GetLogger("Engine");
 
 RenderObject::RenderObject(std::string debugName) {
 	debugName_ = debugName == "" ? "NoName" : debugName;

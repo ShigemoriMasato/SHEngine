@@ -36,7 +36,7 @@ void ModelManager::Initialize(TextureManager* textureManager, DrawDataManager* d
 	drawDataManager_ = drawDataManager;
 	nextID_ = 0;
 
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 
 	LoadModel("Assets/.EngineResource/Model/Cube");
 	LoadModel("Assets/.EngineResource/Model/Plane");

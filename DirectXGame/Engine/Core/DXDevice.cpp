@@ -14,7 +14,7 @@ DXDevice::~DXDevice() {
 }
 
 void DXDevice::Initialize() {
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 	logger_->info("=== DXDevice ===");
 
 #if SH_DEBUG || SH_DEVELOP

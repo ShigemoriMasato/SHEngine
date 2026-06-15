@@ -18,7 +18,7 @@ SHEngine::Screen::WindowsAPI::~WindowsAPI() {
 }
 
 void SHEngine::Screen::WindowsAPI::Initialize(WindowDesc& desc, HINSTANCE hInstance) {
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 
 	std::string logMsg = "Initializing WindowsAPI with width: " + std::to_string(desc.width) +
 		", height: " + std::to_string(desc.height) +

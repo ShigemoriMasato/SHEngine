@@ -27,12 +27,12 @@ void InitializeScene::Initialize() {
 
 	windowsAPI->Initialize(desc, engine_->GetHInstance());
 	commonData_->window = std::make_unique<SHEngine::Screen::SwapChain>();
-	commonData_->window->Initialize(textureManager_, directContext_, 0x050505ff, std::move(windowsAPI));
+	commonData_->window->Initialize(textureManager_, directContext_, 0xffffffff, std::move(windowsAPI));
 
 	input_->SetWindow(commonData_->window->GetWindowsAPI()->GetHwnd());
 
 	commonData_->display = std::make_unique<SHEngine::Screen::Display>();
-	commonData_->display->Initialize(textureManager_, 1280, 720, 0xa0a000ff, "MainWindow");
+	commonData_->display->Initialize(textureManager_, 1280, 720, 0xffffffff, "MainWindow");
 
 	std::vector<VertexData> vertices = {
 		{{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
@@ -144,7 +144,7 @@ void InitializeScene::Draw() {
 	cmdObj->SetRenderTarget(display, true);
 	display->ToTexture(cmdObj);
 
-	cmdObj->SetRenderTarget(swapChain, false);
+	cmdObj->SetRenderTarget(swapChain, true);
 	engine_->DrawImGui(cmdObj);
 	swapChain->ToPresent(cmdObj);
 }

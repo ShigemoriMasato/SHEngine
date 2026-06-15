@@ -53,7 +53,7 @@ namespace SHEngine {
 			int z;
 		} threadGroupSize_;
 
-		Logger logger_ = getLogger("Engine");
+		Logger logger_ = GetLogger("Engine");
 		std::string debugName_;
 	};
 

@@ -3,7 +3,7 @@
 using namespace SHEngine::PSO;
 
 Editor::Editor() {
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 }
 
 void Editor::Initialize(DXDevice* device) {

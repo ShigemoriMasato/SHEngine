@@ -261,6 +261,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Effect\Wave\WaveParticle.cpp" />
     <ClCompile Include="AppSource\Test\TestScene.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Subject.cpp" />
+    <ClCompile Include="MeasureShaderTime.cpp" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Common\MainDisplay.h" />
@@ -337,6 +338,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Test\TestScene.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\Subject.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\HitEffect.h" />
+    <ClInclude Include="MeasureShaderTime.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

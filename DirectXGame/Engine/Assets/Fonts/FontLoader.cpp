@@ -10,7 +10,7 @@
 using namespace SHEngine;
 
 void FontLoader::Initialize(TextureManager* textureManager) {
-	logger_ = getLogger("Engine");
+	logger_ = GetLogger("Engine");
 	logger_->info("FontLoader Initialize");
 
 	LoadResponseText();

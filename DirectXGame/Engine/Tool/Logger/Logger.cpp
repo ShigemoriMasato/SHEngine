@@ -35,7 +35,7 @@ namespace {
 	}
 }
 
-Logger getLogger(const std::string& name, uint32_t flag) {
+Logger GetLogger(const std::string& name, uint32_t flag) {
 	auto existing = spdlog::get(name);
 	if (existing) return existing;
 
