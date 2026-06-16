@@ -100,7 +100,6 @@ double SHEngine::MeasureShaderTime::GetTimeStampResult(std::string name) {
 	auto timeStamp = FindTimeStamp(name);
 	if (!timeStamp) {
 		logger_->error("タイムスタンプ '{}' が見つかりません。", name);
-		assert(false && "MeasureShaderTime::GetTimeStampResult - 指定されたタイムスタンプが見つかりません");
 		return 0.0;
 	}
 

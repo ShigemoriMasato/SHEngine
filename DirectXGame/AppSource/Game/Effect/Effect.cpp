@@ -10,7 +10,7 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 
 	particlePool_ = std::make_unique<ParticlePool>();
 	// 16777216個分のメモリを確保する
-	particlePool_->Initialize(planeDrawData, int(150000), cmdObj);
+	particlePool_->Initialize(planeDrawData, int(1500000), cmdObj);
 
 	compute_->MiddleExecute();
 
@@ -27,8 +27,12 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix,
 
 	auto cmdObj = compute_->GetCurrentCmdObj();
 
+	compute_->BeginTimeStamp("Particle Update");
+
 	//パーティクルの更新処理
 	waveParticle_->Update(cmdObj, deltaTime);
+
+	compute_->EndTimeStamp();
 
 	//Queueに登録して実行
 	auto fence = compute_->MiddleExecute();

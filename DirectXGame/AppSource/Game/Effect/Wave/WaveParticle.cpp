@@ -51,7 +51,7 @@ void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32
 
 	//Loadとかする
 	Load();
-	emitData_.textureID = 0;
+	emitData_.textureID = textureID;
 
 	//メモリ確保
 	waves_.resize(kMaxWaveNum_);

@@ -67,12 +67,7 @@ void GameScene::Initialize() {
 std::unique_ptr<IScene> GameScene::Update() {
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
 
-	engine_->GetComputeCommandContext()->BeginTimeStamp("Particle");
 	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
-	engine_->GetComputeCommandContext()->EndTimeStamp();
-
-	timeViewer_->Add("Particle", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle"));
-	timeViewer_->Add("FPS", deltaTime);
 
 	subject_->Update(worldCamera_->GetVPMatrix());
 
@@ -110,11 +105,13 @@ void GameScene::Draw() {
 	auto display = commonData_->display.get();
 	auto window = commonData_->window.get();
 
+	directContext_->BeginTimeStamp("Particle Draw");
 	effect_->Draw(display);
+	directContext_->EndTimeStamp();
 
 	auto cmdObj = directContext_->GetCurrentCmdObj();
 
-	cmdObj->SetRenderTarget(display);
+	cmdObj->SetRenderTarget(display, false);
 
 	tetris_->Draw(cmdObj);
 	if (tetris_->IsGameOver()) {
@@ -124,6 +121,10 @@ void GameScene::Draw() {
 	}
 
 	subject_->Draw(cmdObj);
+
+	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
+	timeViewer_->Add("Particle Draw", engine_->GetDirectCommandContext()->GetTimeStampResult("Particle Draw"));
+	timeViewer_->Add("FPS", engine_->GetDeltaTime());
 
 	timeViewer_->Draw(cmdObj);
 
@@ -150,22 +151,6 @@ void GameScene::Draw() {
 	tetris_->DrawImGui();
 	gameCamera_->DrawImGui();
 	timeViewer_->DrawImGui();
-
-	ImGui::Begin("Input Debug");
-	Vector2 cursor = input_->GetCursorPos();
-	ImGui::Text("Cursor Pos: (%.1f, %.1f)", cursor.x, cursor.y);
-	bool mouseButtons[3];
-	for (int i = 0; i < 3; i++) {
-		mouseButtons[i] = input_->GetMouseButtonState()[i] & 0x80;
-		ImGui::Text("|| Button %d: %s", i, mouseButtons[i] ? "Pressed" : "Released");
-
-		if (i != 2) {
-			ImGui::SameLine();
-		}
-	}
-	float mouseWheel = input_->GetMouseWheel();
-	ImGui::Text("Mouse Wheel: %.1f", mouseWheel);
-	ImGui::End();
 
 	ImGui::Begin("FPS");
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
@@ -215,12 +200,6 @@ void GameScene::Draw() {
 		ImGui::PopID();
 		postEffect_->CopyBuffer(PostEffectJob::GaussBlur, config);
 	}
-	ImGui::End();
-
-
-	double gpuTime = engine_->GetComputeCommandContext()->GetTimeStampResult("Particle");
-	ImGui::Begin("GPU Time");
-	ImGui::Text("Particle Effect GPU Time: %.3f ms", gpuTime * 1000.0);
 	ImGui::End();
 
 	postEffectConfig_.jobs_ =
