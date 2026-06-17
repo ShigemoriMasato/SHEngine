@@ -37,4 +37,8 @@ private:
 	std::unique_ptr<Subject> subject_ = nullptr;
 
 	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
+
+	std::unique_ptr<SHEngine::Screen::Display> intermediateDisplay_ = nullptr;
+	std::unique_ptr<PostEffect> edgeDetection_ = nullptr;
+	PostEffectConfig forEdgeDetection_{};
 };

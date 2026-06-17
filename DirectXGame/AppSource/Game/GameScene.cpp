@@ -38,6 +38,15 @@ void GameScene::Initialize() {
 	postEffectConfig_.origin = commonData_->display.get();
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
+	intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
+	intermediateDisplay_->Initialize(textureManager_, 1280, 720, 0xffffffff, "EdgeDetection");
+
+	edgeDetection_ = std::make_unique<PostEffect>();
+	edgeDetection_->Initialize(textureManager_, pedd);
+	forEdgeDetection_.origin = commonData_->display.get();
+	forEdgeDetection_.output = intermediateDisplay_.get();
+	forEdgeDetection_.jobs_ = uint32_t(PostEffectJob::EdgeDetection);
+
 	gameOverText = std::make_unique<RenderObject>("GameOverText");
 	gameOverText->Initialize();
 	gameOverText->CreateCBV(sizeof(Matrix4x4), ShaderType::VERTEX_SHADER, "GameOverText::WVPMatrix");
@@ -130,8 +139,16 @@ void GameScene::Draw() {
 
 	display->ToTexture(cmdObj);
 
-#ifdef SH_RELEASE
+	forEdgeDetection_.cmdObj = cmdObj;
+	int edgeDetectionTextureIndex = commonData_->display->GetDepthTexture()->GetOffset();
+	edgeDetection_->CopyBuffer(PostEffectJob::EdgeDetection, edgeDetectionTextureIndex);
+	edgeDetection_->Draw(forEdgeDetection_);
+	intermediateDisplay_->DrawImGui();
+
 	postEffectConfig_.cmdObj = cmdObj;
+
+#ifdef SH_RELEASE
+
 	postEffectConfig_.output = window;
 	postEffect_->Draw(postEffectConfig_);
 	cmdObj->SetRenderTarget(window, false);
@@ -151,6 +168,10 @@ void GameScene::Draw() {
 	tetris_->DrawImGui();
 	gameCamera_->DrawImGui();
 	timeViewer_->DrawImGui();
+	auto depthPtr = commonData_->display->GetDepthTexture()->GetGPUHandle().ptr;
+	ImGui::Begin("Depth");
+	ImGui::Image(ImTextureRef(depthPtr), ImVec2(1280 / 4, 720 / 4));
+	ImGui::End();
 
 	ImGui::Begin("FPS");
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
@@ -164,6 +185,8 @@ void GameScene::Draw() {
 	static bool vignette = false;
 	static bool boxBlur = false;
 	static bool gaussBlur = false;
+	static bool edgeDetection = false;
+	static bool outline = false;
 	ImGui::Checkbox("GrayScale", &grayScale);
 	if (grayScale) {
 		static Grayscale config;
@@ -200,13 +223,30 @@ void GameScene::Draw() {
 		ImGui::PopID();
 		postEffect_->CopyBuffer(PostEffectJob::GaussBlur, config);
 	}
+	ImGui::Checkbox("EdgeDetection", &edgeDetection);
+	if (edgeDetection) {
+		//データは必要ないため無記入
+	}
+	ImGui::Checkbox("Outline", &outline);
+	if (outline) {
+		static Outline config;
+		config.edgeTextureIndex = intermediateDisplay_->GetTextureData()->GetOffset();
+		ImGui::PushID("Outline");
+		ImGui::ColorEdit4("Color", &config.color.x);
+		ImGui::DragFloat("Strength", &config.strength, 0.01f);
+		ImGui::PopID();
+		postEffect_->CopyBuffer(PostEffectJob::Outline, config);
+	}
 	ImGui::End();
+	
 
 	postEffectConfig_.jobs_ =
 		uint32_t(grayScale) << 1 |
 		uint32_t(vignette) << 2 |
 		uint32_t(boxBlur) << 3 |
-		uint32_t(gaussBlur) << 4;
+		uint32_t(gaussBlur) << 4 |
+		uint32_t(edgeDetection) << 5 |
+		uint32_t(outline) << 6;
 #endif
 
 	engine_->DrawImGui(cmdObj);
