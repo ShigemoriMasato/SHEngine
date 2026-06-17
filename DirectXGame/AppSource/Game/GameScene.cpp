@@ -187,6 +187,7 @@ void GameScene::Draw() {
 	static bool gaussBlur = false;
 	static bool edgeDetection = false;
 	static bool outline = false;
+	static bool radialBlur = false;
 	ImGui::Checkbox("GrayScale", &grayScale);
 	if (grayScale) {
 		static Grayscale config;
@@ -237,6 +238,16 @@ void GameScene::Draw() {
 		ImGui::PopID();
 		postEffect_->CopyBuffer(PostEffectJob::Outline, config);
 	}
+	ImGui::Checkbox("RadialBlur", &radialBlur);
+	if (radialBlur) {
+		static RadialBlur config;
+		ImGui::PushID("RadialBlur");
+		ImGui::DragFloat2("Center", &config.center.x, 0.01f);
+		ImGui::DragFloat("Strength", &config.strength, 0.01f);
+		ImGui::DragInt("SampleCount", &config.sampleCount, 1, 1, 10);
+		ImGui::PopID();
+		postEffect_->CopyBuffer(PostEffectJob::RadialBlur, config);
+	}
 	ImGui::End();
 	
 
@@ -246,7 +257,8 @@ void GameScene::Draw() {
 		uint32_t(boxBlur) << 3 |
 		uint32_t(gaussBlur) << 4 |
 		uint32_t(edgeDetection) << 5 |
-		uint32_t(outline) << 6;
+		uint32_t(outline) << 6 | 
+		uint32_t(radialBlur) << 7;
 #endif
 
 	engine_->DrawImGui(cmdObj);

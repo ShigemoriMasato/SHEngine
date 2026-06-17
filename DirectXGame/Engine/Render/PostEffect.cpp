@@ -44,6 +44,7 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 		createPostEffectObject(PostEffectJob::GaussBlur, "GaussBlur");
 		createPostEffectObject(PostEffectJob::EdgeDetection, "EdgeDetection");
 		createPostEffectObject(PostEffectJob::Outline, "Outline");
+		createPostEffectObject(PostEffectJob::RadialBlur, "RadialBlur");
 
 		//PostEffect用Displayの初期化
 		intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();

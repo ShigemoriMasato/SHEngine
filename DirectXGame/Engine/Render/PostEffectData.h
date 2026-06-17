@@ -35,3 +35,9 @@ struct Outline {
 	uint32_t edgeTextureIndex = 0;				// エッジ検出用のテクスチャインデックス
 	float strength = 0.0f;						// アウトラインの強さ
 };
+
+struct RadialBlur {
+	Vector2 center = { 0.5f, 0.5f };			// 中心座標（0.0 - 1.0）
+	float strength = 0.01f;						// ブラーの強さ
+	int sampleCount = 3;						// サンプル数
+};
