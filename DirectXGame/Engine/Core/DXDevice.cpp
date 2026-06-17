@@ -17,7 +17,7 @@ void DXDevice::Initialize() {
 	logger_ = GetLogger("Engine");
 	logger_->info("=== DXDevice ===");
 
-#if SH_DEBUG || SH_DEVELOP
+#if SH_DEBUG
 
     if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_)))) {
         //デバッグレイヤーを有効化する
@@ -34,7 +34,7 @@ void DXDevice::Initialize() {
 
 #endif
 
-    // dxgiFactory
+    // DXGIFactory
     //関数が成功したかどうかをSUCCEEDEDマクロで判定する
     HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
     assert(SUCCEEDED(hr));
@@ -100,7 +100,7 @@ void DXDevice::Initialize() {
     dsvManager_ =  std::make_unique<DSVManager>(device_.Get(), descriptorSizeDSV, 128);
 	logger_->info("Complete create DescriptorHeapManagers");
 
-#if SH_DEBUG || SH_DEVELOP
+#ifdef SH_DEBUG
 
     Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
     if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
@@ -141,7 +141,6 @@ void DXDevice::Initialize() {
     //includeに対応するための設定を行っておく
     hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
     assert(SUCCEEDED(hr));
-
 }
 
 IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderType shaderType) {

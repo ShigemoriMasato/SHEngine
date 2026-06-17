@@ -188,6 +188,7 @@ void GameScene::Draw() {
 	static bool edgeDetection = false;
 	static bool outline = false;
 	static bool radialBlur = false;
+	static bool disolve = false;
 	ImGui::Checkbox("GrayScale", &grayScale);
 	if (grayScale) {
 		static Grayscale config;
@@ -248,6 +249,24 @@ void GameScene::Draw() {
 		ImGui::PopID();
 		postEffect_->CopyBuffer(PostEffectJob::RadialBlur, config);
 	}
+	ImGui::Checkbox("Disolve", &disolve);
+	if (disolve) {
+		static std::vector<int> noise = {
+			textureManager_->LoadTexture("Noise0.png"),
+			textureManager_->LoadTexture("Noise1.png")
+		};
+		static Disolve config;
+		static int noiseIndex = 0;
+		ImGui::PushID("Disolve");
+		ImGui::SliderInt("NoiseTexture", &noiseIndex, 0, int(noise.size()) - 1);
+		ImGui::SliderFloat("Threshold", &config.threshold, 0.0f, 1.0f);
+		ImGui::DragFloat("EdgeThreshold", &config.edgeThreshold, 0.01f, 0.0f, 1.0f);
+		ImGui::ColorEdit3("EdgeColor", &config.edgeColor.x);
+		ImGui::PopID();
+		config.noiseTextureIndex = noise[noiseIndex];
+		config.transitionTextureIndex = 1;	//トランジションテクスチャのインデックスは1で固定
+		postEffect_->CopyBuffer(PostEffectJob::Disolve, config);
+	}
 	ImGui::End();
 	
 
@@ -258,7 +277,8 @@ void GameScene::Draw() {
 		uint32_t(gaussBlur) << 4 |
 		uint32_t(edgeDetection) << 5 |
 		uint32_t(outline) << 6 | 
-		uint32_t(radialBlur) << 7;
+		uint32_t(radialBlur) << 7 |
+		uint32_t(disolve) << 8;
 #endif
 
 	engine_->DrawImGui(cmdObj);
