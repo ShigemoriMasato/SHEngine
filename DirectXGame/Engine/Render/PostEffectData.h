@@ -42,7 +42,7 @@ struct RadialBlur {
 	int sampleCount = 3;						// サンプル数
 };
 
-struct Disolve {
+struct Dissolve {
 	uint32_t noiseTextureIndex = 0;				// ノイズテクスチャのインデックス
 	uint32_t transitionTextureIndex = 0;		// トランジションテクスチャのインデックス
 	float threshold = 0.5f;						// ディゾルブのしきい値（0.0 - 1.0）
