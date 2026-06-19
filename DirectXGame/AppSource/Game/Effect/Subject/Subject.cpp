@@ -38,7 +38,7 @@ void Subject::Update(const Matrix4x4& vpMat) {
 	hitEffect_->Update(deltatime, vpMat);
 }
 
-void Subject::Draw(CmdObj* cmdObj) {
+void Subject::Draw(DCC* cmdObj) {
 	animation_->Draw(cmdObj);
 
 	cube_->Draw(cmdObj);

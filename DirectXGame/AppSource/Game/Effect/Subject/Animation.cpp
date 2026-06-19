@@ -36,6 +36,6 @@ void Animation_Sub::Update(float deltaTime, const Matrix4x4& vpMatrix) {
 	boneBuffer_->CopyBuffer(wellForGPU_.data(), sizeof(WellForGPU) * wellForGPU_.size());
 }
 
-void Animation_Sub::Draw(CmdObj* cmdObj) {
+void Animation_Sub::Draw(DCC* cmdObj) {
 	renderer_->Draw(cmdObj);
 }

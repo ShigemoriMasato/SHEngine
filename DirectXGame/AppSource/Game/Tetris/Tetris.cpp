@@ -70,7 +70,7 @@ void Tetris::Update(float deltaTime) {
 	blockRender_->Update(deltaTime);
 }
 
-void Tetris::Draw(CmdObj* cmdObj) {
+void Tetris::Draw(DCC* cmdObj) {
 	blockRender_->Draw(cmdObj);
 }
 

@@ -23,7 +23,7 @@ public:
 
 	void BeginDeleteEffect(std::vector<int> fillLines, std::vector<std::vector<int>> deletedField);
 
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* cmdObj);
 	void DrawImGui();
 
 	bool GetIsEffecting() const { return isDeleting_; }

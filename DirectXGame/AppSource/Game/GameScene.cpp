@@ -39,7 +39,7 @@ void GameScene::Initialize() {
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
 	intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
-	intermediateDisplay_->Initialize(textureManager_, 1280, 720, 0xffffffff, "EdgeDetection");
+	intermediateDisplay_->Initialize(textureManager_, 1280, 720, 0xffffffff, 1, "EdgeDetection");
 
 	edgeDetection_ = std::make_unique<PostEffect>();
 	edgeDetection_->Initialize(textureManager_, pedd);
@@ -120,16 +120,16 @@ void GameScene::Draw() {
 
 	auto cmdObj = directContext_->GetCurrentCmdObj();
 
-	cmdObj->SetRenderTarget(display, false);
+	directContext_->SetRenderTarget(display, false);
 
-	tetris_->Draw(cmdObj);
+	tetris_->Draw(directContext_);
 	if (tetris_->IsGameOver()) {
 		Matrix4x4 wvp = gameoverMat * worldCamera_->GetVPMatrix();
 		gameOverText->CopyBufferData(0, &wvp, sizeof(Matrix4x4));
 		//gameOverText->Draw(cmdObj);
 	}
 
-	subject_->Draw(cmdObj);
+	subject_->Draw(directContext_);
 
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
 	timeViewer_->Add("Particle Draw", engine_->GetDirectCommandContext()->GetTimeStampResult("Particle Draw"));
@@ -139,13 +139,13 @@ void GameScene::Draw() {
 
 	display->ToTexture(cmdObj);
 
-	forEdgeDetection_.cmdObj = cmdObj;
+	forEdgeDetection_.cmdObj = directContext_;
 	int edgeDetectionTextureIndex = commonData_->display->GetDepthTexture()->GetOffset();
 	edgeDetection_->CopyBuffer(PostEffectJob::EdgeDetection, edgeDetectionTextureIndex);
 	edgeDetection_->Draw(forEdgeDetection_);
 	intermediateDisplay_->DrawImGui();
 
-	postEffectConfig_.cmdObj = cmdObj;
+	postEffectConfig_.cmdObj = directContext_;
 
 #ifdef SH_RELEASE
 

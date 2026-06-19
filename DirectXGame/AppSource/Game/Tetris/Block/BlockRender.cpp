@@ -242,7 +242,7 @@ void BlockRender::BeginDeleteEffect(std::vector<int> fillLines, std::vector<std:
 	deleteEffect_->Initialize();
 }
 
-void BlockRender::Draw(CmdObj* cmdObj) {
+void BlockRender::Draw(DCC* cmdObj) {
 	blockRenderer_->Draw(cmdObj);
 }
 

@@ -200,7 +200,7 @@ void HitEffect::Update(float deltaTime, const Matrix4x4& vpMat) {
 	d_colorBuffer_->CopyBuffer(&color, sizeof(color));
 }
 
-void HitEffect::Draw(CmdObj* cmdObj) {
+void HitEffect::Draw(DCC* cmdObj) {
 	renderer_->Draw(cmdObj);
 	d_renderer_->Draw(cmdObj);
 }

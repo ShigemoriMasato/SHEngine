@@ -23,7 +23,7 @@ public:
 	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime);
 
 	//パーティクルの描画
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* cmdObj);
 
 	//パーティクルの共通要素に関する操作
 	void DrawImGui();

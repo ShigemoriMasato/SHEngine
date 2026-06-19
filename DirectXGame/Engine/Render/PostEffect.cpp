@@ -25,10 +25,10 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 	container_ = std::make_unique<SHEngine::BufferContainer>(64);
 
 	//使用する
-	auto postEffectObject = std::make_unique<SHEngine::Renderer>(drawData);
-	postEffectObject->SetVS("PostEffect/PostEffect.VS.hlsl");
-	postEffectObject->SetSampler(SHEngine::PSO::SamplerID::MagNearest);
-	postEffectObject->SetUseTexture(true);
+	renderer_ = std::make_unique<SHEngine::Renderer>(drawData);
+	renderer_->SetVS("PostEffect/PostEffect.VS.hlsl");
+	renderer_->SetSampler(SHEngine::PSO::SamplerID::MagNearest);
+	renderer_->SetUseTexture(true);
 
 	//最後のコピー用に一つ
 	int textureIndexBufferNum = 1;

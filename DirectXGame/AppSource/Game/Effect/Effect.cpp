@@ -42,11 +42,9 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix,
 }
 
 void Effect::Draw(SHEngine::Screen::IDisplay* display) {
-	auto cmdObj = direct_->GetCurrentCmdObj();
-
 	//描画
-	cmdObj->SetRenderTarget(display, true);
-	particlePool_->Draw(cmdObj);
+	direct_->SetRenderTarget(display, true);
+	particlePool_->Draw(direct_);
 
 	//更新処理の後にこの関数を呼び出す
 	//engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);

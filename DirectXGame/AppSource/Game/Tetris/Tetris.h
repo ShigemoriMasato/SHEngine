@@ -14,7 +14,7 @@ public:
 
 	void Initialize(KeyCoating* keys, Camera* camera, const SHEngine::DrawData& drawData, SHEngine::TextureData* ddsTexture);
 	void Update(float deltaTime);
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* cmdObj);
 	void DrawImGui();
 
 	bool IsGameOver() const { return gameOver_; }

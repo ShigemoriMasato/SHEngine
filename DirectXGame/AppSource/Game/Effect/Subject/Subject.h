@@ -10,7 +10,7 @@ public:
 
 	void Initialize(SHEngine::Engine* engine);
 	void Update(const Matrix4x4& vpMat);
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* cmdObj);
 
 private:
 

@@ -7,7 +7,7 @@ public:
 
 	void Initialize(SHEngine::Engine* engine);
 	void Update(float deltaTime, const Matrix4x4& vpMatrix);
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* cmdObj);
 
 private:
 

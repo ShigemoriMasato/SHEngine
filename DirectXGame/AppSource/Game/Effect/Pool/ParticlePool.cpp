@@ -49,7 +49,7 @@ void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardM
 	pool_.deltaTime->CopyBuffer(&deltaTime, sizeof(float));
 }
 
-void ParticlePool::Draw(CmdObj* cmdObj) {
+void ParticlePool::Draw(DCC* cmdObj) {
 	renderer_->Draw(cmdObj);
 }
 
