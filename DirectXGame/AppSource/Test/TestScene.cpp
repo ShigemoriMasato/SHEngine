@@ -29,16 +29,16 @@ void TestScene::Draw() {
 	auto window = commonData_->window.get();
 	auto display = commonData_->display.get();
 
-	cmdObj->SetRenderTarget(display);
+	directContext_->SetRenderTarget(display);
 
-	ddsTest_->Draw(cmdObj);
+	ddsTest_->Draw(directContext_);
 
 	grid_->Draw(cmdObj);
 
 	display->ToPresent(cmdObj);
 
 
-	cmdObj->SetRenderTarget(window, false);
+	directContext_->SetRenderTarget(window, false);
 
 #ifdef USE_IMGUI
 

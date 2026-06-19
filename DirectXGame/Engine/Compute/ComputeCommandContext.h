@@ -8,8 +8,6 @@ namespace SHEngine {
 
 		void Initialize(DXDevice* device, int initCmdObjNum = 2);
 
-
-
 	private:
 
 	};

@@ -25,15 +25,21 @@ namespace SHEngine::PSO {
 		/// @brief 入力レイアウトID
 		InputLayoutID inputLayoutID = InputLayoutID::Default;
 		/// @brief ブレンドステートID
-		BlendStateID blendID = BlendStateID::Normal;
+		BlendStateID blendID[8] = {};
 		/// @brief 深度ステンシルID
 		DepthStencilID depthStencilID = DepthStencilID::Default;
 		/// @brief ラスタライザーID
 		RasterizerID rasterizerID = RasterizerID::Fill;
 		/// @brief プリミティブトポロジー
 		D3D12_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		/// @brief スワップチェーン用かどうか
-		bool isSwapChain = false;
+		/// @brief RTVのフォーマット
+		DXGI_FORMAT rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		/// @brief RTVの数
+		UINT rtvNum = 1;
+		/// @brief DSVが必要かどうか
+		bool isDSV = true;
+		/// @brief DSVのフォーマット
+		DXGI_FORMAT dsvFormat = DXGI_FORMAT_D32_FLOAT;
 
 		/**
 		* @brief 等価演算子
@@ -43,13 +49,23 @@ namespace SHEngine::PSO {
 		bool operator==(const Config& other) const {
 			return vs == other.vs &&
 				ps == other.ps &&
-				blendID == other.blendID &&
+				blendID[0] == other.blendID[0] &&
+				blendID[1] == other.blendID[1] &&
+				blendID[2] == other.blendID[2] &&
+				blendID[3] == other.blendID[3] &&
+				blendID[4] == other.blendID[4] &&
+				blendID[5] == other.blendID[5] &&
+				blendID[6] == other.blendID[6] &&
+				blendID[7] == other.blendID[7] &&
 				depthStencilID == other.depthStencilID &&
 				rasterizerID == other.rasterizerID &&
 				rootConfig == other.rootConfig &&
 				inputLayoutID == other.inputLayoutID &&
 				topology == other.topology &&
-				isSwapChain == other.isSwapChain;
+				rtvFormat == other.rtvFormat &&
+				rtvNum == other.rtvNum &&
+				isDSV == other.isDSV &&
+				dsvFormat == other.dsvFormat;
 		}
 
 		/**
@@ -77,15 +93,25 @@ namespace std {
 		 */
 		size_t operator()(const SHEngine::PSO::Config& cfg) const {
 			size_t h = 0;
-			hash_combine(h, hash<string>()(cfg.vs));
-			hash_combine(h, hash<string>()(cfg.ps));
-			hash_combine(h, hash<int>()(static_cast<int>(cfg.blendID)));
-			hash_combine(h, hash<int>()(static_cast<int>(cfg.depthStencilID)));
-			hash_combine(h, hash<int>()(static_cast<int>(cfg.rasterizerID)));
-			hash_combine(h, hash<SHEngine::PSO::RootSignatureConfig>()((cfg.rootConfig)));
-			hash_combine(h, hash<int>()(static_cast<int>(cfg.inputLayoutID)));
-			hash_combine(h, hash<int>()(static_cast<int>(cfg.topology)));
-			hash_combine(h, hash<bool>()(cfg.isSwapChain));
+			// 文字列
+			hash_combine(h, std::hash<std::string>()(cfg.vs));
+			hash_combine(h, std::hash<std::string>()(cfg.ps));
+			// ルートシグネチャ設定（既にハッシュ特殊化あり）
+			hash_combine(h, std::hash<SHEngine::PSO::RootSignatureConfig>()(cfg.rootConfig));
+			// 入力レイアウト（enum -> 整数）
+			hash_combine(h, std::hash<uint8_t>()(static_cast<uint8_t>(cfg.inputLayoutID)));
+			// ブレンドステート配列
+			for (const auto& b : cfg.blendID) {
+				hash_combine(h, std::hash<uint8_t>()(static_cast<uint8_t>(b)));
+			}
+			// 深度ステンシル / ラスタライザ / トポロジ / フォーマット類
+			hash_combine(h, std::hash<uint8_t>()(static_cast<uint8_t>(cfg.depthStencilID)));
+			hash_combine(h, std::hash<uint8_t>()(static_cast<uint8_t>(cfg.rasterizerID)));
+			hash_combine(h, std::hash<UINT>()(static_cast<UINT>(cfg.topology)));
+			hash_combine(h, std::hash<UINT>()(static_cast<UINT>(cfg.rtvFormat)));
+			hash_combine(h, std::hash<UINT>()(static_cast<UINT>(cfg.rtvNum)));
+			hash_combine(h, std::hash<bool>()(cfg.isDSV));
+			hash_combine(h, std::hash<UINT>()(static_cast<UINT>(cfg.dsvFormat)));
 			return h;
 		}
 

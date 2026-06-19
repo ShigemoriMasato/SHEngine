@@ -166,7 +166,7 @@ void RenderObject::Draw(Command::Object* cmdObject) {
 	auto cmdList = cmdObject->GetCommandList();
 
 	//パイプラインステートの設定
-	psoConfig_.isSwapChain = cmdObject->GetRenderTarget()->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	psoConfig_.rtvFormat = cmdObject->GetRenderTarget()->GetRTVFormat();
 	psoEditor_->SetPSO(cmdList, psoConfig_);
 
 	//頂点バッファの設定

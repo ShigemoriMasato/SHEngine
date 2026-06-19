@@ -11,14 +11,31 @@ void SHEngine::Renderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderTyp
 	gpuBuffers_[bufferType][shaderType].push_back(gpuBuffer);
 }
 
-void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
+void SHEngine::Renderer::SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType) {
+	for (const auto& gpuBuffer : gpuBuffers) {
+		SetGPUBuffer(gpuBuffer, shaderType, bufferType);
+	}
+}
+
+void SHEngine::Renderer::ResetGPUBuffers() {
+	for (auto& [bufferType, bufferSplitShader] : gpuBuffers_) {
+		for (auto& [shaderType, buffers] : bufferSplitShader) {
+			buffers.clear();
+		}
+	}
+}
+
+void SHEngine::Renderer::EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer) {
+	auto& buffers = gpuBuffers_[bufferType][shaderType];
+	buffers.erase(std::remove(buffers.begin(), buffers.end(), gpuBuffer), buffers.end());
+}
+
+void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
+	auto cmdObj = dcc->GetCurrentCmdObj();
 	auto cmdList = cmdObj->GetCommandList();
-	auto display = cmdObj->GetRenderTarget();
+	auto display = dcc->GetRenderTarget();
 
 	PSO::Config config;
-
-	config.isSwapChain = display->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
 	//PSOConfigを調整
 	config.rootConfig.cbvNums = {
 		int(gpuBuffers_[BufferType::CBV][ShaderType::VERTEX_SHADER].size()),
@@ -46,11 +63,13 @@ void SHEngine::Renderer::Draw(CmdObj* cmdObj) {
 	config.vs = vs_;
 	config.ps = ps_;
 	config.inputLayoutID = inputLayoutID_;
-	config.blendID = blendID_;
+	for (int i = 0; i < 8; ++i) {
+		config.blendID[i] = blendID_[i];
+	}
 	config.depthStencilID = depthStencilID_;
 	config.rasterizerID = rasterizerID_;
 	config.topology = topology_;
-	config.isSwapChain = isSwapChain_;
+	config.rtvFormat = display->GetRTVFormat();
 
 	psoEditor_->SetPSO(cmdList, config);
 

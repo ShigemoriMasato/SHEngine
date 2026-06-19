@@ -15,6 +15,7 @@ namespace SHEngine::PSO {
 		Subtract,   ///< 減算ブレンド
 		Multiply,   ///< 乗算ブレンド
 		Screen,     ///< スクリーンブレンド
+		None,       ///< ブレンドなし
 
 		Count       ///< ブレンドモードの総数
 	};
@@ -37,12 +38,12 @@ namespace SHEngine::PSO {
 		 * @param id ブレンドステートID
 		 * @return ブレンドステートの設定
 		 */
-		D3D12_BLEND_DESC GetBlendState(BlendStateID id) const;
+		D3D12_BLEND_DESC GetBlendState(BlendStateID* id) const;
 
 	private:
 
 		/// @brief 事前定義されたブレンドステートの配列
-		std::vector<D3D12_BLEND_DESC> blendStates_;
+		std::vector<D3D12_RENDER_TARGET_BLEND_DESC> blendStates_;
 
 	};
 

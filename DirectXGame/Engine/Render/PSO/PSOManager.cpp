@@ -43,7 +43,6 @@ void Manager::CreatePSO(PSO::Config config) {
 	//defaultとして設定したPSOを持ってくる
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	//あんまり変わらないやつ
-	psoDesc.NumRenderTargets = 1;
 	psoDesc.SampleDesc.Count = 1;
 	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
@@ -56,8 +55,10 @@ void Manager::CreatePSO(PSO::Config config) {
 	psoDesc.BlendState = blendStateShelf_->GetBlendState(config.blendID);
 	psoDesc.RasterizerState = rasterizerShelf_->GetRasterizerDesc(config.rasterizerID);
 	psoDesc.InputLayout = inputLayoutShelf_->GetInputLayoutDesc(config.inputLayoutID);
-
-	psoDesc.RTVFormats[0] = config.isSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+	psoDesc.NumRenderTargets = config.rtvNum;
+	for (uint32_t i = 0; i < config.rtvNum; ++i) {
+		psoDesc.RTVFormats[i] = config.rtvFormat;
+	}
 	psoDesc.PrimitiveTopologyType = topologyMap_[config.topology];
 
 	ID3D12PipelineState* pso = nullptr;

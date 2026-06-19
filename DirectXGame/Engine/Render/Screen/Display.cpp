@@ -41,21 +41,23 @@ namespace {
 
 }
 
-void SHEngine::Screen::Display::Initialize(TextureManager* textureManager, int width, int height, uint32_t clearColor, std::string windowName) {
+void SHEngine::Screen::Display::Initialize(TextureManager* textureManager, int width, int height, uint32_t clearColor, uint32_t rtNum, std::string windowName) {
     ID3D12Device* device = device_->GetDevice();
     DSVManager* dsvManager = device_->GetDSVManager();
     RTVManager* rtvManager = device_->GetRTVManager();
     rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
 
     //テクスチャの生成
-    int textureHandle = textureManager->CreateWindowTexture(width, height, clearColor);
-    textureData_ = textureManager->GetTextureData(textureHandle);
+	textureData_.resize(rtNum);
+    for (uint32_t i = 0; i < rtNum; ++i) {
+        int textureHandle = textureManager->CreateWindowTexture(width, height, clearColor);
+        textureData_[i] = textureManager->GetTextureData(textureHandle);
+    }
+
     width_ = width;
     height_ = height;
 
-    PrivateInitialize(textureManager, windowName);
-
-	currentBarrier_ = D3D12_RESOURCE_STATE_PRESENT;
+    PrivateInitialize(textureManager, rtNum, windowName);
 
     isOffScreen_ = true;
 }
@@ -63,15 +65,15 @@ void SHEngine::Screen::Display::Initialize(TextureManager* textureManager, int w
 void SHEngine::Screen::Display::Initialize(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor, std::string windowName) {
     rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
+	textureData_.resize(1);
+
 	//スワップチェーンのリソースからテクスチャを作成
 	int textureHandle = textureManager->CreateSwapChainTexture(resource, clearColor);
-	textureData_ = textureManager->GetTextureData(textureHandle);
-	width_ = textureData_->GetSize().first;
-	height_ = textureData_->GetSize().second;
+	textureData_[0] = textureManager->GetTextureData(textureHandle);
+	width_ = textureData_[0]->GetSize().first;
+	height_ = textureData_[0]->GetSize().second;
 
-    PrivateInitialize(textureManager, windowName);
-
-	currentBarrier_ = D3D12_RESOURCE_STATE_PRESENT;
+    PrivateInitialize(textureManager, 1, windowName);
 
 	isOffScreen_ = false;
 }
@@ -81,19 +83,22 @@ void SHEngine::Screen::Display::DrawImGui() {
 
 	Vector2 aspectRatio = { static_cast<float>(width_) / height_, 1.0f };
 
-    ImGui::Begin(windowName_.c_str());
+    for (int i = 0; i < textureData_.size(); ++i) {
+		std::string nameStr = windowName_ + (i != 0 ? std::string("_") + std::to_string(i) : "");
+        ImGui::Begin(nameStr.c_str());
 
-	ImVec2 windowSize = ImGui::GetContentRegionAvail();
-    float ratio;
-    if (windowSize.x / windowSize.y > aspectRatio.x) {
-		ratio = windowSize.y / height_;
-    } else {
-		ratio = windowSize.x / width_;
+        ImVec2 windowSize = ImGui::GetContentRegionAvail();
+        float ratio;
+        if (windowSize.x / windowSize.y > aspectRatio.x) {
+            ratio = windowSize.y / height_;
+        } else {
+            ratio = windowSize.x / width_;
+        }
+        ImVec2 imageSize = ImVec2(width_ * ratio, height_ * ratio);
+
+        ImGui::Image(ImTextureRef(textureData_[i]->GetGPUHandle().ptr), imageSize);
+        ImGui::End();
     }
-	ImVec2 imageSize = ImVec2(width_ * ratio, height_ * ratio);
-
-	ImGui::Image(ImTextureRef(textureData_->GetGPUHandle().ptr), imageSize);
-    ImGui::End();
 
 #endif // USE_IMGUI
 
@@ -137,19 +142,25 @@ bool SHEngine::Screen::Display::IsHovering() {
 	return isHovering;
 }
 
-void SHEngine::Screen::Display::PrivateInitialize(SHEngine::TextureManager* textureManager, std::string windowName) {
+void SHEngine::Screen::Display::PrivateInitialize(SHEngine::TextureManager* textureManager, uint32_t rtvNum, std::string windowName) {
     ID3D12Device* device = device_->GetDevice();
     DSVManager* dsvManager = device_->GetDSVManager();
     RTVManager* rtvManager = device_->GetRTVManager();
 
-    //RTVの設定
-    rtvHandle_.UpdateHandle(rtvManager);
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-    rtvDesc.Format = rtvFormat_;
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;	//2Dテクスチャとしてよみこむ
-    device->CreateRenderTargetView(textureData_->GetResource(), &rtvDesc, rtvHandle_.GetCPU());
+	rtvHandle_.resize(rtvNum);
+	rtvHandlePtr_.resize(rtvNum);
 
-    //DSVの設定
+    //RTVの設定(指定された個数)
+    for (uint32_t i = 0; i < rtvNum; ++i) {
+        rtvHandle_[i].UpdateHandle(rtvManager);
+        D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+        rtvDesc.Format = rtvFormat_;
+        rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;	//2Dテクスチャとしてよみこむ
+        rtvHandlePtr_[i] = rtvHandle_[i].GetCPU();
+        device->CreateRenderTargetView(textureData_[i]->GetResource(), &rtvDesc, rtvHandlePtr_[i]);
+    }
+
+    //DSVの設定(共有で一つ)
     dsvHandle_.UpdateHandle(dsvManager);
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
     dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -158,6 +169,7 @@ void SHEngine::Screen::Display::PrivateInitialize(SHEngine::TextureManager* text
     device->CreateDepthStencilView(row, &dsvDesc, dsvHandle_.GetCPU());
     int dsTextureIndex = textureManager->CreateDepthTexture(row);
     depthTextureData_ = textureManager->GetTextureData(dsTextureIndex);
+	dsvHandlePtr_ = dsvHandle_.GetCPU();
 
 	if (windowName != "") {
 		windowName_ = windowName;
@@ -165,13 +177,19 @@ void SHEngine::Screen::Display::PrivateInitialize(SHEngine::TextureManager* text
 		static int displayCount = 0;
 		windowName_ = "NoName_" + std::format("{:02d}", displayCount++);
 	}
+
+	currentBarrier_.resize(rtvNum, D3D12_RESOURCE_STATE_COMMON);
 }
 
 void SHEngine::Screen::Display::Clear(Command::Object* cmdObject) {
-    Vector4 color = textureData_->GetClearColor();
-    //レンダーターゲットと深度ステンシルをクリア
-    cmdObject->GetCommandList()->ClearRenderTargetView(GetRTVHandle(), &color.x, 0, nullptr);
-	cmdObject->GetCommandList()->ClearDepthStencilView(GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    //RenderTargetをクリア
+    for (size_t i = 0; i < textureData_.size(); ++i) {
+        Vector4 color = textureData_[i]->GetClearColor();
+        cmdObject->GetCommandList()->ClearRenderTargetView(GetRTVHandle()[i], &color.x, 0, nullptr);
+    }
+
+	//DepthStencilをクリア
+	cmdObject->GetCommandList()->ClearDepthStencilView(*GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void SHEngine::Screen::Display::ToRenderTarget(Command::Object* cmdObject) {
@@ -193,8 +211,18 @@ void SHEngine::Screen::Display::ToTexture(Command::Object* cmdObject) {
 	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
+D3D12_CPU_DESCRIPTOR_HANDLE* SHEngine::Screen::Display::GetRTVHandle() {
+    return rtvHandlePtr_.data();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE* SHEngine::Screen::Display::GetDSVHandle() {
+    return &dsvHandlePtr_;
+}
+
 void SHEngine::Screen::Display::TransitionBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
-	SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentBarrier_, textureData_->GetResource());
+    for (size_t i = 0; i < textureData_.size(); ++i) {
+        SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentBarrier_[i], textureData_[i]->GetResource());
+    }
 }
 
 void SHEngine::Screen::Display::TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {

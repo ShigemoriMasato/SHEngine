@@ -79,7 +79,7 @@ void DDSTest::Update(float deltaTime, Camera* camera) {
 	psBuffer_->CopyBuffer(&psData_, sizeof(psData_));
 }
 
-void DDSTest::Draw(CmdObj* cmdObj) {
+void DDSTest::Draw(DCC* cmdObj) {
 	ddsCube_->Draw(cmdObj);
 	reflectObj_->Draw(cmdObj);
 }

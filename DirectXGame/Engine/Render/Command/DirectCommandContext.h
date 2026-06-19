@@ -8,7 +8,15 @@ namespace SHEngine {
 
 		void Initialize(DXDevice* device, int initCmdObjNum = 2);
 
+		void SetRenderTarget(Screen::IDisplay* display, bool clear = true);
+
+		Screen::IDisplay* GetRenderTarget() { return renderTarget_; }
+
 	private:
+
+		Screen::IDisplay* renderTarget_ = nullptr;
 
 	};
 }
+
+using DCC = SHEngine::DirectCommandContext;

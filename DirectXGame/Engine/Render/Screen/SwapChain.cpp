@@ -63,7 +63,7 @@ void SHEngine::Screen::SwapChain::Clear(Command::Object* cmdObject) {
     color[1] = clearColor.y;
     color[2] = clearColor.z;
     color[3] = clearColor.w;
-	cmdList->ClearRenderTargetView(GetRTVHandle(), color, 0, nullptr);
+	cmdList->ClearRenderTargetView(*GetRTVHandle(), color, 0, nullptr);
 }
 
 void SHEngine::Screen::SwapChain::Present() {

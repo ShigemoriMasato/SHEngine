@@ -21,18 +21,27 @@ bool operator<(PostEffectJob a, PostEffectJob b) {
 }
 
 void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData, bool copyOnly) {
+	//containerの用意
+	container_ = std::make_unique<SHEngine::BufferContainer>(64);
+
+	//使用する
+	auto postEffectObject = std::make_unique<SHEngine::Renderer>(drawData);
+	postEffectObject->SetVS("PostEffect/PostEffect.VS.hlsl");
+	postEffectObject->SetSampler(SHEngine::PSO::SamplerID::MagNearest);
+	postEffectObject->SetUseTexture(true);
+
+	//最後のコピー用に一つ
+	int textureIndexBufferNum = 1;
+
 	//RenderObjectの初期化
-	auto createPostEffectObject = [&](PostEffectJob job, std::string psPath) {
-		auto postEffectObject = std::make_unique<SHEngine::RenderObject>("PostEffect::" + psPath);
-		postEffectObject->Initialize();
-		postEffectObject->psoConfig_.vs = "PostEffect/PostEffect.VS.hlsl";
-		postEffectObject->psoConfig_.ps = "PostEffect/" + psPath + ".PS.hlsl";
-		postEffectObject->psoConfig_.rootConfig.samplers = uint32_t(SHEngine::PSO::SamplerID::MagNearest);
-		postEffectObject->SetUseTexture(true);
-		postEffectObject->SetDrawData(drawData);
-		postEffectObject->CreateCBV(sizeof(int), ShaderType::PIXEL_SHADER, "PostEffect::SourceTexture");
-		postEffectObject->CreateCBV(512, ShaderType::PIXEL_SHADER, "PostEffect::SourceTextureOffset");
-		postEffectObjects_[job] = std::move(postEffectObject);
+	auto createPostEffectObject = [this, &textureIndexBufferNum](PostEffectJob job, std::string psPath) {
+		Part part;
+		part.name = psPath;
+		part.cbvBuffer = container_->Create(BufferType::CBV, 512);
+		parts_[job] = part;
+
+		//バッファの種類が増えるたび、textureIndexBufferNumを増やす必要がある
+		textureIndexBufferNum++;
 		};
 
 	createPostEffectObject(PostEffectJob::None, "Simple");
@@ -51,33 +60,45 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 		intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
 		intermediateDisplay_->Initialize(textureManager, 1280, 720, 0xffffffff);
 	}
+
+	textureIndexBuffers_.resize(textureIndexBufferNum);
+	for (int i = 0; i < textureIndexBufferNum; i++) {
+		auto& buffer = textureIndexBuffers_[i];
+		buffer = container_->Create(BufferType::CBV, sizeof(int));
+	}
 }
 
 void PostEffect::Draw(const PostEffectConfig& config) {
 	uint32_t jobs = config.jobs_;
 	SHEngine::Screen::IDisplay* origin = config.origin;
 	SHEngine::Screen::IDisplay* output = intermediateDisplay_.get();
-	auto cmdObject = config.cmdObj;
+	auto dcc = config.cmdObj;
+	auto cmdObject = config.cmdObj->GetCurrentCmdObj();
 
-	//jobがなければ飛ばす
-	if (jobs == 0) {
-		goto FINAL_DRAW;
-	}
-
-	for (const auto& [job, obj] : postEffectObjects_) {
+	int drawCount = 0;
+	for (const auto& [job, part] : parts_) {
 		//ジョブがなければ終了
 		if (!(jobs & job)) {
+			if (jobs == 0) {
+				break;
+			}
 			continue;
 		}
 
 		//描画処理
 		cmdObject->SetRenderTarget(output);
 		origin->ToTexture(cmdObject);
-		//RenderObjectにテクスチャをセット
+		//bufferにテクスチャをセット
 		int textureIndex = origin->GetTextureData()->GetOffset();
-		obj->CopyBufferData(0, &textureIndex, sizeof(int));
-		obj->psoConfig_.isSwapChain = output->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-		obj->Draw(cmdObject);
+		auto& buffer = textureIndexBuffers_.at(drawCount);
+		buffer->CopyBuffer(&textureIndex, sizeof(int));
+		
+		//bufferをset
+		renderer_->ResetGPUBuffers();
+		renderer_->SetGPUBuffers({ buffer, part.cbvBuffer }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+
+		//描画
+		renderer_->Draw(dcc);
 
 		//描画先と描画元の入れ替え
 		std::swap(origin, output);
@@ -85,12 +106,8 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 		//jobを完遂したので削除
 		jobs &= ~job;
 
-		if(jobs == 0) {
-			break;
-		}
+		drawCount++;
 	}
-
-FINAL_DRAW:
 
 	//最終出力先に描画
 	output = config.output;
@@ -107,9 +124,21 @@ FINAL_DRAW:
 	cmdObject->SetRenderTarget(output, true);
 	origin->ToTexture(cmdObject);
 	int textureIndex = origin->GetTextureData()->GetOffset();
-	auto finalObj = postEffectObjects_.at(PostEffectJob::None).get();
-	finalObj->CopyBufferData(0, &textureIndex, sizeof(int));
-	finalObj->psoConfig_.isSwapChain = output->GetRTVFormat() == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	finalObj->Draw(cmdObject);
+
+	//描画処理
+	cmdObject->SetRenderTarget(output);
+	origin->ToTexture(cmdObject);
+	//bufferにテクスチャをセット
+	auto& buffer = textureIndexBuffers_.at(drawCount);
+	buffer->CopyBuffer(&textureIndex, sizeof(int));
+
+	//bufferをset
+	auto part = parts_.at(PostEffectJob::None);
+	renderer_->ResetGPUBuffers();
+	renderer_->SetGPUBuffers({ buffer, part.cbvBuffer }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+
+	//描画
+	renderer_->Draw(dcc);
+
 	output->ToPresent(cmdObject);
 }

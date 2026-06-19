@@ -1,5 +1,5 @@
 #pragma once
-#include <Render/RenderObject.h>
+#include <Render/Renderer.h>
 #include <Render/Screen/Display.h>
 #include "PostEffectData.h"
 
@@ -22,7 +22,7 @@ uint32_t operator~(PostEffectJob a);
 bool operator<(PostEffectJob a, PostEffectJob b);
 
 struct PostEffectConfig {
-	CmdObj* cmdObj = nullptr;
+	SHEngine::DirectCommandContext* cmdObj = nullptr;
 	SHEngine::Screen::IDisplay* origin = nullptr;
 	SHEngine::Screen::IDisplay* output = nullptr;	//nullptrの場合はoriginに描画する
 
@@ -41,12 +41,19 @@ public:
 private:
 
 	std::unique_ptr<SHEngine::Screen::Display> intermediateDisplay_ = nullptr;
-	std::map<PostEffectJob, std::unique_ptr<SHEngine::RenderObject>> postEffectObjects_{};
+	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
+	std::unique_ptr<SHEngine::Renderer> renderer_{};
 
+	struct Part {
+		std::string name;
+		SHEngine::GPUBuffer* cbvBuffer = nullptr;
+	};
+	std::map<PostEffectJob, Part> parts_{};
+	std::vector<SHEngine::GPUBuffer*> textureIndexBuffers_{};
 };
 
 template<typename T>
 inline void PostEffect::CopyBuffer(PostEffectJob job, const T& data) {
-	auto& postEffectObject = postEffectObjects_.at(job);
-	postEffectObject->CopyBufferData(1, &data, sizeof(T));
+	auto& part = parts_[job];
+	part.cbvBuffer->CopyBuffer(&data, sizeof(T));
 }

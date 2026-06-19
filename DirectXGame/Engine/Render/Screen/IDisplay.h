@@ -38,10 +38,13 @@ namespace SHEngine::Screen {
 		virtual int GetRTVNum() { return 1; };
 
 		// @brief RTVのCPUHandleを取得する。
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() = 0;
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE* GetRTVHandle() = 0;
+
+		// @brief RTVの数を取得する
+		virtual uint32_t GetRenderTargetNum() { return 1; }
 
 		// @brief DSVのCPUHandleを取得する。
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle() = 0;
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE* GetDSVHandle() = 0;
 
 		// @brief ImGuiの描画
 		virtual void DrawImGui() {}

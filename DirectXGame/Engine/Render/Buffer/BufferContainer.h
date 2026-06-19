@@ -12,11 +12,11 @@ namespace SHEngine {
 		 
 		// @brief GPUBufferの作成。作られた順番に0からインデックスが振られる。Copyするときはこのインデックスを指定する。
 		// @param bufferType バッファの種類（CBV、SRV、UAVの組み合わせ）
-		// @param size バッファのサイズ（バイト単位）
+		// @param byte バッファのサイズ（バイト単位）
 		// @param num バッファの数（デフォルトは1）
 		// @param bufferNum バッファの数（デフォルトは3、スワップチェーンのバッファ数に合わせる）
-		GPUBuffer* Create(BufferType bufferType, size_t size, uint32_t num = 1, BufferNum bufferNum = BufferNum::MatchSwapChain) {
-			auto& buffer = buffers_.emplace_back(std::make_unique<GPUBuffer>(bufferType, size, num, bufferNum));
+		GPUBuffer* Create(BufferType bufferType, size_t byte, uint32_t num = 1, BufferNum bufferNum = BufferNum::MatchSwapChain) {
+			auto& buffer = buffers_.emplace_back(std::make_unique<GPUBuffer>(bufferType, byte, num, bufferNum));
 			return buffer.get();
 		}
 

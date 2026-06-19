@@ -40,10 +40,10 @@ namespace SHEngine::Screen {
 		int GetRTVNum() { return 1; };
 
 		// @brief RTVのCPUHandleを取得する。
-		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() override { return displays_[currentBufferIndex_]->GetRTVHandle(); }
+		D3D12_CPU_DESCRIPTOR_HANDLE* GetRTVHandle() override { return displays_[currentBufferIndex_]->GetRTVHandle(); }
 
 		// @brief DSVのCPUHandleを取得する。
-		D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle() override { return displays_[currentBufferIndex_]->GetDSVHandle(); }
+		D3D12_CPU_DESCRIPTOR_HANDLE* GetDSVHandle() override { return displays_[currentBufferIndex_]->GetDSVHandle(); }
 
 		// @brief ImGuiの描画
 		void DrawImGui() {}
