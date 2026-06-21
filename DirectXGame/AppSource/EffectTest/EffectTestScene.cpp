@@ -10,6 +10,13 @@ void EffectTestScene::Initialize() {
 
 	hitEffect_ = std::make_unique<HitEffect>();
 	hitEffect_->Initialize(engine_);
+
+	postEffect_ = std::make_unique<PostEffect>();
+	postEffect_->Initialize(textureManager_, drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex), true);
+	peConfig_.origin = commonData_->display.get();
+	peConfig_.output = commonData_->window.get();
+	peConfig_.jobs_ = uint32_t(PostEffectJob::None);
+	peConfig_.dcc = directContext_;
 }
 
 std::unique_ptr<IScene> EffectTestScene::Update() {
@@ -35,7 +42,16 @@ void EffectTestScene::Draw() {
 
 	display->DrawImGui();
 
-	directContext_->SetRenderTarget(window, true);
+
+	bool isFill = true;
+#ifdef SH_RELEASE
+
+	postEffect_->Draw(peConfig_);
+	isFill = false;
+
+#endif
+
+	directContext_->SetRenderTarget(window, isFill);
 
 	
 	engine_->DrawImGui(directContext_->GetCurrentCmdObj());

@@ -72,8 +72,8 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 	uint32_t jobs = config.jobs_;
 	SHEngine::Screen::IDisplay* origin = config.origin;
 	SHEngine::Screen::IDisplay* output = intermediateDisplay_.get();
-	auto dcc = config.cmdObj;
-	auto cmdObject = config.cmdObj->GetCurrentCmdObj();
+	auto dcc = config.dcc;
+	auto cmdObject = config.dcc->GetCurrentCmdObj();
 
 	int drawCount = 0;
 	for (const auto& [job, part] : parts_) {
@@ -96,6 +96,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 		//bufferをset
 		renderer_->ResetGPUBuffers();
 		renderer_->SetGPUBuffers({ buffer, part.cbvBuffer }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+		renderer_->SetPS("PostEffect/" + part.name + ".PS.hlsl");
 
 		//描画
 		renderer_->Draw(dcc);
@@ -136,6 +137,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 	auto part = parts_.at(PostEffectJob::None);
 	renderer_->ResetGPUBuffers();
 	renderer_->SetGPUBuffers({ buffer, part.cbvBuffer }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer_->SetPS("PostEffect/" + part.name + ".PS.hlsl");
 
 	//描画
 	renderer_->Draw(dcc);

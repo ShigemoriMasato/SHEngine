@@ -65,7 +65,7 @@ void TitleScene::Draw() {
 
 #ifdef SH_RELEASE
 
-	postEffectConfig_.cmdObj = directContext_;
+	postEffectConfig_.dcc = directContext_;
 	postEffect_->Draw(postEffectConfig_);
 	cmdObj->SetRenderTarget(window->GetCurrentDisplay(), false);
 

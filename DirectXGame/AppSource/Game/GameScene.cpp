@@ -139,13 +139,13 @@ void GameScene::Draw() {
 
 	display->ToTexture(cmdObj);
 
-	forEdgeDetection_.cmdObj = directContext_;
+	forEdgeDetection_.dcc = directContext_;
 	int edgeDetectionTextureIndex = commonData_->display->GetDepthTexture()->GetHandle();
 	edgeDetection_->CopyBuffer(PostEffectJob::EdgeDetection, edgeDetectionTextureIndex);
 	edgeDetection_->Draw(forEdgeDetection_);
 	intermediateDisplay_->DrawImGui();
 
-	postEffectConfig_.cmdObj = directContext_;
+	postEffectConfig_.dcc = directContext_;
 
 #ifdef SH_RELEASE
 

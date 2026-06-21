@@ -22,7 +22,7 @@ uint32_t operator~(PostEffectJob a);
 bool operator<(PostEffectJob a, PostEffectJob b);
 
 struct PostEffectConfig {
-	SHEngine::DirectCommandContext* cmdObj = nullptr;
+	SHEngine::DirectCommandContext* dcc = nullptr;
 	SHEngine::Screen::IDisplay* origin = nullptr;
 	SHEngine::Screen::IDisplay* output = nullptr;	//nullptrの場合はoriginに描画する
 

@@ -34,7 +34,7 @@ void InitializeScene::Initialize() {
 	input_->SetWindow(commonData_->window->GetWindowsAPI()->GetHwnd());
 
 	commonData_->display = std::make_unique<SHEngine::Screen::Display>();
-	commonData_->display->Initialize(textureManager_, 1280, 720, 0x000000ff, 2, "MainWindow");
+	commonData_->display->Initialize(textureManager_, 1280, 720, 0x000000ff, 1, "MainWindow");
 
 	std::vector<VertexData> vertices = {
 		{{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},

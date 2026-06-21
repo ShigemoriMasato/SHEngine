@@ -145,7 +145,7 @@ void HitEffect::Initialize(SHEngine::Engine* engine) {
 		renderer_->SetUseTexture(true);
 		renderer_->instanceNum_ = spawnNum_;
 
-		translate_ = Matrix::MakeTranslationMatrix({ -12, 5, 0 });
+		translate_ = Matrix::MakeTranslationMatrix({ -10, 5, 0 });
 		worlds_.resize(spawnNum_);
 	}
 
