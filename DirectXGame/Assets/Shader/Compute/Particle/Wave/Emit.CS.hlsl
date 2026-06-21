@@ -2,7 +2,10 @@ cbuffer CSData : register(b0)
 {
     float3 fieldSize;
     float speed;
+    
+    float3 color;
     float lifetime;
+    
     int emitNum;
     uint seed;
     uint textureID;
@@ -19,6 +22,7 @@ RWStructuredBuffer<float3> positions : register(u3);
 RWStructuredBuffer<float3> velocities : register(u4);
 RWStructuredBuffer<float> lifetimes : register(u5);
 RWStructuredBuffer<int> isUse : register(u6);
+RWStructuredBuffer<float4> colors : register(u7);
 
 Texture2D<float4> textures[] : register(t8);
 SamplerState gSampler : register(s0);
@@ -73,4 +77,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
     lifetimes[particleIndex] = lifetime;
     type[particleIndex] = id;
     isUse[particleIndex] = 1;
+    colors[particleIndex] = float4(color.rgb * texColor.rgb, 1.0f);
 }

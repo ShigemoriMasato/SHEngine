@@ -70,6 +70,7 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	config.rasterizerID = rasterizerID_;
 	config.topology = topology_;
 	config.rtvFormat = display->GetRTVFormat();
+	config.rtvNum = display->GetRenderTargetNum();
 
 	psoEditor_->SetPSO(cmdList, config);
 

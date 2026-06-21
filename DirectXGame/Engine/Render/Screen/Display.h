@@ -2,6 +2,7 @@
 #include <Core/DXDevice.h>
 #include <Assets/Texture/TextureManager.h>
 #include "IDisplay.h"
+#include <imgui/imgui.h>
 
 namespace SHEngine::Screen {
 
@@ -26,6 +27,7 @@ namespace SHEngine::Screen {
 		void ToRenderTarget(Command::Object* cmdObject) override;
 		void ToPresent(Command::Object* cmdObject) override;
 		void ToTexture(Command::Object* cmdObject) override;
+		void ToNonPixel(Command::Object* cmdObject) override;
 
 		/// @brief 先頭のテクスチャだけ取得する。
 		TextureData* GetTextureData() const override { return textureData_.front(); }
@@ -43,6 +45,9 @@ namespace SHEngine::Screen {
 
 		// @brief Displayの描画
 		void DrawImGui() override;
+
+		// @brief D&Dに突貫工事で対応したDisplayの描画。将来keyを配列にして、返り値もわかりやすくする。多分。
+		const ImGuiPayload* DrawImGuiWithDD(std::string key);
 
 		// @brief ImGui上でのカーソル位置を取得する
 		// @param windowCursor ウィンドウ基準のカーソル位置
@@ -79,6 +84,11 @@ namespace SHEngine::Screen {
 
 		int width_ = 0;
 		int height_ = 0;
+
+		float imguiWidth_ = 0;
+		float imguiHeight_ = 0;
+
+		Vector2 imguiPos_ = { 0.0f, 0.0f };
 
 		bool isOffScreen_ = false;
 	};

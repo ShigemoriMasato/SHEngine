@@ -78,7 +78,7 @@ bool Player::SpawnMino(Tetrimino::Type tetriminoType) {
 	} else {
 		moveMino_.minoType = tetriminoType;
 	}
-	moveMino_.offset = tetrimino_->GetOffset(Tetrimino::Type(moveMino_.minoType));
+	moveMino_.offset = tetrimino_->GetHandle(Tetrimino::Type(moveMino_.minoType));
 	moveMino_.position = spawnPosition_;
 
 	auto field = field_->GetField();

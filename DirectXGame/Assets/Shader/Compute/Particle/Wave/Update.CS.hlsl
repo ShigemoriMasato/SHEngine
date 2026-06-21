@@ -14,7 +14,6 @@ cbuffer CSData : register(b3)
 {
     float4x4 parentMatrix;
     float lifetime;
-    float3 color;
     float3 fieldSize;
 };
 
@@ -39,12 +38,13 @@ cbuffer WaveBuffer : register(b4)
 RWStructuredBuffer<uint> freeList : register(u0);
 RWStructuredBuffer<uint> freeListIndex : register(u1);
 RWStructuredBuffer<float3> outPositions : register(u2);
-RWStructuredBuffer<float4> colors : register(u3);
+RWStructuredBuffer<float4> outColors : register(u3);
 RWStructuredBuffer<uint> type : register(u4);
 RWStructuredBuffer<float3> velocities : register(u5);
 RWStructuredBuffer<float> lifetimes : register(u6);
 RWStructuredBuffer<float3> positions : register(u7);
 RWStructuredBuffer<uint> isUse : register(u8);
+RWStructuredBuffer<float4> colors : register(u9);
 
 [numthreads(64, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -66,7 +66,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     //波の処理
     float3 pos = positions[index];
-    float3 col = color;
+    float3 col = colors[index].rgb;
     const int kWaveNum = 16;
     for (int i = 0; i < 16; ++i)
     {
@@ -91,7 +91,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     //出力先に値を書き込む
     float alpha = abs(float(lifetimes[index] / (lifetime * 0.5f)) - 1);
-    colors[index] = float4(col, alpha);
+    outColors[index] = float4(col, alpha);
     outPositions[index] = mul(float4(pos, 1), parentMatrix).xyz;
     
     lifetimes[index] -= deltaTime;

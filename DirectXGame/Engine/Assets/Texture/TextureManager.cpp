@@ -114,7 +114,7 @@ int TextureManager::LoadTexture(const std::string& filePath) {
 	}
 
 	auto scratchImage = textureData->Create(factFilePath, device_->GetDevice(), srvManager_);
-	int offset = textureData->GetOffset();
+	int offset = textureData->GetHandle();
 
 	uploadStandby_.emplace_back(offset, std::move(scratchImage));
 
@@ -130,7 +130,7 @@ int TextureManager::CreateWindowTexture(uint32_t width, uint32_t height, uint32_
 	auto textureData = std::make_unique<TextureData>();
 	Vector4 clearColorVec = ConvertColor(clearColor);
 	textureData->Create(width, height, clearColorVec, device_->GetDevice(), srvManager_);
-	int offset = textureData->GetOffset();
+	int offset = textureData->GetHandle();
 	textureData->textureManager_ = this;
 	textureDataList_[offset] = std::move(textureData);
 	return offset;
@@ -140,7 +140,7 @@ int TextureManager::CreateSwapChainTexture(ID3D12Resource* resource, uint32_t cl
 	auto textureData = std::make_unique<TextureData>();
 	textureData->Create(resource, device_->GetDevice(), srvManager_, clearColor);
 	textureData->textureManager_ = this;
-	int offset = textureData->GetOffset();
+	int offset = textureData->GetHandle();
 	textureDataList_[offset] = std::move(textureData);
 	return offset;
 }
@@ -149,7 +149,7 @@ int SHEngine::TextureManager::CreateDepthTexture(ID3D12Resource* resource) {
 	auto textureData = std::make_unique<TextureData>();
 	textureData->Create(resource, device_->GetDevice(), srvManager_);
 	textureData->textureManager_ = this;
-	int offset = textureData->GetOffset();
+	int offset = textureData->GetHandle();
 	textureDataList_[offset] = std::move(textureData);
 	return offset;
 }
@@ -157,7 +157,7 @@ int SHEngine::TextureManager::CreateDepthTexture(ID3D12Resource* resource) {
 int TextureManager::CreateBitmapTexture(uint32_t width, uint32_t height, DirectX::ScratchImage& scratchImage) {
 	auto textureData = std::make_unique<TextureData>();
 	textureData->Create(width, height, device_->GetDevice(), srvManager_);
-	int offset = textureData->GetOffset();
+	int offset = textureData->GetHandle();
 
 	uploadStandby_.emplace_back(offset, std::move(scratchImage));
 

@@ -89,7 +89,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 		cmdObject->SetRenderTarget(output);
 		origin->ToTexture(cmdObject);
 		//bufferにテクスチャをセット
-		int textureIndex = origin->GetTextureData()->GetOffset();
+		int textureIndex = origin->GetTextureData()->GetHandle();
 		auto& buffer = textureIndexBuffers_.at(drawCount);
 		buffer->CopyBuffer(&textureIndex, sizeof(int));
 		
@@ -123,7 +123,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 
 	cmdObject->SetRenderTarget(output, true);
 	origin->ToTexture(cmdObject);
-	int textureIndex = origin->GetTextureData()->GetOffset();
+	int textureIndex = origin->GetTextureData()->GetHandle();
 
 	//描画処理
 	cmdObject->SetRenderTarget(output);

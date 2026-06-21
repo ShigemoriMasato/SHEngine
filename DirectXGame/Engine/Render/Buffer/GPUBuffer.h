@@ -46,7 +46,7 @@ namespace SHEngine {
 		GPUBuffer(TextureData* textureData);
 
 		// @brief GPUBufferへデータコピーをするときの値を変更する。Flush時に実際にGPUへコピーされる。UAVバッファにはコピーできない。
-		void CopyBuffer(const void* data, size_t dataSize);
+		virtual void CopyBuffer(const void* data, size_t dataSize);
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
 		void TransitionBarrier(D3D12_RESOURCE_STATES after);
 		// @brief GPUBufferの状態を実際にGPUへ反映させる。
@@ -57,6 +57,11 @@ namespace SHEngine {
 
 		// @brief Viewの種類を取得する
 		uint8_t GetBufferType() const { return bufferType_; }
+
+		ID3D12Resource* GetResource() const {
+			if (resources_.empty()) return nullptr;
+			return resources_[currentIndex_ % resources_.size()].res.Get();
+		}
 
 	private:
 

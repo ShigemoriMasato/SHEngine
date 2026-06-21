@@ -3,6 +3,8 @@
 #include <Game/GameScene.h>
 #include <Title/TitleScene.h>
 #include <Test/TestScene.h>
+#include <Editor/EditScene.h>
+#include <EffectTest/EffectTestScene.h>
 
 #ifdef USE_IMGUI
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -32,7 +34,7 @@ void InitializeScene::Initialize() {
 	input_->SetWindow(commonData_->window->GetWindowsAPI()->GetHwnd());
 
 	commonData_->display = std::make_unique<SHEngine::Screen::Display>();
-	commonData_->display->Initialize(textureManager_, 1280, 720, 0xffffffff, 2, "MainWindow");
+	commonData_->display->Initialize(textureManager_, 1280, 720, 0x000000ff, 2, "MainWindow");
 
 	std::vector<VertexData> vertices = {
 		{{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
@@ -133,7 +135,9 @@ void InitializeScene::Initialize() {
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
 	//return std::make_unique<TestScene>();
+	return std::make_unique<EffectTestScene>();
 	return std::make_unique<GameScene>();
+	return std::make_unique<EditScene>();
 
 	return nullptr;
 }

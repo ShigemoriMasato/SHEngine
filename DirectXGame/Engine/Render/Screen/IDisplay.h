@@ -25,6 +25,9 @@ namespace SHEngine::Screen {
 		/// @param cmdObject コマンドオブジェクト
 		virtual void ToTexture(Command::Object* cmdObject) = 0;
 
+		/// @brief Vertex,Computeで使用できる状態にする
+		virtual void ToNonPixel(Command::Object* cmdObject) {};
+
 		/// @brief テクスチャ情報を取得する
 		virtual TextureData* GetTextureData() const = 0;
 
@@ -48,6 +51,12 @@ namespace SHEngine::Screen {
 
 		// @brief ImGuiの描画
 		virtual void DrawImGui() {}
+
+		// @brief 表示位置。ウィンドウに添わせるのが基本なので0,0を返す。ImGuiを使用しているときはoverrideされる。
+		virtual Vector2 GetPos() { return { 0.0f, 0.0f }; }
+
+		// @brief 表示サイズ。ウィンドウに添わせるのが基本なのでTextureSizeを返す。ImGuiを使用しているときはoverrideされる。
+		virtual Vector2 GetSize() { auto size = GetTextureData()->GetSize(); return Vector2(float(size.first), float(size.second)); }
 
 	protected:
 

@@ -82,6 +82,10 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 	clampClampMinMagNearest.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
 	samplers_[SamplerID::ClampClamp_MinMagNearest] = clampClampMinMagNearest;
 
+	D3D12_STATIC_SAMPLER_DESC point = base;
+	point.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplers_[SamplerID::Point] = point;
+
 #pragma endregion
 }
 

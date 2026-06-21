@@ -5,6 +5,7 @@
 #include <Compute/ComputeObject.h>
 #include <Render/Font/Text.h>
 #include <Render/Renderer.h>
+#include <Tool/DecoEditor/Data/decoObjectController.h>
 
 #pragma comment(lib, "Dbghelp.lib")
 
@@ -72,6 +73,8 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	hInstance_ = hInstance;
 
 	frameCounter_.Initialize();
+
+	Decorate::ObjController::Initialize(device_.get());
 }
 
 bool Engine::IsLoop() {

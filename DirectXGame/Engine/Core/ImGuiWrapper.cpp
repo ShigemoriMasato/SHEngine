@@ -76,6 +76,8 @@ void ImGuiWrapper::NewFrame() {
 	ImGui::End();
 	ImGui::PopStyleVar(2);
 
+	ImGuizmo::BeginFrame();
+
 #endif
 }
 

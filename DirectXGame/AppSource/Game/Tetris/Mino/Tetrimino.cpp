@@ -18,7 +18,7 @@ void Tetrimino::Initialize(std::mt19937 g) {
 	srsOffsets_[1][0] = { { {0, 0}, {1, 0}, {1, -1}, {0, 2}, {1, 2} } }; //3 rotateL
 }
 
-std::vector<std::pair<int, int>> Tetrimino::GetOffset(Type type) {
+std::vector<std::pair<int, int>> Tetrimino::GetHandle(Type type) {
     return blockOffsets_[type];
 }
 

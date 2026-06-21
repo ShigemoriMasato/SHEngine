@@ -79,3 +79,10 @@ Matrix4x4 Camera::GetBillboardMatrix() const {
 	}
 	return billboardMatrix.Inverse();
 }
+
+Vector3 Camera::GetDirection() const {
+	//角度ゼロの時を基準にして、カメラの向きを計算する
+	Vector3 direction = { 0.0f, 0.0f, 1.0f };
+	direction = MakeRotationMatrix(rotation_) * direction;
+	return direction.Normalize();
+}

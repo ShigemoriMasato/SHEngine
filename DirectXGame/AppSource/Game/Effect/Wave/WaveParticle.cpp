@@ -1,6 +1,7 @@
 #include "WaveParticle.h"
 #include <imgui/imgui.h>
 #include <Utility/MatrixFactory.h>
+#include <Utility/SearchFile.h>
 
 using namespace Matrix;
 
@@ -10,10 +11,12 @@ WaveParticle::~WaveParticle() {
 	Save();
 }
 
-void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32_t id) {
+void WaveParticle::Initialize(SHEngine::TextureManager* textureManager, const Pool& pool, const uint32_t id) {
+	texturemanager_ = textureManager;
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	auto positions = container_->Create(BufferType::UAV, sizeof(Vector3), pool.maxParticleNum, BufferNum::Single); // position
 	auto velocities = container_->Create(BufferType::UAV, sizeof(Vector3), pool.maxParticleNum, BufferNum::Single); // velocity
+	auto colors = container_->Create(BufferType::UAV, sizeof(Vector4), pool.maxParticleNum, BufferNum::Single);
 	auto lifeTimes = container_->Create(BufferType::UAV, sizeof(float), pool.maxParticleNum, BufferNum::Single); // lifeTime
 	auto isUse = container_->Create(BufferType::UAV, sizeof(uint32_t), pool.maxParticleNum, BufferNum::Single); // isUse
 	waveBuffer_ = container_->Create(BufferType::CBV, sizeof(WaveData) * kMaxWaveNum_, 1); // 波の情報を入れるバッファ
@@ -33,7 +36,7 @@ void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32
 		update_[i] = std::make_unique<SHEngine::ComputeObject>("WaveParticle Update");
 
 		emitter_[i]->SetShader("Particle/Wave/Emit.CS.hlsl");
-		emitter_[i]->SetGPUBuffers(BufferType::UAV, { pool.freeList, pool.freeListIndex, pool.type, positions, velocities, lifeTimes, isUse });
+		emitter_[i]->SetGPUBuffers(BufferType::UAV, { pool.freeList, pool.freeListIndex, pool.type, positions, velocities, lifeTimes, isUse, colors });
 		emitter_[i]->SetGPUBuffers(BufferType::CBV, { emitBuffer_[i], idBuffer });
 		emitter_[i]->SetUseTexture(true);
 		emitter_[i]->SetSamplerID(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
@@ -41,7 +44,7 @@ void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32
 		update_[i]->SetShader("Particle/Wave/Update.CS.hlsl");
 
 		update_[i]->SetGPUBuffers(BufferType::UAV, { pool.freeList, pool.freeListIndex, pool.position, pool.color, pool.type,
-			velocities, lifeTimes, positions, isUse });
+			velocities, lifeTimes, positions, isUse, colors });
 		update_[i]->SetGPUBuffers(BufferType::CBV, { pool.particleNum, pool.deltaTime, idBuffer, updateBuffer_[i], waveBuffer_ });
 		//64個ずつで処理をする。
 		update_[i]->SetThreadGroupSize((pool.maxParticleNum / 64) / splitNum);
@@ -51,10 +54,12 @@ void WaveParticle::Initialize(uint32_t textureID, const Pool& pool, const uint32
 
 	//Loadとかする
 	Load();
-	emitData_.textureID = textureID;
+	emitData_.textureID = 1;
 
 	//メモリ確保
 	waves_.resize(kMaxWaveNum_);
+
+	texturePahts_ = SearchFilePathsAddChild("Assets/Texture", ".png");
 }
 
 void WaveParticle::Update(CmdObj* compute, float deltaTime) {
@@ -109,6 +114,28 @@ void WaveParticle::DrawImGui() {
 	if (ImGui::Button("Add")) {
 		AddWave(testWave);
 	}
+
+	ImGui::BeginChild("Texture");
+
+	{
+		int drawCount = 0;
+		for (const auto& pathStr : texturePahts_) {
+			if (drawCount++ % 3 != 0) {
+				ImGui::SameLine();
+			}
+
+			std::filesystem::path path(pathStr);
+			std::string fileName = path.filename().string();
+			int textureHandle = texturemanager_->LoadTexture(pathStr);
+			auto data = texturemanager_->GetTextureData(textureHandle);
+
+			if (ImGui::ImageButton(fileName.c_str(), data->GetGPUHandle().ptr, ImVec2(48, 48))) {
+				config_.currentTextureID = textureHandle;
+			}
+		}
+	}
+
+	ImGui::EndChild();
 
 	ImGui::End();
 
@@ -181,6 +208,7 @@ void WaveParticle::Load() {
 	config_.rotate = binaryManager_.Reverse<Vector3>();
 	config_.color = binaryManager_.Reverse<Vector3>();
 	config_.scale = binaryManager_.Reverse<Vector3>();
+	config_.currentTextureID = binaryManager_.Reverse<int>();
 }
 
 void WaveParticle::Save() {
@@ -193,6 +221,7 @@ void WaveParticle::Save() {
 	binaryManager_.Register(&config_.rotate);
 	binaryManager_.Register(&config_.color);
 	binaryManager_.Register(&config_.scale);
+	binaryManager_.Register(&config_.currentTextureID);
 	binaryManager_.Write(fileName_);
 }
 
@@ -201,10 +230,11 @@ void WaveParticle::CopyConfig(float deltaTime) {
 	emitData_.lifeTime = config_.lifeTime;
 	emitData_.emitNum = int(float(config_.emitNum) * deltaTime);
 	emitData_.fieldSize = config_.fieldSize;
+	emitData_.color = config_.color;
+	emitData_.textureID = config_.currentTextureID;
 	Matrix4x4 parentMatrix = MakeScaleMatrix(config_.scale) * MakeRotationMatrix(config_.rotate) * MakeTranslationMatrix(config_.position);
 	updateData_.parentMatrix = parentMatrix;
 	updateData_.lifeTime = config_.lifeTime;
-	updateData_.color = config_.color;
 	updateData_.fieldSize = config_.fieldSize;
 	for (int i = 0; i < splitNum; ++i) {
 		updateData_.executeOffset = i * (maxParticleNum_ / 256 / splitNum);

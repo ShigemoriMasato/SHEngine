@@ -24,7 +24,7 @@ namespace SHEngine {
 		//明示的な解放
 		void Release();
 
-		int GetOffset() const { return srvHandle_.GetOffset(); }
+		int GetHandle() const { return srvHandle_.GetHandle(); }
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return srvHandle_.GetGPU(); }
 		ID3D12Resource* GetResource() const { return textureResource_.Get(); }
 		std::pair<uint32_t, uint32_t> GetSize() const { return { width_, height_ }; }

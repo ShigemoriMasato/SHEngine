@@ -140,7 +140,7 @@ void GameScene::Draw() {
 	display->ToTexture(cmdObj);
 
 	forEdgeDetection_.cmdObj = directContext_;
-	int edgeDetectionTextureIndex = commonData_->display->GetDepthTexture()->GetOffset();
+	int edgeDetectionTextureIndex = commonData_->display->GetDepthTexture()->GetHandle();
 	edgeDetection_->CopyBuffer(PostEffectJob::EdgeDetection, edgeDetectionTextureIndex);
 	edgeDetection_->Draw(forEdgeDetection_);
 	intermediateDisplay_->DrawImGui();
@@ -151,12 +151,12 @@ void GameScene::Draw() {
 
 	postEffectConfig_.output = window;
 	postEffect_->Draw(postEffectConfig_);
-	cmdObj->SetRenderTarget(window, false);
+	directContext_->SetRenderTarget(window, false);
 
 #else
 
 	postEffect_->Draw(postEffectConfig_);
-	cmdObj->SetRenderTarget(window);
+	directContext_->SetRenderTarget(window);
 
 #endif
 
@@ -232,7 +232,7 @@ void GameScene::Draw() {
 	ImGui::Checkbox("Outline", &outline);
 	if (outline) {
 		static Outline config;
-		config.edgeTextureIndex = intermediateDisplay_->GetTextureData()->GetOffset();
+		config.edgeTextureIndex = intermediateDisplay_->GetTextureData()->GetHandle();
 		ImGui::PushID("Outline");
 		ImGui::ColorEdit4("Color", &config.color.x);
 		ImGui::DragFloat("Strength", &config.strength, 0.01f);

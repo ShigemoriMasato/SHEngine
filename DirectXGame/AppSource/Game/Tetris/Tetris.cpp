@@ -42,7 +42,7 @@ void Tetris::Update(float deltaTime) {
 		auto mapData = field_->GetField();
 		blockRender_->SetStageData(mapData, player_->GetMoveMino());
 		std::vector<std::pair<int, int>> holdPos;
-		holdPos = tetrimino_->GetOffset(Tetrimino::Type(player_->GetHoldMino()));
+		holdPos = tetrimino_->GetHandle(Tetrimino::Type(player_->GetHoldMino()));
 		blockRender_->SetHoldMino(holdPos, Tetrimino::Hold);
 
 		//Next 4個分
@@ -51,7 +51,7 @@ void Tetris::Update(float deltaTime) {
 		nextPos.resize(4 * nextNum);
 		for (int i = 0; i < nextNum; ++i) {
 			auto nextType = tetrimino_->GetNextTetrimino(i);
-			auto next = tetrimino_->GetOffset(nextType);
+			auto next = tetrimino_->GetHandle(nextType);
 			for(int j = 0; j < next.size(); ++j) {
 				nextPos[j + (4 * i)] = next[j];
 			}

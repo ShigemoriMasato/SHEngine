@@ -118,8 +118,8 @@ namespace SHEngine {
 		 * @param handle テクスチャハンドル
 		 * @return ID3D12ResourceのComポインタ
 		 */
-		Microsoft::WRL::ComPtr<ID3D12Resource> GetTextureResource(int handle) {
-			return textureDataList_[handle]->textureResource_;
+		ID3D12Resource* GetTextureResource(int handle) {
+			return textureDataList_[handle]->textureResource_.Get();
 		}
 
 		void UploadResources(CmdObj* cmdObj);

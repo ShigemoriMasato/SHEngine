@@ -28,7 +28,7 @@ public:
 
 	void Initialize(std::mt19937 g);
 
-	std::vector<std::pair<int, int>> GetOffset(Type type);
+	std::vector<std::pair<int, int>> GetHandle(Type type);
 
 	/// <summary>
 	/// ネクストが1進んだ場合に呼ぶ

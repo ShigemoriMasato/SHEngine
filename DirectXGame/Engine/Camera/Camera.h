@@ -92,6 +92,7 @@ public:
 	Matrix4x4 GetProjectionMatrix() const { return projectionMatrix_; }
 
 	virtual Vector3 GetPosition() const { return position_; }
+	Vector3 GetDirection() const;
 
 protected:
 

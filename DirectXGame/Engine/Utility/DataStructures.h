@@ -1,6 +1,7 @@
 #pragma once
 #include <Utility/Vector.h>
 #include <Utility/Quaternion.h>
+#include <Utility/MatrixFactory.h>
 
 struct VertexData {
 	Vector4 position{};
@@ -12,6 +13,10 @@ struct Transform {
 	Vector3 scale = { 1.0f, 1.0f, 1.0f };
 	Vector3 rotate{};
 	Vector3 position{};
+
+	Matrix4x4 Matrix() const {
+		return Matrix::MakeScaleMatrix(scale) * Matrix::MakeRotationMatrix(rotate) * Matrix::MakeTranslationMatrix(position);
+	}
 };
 
 struct QuaternionTransform {

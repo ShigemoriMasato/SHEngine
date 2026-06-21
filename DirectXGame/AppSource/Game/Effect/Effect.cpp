@@ -10,7 +10,7 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 
 	particlePool_ = std::make_unique<ParticlePool>();
 	// 16777216個分のメモリを確保する
-	particlePool_->Initialize(planeDrawData, int(100000), cmdObj);
+	particlePool_->Initialize(planeDrawData, int(3000000), cmdObj);
 
 	compute_->MiddleExecute();
 
@@ -19,7 +19,7 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 
 	waveParticle_ = std::make_unique<WaveParticle>();
 	uint32_t textureID = textureManager_->LoadTexture("WaveParticle.png");
-	waveParticle_->Initialize(textureID, pool, 1);
+	waveParticle_->Initialize(textureManager_, pool, 1);
 }
 
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {

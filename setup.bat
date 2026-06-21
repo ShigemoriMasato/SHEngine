@@ -54,14 +54,16 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -So
 echo === Clone ===
 git clone --branch v6.0.5 --depth 1 --recurse-submodules --shallow-submodules https://github.com/assimp/assimp.git "externals/generated/Project/assimp_clone/"
 git clone --branch VER-2-14-3 --depth 1 --recurse-submodules --shallow-submodules https://github.com/freetype/freetype.git "externals/generated/Project/freetype_clone/"
+git clone --branch 1.10 --depth 1 --recurse-submodules --shallow-submodules https://github.com/CedricGuillemet/ImGuizmo.git "externals/generated/Project/imguizmo_clone/"
 
 echo ==== Create Slution From Library Source ====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\assimp_clone" -BuildDir "externals\generated\Project\assimp"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\freetype_clone" -BuildDir "externals\generated\Project\freetype"
-
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\imguizmo_clone" -BuildDir "externals\generated\Project\imguizmo"
 
 echo ===== Create .lib =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\DirectXTex\DirectXTex_Desktop_2022_Win10.sln" -Platform x64
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\imguizmo\imguizmo.slnx" -Platform x64
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\ForImGui\ForImGui.slnx" -Platform x64
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\freetype\freetype.slnx" -Platform x64
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\assimp\assimp.slnx" -Platform x64
@@ -70,6 +72,10 @@ goto END
 
 
 :BUILD_IMGUI
+
+git clone --branch 1.10 --depth 1 --recurse-submodules --shallow-submodules https://github.com/CedricGuillemet/ImGuizmo.git "externals/generated/Project/imguizmo_clone/"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\imguizmo_clone" -BuildDir "externals\generated\Project\imguizmo"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\imguizmo\imguizmo.slnx" -Platform x64
 
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\ForImGui\ForImGui.slnx" -Platform x64
 
@@ -115,8 +121,9 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -So
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\ForImGui\ImGui" -DestDir "externals\header\imgui"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\nlohmann" -DestDir "externals\header\nlohmann"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\freetype_clone\include" -DestDir "externals\header"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\\assimp_clone\include\assimp" -DestDir "externals\header\assimp"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\\assimp\include\assimp" -DestDir "externals\header\assimp"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\assimp_clone\include\assimp" -DestDir "externals\header\assimp"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\assimp\include\assimp" -DestDir "externals\header\assimp"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\imguizmo_clone\src" -DestDir "externals\header\imguizmo"
 
 echo ===== Create Development .lib =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CreateDev.ps1"
@@ -126,4 +133,3 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\FilterAdjust.ps1"
 
 echo ===== Completed =====
 pause
-

@@ -120,7 +120,7 @@ int RenderObject::CreateSRV(size_t size, uint32_t num, ShaderType type, std::str
 	logger_->debug("SRV Created: {}", debugName_);
 	logger_->debug("  Size: {}", srvBufferDatas.front().size);
 	logger_->debug("  Num: {}", num);
-	logger_->debug("  Index: {}", srvHandles_.back().back()->GetOffset());
+	logger_->debug("  Index: {}", srvHandles_.back().back()->GetHandle());
 
 	if (type == ShaderType::VERTEX_SHADER) {
 		psoConfig_.rootConfig.srvNums.first++;

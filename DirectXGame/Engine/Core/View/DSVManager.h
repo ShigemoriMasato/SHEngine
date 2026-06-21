@@ -45,7 +45,7 @@ public:
 	 * @brief オフセットの取得
 	 * @return ヒープ内のオフセット
 	 */
-	int GetOffset() const { return offset_; }
+	int GetHandle() const { return offset_; }
 
 private:
 

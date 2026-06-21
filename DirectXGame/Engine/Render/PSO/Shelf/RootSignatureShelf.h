@@ -26,6 +26,8 @@ namespace SHEngine::PSO {
 		MinNearest = 1 << 7,             ///< 縮小時ニアレストネイバー補間
 		MinLinear = 1 << 8,              ///< 縮小時リニア補間
 		MinNearestMipmapNearest = 1 << 9,  ///< 縮小時ニアレスト+ミップマップニアレスト
+		Point = MinNearestMipmapNearest,	///< 可読性向上用
+
 		MinLinearMipmapNearest = 1 << 10,  ///< 縮小時リニア+ミップマップニアレスト
 		MinNearestMipmapLinear = 1 << 11,  ///< 縮小時ニアレスト+ミップマップリニア
 		MinLinearMipmapLinear = 1 << 12,   ///< 縮小時リニア+ミップマップリニア

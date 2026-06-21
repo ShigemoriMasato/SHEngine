@@ -35,7 +35,7 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPU() const { return GPU; }
 	/// @brief オフセットを取得
 	/// @return オフセット値
-	int GetOffset() const { return offset_; }
+	int GetHandle() const { return offset_; }
 
 private:
 

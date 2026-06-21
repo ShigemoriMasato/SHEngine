@@ -5,6 +5,10 @@
 #include <imgui/imgui.h>
 #include <Render/Command/DirectCommandContext.h>
 
+#include <imguizmo/ImGuizmo.h>
+#include <Camera/Camera.h>
+#include <Render/Screen/Display.h>
+
 namespace SHEngine {
 	class ImGuiWrapper {
 	public:
@@ -12,6 +16,8 @@ namespace SHEngine {
 		void Initialize(DXDevice* device, DirectCommandContext* directContext, Screen::WindowsAPI* window);
 
 		void NewFrame();
+
+		void ImGuizmoRender(CmdObj* cmdObj, const Matrix4x4& vpMatrix, Screen::IDisplay* display);
 
 		void Render(CmdObj* cmdObj);
 

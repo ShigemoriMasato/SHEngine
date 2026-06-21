@@ -48,13 +48,19 @@ void SHEngine::MeasureShaderTime::NewFrame(CmdObj* cmdObj) {
 
 	current_ = nullptr;
 
-	Begin(cmdObj, "GPUTime");
+	Begin(cmdObj, "Default-GPUTime");
 }
 
 void SHEngine::MeasureShaderTime::FinFrame(CmdObj* cmdObj) {
 	End(cmdObj);
 
 	auto cmdList = cmdObj->GetCommandList();
+
+	if (root_->endHandle == -1) {
+		logger_->error("MeasureShaderTime: endHandleが異常値でした。");
+		assert(false && "MeasureShaderTime: endHandleが異常値でした。");
+		return;
+	}
 
 	// クエリヒープからリードバックバッファにタイムスタンプの結果をコピー
 	cmdList->ResolveQueryData(queryHeap_[cmdObj->GetCurrentID()].ptr.Get(), D3D12_QUERY_TYPE_TIMESTAMP,
