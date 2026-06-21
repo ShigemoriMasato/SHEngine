@@ -8,13 +8,13 @@
 
 struct WaveData {
 	Vector3 position{};
-	float speed = 2.0f;
+	float speed = 48.0f;
 	Vector3 color = { 1.0f, 1.0f, 1.0f };
 	float intensity = 1.0f;
 	float lifetime = 100000.0f;				//勝手に起動しないように大きな数字にする
 	float decayRate = 0.1f;
 	float maxlifetime = 3.0f;
-	float thickness = 1.0f;
+	float thickness = 4.0f;
 };
 
 class WaveParticle {
