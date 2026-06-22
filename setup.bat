@@ -73,10 +73,6 @@ goto END
 
 :BUILD_IMGUI
 
-git clone --branch 1.10 --depth 1 --recurse-submodules --shallow-submodules https://github.com/CedricGuillemet/ImGuizmo.git "externals/generated/Project/imguizmo_clone/"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\imguizmo_clone" -BuildDir "externals\generated\Project\imguizmo"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\imguizmo\imguizmo.slnx" -Platform x64
-
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\ForImGui\ForImGui.slnx" -Platform x64
 
 goto END

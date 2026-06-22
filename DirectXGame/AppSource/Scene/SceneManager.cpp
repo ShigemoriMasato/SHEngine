@@ -17,6 +17,8 @@ void SceneManager::Update() {
 		currentScene_ = std::move(nextScene_);
 	}
 
+	ImGuizmo::OriginalSetRect(commonData_->display.get());
+
 	if (currentScene_) {
 		nextScene_ = currentScene_->Update();
 	}

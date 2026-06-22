@@ -21,8 +21,8 @@ void DecoEditor::Update(Camera* camera, DCC* dcc) {
 
 #endif // USE_IMGUI
 
-	decoObjectController_->Update(decoObjectManager_.get(), dcc);
 	decoObjectManager_->Update(camera);
+	decoObjectController_->Update(decoObjectManager_.get(), camera, dcc);
 }
 
 void DecoEditor::Draw(DCC* dcc) {

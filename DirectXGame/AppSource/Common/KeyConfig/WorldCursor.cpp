@@ -10,7 +10,7 @@ Vector3 GetWorldCursor(Camera* camera, Vector2 cursorPos) {
 	ndc.y = 1.0f - (cursorPos.y / screenHeight) * 2.0f; // Y軸を反転して変換
 
 	// 2. ビュー行列とプロジェクション行列の逆行列を取得
-	Matrix4x4 viewMatrix = camera->GetTransformMatrix();
+	Matrix4x4 viewMatrix = camera->GetViewMatrix();
 
 	Matrix4x4 invView = viewMatrix.Inverse();
 	Matrix4x4 invProj = camera->GetProjectionMatrix().Inverse();

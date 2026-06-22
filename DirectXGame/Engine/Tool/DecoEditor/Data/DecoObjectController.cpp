@@ -30,16 +30,18 @@ Decorate::ObjController::ObjController(SHEngine::Screen::Display* display, SHEng
 	idGetter_->SetSamplerID(SHEngine::PSO::SamplerID::Point);
 }
 
-void Decorate::ObjController::Update(ObjManager* objManager, DCC* dcc) {
+void Decorate::ObjController::Update(ObjManager* objManager, Camera* camera, DCC* dcc) {
 	GetIDFromGPU(objManager, dcc);
 	preClick_ = click_;
 	click_ = bool(engine_->GetInput()->GetMouseButtonState()[0]);
 
-	if (!preClick_ && click_ && display_->IsHovering()) {
+	bool isImGuizmoActive = ImGuizmo::IsUsing() || ImGuizmo::IsOver();
+
+	if (!isImGuizmoActive && !preClick_ && click_ && display_->IsHovering()) {
 		currentID_ = prevID_;
 	}
 
-	EditObject(objManager);
+	EditObject(objManager, camera);
 
 
 }
@@ -87,14 +89,14 @@ void Decorate::ObjController::GetIDFromGPU(ObjManager* objManager, DCC* dcc) {
 	//Computeの起動時勝手にバリアが切り替わるため、バリアは戻さない
 }
 
-void Decorate::ObjController::EditObject(ObjManager* objManager) {
+void Decorate::ObjController::EditObject(ObjManager* objManager, Camera* camera) {
 	//currentID_が0のときは何もしない
 	if (currentID_ == 0) return;
 
 	if (currentID_ > transforms_.size()) {
 		uint32_t preSize = static_cast<uint32_t>(transforms_.size());
 		transforms_.resize(currentID_);
-		for (int i = preSize; i < currentID_; ++i) {
+		for (uint32_t i = preSize; i < currentID_; ++i) {
 			Matrix4x4 world = objManager->GetTransform(i);
 			transforms_[currentID_ - 1].position = { world.m[3][0], world.m[3][1], world.m[3][2] };
 		}
@@ -102,10 +104,69 @@ void Decorate::ObjController::EditObject(ObjManager* objManager) {
 
 	Transform& transform = transforms_[currentID_ - 1];
 
-	//仮でImGui::DragFloat3を使って編集する
+	//ImGuizmoを使って編集する
 #ifdef USE_IMGUI
 
-	ImGui::Begin("Object Editor");
+	ImGuizmo::Enable(true);
+
+	static ImGuizmo::OPERATION op = ImGuizmo::OPERATION::TRANSLATE;
+	ImGuizmo::MODE mode = ImGuizmo::MODE::WORLD;
+
+	float view[16];
+	float projection[16];
+
+	std::memcpy(view, camera->GetViewMatrix().m, sizeof(float) * 16);
+	std::memcpy(projection, camera->GetProjectionMatrix().m, sizeof(float) * 16);
+
+	float world[16];
+	Matrix4x4 mat = transform.Matrix();
+	std::memcpy(world, mat.m, sizeof(float) * 16);
+
+	ImGuizmo::Manipulate(view, projection, op, mode, world);
+
+	float translation[3], rotation[3], scale[3];
+	ImGuizmo::DecomposeMatrixToComponents(world, translation, rotation, scale);
+
+	switch (op) {
+	case ImGuizmo::OPERATION::TRANSLATE:
+		transform.position = { translation[0], translation[1], translation[2] };
+		break;
+	case ImGuizmo::OPERATION::ROTATE:
+		transform.rotate = { rotation[0], rotation[1], rotation[2] };
+		break;
+	case ImGuizmo::OPERATION::SCALE:
+		transform.scale = { scale[0], scale[1], scale[2] };
+		break;
+	default:
+		transform = {
+			{scale[0], scale[1], scale[2]},
+			{rotation[0], rotation[1], rotation[2] },
+			{translation[0], translation[1], translation[2] }
+		};
+		break;
+	}
+
+	ImGui::Begin("DecoObjectController");
+	ImGui::Text("IsWantCaptureMouse: %s", ImGui::GetIO().WantCaptureMouse ? "TRUE" : "FALSE");
+	ImGui::Text("IsOver: %s", ImGuizmo::IsOver() ? "TRUE" : "FALSE");
+	ImGui::Text("IsUsing: %s", ImGuizmo::IsUsing() ? "TRUE" : "FALSE");
+	ImGui::Text("ViewManipulate: %s", ImGuizmo::IsViewManipulateHovered() ? "TRUE" : "FALSE");
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui::Text("Mouse %.1f %.1f Down=%d", io.MousePos.x, io.MousePos.y, io.MouseDown[0]);
+	ImGui::Text("WorldMatrix:");
+	ImGui::Text("%.2f %.2f %.2f %.2f", world[0], world[1], world[2], world[3]);
+	ImGui::Text("%.2f %.2f %.2f %.2f", world[4], world[5], world[6], world[7]);
+	ImGui::Text("%.2f %.2f %.2f %.2f", world[8], world[9], world[10], world[11]);
+	ImGui::Text("%.2f %.2f %.2f %.2f", world[12], world[13], world[14], world[15]);
+	ImGui::End();
+
+
+	ImGui::Begin("Transform");
+	if (ImGui::Button("S")) op = ImGuizmo::OPERATION::SCALE;
+	ImGui::SameLine();
+	if (ImGui::Button("R")) op = ImGuizmo::OPERATION::ROTATE;
+	ImGui::SameLine();
+	if (ImGui::Button("T")) op = ImGuizmo::OPERATION::TRANSLATE;
 
 	ImGui::DragFloat3("Scale", &transform.scale.x, 0.01f);
 	ImGui::DragFloat3("Rotate", &transform.rotate.x, 0.01f);

@@ -17,8 +17,6 @@ namespace SHEngine {
 
 		void NewFrame();
 
-		void ImGuizmoRender(CmdObj* cmdObj, const Matrix4x4& vpMatrix, Screen::IDisplay* display);
-
 		void Render(CmdObj* cmdObj);
 
 		void EndFrame();
@@ -39,4 +37,10 @@ namespace SHEngine {
 
 		constexpr static int bufferNum_ = 3;
 	};
+}
+
+namespace ImGuizmo {
+
+	void OriginalSetRect(SHEngine::Screen::IDisplay* display);
+
 }

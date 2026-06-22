@@ -58,6 +58,9 @@ namespace SHEngine::Screen {
 		// @return カーソルがDisplayの上にあるときtrue、そうでないときfalse | ImGuiが使われていないときは常にtrueを返す。
 		bool IsHovering();
 
+		Vector2 GetPos() override { return imguiPos_; }
+		Vector2 GetSize() override { return { imguiWidth_, imguiHeight_ }; }
+
 	private:
 
 		void PrivateInitialize(SHEngine::TextureManager* textureManager, uint32_t rtNum, std::string windowName = "");

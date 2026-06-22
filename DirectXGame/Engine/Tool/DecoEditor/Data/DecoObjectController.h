@@ -14,13 +14,13 @@ namespace Decorate {
 
 		ObjController(SHEngine::Screen::Display* display, SHEngine::Engine* engine);
 
-		void Update(ObjManager* objManager, DCC* dcc);
+		void Update(ObjManager* objManager, Camera* camera, DCC* dcc);
 
 	private:
 
 		void GetIDFromGPU(ObjManager* objManager, DCC* dcc);
 
-		void EditObject(ObjManager* objManager);
+		void EditObject(ObjManager* objManager, Camera* camera);
 
 		static inline SHEngine::DXDevice* device_ = nullptr;
 

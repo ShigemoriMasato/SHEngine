@@ -81,6 +81,16 @@ struct Matrix4x4 final {
 
 		return mat;
 	}
+
+	Matrix4x4 Transpose() {
+		Matrix4x4 ans;
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				ans.m[i][j] = m[j][i];
+			}
+		}
+		return ans;
+	}
 };
 
 struct Matrix3x3 {

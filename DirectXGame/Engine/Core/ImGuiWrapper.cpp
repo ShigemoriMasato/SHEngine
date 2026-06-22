@@ -54,6 +54,7 @@ void ImGuiWrapper::NewFrame() {
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Always);
@@ -76,14 +77,11 @@ void ImGuiWrapper::NewFrame() {
 	ImGui::End();
 	ImGui::PopStyleVar(2);
 
-	ImGuizmo::BeginFrame();
-
 #endif
 }
 
 void ImGuiWrapper::Render(CmdObj* cmdObj) {
 #ifdef USE_IMGUI
-
 
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdObj->GetCommandList());
@@ -103,4 +101,11 @@ void ImGuiWrapper::Finalize() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 #endif
+}
+
+void ImGuizmo::OriginalSetRect(SHEngine::Screen::IDisplay* display) {
+	Vector2 pos = display ? display->GetPos() : Vector2(0.0f, 0.0f);
+	Vector2 size = display ? display->GetSize() : Vector2(1280.0f, 720.0f);
+
+	ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
 }

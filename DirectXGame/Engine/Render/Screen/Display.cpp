@@ -1,6 +1,7 @@
 #include "Display.h"
 #include <Utility/DirectUtilFuncs.h>
 #include <imgui/imgui.h>
+#include <imguizmo/ImGuizmo.h>
 
 namespace {
 
@@ -140,6 +141,9 @@ const ImGuiPayload* SHEngine::Screen::Display::DrawImGuiWithDD(std::string key) 
 					payload = tmp;
 				}
 			}
+
+			auto drawList = ImGui::GetWindowDrawList();
+			ImGuizmo::SetDrawlist(drawList);
 		}
 
 		ImGui::End();
