@@ -39,9 +39,7 @@ void Decorate::ObjController::Update(Camera* camera, DCC* dcc) {
 	bool isImGuizmoActive = ImGuizmo::IsUsing() || ImGuizmo::IsOver();
 
 	if (!isImGuizmoActive && !preClick_ && click_ && display_->IsHovering()) {
-		uint32_t preID = dataManager_->GetCurrentID();
-		dataManager_->Begin(HistoryType::ID, &preID, sizeof(preID));
-		dataManager_->End(&selectedID_, sizeof(selectedID_));
+		dataManager_->EditID(selectedID_);
 	}
 
 	EditObject(camera);
@@ -137,7 +135,7 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 
 	//ギズモ触ってなくて、ギズモの行列に変更があった時
 	if (!isImGuizmoActive_ && different) {
-		dataManager_->Begin(HistoryType::Transform, &transform, sizeof(transform));
+		dataManager_->EditTransform(newTransform, false);
 		isImGuizmoActive_ = true;
 	}
 
@@ -145,10 +143,10 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	if (isImGuizmoActive_) {
 		//クリックしてないときは、編集終了
 		if (!click_) {
-			dataManager_->End(&newTransform, sizeof(newTransform));
+			dataManager_->EditTransform(newTransform, true);
 			isImGuizmoActive_ = false;
 		} else {
-			dataManager_->Update(&newTransform, sizeof(newTransform));
+			dataManager_->EditTransform(newTransform, false);
 		}
 	}
 
@@ -162,10 +160,6 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	ImGui::Text("Scale:    %.2f, %.2f, %.2f", transform.scale.x, transform.scale.y, transform.scale.z);
 	ImGui::Text("Rotate:   %.2f, %.2f, %.2f", transform.rotate.x, transform.rotate.y, transform.rotate.z);
 	ImGui::Text("Position: %.2f, %.2f, %.2f", transform.position.x, transform.position.y, transform.position.z);
-
-	if(ImGui::Button("Undo")) {
-		dataManager_->Undo();
-	}
 
 	ImGui::End();
 

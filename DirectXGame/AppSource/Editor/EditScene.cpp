@@ -11,6 +11,14 @@ std::unique_ptr<IScene> EditScene::Update() {
 	grid_.Update(debugCamera_.GetCenter(), debugCamera_.GetVPMatrix());
 	decoEditor_->Update(&debugCamera_, directContext_);
 
+	if (input_->GetKeyState(DIK_LCONTROL) && input_->GetKeyState(DIK_Z) && !input_->GetPreKeyState(DIK_Z)) {
+		decoEditor_->Undo();
+	}
+
+	if (input_->GetKeyState(DIK_LCONTROL) && input_->GetKeyState(DIK_Y) && !input_->GetPreKeyState(DIK_Y)) {
+		decoEditor_->Redo();
+	}
+
 	return std::unique_ptr<IScene>();
 }
 

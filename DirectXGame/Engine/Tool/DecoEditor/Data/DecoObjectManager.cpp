@@ -24,8 +24,7 @@ void Decorate::ObjManager::Update(Camera* camera) {
 		Vector3 position = camera->GetPosition() + camera->GetDirection() * cameraDistance;
 		Vector3 dummy = position;
 		dummy.x -= 1.0f;
-		dataManager_->Begin(HistoryType::Add, &dummy, sizeof(dummy));
-		dataManager_->End(currentPath_.data(), currentPath_.size());
+		dataManager_->AddObject(currentPath_, position);
 	}
 
 	auto& objectInfos = dataManager_->GetObjectInfos(currentPath_);

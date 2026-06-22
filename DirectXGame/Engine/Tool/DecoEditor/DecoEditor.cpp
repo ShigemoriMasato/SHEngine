@@ -20,6 +20,8 @@ void DecoEditor::Update(Camera* camera, DCC* dcc) {
 
 	ImGui::End();
 
+	decoDataManager_->DrawImGui();
+
 #endif // USE_IMGUI
 
 	decoObjectManager_->Update(camera);

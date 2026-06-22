@@ -31,6 +31,10 @@ void SHEngine::Renderer::EraseGPUBuffer(BufferType bufferType, ShaderType shader
 }
 
 void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
+	if (instanceNum_ <= 0) {
+		return;
+	}
+
 	auto cmdObj = dcc->GetCurrentCmdObj();
 	auto cmdList = cmdObj->GetCommandList();
 	auto display = dcc->GetRenderTarget();

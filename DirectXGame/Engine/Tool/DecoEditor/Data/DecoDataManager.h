@@ -30,10 +30,11 @@ namespace Decorate {
 		void Undo();
 		void Redo();
 
+		void DrawImGui();
+
 	private:
 
 		enum class HistoryType {
-			Waiting,
 			Transform,
 			Erase,
 			Add,
@@ -46,16 +47,31 @@ namespace Decorate {
 			Transform transform;
 		};
 
+		struct ID {
+			uint32_t prevID;
+			uint32_t nextID;
+		};
+
+		struct Trans {
+			Transform prevTransform;
+			Transform nextTransform;
+		};
+
 		void AddHistory(HistoryType type);
 
 		std::string GetPathFromID(uint32_t id) const;
 
 		std::vector<HistoryType> history_;
+		int historyIndex_ = -1;
 
-		std::vector<uint32_t> historyID_;
-		std::vector<Transform> historyTransform_;
+		std::vector<ID> historyID_;
+		int historyIDIndex_ = -1;
+		std::vector<Trans> historyTransform_;
+		int historyTransformIndex_ = -1;
 		std::vector<Data> historyErase_;
+		int historyEraseIndex_ = -1;
 		std::vector<Data> historyAdd_;
+		int historyAddIndex_ = -1;
 
 		bool editingTransform_ = false;
 
@@ -70,7 +86,6 @@ namespace Decorate {
 		uint32_t currentID_ = 0;
 		std::string currentPath_;
 
-		int historyIndex_ = 0;
 	};
 
 }

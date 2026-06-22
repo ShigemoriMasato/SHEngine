@@ -11,8 +11,10 @@ public:
 	DecoEditor(SHEngine::Engine* engine, SHEngine::Screen::Display* mainDisplay);
 
 	void Update(Camera* camera, DCC* dcc);
-
 	void Draw(DCC* dcc);
+
+	void Undo() { decoDataManager_->Undo(); }
+	void Redo() { decoDataManager_->Redo(); }
 
 private:
 
