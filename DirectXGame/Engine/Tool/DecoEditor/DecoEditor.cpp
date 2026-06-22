@@ -6,6 +6,11 @@ DecoEditor::DecoEditor(SHEngine::Engine* engine, SHEngine::Screen::Display* main
 	decoDataManager_ = std::make_unique<Decorate::DataManager>();
 	decoObjectManager_ = std::make_unique<Decorate::ObjManager>(mainDisplay, engine, decoDataManager_.get());
 	decoObjectController_ = std::make_unique<Decorate::ObjController>(mainDisplay, engine, decoDataManager_.get());
+	decoDataManager_->Load();
+}
+
+DecoEditor::~DecoEditor() {
+	decoDataManager_->Save();
 }
 
 void DecoEditor::Update(Camera* camera, DCC* dcc) {

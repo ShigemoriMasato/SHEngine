@@ -9,6 +9,7 @@ class DecoEditor {
 public:
 
 	DecoEditor(SHEngine::Engine* engine, SHEngine::Screen::Display* mainDisplay);
+	~DecoEditor();
 
 	void Update(Camera* camera, DCC* dcc);
 	void Draw(DCC* dcc);

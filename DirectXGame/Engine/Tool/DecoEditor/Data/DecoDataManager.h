@@ -32,6 +32,9 @@ namespace Decorate {
 
 		void DrawImGui();
 
+		void Save();
+		void Load();
+
 	private:
 
 		enum class HistoryType {
@@ -86,6 +89,8 @@ namespace Decorate {
 		uint32_t currentID_ = 0;
 		std::string currentPath_;
 
+		std::string selectedPath_;
+		const std::string basePath = "Deco/";
 	};
 
 }
