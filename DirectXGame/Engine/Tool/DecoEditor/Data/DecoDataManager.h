@@ -7,12 +7,6 @@
 
 namespace Decorate {
 
-	enum class HistoryType {
-		Waiting,
-		Transform,
-		ID,
-	};
-
 	struct EditData {
 		int id;
 		Transform transform;
@@ -25,29 +19,49 @@ namespace Decorate {
 
 		const Transform& GetCurrentTransform() const;
 
-		void Begin(HistoryType type, const void* preData);
-		void Update(const void* preData);
-		void End(const void* postData);
+		void EditID(uint32_t id);
+		void EditTransform(const Transform& transform, bool correct);
+		void AddObject(std::string path, Vector3 position);
+		void EraseObject(uint32_t id);
 
 		uint32_t GetCurrentID() const { return currentID_; }
 		const std::unordered_map<std::string, std::map<int, Transform>>& GetObjectInfos(std::string path) const;
 
-		void AddObject(std::string path, Vector3 position);
-		void EraseObject(int id);
+		void Undo();
+		void Redo();
 
 	private:
+
+		enum class HistoryType {
+			Waiting,
+			Transform,
+			Erase,
+			Add,
+			ID,
+		};
+
+		struct Data {
+			std::string path;
+			uint32_t id;
+			Transform transform;
+		};
+
+		void AddHistory(HistoryType type);
+
+		std::string GetPathFromID(uint32_t id) const;
+
+		std::vector<HistoryType> history_;
+
+		std::vector<uint32_t> historyID_;
+		std::vector<Transform> historyTransform_;
+		std::vector<Data> historyErase_;
+		std::vector<Data> historyAdd_;
+
+		bool editingTransform_ = false;
 
 		void UpdateHistory();
 		void AcceptHistory();
 
-		struct HistoryData {
-			HistoryType type = HistoryType::Waiting;
-			std::string preData;
-			std::string postData;
-		};
-
-		HistoryData currentHistory_;
-		std::vector<HistoryData> history_;
 		const uint32_t maxHistorySize_ = 128;
 
 		std::unordered_map<std::string, std::map<int, Transform>> transform_;
@@ -55,6 +69,8 @@ namespace Decorate {
 
 		uint32_t currentID_ = 0;
 		std::string currentPath_;
+
+		int historyIndex_ = 0;
 	};
 
 }

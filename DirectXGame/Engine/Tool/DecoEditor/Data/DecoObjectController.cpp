@@ -40,8 +40,8 @@ void Decorate::ObjController::Update(Camera* camera, DCC* dcc) {
 
 	if (!isImGuizmoActive && !preClick_ && click_ && display_->IsHovering()) {
 		uint32_t preID = dataManager_->GetCurrentID();
-		dataManager_->Begin(HistoryType::ID, &preID);
-		dataManager_->End(&selectedID_);
+		dataManager_->Begin(HistoryType::ID, &preID, sizeof(preID));
+		dataManager_->End(&selectedID_, sizeof(selectedID_));
 	}
 
 	EditObject(camera);
@@ -107,14 +107,12 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	float view[16];
 	float projection[16];
 	float world[16];
-	float cache[16];
 
 	std::memcpy(view, camera->GetViewMatrix().m, sizeof(float) * 16);
 	std::memcpy(projection, camera->GetProjectionMatrix().m, sizeof(float) * 16);
 	std::memcpy(world, transform.Matrix().m, sizeof(float) * 16);
-	std::memcpy(cache, world, sizeof(float) * 16);
 
-	ImGuizmo::Manipulate(view, projection, op, mode, world);
+	bool different = ImGuizmo::Manipulate(view, projection, op, mode, world);
 
 	float translation[3], rotation[3], scale[3];
 	ImGuizmo::DecomposeMatrixToComponents(world, translation, rotation, scale);
@@ -123,52 +121,34 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	rotation[1] *= 3.14159265358979323846f / 180.0f;
 	rotation[2] *= 3.14159265358979323846f / 180.0f;
 
+	Transform newTransform = transform;
+
+	switch (op) {
+	case ImGuizmo::TRANSLATE:
+		newTransform.position = { translation[0], translation[1], translation[2] };
+		break;
+	case ImGuizmo::ROTATE:
+		newTransform.rotate = { rotation[0], rotation[1], rotation[2] };
+		break;
+	case ImGuizmo::SCALE:
+		newTransform.scale = { scale[0], scale[1], scale[2] };
+		break;
+	}
+
+	//ギズモ触ってなくて、ギズモの行列に変更があった時
+	if (!isImGuizmoActive_ && different) {
+		dataManager_->Begin(HistoryType::Transform, &transform, sizeof(transform));
+		isImGuizmoActive_ = true;
+	}
+
 	//ImGuizmoを触っているとき
 	if (isImGuizmoActive_) {
 		//クリックしてないときは、編集終了
 		if (!click_) {
-			dataManager_->End(&transform);
+			dataManager_->End(&newTransform, sizeof(newTransform));
 			isImGuizmoActive_ = false;
 		} else {
-			dataManager_->Update(&transform);
-		}
-	}
-
-	bool different = false;
-
-	switch (op) {
-	case ImGuizmo::TRANSLATE:
-		for (int i = 0; i < 3; ++i) {
-			if ((&transform.position.x)[i] != translation[i]) {
-				different = true;
-				break;
-			}
-		}
-		break;
-	case ImGuizmo::ROTATE:
-		for (int i = 0; i < 3; ++i) {
-			if ((&transform.rotate.x)[i] != rotation[i]) {
-				different = true;
-				break;
-			}
-		}
-		break;
-	case ImGuizmo::SCALE:
-		for (int i = 0; i < 3; ++i) {
-			if ((&transform.scale.x)[i] != scale[i]) {
-				different = true;
-				break;
-			}
-		}
-		break;
-	}
-
-	//ギズモ触ってなくて、クリックしていて、カーソルがギズモの上にあるとき
-	if (!isImGuizmoActive_ && ImGuizmo::IsOver() && click_) {
-		//値が変わってたら
-		if (different) {
-			dataManager_->Begin(HistoryType::Transform, &transform);
-			isImGuizmoActive_ = true;
+			dataManager_->Update(&newTransform, sizeof(newTransform));
 		}
 	}
 
@@ -182,6 +162,10 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	ImGui::Text("Scale:    %.2f, %.2f, %.2f", transform.scale.x, transform.scale.y, transform.scale.z);
 	ImGui::Text("Rotate:   %.2f, %.2f, %.2f", transform.rotate.x, transform.rotate.y, transform.rotate.z);
 	ImGui::Text("Position: %.2f, %.2f, %.2f", transform.position.x, transform.position.y, transform.position.z);
+
+	if(ImGui::Button("Undo")) {
+		dataManager_->Undo();
+	}
 
 	ImGui::End();
 

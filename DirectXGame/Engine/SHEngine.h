@@ -32,8 +32,6 @@ namespace SHEngine {
 		// コマンドのクローズ
 		void PostDraw();
 
-		void WaitFence(Command::WaitFence& waitFence, Command::Type type);
-
 		void StopGPU() {
 			directCmdContext_->StopGPU();
 		}

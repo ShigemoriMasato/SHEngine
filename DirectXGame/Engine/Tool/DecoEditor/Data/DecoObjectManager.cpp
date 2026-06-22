@@ -22,7 +22,10 @@ void Decorate::ObjManager::Update(Camera* camera) {
 	if (!currentPath_.empty()) {
 		constexpr static float cameraDistance = 20.0f;
 		Vector3 position = camera->GetPosition() + camera->GetDirection() * cameraDistance;
-		dataManager_->AddObject(currentPath_, position);
+		Vector3 dummy = position;
+		dummy.x -= 1.0f;
+		dataManager_->Begin(HistoryType::Add, &dummy, sizeof(dummy));
+		dataManager_->End(currentPath_.data(), currentPath_.size());
 	}
 
 	auto& objectInfos = dataManager_->GetObjectInfos(currentPath_);

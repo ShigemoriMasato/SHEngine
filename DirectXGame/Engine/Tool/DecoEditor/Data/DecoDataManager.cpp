@@ -2,7 +2,6 @@
 #include <cassert>
 
 Decorate::DataManager::DataManager() {
-	history_.reserve(maxHistorySize_);
 }
 
 const Transform& Decorate::DataManager::GetCurrentTransform() const {
@@ -17,80 +16,95 @@ const Transform& Decorate::DataManager::GetCurrentTransform() const {
 	return transform_.at(currentPath_).at(currentID_);
 }
 
-void Decorate::DataManager::Begin(HistoryType type, const void* preData) {
-	if (currentHistory_.type != HistoryType::Waiting) {
-		assert(false && "Invalid history state");
+void Decorate::DataManager::EditID(uint32_t id) {
+	if (currentID_ == id) {
 		return;
 	}
-	currentHistory_.type = type;
-	currentHistory_.preData = std::string(reinterpret_cast<const char*>(preData));
+
+	currentID_ = id;
+	currentPath_ = GetPathFromID(id);
+	history_.push_back(HistoryType::ID);
+	historyID_.push_back(id);
 }
 
-void Decorate::DataManager::Update(const void* preData) {
-	if (currentHistory_.type == HistoryType::Waiting) {
-		assert(false && "Invalid history state");
-		return;
+void Decorate::DataManager::EditTransform(const Transform& transform, bool correct) {
+	const Transform& currentTransform = GetCurrentTransform();
+
+	if (!editingTransform_) {
+		history_.push_back(HistoryType::Transform);
+		historyTransform_.push_back(transform);
+		editingTransform_ = true;
 	}
-	currentHistory_.postData = std::string(reinterpret_cast<const char*>(preData));
-	UpdateHistory();
+
+	historyTransform_.back() = transform;
+
+	if (correct) {
+		editingTransform_ = false;
+	}
 }
 
-void Decorate::DataManager::End(const void* postData) {
-	currentHistory_.postData = std::string(reinterpret_cast<const char*>(postData));
-	AcceptHistory();
+void Decorate::DataManager::AddObject(std::string path, Vector3 position) {
+	history_.push_back(HistoryType::Add);
+	Data data{};
+	data.path = path;
+	data.id = nextID_++;
+	data.transform.position = position;
+
+	transform_[data.path][data.id] = data.transform;
+	historyAdd_.push_back(data);
+}
+
+void Decorate::DataManager::EraseObject(uint32_t id) {
+	history_.push_back(HistoryType::Erase);
+	Data data{};
+	data.path = GetPathFromID(id);
+	data.id = id;
+	data.transform = transform_.at(data.path).at(data.id);
+
+	historyErase_.push_back(data);
+
+	transform_.at(data.path).erase(data.id);
 }
 
 const std::unordered_map<std::string, std::map<int, Transform>>& Decorate::DataManager::GetObjectInfos(std::string path) const {
 	return transform_;
 }
 
-void Decorate::DataManager::AddObject(std::string path, Vector3 position) {
-	Transform newTransform;
-	newTransform.position = position;
-	transform_[path][nextID_++] = newTransform;
+void Decorate::DataManager::Undo() {
+
 }
 
-void Decorate::DataManager::EraseObject(int id) {
-	if (transform_.find(currentPath_) != transform_.end()) {
-		transform_.at(currentPath_).erase(id);
+void Decorate::DataManager::Redo() {
+	
+}
+
+void Decorate::DataManager::AddHistory(HistoryType type) {
+	uint32_t currentHistorySize = static_cast<uint32_t>(history_.size());
+	if (historyIndex_ < currentHistorySize - 1) {
+		history_.resize(historyIndex_ + 1);
+		historyID_.resize(historyIndex_ + 1);
+		historyTransform_.resize(historyIndex_ + 1);
+		historyErase_.resize(historyIndex_ + 1);
+		historyAdd_.resize(historyIndex_ + 1);
 	}
 }
 
+std::string Decorate::DataManager::GetPathFromID(uint32_t id) const {
+	for (const auto& [path, info] : transform_) {
+		if (info.find(id) != info.end()) {
+			return path;
+		}
+	}
+	return std::string();
+}
 
 
 
 void Decorate::DataManager::UpdateHistory() {
-	switch(currentHistory_.type) {
-		case HistoryType::Transform:
-			transform_[currentPath_][currentID_] = *reinterpret_cast<const Transform*>(currentHistory_.postData.data());
-			break;
-		case HistoryType::ID:
-			currentID_ = *reinterpret_cast<const uint32_t*>(currentHistory_.postData.data());
-			for (const auto& [path, info] : transform_) {
-				if (info.find(currentID_) != info.end()) {
-					currentPath_ = path;
-					return;
-				}
-			}
-			break;
-		default:
-			assert(false && "Unknown history type");
-			break;
-	}
+	
 }
 
 void Decorate::DataManager::AcceptHistory() {
 	//データ内容が変化していない場合は履歴に追加しない
-	if (currentHistory_.preData == currentHistory_.postData) {
-		currentHistory_ = {};
-		return;
-	}
-
-	UpdateHistory();
-
-	history_.push_back(currentHistory_);
-	currentHistory_ = {};
-	if (history_.size() > maxHistorySize_) {
-		history_.erase(history_.begin());
-	}
+	
 }

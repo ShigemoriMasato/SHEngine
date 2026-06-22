@@ -12,7 +12,7 @@ echo 2 : DirectXTex
 echo 3 : Assimp
 echo 4 : FreeType
 echo 9 : HeaderCopy
-echo 0 : Shutdown
+echo - : Shutdown
 echo ==========================
 
 set /p BUILD_MODE=Select Number :
@@ -23,7 +23,7 @@ if "%BUILD_MODE%"=="2" goto BUILD_DIRECTXTEX
 if "%BUILD_MODE%"=="3" goto BUILD_ASSIMP
 if "%BUILD_MODE%"=="4" goto BUILD_FREETYPE
 if "%BUILD_MODE%"=="9" goto COPY_HEADER
-if "%BUILD_MODE%"=="0" exit
+if "%BUILD_MODE%"=="-" exit
 
 echo Invalid Number
 pause
