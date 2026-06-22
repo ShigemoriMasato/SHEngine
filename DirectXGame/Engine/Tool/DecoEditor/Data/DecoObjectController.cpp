@@ -92,9 +92,12 @@ void Decorate::ObjController::EditObject(ObjManager* objManager) {
 	if (currentID_ == 0) return;
 
 	if (currentID_ > transforms_.size()) {
+		uint32_t preSize = static_cast<uint32_t>(transforms_.size());
 		transforms_.resize(currentID_);
-		Matrix4x4 world = objManager->GetTransform(currentID_);
-		transforms_[currentID_ - 1].position = { world.m[3][0], world.m[3][1], world.m[3][2] };
+		for (int i = preSize; i < currentID_; ++i) {
+			Matrix4x4 world = objManager->GetTransform(i);
+			transforms_[currentID_ - 1].position = { world.m[3][0], world.m[3][1], world.m[3][2] };
+		}
 	}
 
 	Transform& transform = transforms_[currentID_ - 1];
