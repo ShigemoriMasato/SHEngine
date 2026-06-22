@@ -38,28 +38,28 @@ DecoPath CreateDirectoryTree(const fs::path& rootPath) {
     return root;
 }
 
-Decorate::DecoPathManager::DecoPathManager() {
+Decorate::PathManager::PathManager() {
 	Update();
 }
 
-Decorate::DecoPath Decorate::DecoPathManager::GetDecoPath(const std::string& name) {
+Decorate::DecoPath Decorate::PathManager::GetDecoPath(const std::string& name) {
 	return root_;
 }
 
-void Decorate::DecoPathManager::UpdateDecoPath() {
+void Decorate::PathManager::UpdateDecoPath() {
 	Update();
 }
 
-void Decorate::DecoPathManager::Update() {
+void Decorate::PathManager::Update() {
 	root_ = CreateDirectoryTree("Assets/Model/");
 }
 
 
-void Decorate::DecoPathManager::DrawImGui() {
+void Decorate::PathManager::DrawImGui() {
 	DrawDecoPath(root_);
 }
 
-void Decorate::DecoPathManager::DrawDecoPath(const DecoPath& node) {
+void Decorate::PathManager::DrawDecoPath(const DecoPath& node) {
 #ifdef USE_IMGUI
 
     if (node.children.empty()) {

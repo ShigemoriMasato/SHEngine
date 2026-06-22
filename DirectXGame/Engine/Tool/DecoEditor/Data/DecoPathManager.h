@@ -9,10 +9,10 @@ namespace Decorate {
 		std::vector<DecoPath> children;
 	};
 
-	class DecoPathManager {
+	class PathManager {
 	public:
 
-		DecoPathManager();
+		PathManager();
 
 		DecoPath GetDecoPath(const std::string& name);
 		

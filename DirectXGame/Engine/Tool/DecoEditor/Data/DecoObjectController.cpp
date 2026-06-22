@@ -1,9 +1,10 @@
 #include "DecoObjectController.h"
 #include <Utility/DirectUtilFuncs.h>
 
-Decorate::ObjController::ObjController(SHEngine::Screen::Display* display, SHEngine::Engine* engine) {
+Decorate::ObjController::ObjController(SHEngine::Screen::Display* display, SHEngine::Engine* engine, DataManager* dataManager) {
 	display_ = display;
 	engine_ = engine;
+	dataManager_ = dataManager;
 
 	//ReadBackをSwapChainに合わせて作成する
 	int bufferCount = device_->GetBufferCount();
@@ -30,25 +31,25 @@ Decorate::ObjController::ObjController(SHEngine::Screen::Display* display, SHEng
 	idGetter_->SetSamplerID(SHEngine::PSO::SamplerID::Point);
 }
 
-void Decorate::ObjController::Update(ObjManager* objManager, Camera* camera, DCC* dcc) {
-	GetIDFromGPU(objManager, dcc);
+void Decorate::ObjController::Update(Camera* camera, DCC* dcc) {
+	GetIDFromGPU(dcc);
 	preClick_ = click_;
 	click_ = bool(engine_->GetInput()->GetMouseButtonState()[0]);
 
 	bool isImGuizmoActive = ImGuizmo::IsUsing() || ImGuizmo::IsOver();
 
 	if (!isImGuizmoActive && !preClick_ && click_ && display_->IsHovering()) {
-		currentID_ = prevID_;
+		uint32_t preID = dataManager_->GetCurrentID();
+		dataManager_->Begin(HistoryType::ID, &preID);
+		dataManager_->End(&selectedID_);
 	}
 
-	EditObject(objManager, camera);
-
-
+	EditObject(camera);
 }
 
 // =======================================================================================================================
 
-void Decorate::ObjController::GetIDFromGPU(ObjManager* objManager, DCC* dcc) {
+void Decorate::ObjController::GetIDFromGPU(DCC* dcc) {
 	auto cmdObj = dcc->GetCurrentCmdObj();
 	auto readBack = readBacks_[cmdObj->GetCurrentID()];
 	auto cmdList = cmdObj->GetCommandList();
@@ -59,7 +60,7 @@ void Decorate::ObjController::GetIDFromGPU(ObjManager* objManager, DCC* dcc) {
 	{
 		void* mappedData = nullptr;
 		readBack.res->Map(0, nullptr, &mappedData);
-		prevID_ = *static_cast<uint32_t*>(mappedData);
+		selectedID_ = *static_cast<uint32_t*>(mappedData);
 	}
 
 	//結果の取得を命令する
@@ -89,20 +90,11 @@ void Decorate::ObjController::GetIDFromGPU(ObjManager* objManager, DCC* dcc) {
 	//Computeの起動時勝手にバリアが切り替わるため、バリアは戻さない
 }
 
-void Decorate::ObjController::EditObject(ObjManager* objManager, Camera* camera) {
+void Decorate::ObjController::EditObject(Camera* camera) {
 	//currentID_が0のときは何もしない
-	if (currentID_ == 0) return;
+	if (dataManager_->GetCurrentID() == 0) return;
 
-	if (currentID_ > transforms_.size()) {
-		uint32_t preSize = static_cast<uint32_t>(transforms_.size());
-		transforms_.resize(currentID_);
-		for (uint32_t i = preSize; i < currentID_; ++i) {
-			Matrix4x4 world = objManager->GetTransform(i);
-			transforms_[currentID_ - 1].position = { world.m[3][0], world.m[3][1], world.m[3][2] };
-		}
-	}
-
-	Transform& transform = transforms_[currentID_ - 1];
+	const Transform& transform = dataManager_->GetCurrentTransform();
 
 	//ImGuizmoを使って編集する
 #ifdef USE_IMGUI
@@ -114,52 +106,71 @@ void Decorate::ObjController::EditObject(ObjManager* objManager, Camera* camera)
 
 	float view[16];
 	float projection[16];
+	float world[16];
+	float cache[16];
 
 	std::memcpy(view, camera->GetViewMatrix().m, sizeof(float) * 16);
 	std::memcpy(projection, camera->GetProjectionMatrix().m, sizeof(float) * 16);
-
-	float world[16];
-	Matrix4x4 mat = transform.Matrix();
-	std::memcpy(world, mat.m, sizeof(float) * 16);
+	std::memcpy(world, transform.Matrix().m, sizeof(float) * 16);
+	std::memcpy(cache, world, sizeof(float) * 16);
 
 	ImGuizmo::Manipulate(view, projection, op, mode, world);
 
 	float translation[3], rotation[3], scale[3];
 	ImGuizmo::DecomposeMatrixToComponents(world, translation, rotation, scale);
 
+	rotation[0] *= 3.14159265358979323846f / 180.0f;
+	rotation[1] *= 3.14159265358979323846f / 180.0f;
+	rotation[2] *= 3.14159265358979323846f / 180.0f;
+
+	//ImGuizmoを触っているとき
+	if (isImGuizmoActive_) {
+		//クリックしてないときは、編集終了
+		if (!click_) {
+			dataManager_->End(&transform);
+			isImGuizmoActive_ = false;
+		} else {
+			dataManager_->Update(&transform);
+		}
+	}
+
+	bool different = false;
+
 	switch (op) {
-	case ImGuizmo::OPERATION::TRANSLATE:
-		transform.position = { translation[0], translation[1], translation[2] };
+	case ImGuizmo::TRANSLATE:
+		for (int i = 0; i < 3; ++i) {
+			if ((&transform.position.x)[i] != translation[i]) {
+				different = true;
+				break;
+			}
+		}
 		break;
-	case ImGuizmo::OPERATION::ROTATE:
-		transform.rotate = { rotation[0], rotation[1], rotation[2] };
+	case ImGuizmo::ROTATE:
+		for (int i = 0; i < 3; ++i) {
+			if ((&transform.rotate.x)[i] != rotation[i]) {
+				different = true;
+				break;
+			}
+		}
 		break;
-	case ImGuizmo::OPERATION::SCALE:
-		transform.scale = { scale[0], scale[1], scale[2] };
-		break;
-	default:
-		transform = {
-			{scale[0], scale[1], scale[2]},
-			{rotation[0], rotation[1], rotation[2] },
-			{translation[0], translation[1], translation[2] }
-		};
+	case ImGuizmo::SCALE:
+		for (int i = 0; i < 3; ++i) {
+			if ((&transform.scale.x)[i] != scale[i]) {
+				different = true;
+				break;
+			}
+		}
 		break;
 	}
 
-	ImGui::Begin("DecoObjectController");
-	ImGui::Text("IsWantCaptureMouse: %s", ImGui::GetIO().WantCaptureMouse ? "TRUE" : "FALSE");
-	ImGui::Text("IsOver: %s", ImGuizmo::IsOver() ? "TRUE" : "FALSE");
-	ImGui::Text("IsUsing: %s", ImGuizmo::IsUsing() ? "TRUE" : "FALSE");
-	ImGui::Text("ViewManipulate: %s", ImGuizmo::IsViewManipulateHovered() ? "TRUE" : "FALSE");
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui::Text("Mouse %.1f %.1f Down=%d", io.MousePos.x, io.MousePos.y, io.MouseDown[0]);
-	ImGui::Text("WorldMatrix:");
-	ImGui::Text("%.2f %.2f %.2f %.2f", world[0], world[1], world[2], world[3]);
-	ImGui::Text("%.2f %.2f %.2f %.2f", world[4], world[5], world[6], world[7]);
-	ImGui::Text("%.2f %.2f %.2f %.2f", world[8], world[9], world[10], world[11]);
-	ImGui::Text("%.2f %.2f %.2f %.2f", world[12], world[13], world[14], world[15]);
-	ImGui::End();
-
+	//ギズモ触ってなくて、クリックしていて、カーソルがギズモの上にあるとき
+	if (!isImGuizmoActive_ && ImGuizmo::IsOver() && click_) {
+		//値が変わってたら
+		if (different) {
+			dataManager_->Begin(HistoryType::Transform, &transform);
+			isImGuizmoActive_ = true;
+		}
+	}
 
 	ImGui::Begin("Transform");
 	if (ImGui::Button("S")) op = ImGuizmo::OPERATION::SCALE;
@@ -168,13 +179,11 @@ void Decorate::ObjController::EditObject(ObjManager* objManager, Camera* camera)
 	ImGui::SameLine();
 	if (ImGui::Button("T")) op = ImGuizmo::OPERATION::TRANSLATE;
 
-	ImGui::DragFloat3("Scale", &transform.scale.x, 0.01f);
-	ImGui::DragFloat3("Rotate", &transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("Position", &transform.position.x, 0.1f);
+	ImGui::Text("Scale:    %.2f, %.2f, %.2f", transform.scale.x, transform.scale.y, transform.scale.z);
+	ImGui::Text("Rotate:   %.2f, %.2f, %.2f", transform.rotate.x, transform.rotate.y, transform.rotate.z);
+	ImGui::Text("Position: %.2f, %.2f, %.2f", transform.position.x, transform.position.y, transform.position.z);
 
 	ImGui::End();
 
 #endif
-
-	objManager->SetTransform(currentID_, transform);
 }

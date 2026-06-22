@@ -1,6 +1,7 @@
 #pragma once
 #include <SHEngine.h>
 #include "DecoObjectRender.h"
+#include "DecoDataManager.h"
 
 namespace Decorate {
 
@@ -8,16 +9,15 @@ namespace Decorate {
 	class ObjManager {
 	public:
 
-		ObjManager(SHEngine::Screen::Display* display, SHEngine::Engine* engine);
+		ObjManager(SHEngine::Screen::Display* display, SHEngine::Engine* engine, DataManager* dataManager);
 
 		void Update(Camera* camera);
 
 		void Draw(DCC* dcc);
 
-		void SetTransform(uint32_t id, const Transform& transform);
-		Matrix4x4 GetTransform(uint32_t id) const;
-
 	private:
+
+		DataManager* dataManager_ = nullptr;
 
 		std::string currentPath_ = "";
 
@@ -29,9 +29,7 @@ namespace Decorate {
 			std::vector<Matrix4x4> transforms;
 		};
 		std::vector<RenderInfo> renderInfos_;
-		std::vector<std::unique_ptr<ObjRenderer>> renderers_;
-
-		uint32_t nextID_ = 1;
+		std::unordered_map<std::string, std::unique_ptr<ObjRenderer>> renderers_;
 	};
 
 }

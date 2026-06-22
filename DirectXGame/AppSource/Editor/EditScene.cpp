@@ -26,6 +26,14 @@ void EditScene::Draw() {
 
 	display->ToTexture(directContext_->GetCurrentCmdObj());
 
+#ifdef USE_IMGUI
+
+	ImGui::Begin("FPS");
+	ImGui::Text("FPS: %.1f", 1.0f / engine_->GetDeltaTime());
+	ImGui::End();
+
+#endif
+
 	directContext_->SetRenderTarget(window, true);
 
 	engine_->DrawImGui(directContext_->GetCurrentCmdObj());

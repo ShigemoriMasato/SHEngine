@@ -2,6 +2,7 @@
 #include <Render/Screen/Display.h>
 #include <Compute/ComputeObject.h>
 #include "DecoObjectManager.h"
+#include "DecoDataManager.h"
 
 namespace Decorate {
 
@@ -12,18 +13,19 @@ namespace Decorate {
 		//ReadBack用のリソースを作成するために、DXDeviceを渡す必要がある
 		static void Initialize(SHEngine::DXDevice* device) { device_ = device; }
 
-		ObjController(SHEngine::Screen::Display* display, SHEngine::Engine* engine);
+		ObjController(SHEngine::Screen::Display* display, SHEngine::Engine* engine, DataManager* dataManager);
 
-		void Update(ObjManager* objManager, Camera* camera, DCC* dcc);
+		void Update(Camera* camera, DCC* dcc);
 
 	private:
 
-		void GetIDFromGPU(ObjManager* objManager, DCC* dcc);
+		void GetIDFromGPU(DCC* dcc);
 
-		void EditObject(ObjManager* objManager, Camera* camera);
+		void EditObject(Camera* camera);
 
 		static inline SHEngine::DXDevice* device_ = nullptr;
 
+		DataManager* dataManager_ = nullptr;
 		SHEngine::Screen::Display* display_ = nullptr;
 		SHEngine::Engine* engine_ = nullptr;
 
@@ -38,13 +40,12 @@ namespace Decorate {
 		SHEngine::GPUBuffer* cursorBuffer_ = nullptr;
 		SHEngine::GPUBuffer* ansBuffer_ = nullptr;
 
-		uint32_t prevID_ = 0;
-		uint32_t currentID_ = 0;
+		uint32_t selectedID_ = 0;
 
 		bool click_ = false;
 		bool preClick_ = false;
 
-		std::vector<Transform> transforms_ = {};
+		bool isImGuizmoActive_ = false;
 	};
 
 }

@@ -2,9 +2,10 @@
 
 DecoEditor::DecoEditor(SHEngine::Engine* engine, SHEngine::Screen::Display* mainDisplay) {
 	display_ = mainDisplay;
-	decoPathManager_ = std::make_unique<Decorate::DecoPathManager>();
-	decoObjectManager_ = std::make_unique<Decorate::ObjManager>(mainDisplay, engine);
-	decoObjectController_ = std::make_unique<Decorate::ObjController>(mainDisplay, engine);
+	decoPathManager_ = std::make_unique<Decorate::PathManager>();
+	decoDataManager_ = std::make_unique<Decorate::DataManager>();
+	decoObjectManager_ = std::make_unique<Decorate::ObjManager>(mainDisplay, engine, decoDataManager_.get());
+	decoObjectController_ = std::make_unique<Decorate::ObjController>(mainDisplay, engine, decoDataManager_.get());
 }
 
 void DecoEditor::Update(Camera* camera, DCC* dcc) {
@@ -22,7 +23,7 @@ void DecoEditor::Update(Camera* camera, DCC* dcc) {
 #endif // USE_IMGUI
 
 	decoObjectManager_->Update(camera);
-	decoObjectController_->Update(decoObjectManager_.get(), camera, dcc);
+	decoObjectController_->Update(camera, dcc);
 }
 
 void DecoEditor::Draw(DCC* dcc) {

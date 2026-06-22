@@ -198,6 +198,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Test\DDS\DDSTest.cpp" />
     <ClCompile Include="AppSource\Editor\EditScene.cpp" />
     <ClCompile Include="AppSource\EffectTest\EffectTestScene.cpp" />
+    <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoDataManager.cpp" />
     <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoObjectController.cpp" />
     <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoObjectManager.cpp" />
     <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoObjectRender.cpp" />
@@ -294,6 +295,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Test\DDS\DDSTest.h" />
     <ClInclude Include="AppSource\Editor\EditScene.h" />
     <ClInclude Include="AppSource\EffectTest\EffectTestScene.h" />
+    <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoDataManager.h" />
     <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoObjectController.h" />
     <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoObjectManager.h" />
     <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoObjectRender.h" />

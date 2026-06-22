@@ -18,7 +18,8 @@ private:
 
 	SHEngine::Screen::Display* display_ = nullptr;
 
-	std::unique_ptr<Decorate::DecoPathManager> decoPathManager_;
+	std::unique_ptr<Decorate::PathManager> decoPathManager_;
+	std::unique_ptr<Decorate::DataManager> decoDataManager_;
 	std::unique_ptr<Decorate::ObjManager> decoObjectManager_;
 
 	std::unique_ptr<Decorate::ObjController> decoObjectController_;
