@@ -1,7 +1,7 @@
 #include "Display.h"
 #include <Utility/DirectUtilFuncs.h>
 #include <imgui/imgui.h>
-#include <imguizmo/ImGuizmo.h>
+#include <imgui/ImGuizmo.h>
 
 namespace {
 

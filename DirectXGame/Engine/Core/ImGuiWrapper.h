@@ -5,7 +5,7 @@
 #include <imgui/imgui.h>
 #include <Render/Command/DirectCommandContext.h>
 
-#include <imguizmo/ImGuizmo.h>
+#include <imgui/ImGuizmo.h>
 #include <Camera/Camera.h>
 #include <Render/Screen/Display.h>
 
