@@ -8,6 +8,12 @@ Decorate::DataManager::DataManager() {
 	if (!std::filesystem::exists("Assets/Binary/" + basePath)) {
 		std::filesystem::create_directories("Assets/Binary/" + basePath);
 	}
+
+	BinaryManager fileNameManager;
+	if (!fileNameManager.Boot(configName)) {
+		return;
+	}
+	selectedPath_ = fileNameManager.Reverse<std::string>();
 }
 
 const Transform& Decorate::DataManager::GetCurrentTransform() const {
@@ -197,6 +203,8 @@ void Decorate::DataManager::DrawImGui() {
 			selectedPath_ = std::string(newFileName) + ".bin";
 			Save();
 			newFileName[0] = '\0';
+		} else {
+			Save();
 		}
 	}
 
@@ -207,6 +215,10 @@ void Decorate::DataManager::DrawImGui() {
 }
 
 void Decorate::DataManager::Save() {
+	BinaryManager fileNameManager;
+	fileNameManager.Register(&selectedPath_);
+	fileNameManager.Write(configName);
+
 	BinaryManager binManager;
 
 	int pathCount = static_cast<int>(transform_.size());
@@ -225,8 +237,11 @@ void Decorate::DataManager::Save() {
 }
 
 void Decorate::DataManager::Load() {
+	transform_.clear();
+	nextID_ = 1;
+
 	BinaryManager binManager;
-	if (binManager.Boot(basePath + selectedPath_)) {
+	if (!binManager.Boot(basePath + selectedPath_)) {
 		return;
 	}
 
@@ -251,6 +266,9 @@ void Decorate::DataManager::Load() {
 	historyEraseIndex_ = -1;
 	historyTransformIndex_ = -1;
 	historyIDIndex_ = -1;
+
+	currentPath_.clear();
+	currentID_ = 0;
 }
 
 void Decorate::DataManager::AddHistory(HistoryType type) {

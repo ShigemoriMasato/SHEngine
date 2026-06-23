@@ -161,6 +161,10 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	ImGui::Text("Rotate:   %.2f, %.2f, %.2f", transform.rotate.x, transform.rotate.y, transform.rotate.z);
 	ImGui::Text("Position: %.2f, %.2f, %.2f", transform.position.x, transform.position.y, transform.position.z);
 
+	if (ImGui::Button("Erase")) {
+		dataManager_->EraseObject(dataManager_->GetCurrentID());
+	}
+
 	ImGui::End();
 
 #endif

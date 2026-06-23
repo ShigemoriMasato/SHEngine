@@ -4,6 +4,7 @@
 #include <Game/Effect/Effect.h>
 #include <Game/Effect/Subject/HitEffect.h>
 #include <Render/PostEffect.h>
+#include <Tool/TimeViewer/TimeViewer.h>
 
 class EffectTestScene : public IScene {
 public:
@@ -23,4 +24,6 @@ private:
 
 	std::unique_ptr<PostEffect> postEffect_ = nullptr;
 	PostEffectConfig peConfig_{};
+
+	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
 };

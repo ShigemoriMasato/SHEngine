@@ -27,6 +27,10 @@ void Decorate::ObjManager::Update(Camera* camera) {
 		dataManager_->AddObject(currentPath_, position);
 	}
 
+	for (auto& [path, renderer] : renderers_) {
+		renderer->Update(camera);
+	}
+
 	auto& objectInfos = dataManager_->GetObjectInfos(currentPath_);
 	for (const auto& [path, info] : objectInfos) {
 		auto& renderer = renderers_[path];
@@ -50,7 +54,6 @@ void Decorate::ObjManager::Update(Camera* camera) {
 			ids.push_back(id);
 		}
 		renderer->SetObjInfo(transforms, ids);
-		renderer->Update(camera);
 	}
 }
 

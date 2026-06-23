@@ -91,6 +91,8 @@ namespace Decorate {
 
 		std::string selectedPath_;
 		const std::string basePath = "Deco/";
+
+		const std::string configName = "DecoDataConfig.bin";
 	};
 
 }

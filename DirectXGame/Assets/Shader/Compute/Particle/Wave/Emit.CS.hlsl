@@ -55,6 +55,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     uint state = seed ^ index;
     float3 position = float3(Rand(state), Rand(state), Rand(state));
     float2 uv = position.xz;
+    uv.y = 1.0f - uv.y; // テクスチャのUVは左上が原点なので、Y軸を反転させる
     float4 texColor = textures[textureID].SampleLevel(gSampler, uv, 0);
     // テクスチャの色が暗い場合はパーティクルを発生させない
     if (texColor.r < 0.1f)

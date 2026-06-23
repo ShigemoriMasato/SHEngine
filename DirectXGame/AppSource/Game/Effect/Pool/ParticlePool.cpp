@@ -33,7 +33,7 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	renderer_->SetGPUBuffer(vpMatrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
 	renderer_->SetGPUBuffer(pool_.type, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	renderer_->instanceNum_ = kMaxParticleNum;
+	renderer_->instanceNum_ = std::min(kMaxParticleNum, 1000000);
 	renderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add);
 
 	initialize_->Execute(cmdObj);
@@ -57,6 +57,9 @@ void ParticlePool::DrawImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Particle Common");
 	ImGui::DragFloat("Size", &size_, 0.01f);
+	int instance = (int)renderer_->instanceNum_;
+	ImGui::SliderInt("RenderNum", &instance, 1, pool_.maxParticleNum);
+	renderer_->instanceNum_ = uint32_t(instance);
 	ImGui::End();
 
 	sizeBuffer_->CopyBuffer(&size_, sizeof(size_));

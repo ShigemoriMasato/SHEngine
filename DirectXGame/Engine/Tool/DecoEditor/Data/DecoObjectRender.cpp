@@ -25,6 +25,7 @@ ObjRenderer::ObjRenderer(const SHEngine::DrawData& drawData, int textureIndex) {
 void ObjRenderer::Update(Camera* camera) {
 	Matrix4x4 vpMatrix = camera->GetVPMatrix();
 	cameraBuffer_->CopyBuffer(&vpMatrix, sizeof(Matrix4x4));
+	renderer_->instanceNum_ = 0;
 }
 
 void ObjRenderer::Draw(DCC* dcc) {
