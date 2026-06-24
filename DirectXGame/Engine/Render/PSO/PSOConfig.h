@@ -8,6 +8,14 @@
 
 namespace SHEngine::PSO {
 
+	enum class Topology : uint8_t {
+		Triangle,
+		Line,
+		Point,
+
+		Count
+	};
+
 	/**
 	 * @struct PSOConfig
 	 * @brief パイプラインステートオブジェクト（PSO）の設定をまとめた構造体
@@ -31,7 +39,7 @@ namespace SHEngine::PSO {
 		/// @brief ラスタライザーID
 		RasterizerID rasterizerID = RasterizerID::Fill;
 		/// @brief プリミティブトポロジー
-		D3D12_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		Topology topology = Topology::Triangle;
 		/// @brief RTVのフォーマット
 		DXGI_FORMAT rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		/// @brief RTVの数

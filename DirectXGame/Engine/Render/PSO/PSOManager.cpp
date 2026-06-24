@@ -3,7 +3,7 @@
 
 using namespace SHEngine::PSO;
 
-std::unordered_map<D3D12_PRIMITIVE_TOPOLOGY, D3D12_PRIMITIVE_TOPOLOGY_TYPE> Manager::topologyMap_{};
+std::unordered_map<Topology, D3D12_PRIMITIVE_TOPOLOGY_TYPE> Manager::topologyMap_{};
 
 Manager::Manager(DXDevice* device) {
 	shaderShelf_ = std::make_unique<ShaderShelf>(device);
@@ -18,9 +18,9 @@ Manager::Manager(DXDevice* device) {
 
 	device_ = device->GetDevice();
 
-	topologyMap_[D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	topologyMap_[D3D_PRIMITIVE_TOPOLOGY_LINELIST] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-	topologyMap_[D3D_PRIMITIVE_TOPOLOGY_POINTLIST] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+	topologyMap_[Topology::Triangle] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	topologyMap_[Topology::Line] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+	topologyMap_[Topology::Point] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 }
 
 Manager::~Manager() {

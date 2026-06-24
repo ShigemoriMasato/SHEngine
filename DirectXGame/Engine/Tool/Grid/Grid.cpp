@@ -16,7 +16,7 @@ void Grid::Initialize(SHEngine::DrawDataManager* drawDataManager) {
 	render_->psoConfig_.vs = "Engine/Grid.VS.hlsl";
 	render_->psoConfig_.ps = "Engine/Grid.PS.hlsl";
 	render_->psoConfig_.inputLayoutID = SHEngine::PSO::InputLayoutID::Vector3;
-	render_->psoConfig_.topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	render_->psoConfig_.topology = SHEngine::PSO::Topology::Line;
 
 	render_->CreateSRV(sizeof(LineConfig), lineNum_ * 2, ShaderType::VERTEX_SHADER, "Config");
 	render_->CreateCBV(sizeof(Matrix4x4), ShaderType::VERTEX_SHADER, "VP");

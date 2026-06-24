@@ -68,6 +68,8 @@ namespace SHEngine::PSO {
 		 */
 		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> GetSamplers() const { return rootSignatureShelf_->GetSamplers(); }
 
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE GetTopology(Topology topology) const { return topologyMap_[topology]; }
+
 	private:
 
 		/**
@@ -107,7 +109,7 @@ namespace SHEngine::PSO {
 		std::shared_ptr<spdlog::logger> logger_ = nullptr;
 
 		/// @brief プリミティブトポロジとトポロジタイプの変換マップ
-		static std::unordered_map<D3D12_PRIMITIVE_TOPOLOGY, D3D12_PRIMITIVE_TOPOLOGY_TYPE> topologyMap_;
+		static std::unordered_map<Topology, D3D12_PRIMITIVE_TOPOLOGY_TYPE> topologyMap_;
 	};
 
 }

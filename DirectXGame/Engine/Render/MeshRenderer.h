@@ -6,12 +6,11 @@
 
 namespace SHEngine {
 
-	class Renderer {
-	public:
+	class MeshRenderer {
 
 		static void SetPSOEditor(PSO::Editor* psoEditor, D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle) { psoEditor_ = psoEditor; textureStartHandle_ = textureStartHandle; }
 
-		Renderer(const DrawData& drawData);
+		MeshRenderer(const DrawData& drawData);
 
 		/// @brief GPUBufferをセットする。register順。
 		/// @param gpuBuffer 使用するBuffer
@@ -33,11 +32,9 @@ namespace SHEngine {
 
 
 		// @brief VertexShaderのファイル名をセットする。デフォルトは"Simple.VS.hlsl"。
-		void SetVS(const std::string& vs) { vs_ = vs; }
+		void SetMS(const std::string& ms) { ms_ = ms; }
 		// @brief PixelShaderのファイル名をセットする。デフォルトは"White.PS.hlsl"。
 		void SetPS(const std::string& ps) { ps_ = ps; }
-		// @brief 入力レイアウトIDをセットする。デフォルトはPSO::InputLayoutID::Default。
-		void SetInputLayout(PSO::InputLayoutID id) { inputLayoutID_ = id; }
 		// @brief ブレンドステートIDをセットする。デフォルトはPSO::BlendStateID::Normal。
 		void SetBlendState(PSO::BlendStateID id, int index = 0) { blendID_[index] = id; }
 		// @brief 深度ステンシルIDをセットする。デフォルトはPSO::DepthStencilID::Default。
@@ -45,7 +42,7 @@ namespace SHEngine {
 		// @brief ラスタライザーIDをセットする。デフォルトはPSO::RasterizerID::Fill。
 		void SetRasterizer(PSO::RasterizerID id) { rasterizerID_ = id; }
 		// @brief プリミティブトポロジーをセットする。デフォルトはD3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST。
-		void SetTopology(PSO::Topology topology) { topology_ = topology; }
+		void SetTopology(D3D12_PRIMITIVE_TOPOLOGY topology) { topology_ = topology; }
 		// @brief スワップチェーン用かどうかをセットする。デフォルトはfalse。
 		void SetUseTexture(bool use) { isUseTexture_ = use; }
 		// @brief Samplerの設定
@@ -62,11 +59,9 @@ namespace SHEngine {
 	private:
 
 		/// @brief 頂点シェーダーファイル名
-		std::string vs_ = "Simple.VS.hlsl";
+		std::string ms_ = "Simple.MS.hlsl";
 		/// @brief ピクセルシェーダーファイル名
 		std::string ps_ = "White.PS.hlsl";
-		/// @brief 入力レイアウトID
-		PSO::InputLayoutID inputLayoutID_ = PSO::InputLayoutID::Default;
 		/// @brief ブレンドステートID
 		PSO::BlendStateID blendID_[8];
 		/// @brief 深度ステンシルID
@@ -74,7 +69,7 @@ namespace SHEngine {
 		/// @brief ラスタライザーID
 		PSO::RasterizerID rasterizerID_ = PSO::RasterizerID::Fill;
 		/// @brief プリミティブトポロジー
-		PSO::Topology topology_ = PSO::Topology::Triangle;
+		D3D12_PRIMITIVE_TOPOLOGY topology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		/// @brief スワップチェーン用かどうか
 		bool isSwapChain_ = false;
 		/// @brief 画像を使用するかどうか

@@ -44,10 +44,12 @@ void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Dir
 
         //Displayを初期化する
         displays_[i] = std::make_unique<Display>();
-		displays_[i]->Initialize(textureManager, swapChainResources, clearColor);
+		displays_[i]->Initialize(width, height, "SwapChain_" + std::to_string(i));
+		displays_[i]->CreateDepthTexture(textureManager);
+		displays_[i]->AddRenderTarget(textureManager, swapChainResources, clearColor);
     }
 
-    logger_->info("SwapChain Info: Width : {} Height : {} ClearColor : {:08X}", width, height, clearColor);
+    logger_->info("SwapChain Info: Size: {}x{} ClearColor : {:08X}", width, height, clearColor);
     logger_->info("=== Complete create SwapChain ===");
 
 	currentBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();

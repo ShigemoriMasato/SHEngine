@@ -69,7 +69,7 @@ void TextureData::Release() {
 }
 
 void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, ID3D12Device* device, SRVManager* srvManager) {
-	//PostEffect用のリソースの作成
+	//OffScreen用のリソースの作成
 	D3D12_RESOURCE_DESC desc = {};
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	desc.Width = width;
@@ -93,7 +93,7 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, ID
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProps, D3D12_HEAP_FLAG_NONE,
 		&desc,
-		D3D12_RESOURCE_STATE_PRESENT,
+		D3D12_RESOURCE_STATE_COMMON,
 		&clearValue,
 		IID_PPV_ARGS(&textureResource_)
 	);

@@ -62,6 +62,12 @@ namespace SHEngine::PSO {
 		/// @brief 初回フラグ
 		bool isFirst_ = true;
 
+		std::vector<D3D_PRIMITIVE_TOPOLOGY> topologyList_ = {
+			D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+			D3D10_PRIMITIVE_TOPOLOGY_LINELIST,
+			D3D10_PRIMITIVE_TOPOLOGY_POINTLIST,
+		};
+
 	};
 
 }

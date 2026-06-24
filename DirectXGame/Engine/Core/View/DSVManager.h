@@ -50,9 +50,9 @@ public:
 private:
 
 	/// @brief CPUディスクリプタハンドル
-	D3D12_CPU_DESCRIPTOR_HANDLE CPU{};
+	D3D12_CPU_DESCRIPTOR_HANDLE CPU = { 0 };
 	/// @brief GPUディスクリプタハンドル
-	D3D12_GPU_DESCRIPTOR_HANDLE GPU{};
+	D3D12_GPU_DESCRIPTOR_HANDLE GPU = { 0 };
 	/// @brief ヒープ内のオフセット
 	int offset_{};
 

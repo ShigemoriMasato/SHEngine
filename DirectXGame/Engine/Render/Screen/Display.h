@@ -6,6 +6,12 @@
 
 namespace SHEngine::Screen {
 
+	enum class Format : uint32_t {
+		R8,
+		R8G8B8,
+		R8G8B8A8,
+	};
+
 	class Display final : public IDisplay {
 	public:
 
@@ -16,12 +22,11 @@ namespace SHEngine::Screen {
 		/// @param clearColor クリアカラー
 		/// @param rtNum RenderTargetの数
 		/// @param windowName ウィンドウ名（ImGuiやlogで表示される）
-		void Initialize(TextureManager* textureManager, int width, int height, uint32_t clearColor, uint32_t rtNum = 1, std::string windowName = "");
+		void Initialize(int width, int height, std::string windowName = "");
 
-		/// @brief スワップチェーン用初期化関数
-		/// @param textureManager テクスチャマネージャーへのポインタ
-		/// @param resource スワップチェーンのリソース
-		void Initialize(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor, std::string windowName = "");
+		void CreateDepthTexture(TextureManager* textureManager);
+		void AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor);
+		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8);
 
 		void Clear(Command::Object* cmdObject) override;
 		void ToRenderTarget(Command::Object* cmdObject) override;
@@ -63,10 +68,12 @@ namespace SHEngine::Screen {
 
 	private:
 
-		void PrivateInitialize(SHEngine::TextureManager* textureManager, uint32_t rtNum, std::string windowName = "");
+		void CreateRenderTarget(SHEngine::TextureManager* textureManager, uint32_t index);
 
 		void TransitionBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after);
 		void TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after);
+
+		static inline Logger logger_ = GetLogger("Engine");
 
 		std::vector<TextureData*> textureData_ = {};
 		TextureData* depthTextureData_ = nullptr;
@@ -76,7 +83,7 @@ namespace SHEngine::Screen {
 
 		// 関数で渡す用
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandlePtr_{};
-		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandlePtr_;
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandlePtr_ = { 0 };
 
 		DXGI_FORMAT rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
@@ -85,15 +92,15 @@ namespace SHEngine::Screen {
 
 		std::string windowName_;
 
-		int width_ = 0;
-		int height_ = 0;
+		int width_ = -1;
+		int height_ = -1;
 
 		float imguiWidth_ = 0;
 		float imguiHeight_ = 0;
 
 		Vector2 imguiPos_ = { 0.0f, 0.0f };
 
-		bool isOffScreen_ = false;
+		bool isOffScreen_ = true;
 	};
 
 }

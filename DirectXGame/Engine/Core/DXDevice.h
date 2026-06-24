@@ -19,6 +19,7 @@ enum class ShaderType {
 	VERTEX_SHADER,  ///< 頂点シェーダー
 	PIXEL_SHADER,   ///< ピクセルシェーダー
 	COMPUTE_SHADER, ///< コンピュートシェーダー
+	MESH_SHADER,
 
 	Count           ///< シェーダータイプの総数
 };

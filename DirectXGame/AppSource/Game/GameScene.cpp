@@ -39,7 +39,8 @@ void GameScene::Initialize() {
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
 	intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
-	intermediateDisplay_->Initialize(textureManager_, 1280, 720, 0xffffffff, 1, "EdgeDetection");
+	intermediateDisplay_->Initialize(1280, 720, "EdgeDetection");
+	intermediateDisplay_->AddRenderTarget(textureManager_, 0xff);
 
 	edgeDetection_ = std::make_unique<PostEffect>();
 	edgeDetection_->Initialize(textureManager_, pedd);

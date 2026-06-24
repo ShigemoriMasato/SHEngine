@@ -58,7 +58,8 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, SHEngine::
 
 		//PostEffect用Displayの初期化
 		intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
-		intermediateDisplay_->Initialize(textureManager, 1280, 720, 0xffffffff);
+		intermediateDisplay_->Initialize(1280, 720, "PostEffect::Intermediate");
+		intermediateDisplay_->AddRenderTarget(textureManager, 0xff);
 	}
 
 	textureIndexBuffers_.resize(textureIndexBufferNum);

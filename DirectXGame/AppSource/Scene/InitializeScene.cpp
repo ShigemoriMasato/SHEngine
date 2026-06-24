@@ -34,7 +34,9 @@ void InitializeScene::Initialize() {
 	input_->SetWindow(commonData_->window->GetWindowsAPI()->GetHwnd());
 
 	commonData_->display = std::make_unique<SHEngine::Screen::Display>();
-	commonData_->display->Initialize(textureManager_, 1280, 720, 0x000000ff, 2, "MainWindow");
+	commonData_->display->Initialize(1280, 720, "MainWindow");
+	commonData_->display->CreateDepthTexture(textureManager_);
+	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 
 	std::vector<VertexData> vertices = {
 		{{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
@@ -146,9 +148,6 @@ void InitializeScene::Draw() {
 	auto swapChain = commonData_->window.get();
 	auto display = commonData_->display.get();
 	auto cmdObj = directContext_->GetCurrentCmdObj();
-
-	cmdObj->SetRenderTarget(display, true);
-	display->ToTexture(cmdObj);
 
 	cmdObj->SetRenderTarget(swapChain, true);
 	engine_->DrawImGui(cmdObj);
