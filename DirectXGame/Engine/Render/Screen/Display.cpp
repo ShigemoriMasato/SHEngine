@@ -116,7 +116,7 @@ void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, 
 	isOffScreen_ = true;
 	rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-	int textureHandle = textureManager->CreateWindowTexture(width_, height_, clearColor);
+	int textureHandle = textureManager->CreateWindowTexture(width_, height_, clearColor, format);
 	textureData_.push_back(textureManager->GetTextureData(textureHandle));
 
 	CreateRenderTarget(textureManager, uint32_t(textureData_.size() - 1));
@@ -244,10 +244,13 @@ void SHEngine::Screen::Display::CreateRenderTarget(SHEngine::TextureManager* tex
 	rtvHandle_.resize(textureData_.size());
 	rtvHandlePtr_.resize(textureData_.size());
 
+	//いつか配列にする
+	rtvFormat_ = data->GetFormat();
+
 	//RTVの設定(指定された個数)
 	rtvHandle_[index].UpdateHandle(rtvManager);
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.Format = rtvFormat_;
+	rtvDesc.Format = data->GetFormat();
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;	//2Dテクスチャとしてよみこむ
 	rtvHandlePtr_[index] = rtvHandle_[index].GetCPU();
 	device->CreateRenderTargetView(textureData_[index]->GetResource(), &rtvDesc, rtvHandlePtr_[index]);

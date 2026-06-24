@@ -6,12 +6,6 @@
 
 namespace SHEngine::Screen {
 
-	enum class Format : uint32_t {
-		R8,
-		R8G8B8,
-		R8G8B8A8,
-	};
-
 	class Display final : public IDisplay {
 	public:
 

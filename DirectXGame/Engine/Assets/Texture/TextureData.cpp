@@ -68,7 +68,19 @@ void TextureData::Release() {
 	textureManager_->DeleteTexture(this);
 }
 
-void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, ID3D12Device* device, SRVManager* srvManager) {
+void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, ID3D12Device* device, SRVManager* srvManager) {
+	DXGI_FORMAT dxgiformat;
+	switch (format) {
+	case Format::R8:
+		dxgiformat = DXGI_FORMAT_R8_UNORM;
+		break;
+	case Format::R8G8B8A8:
+		dxgiformat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	}
+
+	format_ = dxgiformat;
+
 	//OffScreen用のリソースの作成
 	D3D12_RESOURCE_DESC desc = {};
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -76,7 +88,7 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, ID
 	desc.Height = height;
 	desc.DepthOrArraySize = 1;
 	desc.MipLevels = 1;
-	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.Format = dxgiformat;
 	desc.SampleDesc.Count = 1;
 	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
@@ -85,7 +97,7 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, ID
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;              // defaultのヒープを使用
 
 	D3D12_CLEAR_VALUE clearValue = {};
-	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	clearValue.Format = dxgiformat;
 	for (int i = 0; i < 4; ++i) {
 		clearValue.Color[i] = clearColor[i];
 	}
@@ -124,9 +136,11 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, ID
 void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager, uint32_t clearColor) {
 	textureResource_.Attach(resource);
 
+	format_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
 	// metadataがないのでフォーマットとミップ数は手動設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	srvDesc.Format = format_;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	//!mipmapを使うかどうかは今後要検討
