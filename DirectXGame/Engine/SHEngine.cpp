@@ -54,6 +54,8 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	input_ = std::make_unique<Input>();
 	input_->Initialize(hInstance);
 
+	shelfManager_ = std::make_unique<PSO::ShelfManager>(device_.get());
+
 	psoEditor_ = std::make_unique<PSO::Editor>();
 	psoEditor_->Initialize(device_.get());
 

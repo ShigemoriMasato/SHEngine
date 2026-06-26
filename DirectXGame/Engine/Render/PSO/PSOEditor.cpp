@@ -6,8 +6,8 @@ Editor::Editor() {
 	logger_ = GetLogger("Engine");
 }
 
-void Editor::Initialize(DXDevice* device) {
-	psoManager_ = std::make_unique<Manager>(device);
+void Editor::Initialize(DXDevice* device, ShelfManager* shelfManager) {
+	psoManager_ = std::make_unique<Manager>(device, shelfManager);
 	psoManager_->Initialize();
 
 	topologyList_.resize(static_cast<size_t>(Topology::Count));

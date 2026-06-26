@@ -10,6 +10,7 @@
 #include <Render/Screen/WindowsAPI.h>
 #include <Tool/FPS/FPSObserver.h>
 #include <Render/PSO/PSOEditor.h>
+#include <Render/PSO/ShelfManager.h>
 #include <Compute/PSO/CSPSOManager.h>
 #include <Assets/Audio/AudioManager.h>
 #include <Core/FrameCounter.h>
@@ -61,6 +62,7 @@ namespace SHEngine {
 		std::unique_ptr<DXDevice> device_;
 		std::unique_ptr<ImGuiWrapper> imGuiWrapper_;
 		std::unique_ptr<PSO::Editor> psoEditor_;
+		std::unique_ptr<PSO::ShelfManager> shelfManager_;
 		std::unique_ptr<PSO::CSPSOManager> csPsoManager_;
 
 	private: // Engine外部からアクセスするクラス

@@ -38,7 +38,7 @@ namespace SHEngine::PSO {
 		 * @param id ブレンドステートID
 		 * @return ブレンドステートの設定
 		 */
-		D3D12_BLEND_DESC GetBlendState(BlendStateID* id) const;
+		D3D12_BLEND_DESC GetBlendState(const BlendStateID* id) const;
 
 	private:
 

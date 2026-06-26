@@ -53,7 +53,7 @@ namespace SHEngine {
 
 		/// @brief DirectX12デバイスを取得
 		/// @return ID3D12Device*
-		ID3D12Device* GetDevice() { return device_.Get(); }
+		ID3D12Device2* GetDevice() { return device_.Get(); }
 
 		/// @brief DXGIファクトリを取得
 		/// @return IDXGIFactory7*
@@ -84,7 +84,7 @@ namespace SHEngine {
 		/// @brief 使用するグラフィックスアダプタ
 		Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_ = nullptr;
 		/// @brief DirectX12デバイス
-		Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Device2> device_ = nullptr;
 
 		/// @brief SRV/CBV/UAVディスクリプタヒープマネージャー
 		std::unique_ptr<SRVManager> srvManager_;

@@ -79,7 +79,7 @@ BlendStateShelf::BlendStateShelf() {
 BlendStateShelf::~BlendStateShelf() {
 }
 
-D3D12_BLEND_DESC BlendStateShelf::GetBlendState(BlendStateID* id) const {
+D3D12_BLEND_DESC BlendStateShelf::GetBlendState(const BlendStateID* id) const {
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.AlphaToCoverageEnable = false;
 	blendDesc.IndependentBlendEnable = false;

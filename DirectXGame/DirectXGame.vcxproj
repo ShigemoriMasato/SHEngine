@@ -272,6 +272,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Tool\TimeViewer\TimeViewer.cpp" />
     <ClCompile Include="Engine\Render\MeshRenderer.cpp" />
     <ClCompile Include="Engine\Render\PSO\PSOManagerForMS.cpp" />
+    <ClCompile Include="Engine\Render\PSO\ShelfManager.cpp" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Game\Camera\GameCamera.h" />
@@ -359,6 +360,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Tool\TimeViewer\TimeViewer.h" />
     <ClInclude Include="Engine\Render\MeshRenderer.h" />
     <ClInclude Include="Engine\Render\PSO\PSOManagerForMS.h" />
+    <ClInclude Include="Engine\Render\PSO\ShelfManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

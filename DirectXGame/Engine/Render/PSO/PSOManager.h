@@ -3,6 +3,7 @@
 #include <vector>
 #include <Tool/Binary/BinaryManager.h>
 #include <Render/PSO/PSOConfig.h>
+#include <Render/PSO/ShelfManager.h>
 
 namespace SHEngine::PSO {
 
@@ -22,7 +23,7 @@ namespace SHEngine::PSO {
 		 *
 		 * @param device DirectX12デバイス
 		 */
-		Manager(DXDevice* device);
+		Manager(DXDevice* device, ShelfManager* shelfManager);
 
 		/**
 		 * @brief デストラクタ
@@ -54,22 +55,6 @@ namespace SHEngine::PSO {
 		 */
 		ID3D12RootSignature* GetRootSignature(const RootSignatureConfig& config) const;
 
-		/**
-		 * @brief シェーダーシェルフの取得
-		 *
-		 * @return シェーダーシェルフのポインタ
-		 */
-		ShaderShelf* GetShaderShelf() const { return shaderShelf_.get(); }
-
-		/**
-		 * @brief ブレンドステートシェルフの取得
-		 *
-		 * @return ブレンドステートシェルフのポインタ
-		 */
-		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> GetSamplers() const { return rootSignatureShelf_->GetSamplers(); }
-
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE GetTopology(Topology topology) const { return topologyMap_[topology]; }
-
 	private:
 
 		/**
@@ -84,32 +69,17 @@ namespace SHEngine::PSO {
 		/// @brief DirectX12デバイス
 		ID3D12Device* device_ = nullptr;
 
+		ShelfManager* shelfManager_ = nullptr;
+
 		/// @brief PSOのキャッシュマップ(PSOConfig -> ID3D12PipelineState*)
 		std::unordered_map<PSO::Config, ID3D12PipelineState*> psoMap_;
 
-		/// @brief シェーダー管理
-		std::unique_ptr<ShaderShelf> shaderShelf_{};
-		/// @brief ブレンドステート管理
-		std::unique_ptr<BlendStateShelf> blendStateShelf_{};
-		/// @brief 深度ステンシル管理
-		std::unique_ptr<DepthStencilShelf> depthStencilShelf_{};
-		/// @brief ラスタライザー管理
-		std::unique_ptr<RasterizerShelf> rasterizerShelf_{};
-		/// @brief ルートシグネチャ管理
-		std::unique_ptr<RootSignatureShelf> rootSignatureShelf_{};
-		/// @brief 入力レイアウト管理
-		std::unique_ptr<InputLayoutShelf> inputLayoutShelf_{};
-
 		/// @brief バイナリデータ管理
 		std::unique_ptr<BinaryManager> binaryManager_ = nullptr;
-		/// @brief シェーダー編集データのファイル名
-		const std::string shaderDataFile = "ShaderEditData.bin";
 
 		/// @brief ログ出力用logger
 		std::shared_ptr<spdlog::logger> logger_ = nullptr;
 
-		/// @brief プリミティブトポロジとトポロジタイプの変換マップ
-		static std::unordered_map<Topology, D3D12_PRIMITIVE_TOPOLOGY_TYPE> topologyMap_;
 	};
 
 }
