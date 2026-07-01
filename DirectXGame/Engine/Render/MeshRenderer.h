@@ -3,14 +3,16 @@
 #include "DrawDataManager.h"
 #include "PSO/PSOEditor.h"
 #include "Command/DirectCommandContext.h"
+#include "PSO/PSOManagerForMS.h"
 
 namespace SHEngine {
 
 	class MeshRenderer {
+	public:
 
-		static void SetPSOEditor(PSO::Editor* psoEditor, D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle) { psoEditor_ = psoEditor; textureStartHandle_ = textureStartHandle; }
+		static void SetPSOEditor(PSO::ManagerMSType* psoEditor, D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle) { psoEditor_ = psoEditor; textureStartHandle_ = textureStartHandle; }
 
-		MeshRenderer(const DrawData& drawData);
+		MeshRenderer() = default;
 
 		/// @brief GPUBufferをセットする。register順。
 		/// @param gpuBuffer 使用するBuffer
@@ -30,7 +32,6 @@ namespace SHEngine {
 		/// @param gpuBuffer リセットするGPUBuffer
 		void EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer);
 
-
 		// @brief VertexShaderのファイル名をセットする。デフォルトは"Simple.VS.hlsl"。
 		void SetMS(const std::string& ms) { ms_ = ms; }
 		// @brief PixelShaderのファイル名をセットする。デフォルトは"White.PS.hlsl"。
@@ -41,8 +42,6 @@ namespace SHEngine {
 		void SetDepthStencil(PSO::DepthStencilID id) { depthStencilID_ = id; }
 		// @brief ラスタライザーIDをセットする。デフォルトはPSO::RasterizerID::Fill。
 		void SetRasterizer(PSO::RasterizerID id) { rasterizerID_ = id; }
-		// @brief プリミティブトポロジーをセットする。デフォルトはD3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST。
-		void SetTopology(D3D12_PRIMITIVE_TOPOLOGY topology) { topology_ = topology; }
 		// @brief スワップチェーン用かどうかをセットする。デフォルトはfalse。
 		void SetUseTexture(bool use) { isUseTexture_ = use; }
 		// @brief Samplerの設定
@@ -58,6 +57,10 @@ namespace SHEngine {
 
 	private:
 
+		static inline PSO::ManagerMSType* psoEditor_ = nullptr;
+		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
+		static inline Logger logger_ = GetLogger("Engine");
+
 		/// @brief 頂点シェーダーファイル名
 		std::string ms_ = "Simple.MS.hlsl";
 		/// @brief ピクセルシェーダーファイル名
@@ -68,19 +71,11 @@ namespace SHEngine {
 		PSO::DepthStencilID depthStencilID_ = PSO::DepthStencilID::Default;
 		/// @brief ラスタライザーID
 		PSO::RasterizerID rasterizerID_ = PSO::RasterizerID::Fill;
-		/// @brief プリミティブトポロジー
-		D3D12_PRIMITIVE_TOPOLOGY topology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		/// @brief スワップチェーン用かどうか
-		bool isSwapChain_ = false;
 		/// @brief 画像を使用するかどうか
 		bool isUseTexture_ = false;
 		/// @brief Samplerフラグ
 		uint32_t samplerFlag_ = uint32_t(PSO::SamplerID::Default);
 
-		static inline PSO::Editor* psoEditor_ = nullptr;
-		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
-
-		DrawData drawData_;
 		std::map<BufferType, std::map<ShaderType, std::vector<GPUBuffer*>>> gpuBuffers_;
 
 	};

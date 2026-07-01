@@ -5,6 +5,7 @@
 #include <Compute/ComputeObject.h>
 #include <Render/Font/Text.h>
 #include <Render/Renderer.h>
+#include <Render/MeshRenderer.h>
 #include <Tool/DecoEditor/Data/decoObjectController.h>
 
 #pragma comment(lib, "Dbghelp.lib")
@@ -57,14 +58,15 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	shelfManager_ = std::make_unique<PSO::ShelfManager>(device_.get());
 
 	psoEditor_ = std::make_unique<PSO::Editor>();
-	psoEditor_->Initialize(device_.get());
+	psoEditor_->Initialize(device_.get(), shelfManager_.get());
 
 	csPsoManager_ = std::make_unique<PSO::CSPSOManager>();
-	csPsoManager_->Initialize(device_.get(), psoEditor_->GetSamplers());
+	csPsoManager_->Initialize(device_.get(), shelfManager_->GetSamplers());
 
 	Screen::IDisplay::SetDevice(device_.get());
 	RenderObject::StaticInitialize(device_.get(), psoEditor_.get());
 	Renderer::SetPSOEditor(psoEditor_.get(), device_->GetSRVManager()->GetStartPtr());
+	MeshRenderer::SetPSOEditor(psoManagerForMS_.get(), device_->GetSRVManager()->GetStartPtr());
 	GPUBuffer::SetDevice(device_.get());
 	Text::SetFontLoader(fontLoader_.get());
 	ComputeObject::StaticInitialize(csPsoManager_.get(), device_->GetSRVManager()->GetStartPtr());

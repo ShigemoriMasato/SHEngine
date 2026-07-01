@@ -27,7 +27,7 @@ namespace SHEngine::Command {
 		Screen::IDisplay* GetRenderTarget() const { return renderTarget_; }
 
 		/// @brief コマンドリストを取得
-		ID3D12GraphicsCommandList* GetCommandList() { return commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->GetCommandList(); }
+		ID3D12GraphicsCommandList6* GetCommandList() { return commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->GetCommandList(); }
 
 		/// @brief このフレームで使用するコマンドリストのインデックスを取得
 		uint32_t GetCurrentID() const { return currentIndex_ % uint32_t(commandLists_.size()); }

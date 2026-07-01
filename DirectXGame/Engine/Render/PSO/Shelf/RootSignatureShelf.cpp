@@ -120,26 +120,40 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	// === CBV ===
 	//VertexShader
 	registerIndex = 0;
-	for (int i = 0; i < config.cbvNums.first; ++i) {
+	for (int i = 0; i < config.cbvNums.vertex; ++i) {
 		auto& param = rootParameters.emplace_back();
 		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
 		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;    //VertexShaderで使う
 		param.Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
 	}
 	registerIndex = 0;
-	for (int i = 0; i < config.cbvNums.second; ++i) {
+	for (int i = 0; i < config.cbvNums.pixel; ++i) {
 		auto& param = rootParameters.emplace_back();
 		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
 		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
 		param.Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
 	}
+	registerIndex = 0;
+	for (int i = 0; i < config.cbvNums.compute; ++i) {
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;     //PixelShaderで使う
+		param.Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
+	}
+	registerIndex = 0;
+	for (int i = 0; i < config.cbvNums.mesh; ++i) {
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_MESH;     //MeshShaderで使う
+		param.Descriptor.ShaderRegister = registerIndex++;          //レジスタ番号0とバインド
+	}
 
 	// === SRV ===
 	//VertexShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> vertexSrvRanges;
-	vertexSrvRanges.resize(config.srvNums.first);
+	std::vector<D3D12_DESCRIPTOR_RANGE> vertexSrvRanges;
+	vertexSrvRanges.resize(config.srvNums.vertex);
 	int srvVSRegister = 0;			//いろんな奴と共用するので変数で明示化する
-	for (int i = 0; i < config.srvNums.first; ++i) {
+	for (int i = 0; i < config.srvNums.vertex; ++i) {
 		auto& range = vertexSrvRanges[i];
 		range.BaseShaderRegister = srvVSRegister++;
 		range.NumDescriptors = 1;
@@ -147,17 +161,17 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 		auto& param = rootParameters.emplace_back();
-		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
-		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
-		param.DescriptorTable.pDescriptorRanges = &range;						//テーブルの中身
-		param.DescriptorTable.NumDescriptorRanges = 1;							//テーブルの数
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		param.DescriptorTable.pDescriptorRanges = &range;
+		param.DescriptorTable.NumDescriptorRanges = 1;
 	}
 
 	//PixelShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> pixelSrvRanges;
-	pixelSrvRanges.resize(config.srvNums.second);
+	std::vector<D3D12_DESCRIPTOR_RANGE> pixelSrvRanges;
+	pixelSrvRanges.resize(config.srvNums.pixel);
 	int srvPSRegister = 0;			//いろんな奴と共用するので変数で明示化する
-	for (int i = 0; i < config.srvNums.second; ++i) {
+	for (int i = 0; i < config.srvNums.pixel; ++i) {
 		D3D12_DESCRIPTOR_RANGE& range = pixelSrvRanges[i];
 		range.BaseShaderRegister = srvPSRegister++;
 		range.NumDescriptors = 1;
@@ -165,17 +179,51 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 		auto& param = rootParameters.emplace_back();
-		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
-		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                 //PixelShaderで使う
-		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
-		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		param.DescriptorTable.pDescriptorRanges = &range;
+		param.DescriptorTable.NumDescriptorRanges = 1;
+	}
+
+	//ComputeShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> computeSrvRanges;
+	computeSrvRanges.resize(config.srvNums.compute);
+	int srvCSRegister = 0;			//いろんな奴と共用するので変数で明示化する
+	for (int i = 0; i < config.srvNums.compute; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = computeSrvRanges[i];
+		range.BaseShaderRegister = srvCSRegister++;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		param.DescriptorTable.pDescriptorRanges = &range;
+		param.DescriptorTable.NumDescriptorRanges = 1;
+	}
+
+	//MeshShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> meshSrvRanges;
+	meshSrvRanges.resize(config.srvNums.mesh);
+	int srvMSRegister = 0;			//いろんな奴と共用するので変数で明示化する
+	for (int i = 0; i < config.srvNums.mesh; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = meshSrvRanges[i];
+		range.BaseShaderRegister = srvMSRegister++;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_MESH;
+		param.DescriptorTable.pDescriptorRanges = &range;
+		param.DescriptorTable.NumDescriptorRanges = 1;
 	}
 
 	// === UAV ===
 	//VertexShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> vertexUavRanges;
-	vertexUavRanges.resize(config.uavNums.first);
-	for (int i = 0; i < config.uavNums.first; ++i) {
+	std::vector<D3D12_DESCRIPTOR_RANGE> vertexUavRanges;
+	vertexUavRanges.resize(config.uavNums.vertex);
+	for (int i = 0; i < config.uavNums.vertex; ++i) {
 		auto& range = vertexUavRanges[i];
 		range.BaseShaderRegister = i;
 		range.NumDescriptors = 1;
@@ -190,9 +238,9 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	}
 
 	//PixelShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> pixelUavRanges;
-	pixelUavRanges.resize(config.uavNums.second);
-	for (int i = 0; i < config.uavNums.second; ++i) {
+	std::vector<D3D12_DESCRIPTOR_RANGE> pixelUavRanges;
+	pixelUavRanges.resize(config.uavNums.pixel);
+	for (int i = 0; i < config.uavNums.pixel; ++i) {
 		D3D12_DESCRIPTOR_RANGE& range = pixelUavRanges[i];
 		range.BaseShaderRegister = i;
 		range.NumDescriptors = 1;
@@ -206,11 +254,43 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
 	}
 
+	//computeShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> computeUavRanges;
+	computeUavRanges.resize(config.uavNums.compute);
+	for (int i = 0; i < config.uavNums.compute; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = computeUavRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;                   //ComputeShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
+	//meshShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> meshUavRanges;
+	meshUavRanges.resize(config.uavNums.mesh);
+	for (int i = 0; i < config.uavNums.mesh; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = meshUavRanges[i];
+		range.BaseShaderRegister = i;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_MESH;                  //MeshShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
 	// === 2DTexture ===
 	//VertexShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> vertexTexture2DRanges;
-	vertexTexture2DRanges.resize(config.textureNums.first);
-	for (int i = 0; i < config.textureNums.first; ++i) {
+	std::vector<D3D12_DESCRIPTOR_RANGE> vertexTexture2DRanges;
+	vertexTexture2DRanges.resize(config.textureNums.vertex);
+	for (int i = 0; i < config.textureNums.vertex; ++i) {
 		auto& range = vertexTexture2DRanges[i];
 		range.BaseShaderRegister = srvVSRegister++;
 		range.NumDescriptors = 1;
@@ -225,9 +305,9 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	}
 
 	//PixelShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> pixelTexture2DRanges;
-	pixelTexture2DRanges.resize(config.textureNums.second);
-	for (int i = 0; i < config.textureNums.second; ++i) {
+	std::vector<D3D12_DESCRIPTOR_RANGE> pixelTexture2DRanges;
+	pixelTexture2DRanges.resize(config.textureNums.pixel);
+	for (int i = 0; i < config.textureNums.pixel; ++i) {
 		D3D12_DESCRIPTOR_RANGE& range = pixelTexture2DRanges[i];
 		range.BaseShaderRegister = srvPSRegister++;
 		range.NumDescriptors = 1;
@@ -241,11 +321,43 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
 	}
 
+	//ComputeShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> computeTexture2DRanges;
+	computeSrvRanges.resize(config.textureNums.compute);
+	for (int i = 0; i < config.textureNums.compute; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = computeTexture2DRanges[i];
+		range.BaseShaderRegister = srvCSRegister++;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;                   //ComputeShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
+	//MeshShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> meshTexture2DRanges;
+	meshTexture2DRanges.resize(config.textureNums.mesh);
+	for (int i = 0; i < config.textureNums.mesh; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = meshTexture2DRanges[i];
+		range.BaseShaderRegister = srvMSRegister++;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_MESH;                  //MeshShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
 	// === DDS ===
 	//VertexShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> vertexDDSRanges;
-	vertexDDSRanges.resize(config.ddsNums.first);
-	for (int i = 0; i < config.ddsNums.first; ++i) {
+	std::vector<D3D12_DESCRIPTOR_RANGE> vertexDDSRanges;
+	vertexDDSRanges.resize(config.ddsNums.vertex);
+	for (int i = 0; i < config.ddsNums.vertex; ++i) {
 		auto& range = vertexDDSRanges[i];
 		range.BaseShaderRegister = srvVSRegister++;
 		range.NumDescriptors = 1;
@@ -260,9 +372,9 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 	}
 
 	//PixelShader
-	std::vector< D3D12_DESCRIPTOR_RANGE> pixelDDSRanges;
-	pixelDDSRanges.resize(config.ddsNums.second);
-	for (int i = 0; i < config.ddsNums.second; ++i) {
+	std::vector<D3D12_DESCRIPTOR_RANGE> pixelDDSRanges;
+	pixelDDSRanges.resize(config.ddsNums.pixel);
+	for (int i = 0; i < config.ddsNums.pixel; ++i) {
 		D3D12_DESCRIPTOR_RANGE& range = pixelDDSRanges[i];
 		range.BaseShaderRegister = srvPSRegister++;
 		range.NumDescriptors = 1;
@@ -276,9 +388,45 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
 	}
 
+	//ComputeShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> computeDDSRanges;
+	computeDDSRanges.resize(config.ddsNums.compute);
+	for (int i = 0; i < config.ddsNums.compute; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = computeDDSRanges[i];
+		range.BaseShaderRegister = srvCSRegister++;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;                   //ComputeShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
+	//MeshShader
+	std::vector<D3D12_DESCRIPTOR_RANGE> meshDDSRanges;
+	meshDDSRanges.resize(config.ddsNums.mesh);
+	for (int i = 0; i < config.ddsNums.mesh; ++i) {
+		D3D12_DESCRIPTOR_RANGE& range = meshDDSRanges[i];
+		range.BaseShaderRegister = srvMSRegister++;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		auto& param = rootParameters.emplace_back();
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //SRVを使う
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_MESH;                  //MeshShaderで使う
+		param.DescriptorTable.pDescriptorRanges = &range;                       //テーブルの中身
+		param.DescriptorTable.NumDescriptorRanges = 1;                          //テーブルの数
+	}
+
 	// === TextureList ===
 	D3D12_DESCRIPTOR_RANGE textureDescriptor[1] = {};
 	if (config.useTexture) {
+		if (srvPSRegister >= 8) {
+			assert(false && "SRVは8個以上使用できません。");
+		}
+
 		textureDescriptor[0].BaseShaderRegister = 8;
 		textureDescriptor[0].NumDescriptors = 1024;
 		textureDescriptor[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -286,7 +434,7 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 
 		auto& param = rootParameters.emplace_back();
 		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;           //SRVを使う
-		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                       //全Shaderから見れる
+		param.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;                       //全Shaderから見れる
 		param.DescriptorTable.pDescriptorRanges = textureDescriptor;                //テーブルの中身
 		param.DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);    //テーブルの数
 	}
@@ -350,6 +498,9 @@ namespace SHEngine::PSO {
 bool RootSignatureConfig::operator<(const RootSignatureConfig& other) const {
 	if (cbvNums != other.cbvNums) return cbvNums < other.cbvNums;
 	if (srvNums != other.srvNums) return srvNums < other.srvNums;
+	if (uavNums != other.uavNums) return uavNums < other.uavNums;
+	if (textureNums != other.textureNums) return textureNums < other.textureNums;
+	if (ddsNums != other.ddsNums) return ddsNums < other.ddsNums;
 	if (useTexture != other.useTexture) return useTexture < other.useTexture;
 	return samplers < other.samplers;
 }
@@ -357,6 +508,9 @@ bool RootSignatureConfig::operator<(const RootSignatureConfig& other) const {
 bool RootSignatureConfig::operator==(const RootSignatureConfig& other) const {
 	return cbvNums == other.cbvNums &&
 		srvNums == other.srvNums &&
+		uavNums == other.uavNums &&
+		textureNums == other.textureNums &&
+		ddsNums == other.ddsNums &&
 		useTexture == other.useTexture &&
 		samplers == other.samplers;
 }

@@ -11,8 +11,10 @@ namespace fs = std::filesystem;
 ShaderShelf::ShaderShelf(DXDevice* device) {
 	device_ = device;
 
-	compileVersions_[0] = L"vs_6_0"; // Vertex Shader
-	compileVersions_[1] = L"ps_6_0"; // Pixel Shader
+	compileVersions_[int(ShaderType::VERTEX_SHADER)] = L"vs_6_5"; // Vertex Shader
+	compileVersions_[int(ShaderType::PIXEL_SHADER)] = L"ps_6_5"; // Pixel Shader
+	compileVersions_[int(ShaderType::COMPUTE_SHADER)] = L"cs_6_5"; // Pixel Shader
+	compileVersions_[int(ShaderType::MESH_SHADER)] = L"ms_6_5"; // Pixel Shader
 }
 
 ShaderShelf::~ShaderShelf() {
@@ -35,13 +37,21 @@ void ShaderShelf::CompileAllShader() {
 		if (sn.find(".hlsli") != std::string::npos) {
 			continue;
 		}
-		//VertexShaderだったら
+		//VertexShader
 		else if (sn.find("VS") != std::string::npos) {
 			RegisterShaderByteCode(sn, ShaderType::VERTEX_SHADER);
 		}
-		//PixelShaderだったら
+		//PixelShader
 		else if (sn.find("PS") != std::string::npos) {
 			RegisterShaderByteCode(sn, ShaderType::PIXEL_SHADER);
+		}
+		//ComputeShader
+		else if (sn.find("CS") != std::string::npos) {
+			RegisterShaderByteCode(sn, ShaderType::COMPUTE_SHADER);
+		}
+		//MeshShader
+		else if (sn.find("MS") != std::string::npos) {
+			RegisterShaderByteCode(sn, ShaderType::MESH_SHADER);
 		}
 		//これ以降も同じように追加する
 

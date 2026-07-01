@@ -7,5 +7,3 @@ if (!(Test-Path $dest)) {
 Copy-Item -Path "externals/generated/Lib/Release/*" `
           -Destination $dest `
           -Recurse -Force
-
-Remove-Item "externals/generated/Lib/Release/ImGui.lib"

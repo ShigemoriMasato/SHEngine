@@ -38,13 +38,13 @@ namespace SHEngine::Command {
 		void WaitFenceInCPU();
 
 		/// @brief コマンドリストを取得
-		ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); }
+		ID3D12GraphicsCommandList6* GetCommandList() { return commandList_.Get(); }
 
 		void ResetCommandList();
 
 	private:
 
-		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6> commandList_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
 
 		std::vector<std::pair<Queue*, uint64_t>> executed_;		//実行中のキューとフェンス。実行できるかのチェック用

@@ -59,6 +59,22 @@ namespace SHEngine::PSO {
 	 */
 	bool operator<(SamplerID a, SamplerID b);
 
+	struct PartitionShader {
+		int vertex = 0;
+		int pixel = 0;
+		int compute = 0;
+		int mesh = 0;
+		bool operator==(const PartitionShader& other) const {
+			return vertex == other.vertex && pixel == other.pixel && compute == other.compute && mesh == other.mesh;
+		}
+		bool operator<(const PartitionShader& other) const {
+			if (vertex != other.vertex) return vertex < other.vertex;
+			if (pixel != other.pixel) return pixel < other.pixel;
+			if (compute != other.compute) return compute < other.compute;
+			return mesh < other.mesh;
+		}
+	};
+
 	/**
 	 * @struct RootSignatureConfig
 	 * @brief ルートシグネチャの設定情報
@@ -67,11 +83,11 @@ namespace SHEngine::PSO {
 	 * テクスチャ、サンプラーの設定をまとめた構造体。
 	 */
 	struct RootSignatureConfig {
-		std::pair<int, int> cbvNums{};                         ///< 定数バッファ数<Vertex, Pixel>
-		std::pair<int, int> srvNums{};                         ///< シェーダーリソース数<Vertex, Pixel>（上限8）
-		std::pair<int, int> uavNums{};
-		std::pair<int, int> textureNums{};
-		std::pair<int, int> ddsNums{};
+		PartitionShader cbvNums{};                         ///< 定数バッファ数<Vertex, Pixel>
+		PartitionShader srvNums{};                         ///< シェーダーリソース数<Vertex, Pixel>（上限8）
+		PartitionShader uavNums{};
+		PartitionShader textureNums{};
+		PartitionShader ddsNums{};
 		bool useTexture = false;                                ///< テクスチャ配列を使用するか
 		uint32_t samplers = uint32_t(SamplerID::Default);        ///< サンプラーIDのビットマスク
 
@@ -93,12 +109,22 @@ namespace SHEngine::PSO {
 } // namespace SHEngine
 
 namespace std {
-	/**
-	* @brief RootSignatureConfigのハッシュ関数特殊化
-	*
-	* RootSignatureConfigをunordered_mapなどのキーとして使用できるように
-	* std::hashを特殊化しています。
-	*/
+	template<>
+	struct hash<SHEngine::PSO::PartitionShader> {
+		size_t operator()(const SHEngine::PSO::PartitionShader& cfg) const {
+			size_t h = 0;
+			hash_combine(h, hash<int>()(cfg.vertex));
+			hash_combine(h, hash<int>()(cfg.pixel));
+			hash_combine(h, hash<int>()(cfg.compute));
+			hash_combine(h, hash<int>()(cfg.mesh));
+			return h;
+		}
+	private:
+		static void hash_combine(size_t& seed, size_t value) {
+			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		}
+	};
+
 	template<>
 	struct hash<SHEngine::PSO::RootSignatureConfig> {
 		/**
@@ -108,10 +134,10 @@ namespace std {
 		*/
 		size_t operator()(const SHEngine::PSO::RootSignatureConfig& cfg) const {
 			size_t h = 0;
-			hash_combine(h, hash<int>()(cfg.cbvNums.first));
-			hash_combine(h, hash<int>()(cfg.cbvNums.second));
-			hash_combine(h, hash<int>()(cfg.srvNums.first));
-			hash_combine(h, hash<int>()(cfg.srvNums.second));
+			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.cbvNums));
+			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.srvNums));
+			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.uavNums));
+			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.textureNums));
 			hash_combine(h, hash<bool>()(cfg.useTexture));
 			hash_combine(h, hash<uint32_t>()(cfg.samplers));
 			return h;

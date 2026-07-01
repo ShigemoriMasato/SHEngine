@@ -155,7 +155,7 @@ void SHEngine::GPUBuffer::TransitionBarrier(D3D12_RESOURCE_STATES after) {
 void SHEngine::GPUBuffer::Flush(CmdObj* cmdObj) {
 	uint32_t bufferIndex = currentIndex_ % resources_.size();
 	//UAVが含まれていない場合は値をコピーする
-	if (!(bufferType_ & BufferType::UAV)) {
+	if (!(bufferType_ & BufferType::UAV) && !mappedData_.empty()) {
 		std::memcpy(mappedData_[bufferIndex], nextData_.data(), nextData_.size());
 	}
 

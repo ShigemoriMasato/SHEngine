@@ -13,7 +13,7 @@ namespace SHEngine::PSO {
 	class CSPSOManager {
 	public:
 
-		void Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC>);
+		void Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers);
 		
 		void SetPSO(CmdObj* cmdObj, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName);
 

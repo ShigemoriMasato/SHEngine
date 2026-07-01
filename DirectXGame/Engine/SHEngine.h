@@ -12,6 +12,7 @@
 #include <Render/PSO/PSOEditor.h>
 #include <Render/PSO/ShelfManager.h>
 #include <Compute/PSO/CSPSOManager.h>
+#include <Render/PSO/PSOManagerForMS.h>
 #include <Assets/Audio/AudioManager.h>
 #include <Core/FrameCounter.h>
 #include <Render/Command/DirectCommandContext.h>
@@ -64,6 +65,7 @@ namespace SHEngine {
 		std::unique_ptr<PSO::Editor> psoEditor_;
 		std::unique_ptr<PSO::ShelfManager> shelfManager_;
 		std::unique_ptr<PSO::CSPSOManager> csPsoManager_;
+		std::unique_ptr<PSO::ManagerMSType> psoManagerForMS_;
 
 	private: // Engine外部からアクセスするクラス
 		std::unique_ptr<TextureManager> textureManager_;

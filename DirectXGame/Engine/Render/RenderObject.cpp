@@ -68,9 +68,11 @@ int RenderObject::CreateCBV(size_t size, ShaderType type, std::string debugName)
 	logger_->debug("  Size: {}", size);
 
 	if (type == ShaderType::VERTEX_SHADER) {
-		psoConfig_.rootConfig.cbvNums.first++;
+		psoConfig_.rootConfig.cbvNums.vertex++;
+	} else if (type == ShaderType::PIXEL_SHADER) {
+		psoConfig_.rootConfig.cbvNums.pixel++;
 	} else {
-		psoConfig_.rootConfig.cbvNums.second++;
+		logger_->warn("CBV Created with unsupported shader type: {}", debugName_);
 	}
 
 	//indexの交付
@@ -123,9 +125,11 @@ int RenderObject::CreateSRV(size_t size, uint32_t num, ShaderType type, std::str
 	logger_->debug("  Index: {}", srvHandles_.back().back()->GetHandle());
 
 	if (type == ShaderType::VERTEX_SHADER) {
-		psoConfig_.rootConfig.srvNums.first++;
+		psoConfig_.rootConfig.srvNums.vertex++;
+	} else if (type == ShaderType::PIXEL_SHADER) {
+		psoConfig_.rootConfig.srvNums.pixel++;
 	} else {
-		psoConfig_.rootConfig.srvNums.second++;
+		logger_->warn("SRV Created with unsupported shader type: {}", debugName_);
 	}
 
 	return int(bufferList_.size() - 1);

@@ -39,44 +39,32 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	auto cmdList = cmdObj->GetCommandList();
 	auto display = dcc->GetRenderTarget();
 
-	PSO::Config config;
 	//PSOConfigを調整
-	config.rootConfig.cbvNums = {
+	psoConfig_.rootConfig.cbvNums = {
 		int(gpuBuffers_[BufferType::CBV][ShaderType::VERTEX_SHADER].size()),
 		int(gpuBuffers_[BufferType::CBV][ShaderType::PIXEL_SHADER].size())
 	};
-	config.rootConfig.srvNums = {
+	psoConfig_.rootConfig.srvNums = {
 		int(gpuBuffers_[BufferType::SRV][ShaderType::VERTEX_SHADER].size()),
 		int(gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER].size())
 	};
-	config.rootConfig.uavNums = {
+	psoConfig_.rootConfig.uavNums = {
 		int(gpuBuffers_[BufferType::UAV][ShaderType::VERTEX_SHADER].size()),
 		int(gpuBuffers_[BufferType::UAV][ShaderType::PIXEL_SHADER].size())
 	};
-	config.rootConfig.textureNums = {
+	psoConfig_.rootConfig.textureNums = {
 		int(gpuBuffers_[BufferType::Texture2D][ShaderType::VERTEX_SHADER].size()),
 		int(gpuBuffers_[BufferType::Texture2D][ShaderType::PIXEL_SHADER].size())
 	};
-	config.rootConfig.ddsNums = {
+	psoConfig_.rootConfig.ddsNums = {
 		int(gpuBuffers_[BufferType::DDSTexture][ShaderType::VERTEX_SHADER].size()),
 		int(gpuBuffers_[BufferType::DDSTexture][ShaderType::PIXEL_SHADER].size())
 	};
-	config.rootConfig.useTexture = isUseTexture_;
-	config.rootConfig.samplers = samplerFlag_;
+	
+	psoConfig_.rtvFormat = display->GetRTVFormat();
+	psoConfig_.rtvNum = display->GetRenderTargetNum();
 
-	config.vs = vs_;
-	config.ps = ps_;
-	config.inputLayoutID = inputLayoutID_;
-	for (int i = 0; i < 8; ++i) {
-		config.blendID[i] = blendID_[i];
-	}
-	config.depthStencilID = depthStencilID_;
-	config.rasterizerID = rasterizerID_;
-	config.topology = topology_;
-	config.rtvFormat = display->GetRTVFormat();
-	config.rtvNum = display->GetRenderTargetNum();
-
-	psoEditor_->SetPSO(cmdList, config);
+	psoEditor_->SetPSO(cmdList, psoConfig_);
 
 	cmdList->IASetVertexBuffers(0, UINT(drawData_.vbv.size()), drawData_.vbv.data());
 	cmdList->IASetIndexBuffer(&drawData_.ibv);
@@ -125,7 +113,7 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, DDStexture->GetGPUDescriptorHandle(BufferType::DDSTexture));
 	}
 
-	if (isUseTexture_) {
+	if (psoConfig_.rootConfig.useTexture) {
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, textureStartHandle_);
 	}
 
