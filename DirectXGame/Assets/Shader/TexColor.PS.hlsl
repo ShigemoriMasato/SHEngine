@@ -29,5 +29,11 @@ PSOutput main(PSInput input)
     PSOutput output;
     float4 texColor = textures[textureIndex].Sample(gSampler, input.texCoord);
     output.color = color * texColor;
+    
+    if (output.color.a < 0.1f)
+    {
+        discard;
+    }
+    
     return output;
 }

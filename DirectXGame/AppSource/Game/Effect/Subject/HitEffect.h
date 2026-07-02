@@ -13,7 +13,7 @@ public:
 
 private:
 
-	void Spawn(const Matrix4x4& vpMat);
+	void Spawn();
 
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 	std::unique_ptr<SHEngine::Renderer> renderer_;

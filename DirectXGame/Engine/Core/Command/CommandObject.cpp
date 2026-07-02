@@ -46,6 +46,10 @@ void SHEngine::Command::Object::SetRenderTarget(Screen::IDisplay* display, bool 
 	auto dsvHandle = display->GetDSVHandle();
 	auto cmdList = GetCommandList();
 
+	if (dsvHandle->ptr == 0) {
+		dsvHandle = nullptr;
+	}
+
 	display->ToRenderTarget(this);
 
 	cmdList->OMSetRenderTargets(display->GetRenderTargetNum(), rtvHandle, FALSE, dsvHandle);

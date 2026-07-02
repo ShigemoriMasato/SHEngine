@@ -37,6 +37,7 @@ void InitializeScene::Initialize() {
 	commonData_->display->Initialize(1280, 720, "MainWindow");
 	commonData_->display->CreateDepthTexture(textureManager_);
 	commonData_->display->AddRenderTarget(textureManager_, 0xff);
+	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 
 	std::vector<VertexData> vertices = {
 		{{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
@@ -137,9 +138,9 @@ void InitializeScene::Initialize() {
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
 	//return std::make_unique<TestScene>();
+	return std::make_unique<GameScene>();
 	return std::make_unique<EffectTestScene>();
 	return std::make_unique<EditScene>();
-	return std::make_unique<GameScene>();
 
 	return nullptr;
 }

@@ -4,6 +4,7 @@
 #include <Camera/Camera.h>
 #include "Animation.h"
 #include "HitEffect.h"
+#include "Cylinder.h"
 
 class Subject {
 public:
@@ -23,4 +24,5 @@ private:
 
 	std::unique_ptr<Animation_Sub> animation_;
 	std::unique_ptr<HitEffect> hitEffect_;
+	std::unique_ptr<Cylinder> cylinder_;
 };

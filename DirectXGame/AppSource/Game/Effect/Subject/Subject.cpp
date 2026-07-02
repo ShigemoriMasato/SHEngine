@@ -27,6 +27,8 @@ void Subject::Initialize(SHEngine::Engine* engine) {
 
 	hitEffect_ = std::make_unique<HitEffect>();
 	hitEffect_->Initialize(engine_);
+
+	cylinder_ = std::make_unique<Cylinder>(engine_);
 }
 
 void Subject::Update(const Matrix4x4& vpMat) {
@@ -36,6 +38,7 @@ void Subject::Update(const Matrix4x4& vpMat) {
 
 	animation_->Update(deltatime, vpMat);
 	hitEffect_->Update(deltatime, vpMat);
+	cylinder_->Update(deltatime, vpMat);
 }
 
 void Subject::Draw(DCC* cmdObj) {
@@ -44,4 +47,6 @@ void Subject::Draw(DCC* cmdObj) {
 	cube_->Draw(cmdObj);
 
 	hitEffect_->Draw(cmdObj);
+
+	cylinder_->Draw(cmdObj);
 }

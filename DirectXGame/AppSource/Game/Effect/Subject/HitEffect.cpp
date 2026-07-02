@@ -176,7 +176,7 @@ void HitEffect::Update(float deltaTime, const Matrix4x4& vpMat) {
 	timer_ += deltaTime;
 	if (timer_ >= spawnInterval_) {
 		timer_ = 0.0f;
-		Spawn(vpMat);
+		Spawn();
 	}
 
 	std::vector<Matrix4x4> wvpMats;
@@ -205,7 +205,7 @@ void HitEffect::Draw(DCC* cmdObj) {
 	d_renderer_->Draw(cmdObj);
 }
 
-void HitEffect::Spawn(const Matrix4x4& vpMat) {
+void HitEffect::Spawn() {
 	for (uint32_t i = 0; i < spawnNum_; i++) {
 		Vector3 scale = { 0.4f,12.f,12.f };
 		Vector3 rot = { randDist_(randEngine_), randDist_(randEngine_), randDist_(randEngine_) };

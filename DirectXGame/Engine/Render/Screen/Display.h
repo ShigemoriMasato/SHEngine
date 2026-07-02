@@ -3,6 +3,7 @@
 #include <Assets/Texture/TextureManager.h>
 #include "IDisplay.h"
 #include <imgui/imgui.h>
+#include <memory>
 
 namespace SHEngine::Screen {
 
@@ -72,7 +73,7 @@ namespace SHEngine::Screen {
 		std::vector<TextureData*> textureData_ = {};
 		TextureData* depthTextureData_ = nullptr;
 
-		std::vector<RTVHandle> rtvHandle_{};
+		std::vector<std::unique_ptr<RTVHandle>> rtvHandle_{};
 		DSVHandle dsvHandle_{};
 
 		// 関数で渡す用

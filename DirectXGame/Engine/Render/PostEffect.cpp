@@ -87,7 +87,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 		}
 
 		//描画処理
-		cmdObject->SetRenderTarget(output);
+		dcc->SetRenderTarget(output);
 		origin->ToTexture(cmdObject);
 		//bufferにテクスチャをセット
 		int textureIndex = origin->GetTextureData()->GetHandle();

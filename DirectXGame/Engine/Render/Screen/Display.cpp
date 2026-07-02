@@ -247,12 +247,14 @@ void SHEngine::Screen::Display::CreateRenderTarget(SHEngine::TextureManager* tex
 	//いつか配列にする
 	rtvFormat_ = data->GetFormat();
 
+	rtvHandle_[index] = std::make_unique<RTVHandle>();
+
 	//RTVの設定(指定された個数)
-	rtvHandle_[index].UpdateHandle(rtvManager);
+	rtvHandle_[index]->UpdateHandle(rtvManager);
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = data->GetFormat();
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;	//2Dテクスチャとしてよみこむ
-	rtvHandlePtr_[index] = rtvHandle_[index].GetCPU();
+	rtvHandlePtr_[index] = rtvHandle_[index]->GetCPU();
 	device->CreateRenderTargetView(textureData_[index]->GetResource(), &rtvDesc, rtvHandlePtr_[index]);
 
 	if (currentBarrier_.size() < textureData_.size()) {
@@ -268,7 +270,9 @@ void SHEngine::Screen::Display::Clear(Command::Object* cmdObject) {
 	}
 
 	//DepthStencilをクリア
-	cmdObject->GetCommandList()->ClearDepthStencilView(*GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	if (depthTextureData_) {
+		cmdObject->GetCommandList()->ClearDepthStencilView(*GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	}
 }
 
 void SHEngine::Screen::Display::ToRenderTarget(Command::Object* cmdObject) {
@@ -310,5 +314,7 @@ void SHEngine::Screen::Display::TransitionBarrier(Command::Object* cmdObject, D3
 }
 
 void SHEngine::Screen::Display::TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
-	SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentDepthBarrier_, depthTextureData_->GetResource());
+	if (depthTextureData_) {
+		SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentDepthBarrier_, depthTextureData_->GetResource());
+	}
 }

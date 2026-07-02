@@ -22,6 +22,12 @@ DepthStencilShelf::DepthStencilShelf() {
 
 	depthStencilDescs_.resize(int(DepthStencilID::Count));
 
+	D3D12_DEPTH_STENCIL_DESC noneDesc{};
+	noneDesc.DepthEnable = false;	//深度バッファを使わない
+	noneDesc.StencilEnable = FALSE; // ステンシルテストを使わないなら FALSE
+
+	depthStencilDescs_[int(DepthStencilID::None)] = noneDesc;
+
 	D3D12_DEPTH_STENCIL_DESC defaultDesc{};
 	defaultDesc.DepthEnable = true;	//深度バッファを使う
 	defaultDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;	//全ての深度値を使う

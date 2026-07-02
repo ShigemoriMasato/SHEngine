@@ -64,6 +64,10 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	psoConfig_.rtvFormat = display->GetRTVFormat();
 	psoConfig_.rtvNum = display->GetRenderTargetNum();
 
+	if (!display->GetDepthTexture()) {
+		psoConfig_.depthStencilID = PSO::DepthStencilID::None;
+	}
+
 	psoEditor_->SetPSO(cmdList, psoConfig_);
 
 	cmdList->IASetVertexBuffers(0, UINT(drawData_.vbv.size()), drawData_.vbv.data());
