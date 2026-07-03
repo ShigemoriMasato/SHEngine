@@ -1,6 +1,6 @@
 #pragma once
 #include <Compute/ComputeObject.h>
-#include <Render/Renderer.h>
+#include <Render/MeshRenderer.h>
 
 struct Pool {
 	SHEngine::GPUBuffer* freeList;
@@ -32,6 +32,8 @@ public:
 
 private:
 
+	void CreateRenderer();
+
 	constexpr static inline int kThreadGroupSize_ = 256;
 
 	std::unique_ptr<SHEngine::BufferContainer> container_;
@@ -43,11 +45,13 @@ private:
 	SHEngine::GPUBuffer* sizeBuffer_ = nullptr;
 	Pool pool_{};
 
-	std::unique_ptr<SHEngine::Renderer> renderer_;
+	std::vector<std::unique_ptr<SHEngine::MeshRenderer>> renderer_;
 
 	float size_ = 0.2f;
 	struct Camera {
 		Matrix4x4 vpMatrix;
 		Matrix4x4 billboardMatrix;
 	}camera_;
+
+	int drawCount_;
 };

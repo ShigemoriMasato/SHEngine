@@ -16,7 +16,7 @@ namespace SHEngine::PSO {
 		Topology topology = Topology::Triangle;
 		DepthStencilID depthStencilID = DepthStencilID::Default;
 		uint32_t rtvNum = 1;
-		std::vector<DXGI_FORMAT> rtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
+		DXGI_FORMAT rtvFormats[8] = {};
 		DXGI_FORMAT dsvFormat = DXGI_FORMAT_D32_FLOAT;
 
 		bool operator==(const ConfigMSType& other) const {

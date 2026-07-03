@@ -78,5 +78,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
     lifetimes[particleIndex] = lifetime;
     type[particleIndex] = id;
     isUse[particleIndex] = 1;
-    colors[particleIndex] = float4(color.rgb * texColor.rgb, 1.0f);
+    colors[particleIndex] = clamp(float4(color.rgb * texColor.rgb, 1.0f), float4(0, 0, 0, 0), float4(1, 1, 1, 1));
 }

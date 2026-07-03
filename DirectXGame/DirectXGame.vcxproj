@@ -194,7 +194,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Title\Title\Title.cpp" />
     <ClCompile Include="AppSource\Title\WaterWave\WaterWave.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Effect.cpp" />
-    <ClCompile Include="AppSource\Test\DDS\DDSTest.cpp" />
     <ClCompile Include="AppSource\Editor\EditScene.cpp" />
     <ClCompile Include="AppSource\EffectTest\EffectTestScene.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Cylinder.cpp" />
@@ -294,7 +293,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Title\Title\Title.h" />
     <ClInclude Include="AppSource\Title\WaterWave\WaterWave.h" />
     <ClInclude Include="AppSource\Game\Effect\Effect.h" />
-    <ClInclude Include="AppSource\Test\DDS\DDSTest.h" />
     <ClInclude Include="AppSource\Editor\EditScene.h" />
     <ClInclude Include="AppSource\EffectTest\EffectTestScene.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\Cylinder.h" />

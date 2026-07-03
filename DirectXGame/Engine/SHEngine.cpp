@@ -63,6 +63,9 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	csPsoManager_ = std::make_unique<PSO::CSPSOManager>();
 	csPsoManager_->Initialize(device_.get(), shelfManager_->GetSamplers());
 
+	psoManagerForMS_ = std::make_unique<PSO::ManagerMSType>(device_.get(), shelfManager_.get());
+	psoManagerForMS_->Initialize();
+
 	Screen::IDisplay::SetDevice(device_.get());
 	RenderObject::StaticInitialize(device_.get(), psoEditor_.get());
 	Renderer::SetPSOEditor(psoEditor_.get(), device_->GetSRVManager()->GetStartPtr());
@@ -94,6 +97,7 @@ void Engine::BeginFrame() {
 	computeCmdContext_->BeginFrame();
 	input_->Update();
 	fpsObserver_->TimeAdjustment();
+	psoEditor_->FrameInitialize();
 	AudioManager::GetInstance()->Update();
 	if (imGuiWrapper_) {
 		imGuiWrapper_->NewFrame();

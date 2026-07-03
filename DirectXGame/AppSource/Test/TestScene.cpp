@@ -9,8 +9,9 @@ void TestScene::Initialize() {
 
 	// ===================== 超えられない壁 =================================
 
-	ddsTest_ = std::make_unique<DDSTest>();
-	ddsTest_->Initialize(engine_);
+	meshRenderer_ = std::make_unique<SHEngine::MeshRenderer>();
+	meshRenderer_->SetMS("Mesh/Sample.MS.hlsl");
+	meshRenderer_->SetPS("White.PS.hlsl");
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
@@ -19,9 +20,8 @@ std::unique_ptr<IScene> TestScene::Update() {
 	grid_->Update(debugCamera_->GetCenter(), debugCamera_->GetVPMatrix());
 
 	float deltaTime = engine_->GetDeltaTime();
-	ddsTest_->Update(deltaTime, debugCamera_.get());
 
-	return std::unique_ptr<IScene>();
+	return nullptr;
 }
 
 void TestScene::Draw() {
@@ -31,14 +31,13 @@ void TestScene::Draw() {
 
 	directContext_->SetRenderTarget(display);
 
-	ddsTest_->Draw(directContext_);
-
-	grid_->Draw(cmdObj);
+	grid_->Draw(directContext_);
+	meshRenderer_->Draw(directContext_);
 
 	display->ToPresent(cmdObj);
 
 
-	directContext_->SetRenderTarget(window, false);
+	directContext_->SetRenderTarget(window);
 
 #ifdef USE_IMGUI
 

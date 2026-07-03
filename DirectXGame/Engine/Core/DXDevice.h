@@ -108,9 +108,10 @@ namespace SHEngine {
 		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_ = nullptr;
 
 		std::map<ShaderType, std::wstring> compileProfiles_ = {
-			{ShaderType::VERTEX_SHADER, L"vs_6_0"},
-			{ShaderType::PIXEL_SHADER, L"ps_6_0"},
-			{ShaderType::COMPUTE_SHADER, L"cs_6_0"}
+			{ShaderType::VERTEX_SHADER, L"vs_6_5"},
+			{ShaderType::PIXEL_SHADER, L"ps_6_5"},
+			{ShaderType::COMPUTE_SHADER, L"cs_6_5"},
+			{ ShaderType::MESH_SHADER, L"ms_6_5" }
 		};
 
 	};

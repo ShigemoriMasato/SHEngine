@@ -10,7 +10,7 @@ PSO::Editor* RenderObject::psoEditor_ = nullptr;
 Logger RenderObject::logger_ = GetLogger("Engine");
 
 RenderObject::RenderObject(std::string debugName) {
-	debugName_ = debugName == "" ? "NoName" : debugName;
+	debugName_ = (debugName == "" ? "NoName" : debugName);
 	logger_->debug("RenderObject Created: {}", debugName_);
 }
 

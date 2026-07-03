@@ -152,7 +152,7 @@ void HitEffect::Initialize(SHEngine::Engine* engine) {
 	{
 		auto modelData = mm->GetNodeModelData(mm->LoadModel("donut"));
 		auto drawData = ddm->GetDrawData(modelData.drawDataIndex);
-		int textureIndex = modelData.materials[modelData.materialIndex.front()].textureIndex;
+		int textureIndex = tm->LoadTexture("gradationLine.png");
 
 		d_renderer_ = std::make_unique<SHEngine::Renderer>(drawData);
 		d_renderer_->SetVS("Test/Donut/UV.VS.hlsl");

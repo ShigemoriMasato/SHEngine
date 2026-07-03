@@ -3,29 +3,31 @@
 void Grid::Initialize(SHEngine::DrawDataManager* drawDataManager) {
 	static int drawDataIndex = -1;
 	if (drawDataIndex == -1) {
-		std::vector<Vector3> vertices = std::vector<Vector3>(2, {});
+		std::vector<Vector3> vertices = { {}, {} };
 		drawDataManager->AddVertexBuffer(vertices);
 		drawDataIndex = drawDataManager->CreateDrawData();
 	}
 
 	auto drawData = drawDataManager->GetDrawData(drawDataIndex);
 
-	render_ = std::make_unique<SHEngine::RenderObject>("Grid Tool");
-	render_->Initialize();
-	render_->SetDrawData(drawData);
-	render_->psoConfig_.vs = "Engine/Grid.VS.hlsl";
-	render_->psoConfig_.ps = "Engine/Grid.PS.hlsl";
-	render_->psoConfig_.inputLayoutID = SHEngine::PSO::InputLayoutID::Vector3;
-	render_->psoConfig_.topology = SHEngine::PSO::Topology::Line;
+	container_ = std::make_unique<SHEngine::BufferContainer>(2);
 
-	render_->CreateSRV(sizeof(LineConfig), lineNum_ * 2, ShaderType::VERTEX_SHADER, "Config");
-	render_->CreateCBV(sizeof(Matrix4x4), ShaderType::VERTEX_SHADER, "VP");
-	render_->instanceNum_ = lineNum_ * 2;
+	configBuffer_ = container_->Create(BufferType::SRV, sizeof(LineConfig), lineNum_ * 2);
+	vpBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4));
+
+	renderer_ = std::make_unique<SHEngine::Renderer>(drawData);
+	renderer_->SetVS("Engine/Grid.VS.hlsl");
+	renderer_->SetPS("Engine/Grid.PS.hlsl");
+	renderer_->SetGPUBuffer(configBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
+	renderer_->SetGPUBuffer(vpBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
+	renderer_->SetInputLayout(SHEngine::PSO::InputLayoutID::Vector3);
+	renderer_->SetTopology(SHEngine::PSO::Topology::Line);
+	renderer_->instanceNum_ = lineNum_ * 2;
 
 	vertical_.resize(lineNum_);
 	horizontal_.resize(lineNum_);
 
-	gpuBuffer_.reserve(lineNum_ * 2);
+	configs_.reserve(lineNum_ * 2);
 }
 
 void Grid::Update(Vector3 middle, const Matrix4x4& vpMatrix) {
@@ -34,6 +36,8 @@ void Grid::Update(Vector3 middle, const Matrix4x4& vpMatrix) {
 		0.0f,
 		std::round(middle.z / interval_) * interval_
 	};
+
+	configs_.clear();
 
 	for(int i = 0; i < lineNum_; i++) {
 		float offset = (i - lineNum_ / 2) * interval_;
@@ -54,15 +58,13 @@ void Grid::Update(Vector3 middle, const Matrix4x4& vpMatrix) {
 	}
 
 	//GPUに転送
-	gpuBuffer_.insert(gpuBuffer_.end(), vertical_.begin(), vertical_.end());
-	gpuBuffer_.insert(gpuBuffer_.end(), horizontal_.begin(), horizontal_.end());
-	render_->CopyBufferData(0, gpuBuffer_.data(), sizeof(LineConfig) * gpuBuffer_.size());
+	configs_.insert(configs_.end(), vertical_.begin(), vertical_.end());
+	configs_.insert(configs_.end(), horizontal_.begin(), horizontal_.end());
 
-	gpuBuffer_.clear();
-
-	render_->CopyBufferData(1, &vpMatrix, sizeof(Matrix4x4));
+	configBuffer_->CopyBuffer(configs_.data(), sizeof(LineConfig) * configs_.size());
+	vpBuffer_->CopyBuffer(&vpMatrix, sizeof(Matrix4x4));
 }
 
-void Grid::Draw(CmdObj* cmdObj) {
-	render_->Draw(cmdObj);
+void Grid::Draw(DCC* dcc) {
+	renderer_->Draw(dcc);
 }

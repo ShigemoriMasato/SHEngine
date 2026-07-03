@@ -31,7 +31,7 @@ namespace SHEngine::PSO {
 		 * @brief フレーム開始時の初期化
 		 * @param commandList コマンドリスト
 		 */
-		void FrameInitialize(ID3D12GraphicsCommandList* commandList);
+		void FrameInitialize();
 
 		/**
 		 * @brief 設定した内容でPSOを設定し、内部の設定をデフォルトに戻す
@@ -49,6 +49,8 @@ namespace SHEngine::PSO {
 
 		/// @brief 現在のPSO設定
 		PSO::Config nowConfig_{};
+
+		bool frameFirst = true;
 
 		/// @brief ログ出力用logger
 		std::shared_ptr<spdlog::logger> logger_;

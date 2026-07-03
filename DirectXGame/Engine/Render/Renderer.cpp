@@ -124,10 +124,12 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	cmdList->DrawIndexedInstanced(drawData_.indexNum, instanceNum_, 0, 0, 0);
 
 	//SRVのなかで、UAVが含まれるPSResourceはCommonに直しておく
-	for (const auto& srv : gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER]) {
-		if (srv->GetBufferType() & uint8_t(BufferType::UAV)) {
-			srv->TransitionBarrier(D3D12_RESOURCE_STATE_COMMON);
-			srv->Flush(cmdObj);
+	for (const auto& srvs : gpuBuffers_[BufferType::SRV]) {
+		for (const auto& srv : srvs.second) {
+			if (srv->GetBufferType() & uint8_t(BufferType::UAV)) {
+				srv->TransitionBarrier(D3D12_RESOURCE_STATE_COMMON);
+				srv->Flush(cmdObj);
+			}
 		}
 	}
 }

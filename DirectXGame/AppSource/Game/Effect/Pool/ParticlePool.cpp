@@ -5,7 +5,6 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	initialize_ = std::make_unique<SHEngine::ComputeObject>("Pool Init");
 	update_ = std::make_unique<SHEngine::ComputeObject>("Pool Update");
-	renderer_ = std::make_unique<SHEngine::Renderer>(planeDrawData);
 
 	pool_.freeList = container_->Create(BufferType::UAV, sizeof(uint32_t), kMaxParticleNum, BufferNum::Single); // freeList
 	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(uint32_t), 1, BufferNum::Single); // freeListIndex
@@ -13,7 +12,7 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	pool_.position = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum); // world
 	pool_.color = container_->Create(BufferType::SRV_UAV, sizeof(Vector4), kMaxParticleNum); // color
 	pool_.type = container_->Create(BufferType::SRV_UAV, sizeof(uint32_t), kMaxParticleNum); // type
-	pool_.particleNum = container_->Create(BufferType::CBV, sizeof(uint32_t), 1); // particleNum
+	pool_.particleNum = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single); // particleNum
 	pool_.particleNum->CopyBuffer(&kMaxParticleNum, sizeof(uint32_t));//定数なので初期化しておく
 	pool_.deltaTime = container_->Create(BufferType::CBV, sizeof(float), 1); // deltaTime
 
@@ -25,23 +24,22 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	initialize_->SetGPUBuffer(BufferType::CBV, pool_.particleNum);
 	initialize_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_);
 
-	renderer_->SetVS("Game/GPUParticle.VS.hlsl");
-	renderer_->SetPS("Game/GPUParticle.PS.hlsl");
-	renderer_->SetGPUBuffer(pool_.position, ShaderType::VERTEX_SHADER , BufferType::SRV);
-	renderer_->SetGPUBuffer(pool_.type, ShaderType::VERTEX_SHADER , BufferType::SRV);
-	renderer_->SetGPUBuffer(sizeBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	renderer_->SetGPUBuffer(vpMatrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	renderer_->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	renderer_->SetGPUBuffer(pool_.type, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	renderer_->instanceNum_ = std::min(kMaxParticleNum, 1000000);
-	renderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add);
-
 	initialize_->Execute(cmdObj);
+
+	CreateRenderer();
 
 	pool_.maxParticleNum = kMaxParticleNum;
 }
 
 void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
+	for (int i = 0; i < drawCount_ / 65535 + 1; ++i) {
+		if (renderer_.size() <= i) {
+			CreateRenderer();
+		}
+		auto& renderer = renderer_[i];
+		renderer->SetDispatchGroup(std::min(((drawCount_) - i * 65535) + 1, 65535));
+	}
+
 	camera_.vpMatrix = vpMatrix;
 	camera_.billboardMatrix = billboardMatrix;
 	vpMatrixBuffer_->CopyBuffer(&camera_, sizeof(camera_));
@@ -50,18 +48,39 @@ void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardM
 }
 
 void ParticlePool::Draw(DCC* cmdObj) {
-	renderer_->Draw(cmdObj);
+	for (int i = 0; i < drawCount_ / 65535 + 1; ++i) {
+		renderer_[i]->Draw(cmdObj);
+	}
 }
 
 void ParticlePool::DrawImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Particle Common");
 	ImGui::DragFloat("Size", &size_, 0.01f);
-	int instance = (int)renderer_->instanceNum_;
-	ImGui::SliderInt("RenderNum", &instance, 1, pool_.maxParticleNum);
-	renderer_->instanceNum_ = uint32_t(instance);
+	ImGui::SliderInt("RenderNum", &drawCount_, 1, pool_.maxParticleNum / 128);
 	ImGui::End();
 
 	sizeBuffer_->CopyBuffer(&size_, sizeof(size_));
 #endif
+}
+
+void ParticlePool::CreateRenderer() {
+	auto& renderer = renderer_.emplace_back(std::make_unique<SHEngine::MeshRenderer>());
+
+	auto executeOffsetBuffer = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single);
+	int executeOffset = int(renderer_.size() - 1) * 65535 * 128;
+	executeOffsetBuffer->CopyBuffer(&executeOffset, sizeof(executeOffset));
+
+	renderer->SetMS("Mesh/Particle/Quad.MS.hlsl");
+	renderer->SetPS("Game/GPUParticle.PS.hlsl");
+	renderer->SetGPUBuffer(pool_.position, ShaderType::MESH_SHADER, BufferType::SRV);
+	renderer->SetGPUBuffer(pool_.type, ShaderType::MESH_SHADER, BufferType::SRV);
+	renderer->SetGPUBuffer(sizeBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
+	renderer->SetGPUBuffer(vpMatrixBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
+	renderer->SetGPUBuffer(pool_.particleNum, ShaderType::MESH_SHADER, BufferType::CBV);
+	renderer->SetGPUBuffer(executeOffsetBuffer, ShaderType::MESH_SHADER, BufferType::CBV);
+	renderer->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	renderer->SetGPUBuffer(pool_.type, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	renderer->SetDispatchGroup(128 / 128);
+	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Add);
 }

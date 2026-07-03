@@ -49,11 +49,11 @@ namespace SHEngine {
 		// @brief Samplerの設定
 		void SetSampler(PSO::SamplerID samplerFlag) { samplerFlag_ = uint32_t(samplerFlag); }
 
+		// @brief Dispatchするインスタンスの数をセットする。デフォルトは1。
+		void SetDispatchGroup(uint32_t groupX, uint32_t groupY = 1, uint32_t groupZ = 1) { groupX_ = groupX; groupY_ = groupY; groupZ_ = groupZ; }
+
 		// @brief 指定された設定を基に描画コマンドを発行する。
 		void Draw(DirectCommandContext* dcc);
-
-		// インスタンスの数
-		uint32_t instanceNum_ = 1;
 
 	private:
 
@@ -77,6 +77,11 @@ namespace SHEngine {
 		uint32_t samplerFlag_ = uint32_t(PSO::SamplerID::Default);
 
 		std::map<BufferType, std::map<ShaderType, std::vector<GPUBuffer*>>> gpuBuffers_;
+
+		// @brief Dispatchするインスタンスの数
+		uint32_t groupX_ = 1;
+		uint32_t groupY_ = 1;
+		uint32_t groupZ_ = 1;
 
 	};
 

@@ -17,10 +17,12 @@ void Editor::Initialize(DXDevice* device, ShelfManager* shelfManager) {
 }
 
 void Editor::SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config) {
-	if (nowConfig_ == config) {
+	// すでに同じ設定がされている場合は何もしない(フレーム時初めての設定の場合は例外的に設定するようにする)
+	if (nowConfig_ == config && !frameFirst) {
 		return;
 	}
 
+	frameFirst = false;
 	commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(config.rootConfig));
 	commandList->IASetPrimitiveTopology(topologyList_[uint32_t(config.topology)]);
 	commandList->SetPipelineState(psoManager_->GetPSO(config));
@@ -28,9 +30,6 @@ void Editor::SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& c
 	nowConfig_ = config;
 }
 
-void Editor::FrameInitialize(ID3D12GraphicsCommandList* commandList) {
-	nowConfig_ = {};
-	commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nowConfig_.rootConfig));
-	commandList->IASetPrimitiveTopology(topologyList_[uint32_t(nowConfig_.topology)]);
-	commandList->SetPipelineState(psoManager_->GetPSO(nowConfig_));
+void Editor::FrameInitialize() {
+	frameFirst = true;
 }

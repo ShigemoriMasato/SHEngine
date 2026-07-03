@@ -1,8 +1,8 @@
 #pragma once
 #include <Scene/IScene.h>
-#include "DDS/DDSTest.h"
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
+#include <Render/MeshRenderer.h>
 
 class TestScene : public IScene {
 public:
@@ -16,6 +16,6 @@ private:
 	std::unique_ptr<DebugCamera> debugCamera_;
 	std::unique_ptr<Grid> grid_;
 
-	std::unique_ptr<DDSTest> ddsTest_;
+	std::unique_ptr<SHEngine::MeshRenderer> meshRenderer_;
 
 };

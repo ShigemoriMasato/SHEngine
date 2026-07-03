@@ -57,6 +57,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     if (isUse[index] == 0)
     {
+        outPositions[index] = float3(0, 0, 0);
+        outColors[index] = float4(0, 0, 0, 0);
         type[index] = 0;
         return;
     }

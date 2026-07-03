@@ -30,7 +30,7 @@ void EditScene::Draw() {
 
 	decoEditor_->Draw(directContext_);
 
-	grid_.Draw(directContext_->GetCurrentCmdObj());
+	grid_.Draw(directContext_);
 
 	display->ToTexture(directContext_->GetCurrentCmdObj());
 

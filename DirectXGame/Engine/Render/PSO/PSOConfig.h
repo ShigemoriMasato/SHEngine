@@ -25,7 +25,7 @@ namespace SHEngine::PSO {
 	 */
 	struct Config {
 		/// @brief 頂点シェーダーファイル名
-		std::string vs = "Object3d.VS.hlsl";
+		std::string vs = ".VS.hlsl";
 		/// @brief ピクセルシェーダーファイル名
 		std::string ps = "Object3d.PS.hlsl";
 		/// @brief ルートシグネチャ設定
