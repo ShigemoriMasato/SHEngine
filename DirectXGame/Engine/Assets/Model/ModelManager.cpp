@@ -203,6 +203,7 @@ NodeModelData ModelManager::WritingNodeModelData(const aiScene* scene, std::stri
 	//コードがごちゃつくのでModelLoaderに処理を投げる
 	result.vertices = ModelLoader::LoadVertices(scene);
 	result.indices = ModelLoader::LoadIndices(scene);
+	result.positions = ModelLoader::LoadOnlyPositions(scene);
 	result.materials = ModelLoader::LoadMaterials(scene, filePath, textureManager_);
 	result.materialIndex = ModelLoader::LoadMaterialIndices(scene);
 	result.rootNode = ModelLoader::ReadNode(scene->mRootNode);

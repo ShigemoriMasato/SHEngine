@@ -104,8 +104,10 @@ void ImGuiWrapper::Finalize() {
 }
 
 void ImGuizmo::OriginalSetRect(SHEngine::Screen::IDisplay* display) {
+#ifdef USE_IMGUI
 	Vector2 pos = display ? display->GetPos() : Vector2(0.0f, 0.0f);
 	Vector2 size = display ? display->GetSize() : Vector2(1280.0f, 720.0f);
 
 	ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
+#endif
 }

@@ -61,6 +61,23 @@ std::vector<VertexData> ModelLoader::LoadVertices(const aiScene* scene) {
 	return vertices;
 }
 
+std::vector<Vector3> ModelLoader::LoadOnlyPositions(const aiScene* scene) {
+	std::vector<Vector3> positions;
+
+	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
+		aiMesh* ai_mesh = scene->mMeshes[mesh];
+		for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+			Vector3 position{};
+			position.x = ai_mesh->mVertices[v].x;
+			position.y = ai_mesh->mVertices[v].y;
+			position.z = ai_mesh->mVertices[v].z;
+			positions.push_back(position);
+		}
+	}
+
+	return positions;
+}
+
 std::vector<VertexInfluence> ModelLoader::LoadVertexInfluences(const aiScene* scene) {
 	std::vector<VertexInfluence> vertexInfluences;
 	//頂点数分の空のデータを作成

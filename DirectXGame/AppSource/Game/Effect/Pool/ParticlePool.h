@@ -34,7 +34,7 @@ private:
 
 	void CreateRenderer();
 
-	constexpr static inline int kThreadGroupSize_ = 256;
+	constexpr static inline int kThreadGroupSize_ = 1024;
 
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 

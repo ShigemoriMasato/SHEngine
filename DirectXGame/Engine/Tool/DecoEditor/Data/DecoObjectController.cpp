@@ -36,7 +36,11 @@ void Decorate::ObjController::Update(Camera* camera, DCC* dcc) {
 	preClick_ = click_;
 	click_ = bool(engine_->GetInput()->GetMouseButtonState()[0]);
 
-	bool isImGuizmoActive = ImGuizmo::IsUsing() || ImGuizmo::IsOver();
+	bool isImGuizmoActive = false;
+
+#ifdef USE_IMGUI
+	isImGuizmoActive = ImGuizmo::IsUsing() || ImGuizmo::IsOver();
+#endif
 
 	if (!isImGuizmoActive && !preClick_ && click_ && display_->IsHovering()) {
 		dataManager_->EditID(selectedID_);

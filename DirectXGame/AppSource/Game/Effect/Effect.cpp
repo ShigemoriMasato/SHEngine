@@ -9,7 +9,7 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 	auto cmdObj = compute_->GetCurrentCmdObj();
 
 	particlePool_ = std::make_unique<ParticlePool>();
-	// 16777216個分のメモリを確保する
+	// メモリを確保する
 	particlePool_->Initialize(planeDrawData, int(50000000), cmdObj);
 
 	compute_->MiddleExecute();

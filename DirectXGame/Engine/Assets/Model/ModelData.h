@@ -53,6 +53,7 @@ struct NodeModelData {
 	//VertexBufferView関連
 	std::vector<VertexData> vertices{};
 	std::vector<uint32_t> materialIndex{};
+	std::vector<Vector3> positions{};
 
 	//IndexBufferView関連
 	std::vector<uint32_t> indices{};

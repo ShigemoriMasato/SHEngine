@@ -8,6 +8,7 @@ namespace ModelLoader {
 	Node ReadNode(const aiNode* node);
 
 	std::vector<VertexData> LoadVertices(const aiScene* scene);
+	std::vector<Vector3> LoadOnlyPositions(const aiScene* scene);
 	std::vector<VertexInfluence> LoadVertexInfluences(const aiScene* scene);
 	std::vector<uint32_t> LoadIndices(const aiScene* scene);
 

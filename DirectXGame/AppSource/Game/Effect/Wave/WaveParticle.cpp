@@ -5,7 +5,7 @@
 
 using namespace Matrix;
 
-constexpr int splitNum = 8;
+constexpr int splitNum = 12;
 
 WaveParticle::~WaveParticle() {
 	Save();
