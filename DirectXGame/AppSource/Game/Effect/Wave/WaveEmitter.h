@@ -1,10 +1,9 @@
 #pragma once
 #include <Assets/Texture/TextureManager.h>
-#include <Compute/ComputeObject.h>
-#include <Render/Renderer.h>
 #include <Game/Effect/Pool/ParticlePool.h>
 #include <Tool/Binary/BinaryManager.h>
 #include <random>
+#include <Game/Effect/Base/IEmitter.h>
 
 struct WaveData {
 	Vector3 position{};
@@ -17,10 +16,10 @@ struct WaveData {
 	float thickness = 4.0f;
 };
 
-class WaveParticle {
+class WaveEmitter {
 public:
 
-	~WaveParticle();
+	~WaveEmitter();
 
 	void Initialize(SHEngine::TextureManager* textureManager, const Pool& pool, const uint32_t id);
 	void Update(CmdObj* compute, float deltaTime);

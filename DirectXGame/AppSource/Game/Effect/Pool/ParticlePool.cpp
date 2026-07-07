@@ -29,6 +29,8 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	CreateRenderer();
 
 	pool_.maxParticleNum = kMaxParticleNum;
+
+	drawCount_ = kMaxParticleNum / 128 / 2;
 }
 
 void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {

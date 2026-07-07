@@ -14,12 +14,15 @@ void Effect::Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* eng
 
 	compute_->MiddleExecute();
 
-	//このプールを使用してパーティクルを発生させる
+
+}
+
+void Effect::AddEmitter(IEmitter* emitter) {
 	auto pool = particlePool_->GetPool();
 
-	waveParticle_ = std::make_unique<WaveParticle>();
-	uint32_t textureID = textureManager_->LoadTexture("WaveParticle.png");
-	waveParticle_->Initialize(textureManager_, pool, 1);
+	emitter->Initialize(engine_, pool, nextOffset_);
+	nextOffset_ += emitter->GetMaxParticleNum();
+	emitters_.push_back(emitter);
 }
 
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
@@ -28,9 +31,6 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix,
 	auto cmdObj = compute_->GetCurrentCmdObj();
 
 	compute_->BeginTimeStamp("Particle Update");
-
-	//パーティクルの更新処理
-	waveParticle_->Update(cmdObj, deltaTime);
 
 	compute_->EndTimeStamp();
 
@@ -47,9 +47,7 @@ void Effect::Draw(SHEngine::Screen::IDisplay* display) {
 	particlePool_->Draw(direct_);
 
 	//更新処理の後にこの関数を呼び出す
-	//engine_->WaitFence(computeFence_, SHEngine::Command::Type::Direct);
 	direct_->MiddleExecute();
 
 	particlePool_->DrawImGui();
-	waveParticle_->DrawImGui();
 }

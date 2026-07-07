@@ -34,9 +34,16 @@ namespace SHEngine {
 			buffers_[index]->CopyBuffer(data, dataSize);
 		}
 
+		// @brief GPUBufferを解放する。安全のため、3frame待機したのち解放される。生ポインタは無効になるので注意。
+		void Erase(GPUBuffer* buffer);
+
+		static void EraseListUpdate();
+
 	private:
 
 		std::vector<std::unique_ptr<GPUBuffer>> buffers_;
+
+		static inline std::vector<std::pair<int, std::unique_ptr<GPUBuffer>>> eraseList_;
 
 	};
 

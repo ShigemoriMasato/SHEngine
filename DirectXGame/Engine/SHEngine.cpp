@@ -99,6 +99,7 @@ void Engine::BeginFrame() {
 	fpsObserver_->TimeAdjustment();
 	psoEditor_->FrameInitialize();
 	AudioManager::GetInstance()->Update();
+	BufferContainer::EraseListUpdate();
 	if (imGuiWrapper_) {
 		imGuiWrapper_->NewFrame();
 		imguiDrew_ = false;

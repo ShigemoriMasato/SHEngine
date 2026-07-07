@@ -1,4 +1,4 @@
-#include "WaveParticle.h"
+#include "WaveEmitter.h"
 #include <imgui/imgui.h>
 #include <Utility/MatrixFactory.h>
 #include <Utility/SearchFile.h>
@@ -7,11 +7,11 @@ using namespace Matrix;
 
 constexpr int splitNum = 12;
 
-WaveParticle::~WaveParticle() {
+WaveEmitter::~WaveEmitter() {
 	Save();
 }
 
-void WaveParticle::Initialize(SHEngine::TextureManager* textureManager, const Pool& pool, const uint32_t id) {
+void WaveEmitter::Initialize(SHEngine::TextureManager* textureManager, const Pool& pool, const uint32_t id) {
 	texturemanager_ = textureManager;
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	auto positions = container_->Create(BufferType::UAV, sizeof(Vector3), pool.maxParticleNum, BufferNum::Single); // position
@@ -32,8 +32,8 @@ void WaveParticle::Initialize(SHEngine::TextureManager* textureManager, const Po
 		updateBuffer_[i] = container_->Create(BufferType::CBV, sizeof(UpdateData), 1, BufferNum::Single); // UpdateのCBV
 		emitBuffer_[i] = container_->Create(BufferType::CBV, sizeof(EmitData), 1, BufferNum::Single); // EmitのCBV
 
-		emitter_[i] = std::make_unique<SHEngine::ComputeObject>("WaveParticle Emitter");
-		update_[i] = std::make_unique<SHEngine::ComputeObject>("WaveParticle Update");
+		emitter_[i] = std::make_unique<SHEngine::ComputeObject>("WaveEmitter Emitter");
+		update_[i] = std::make_unique<SHEngine::ComputeObject>("WaveEmitter Update");
 
 		emitter_[i]->SetShader("Particle/Wave/Emit.CS.hlsl");
 		emitter_[i]->SetGPUBuffers(BufferType::UAV, { pool.freeList, pool.freeListIndex, pool.type, positions, velocities, lifeTimes, isUse, colors });
@@ -62,7 +62,7 @@ void WaveParticle::Initialize(SHEngine::TextureManager* textureManager, const Po
 	texturePahts_ = SearchFilePathsAddChild("Assets/Texture", ".png");
 }
 
-void WaveParticle::Update(CmdObj* compute, float deltaTime) {
+void WaveEmitter::Update(CmdObj* compute, float deltaTime) {
 	emitData_.seed = randomDist_(randomEngine_);
 	CopyConfig(deltaTime);
 
@@ -85,9 +85,9 @@ void WaveParticle::Update(CmdObj* compute, float deltaTime) {
 	}
 }
 
-void WaveParticle::DrawImGui() {
+void WaveEmitter::DrawImGui() {
 #ifdef USE_IMGUI
-	ImGui::Begin("WaveParticle");
+	ImGui::Begin("WaveEmitter");
 
 	ImGui::DragFloat("Speed", &config_.speed, 0.01f);
 	ImGui::DragFloat("LifeTime", &config_.lifeTime, 0.1f, 5.0f);
@@ -183,7 +183,7 @@ void WaveParticle::DrawImGui() {
 #endif
 }
 
-void WaveParticle::AddWave(const WaveData& waveData) {
+void WaveEmitter::AddWave(const WaveData& waveData) {
 	//波の情報を追加する
 	for (auto& wave : waves_) {
 		if (wave.lifetime >= wave.maxlifetime) {
@@ -194,7 +194,7 @@ void WaveParticle::AddWave(const WaveData& waveData) {
 	}
 }
 
-void WaveParticle::Load() {
+void WaveEmitter::Load() {
 	if (!binaryManager_.Boot(fileName_)) {
 		config_ = {};
 		return;
@@ -211,7 +211,7 @@ void WaveParticle::Load() {
 	config_.currentTextureID = binaryManager_.Reverse<int>();
 }
 
-void WaveParticle::Save() {
+void WaveEmitter::Save() {
 	binaryManager_.Boot(fileName_);
 	binaryManager_.Register(&config_.speed);
 	binaryManager_.Register(&config_.lifeTime);
@@ -225,7 +225,7 @@ void WaveParticle::Save() {
 	binaryManager_.Write(fileName_);
 }
 
-void WaveParticle::CopyConfig(float deltaTime) {
+void WaveEmitter::CopyConfig(float deltaTime) {
 	emitData_.speed = config_.speed;
 	emitData_.lifeTime = config_.lifeTime;
 	emitData_.emitNum = int(float(config_.emitNum) * deltaTime);
