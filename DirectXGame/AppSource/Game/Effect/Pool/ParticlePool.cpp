@@ -1,7 +1,7 @@
 #include "ParticlePool.h"
 #include <imgui/imgui.h>
 
-void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxParticleNum, CmdObj* cmdObj) {
+void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	initialize_ = std::make_unique<SHEngine::ComputeObject>("Pool Init");
 	update_ = std::make_unique<SHEngine::ComputeObject>("Pool Update");
@@ -11,7 +11,6 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 
 	pool_.position = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum); // world
 	pool_.color = container_->Create(BufferType::SRV_UAV, sizeof(Vector4), kMaxParticleNum); // color
-	pool_.type = container_->Create(BufferType::SRV_UAV, sizeof(uint32_t), kMaxParticleNum); // type
 	pool_.particleNum = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single); // particleNum
 	pool_.particleNum->CopyBuffer(&kMaxParticleNum, sizeof(uint32_t));//定数なので初期化しておく
 	pool_.deltaTime = container_->Create(BufferType::CBV, sizeof(float), 1); // deltaTime
@@ -20,11 +19,11 @@ void ParticlePool::Initialize(SHEngine::DrawData& planeDrawData, const int kMaxP
 	sizeBuffer_ = container_->Create(BufferType::CBV, sizeof(float), 1); // size
 
 	initialize_->SetShader("Particle/Pool/Initialize.CS.hlsl");
-	initialize_->SetGPUBuffers(BufferType::UAV, { pool_.freeList, pool_.freeListIndex, pool_.type });
+	initialize_->SetGPUBuffers(BufferType::UAV, { pool_.freeList, pool_.freeListIndex, pool_.position });
 	initialize_->SetGPUBuffer(BufferType::CBV, pool_.particleNum);
 	initialize_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_);
 
-	initialize_->Execute(cmdObj);
+	initialize_->Execute(compute);
 
 	CreateRenderer();
 
@@ -76,13 +75,12 @@ void ParticlePool::CreateRenderer() {
 	renderer->SetMS("Mesh/Particle/Quad.MS.hlsl");
 	renderer->SetPS("Game/GPUParticle.PS.hlsl");
 	renderer->SetGPUBuffer(pool_.position, ShaderType::MESH_SHADER, BufferType::SRV);
-	renderer->SetGPUBuffer(pool_.type, ShaderType::MESH_SHADER, BufferType::SRV);
 	renderer->SetGPUBuffer(sizeBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(vpMatrixBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(pool_.particleNum, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(executeOffsetBuffer, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	renderer->SetGPUBuffer(pool_.type, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	renderer->SetDispatchGroup(128 / 128);
+	renderer->SetDispatchGroup(1);
 	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Add);
+	renderer->SetDepthStencil(SHEngine::PSO::DepthStencilID::Transparent);
 }

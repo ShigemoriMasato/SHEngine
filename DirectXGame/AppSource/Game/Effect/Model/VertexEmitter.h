@@ -6,14 +6,13 @@ public:
 
 	VertexEmitter();
 
-	void Initialize(SHEngine::Engine* engine, const Pool& pool, const uint32_t offset) override;
+	void Initialize(SHEngine::Engine* engine, const Pool& pool) override;
 
-	[[nodiscard]]
 	int AddModel(const std::vector<Vector3>& vertices);
 	void EraseModel(int index);
 	void EditColor(int index, const Vector3& color);
 
-	void Update(CmdObj* compute, float deltaTime);
+	void Update(CmdObj* compute, float deltaTime) override;
 
 private:
 
@@ -26,8 +25,8 @@ private:
 
 	std::unique_ptr<SHEngine::ComputeObject> update_ = nullptr;
 
-	SHEngine::GPUBuffer* colorBuffer_ = nullptr;
-	std::vector<Vector3> colors_ = {};
+	SHEngine::GPUBuffer* positions_ = nullptr;
+	SHEngine::GPUBuffer* colors_ = nullptr;
 
 	std::vector<Data> modelData_ = {};
 

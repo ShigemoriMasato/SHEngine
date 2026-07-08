@@ -187,7 +187,7 @@ TextureData* TextureManager::GetTextureData(int handle) {
 	return textureDataList_[handle].get();
 }
 
-void TextureManager::UploadResources(CmdObj* cmdObj) {
+void TextureManager::UploadResources(ID3D12GraphicsCommandList* cmdList) {
 	//中間リソースがなければ何もしない
 	if (uploadStandby_.empty()) {
 		return;
@@ -197,7 +197,7 @@ void TextureManager::UploadResources(CmdObj* cmdObj) {
 
 	for (auto& [offset, scratchImage] : uploadStandby_) {
 		auto textureData = textureDataList_[offset].get();
-		auto intermediateResource = UploadTextureData(textureData->GetResource(), scratchImage, device_->GetDevice(), cmdObj->GetCommandList());
+		auto intermediateResource = UploadTextureData(textureData->GetResource(), scratchImage, device_->GetDevice(), cmdList);
 		Resource res;
 		res.res.Attach(intermediateResource);
 		intermediateResources_.push_back(res);

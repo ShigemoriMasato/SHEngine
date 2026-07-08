@@ -1,5 +1,11 @@
 #include "BufferContainer.h"
 
+SHEngine::BufferContainer::~BufferContainer() {
+	/*while (!buffers_.empty()) {
+		eraseList_.emplace_back(0, std::move(buffers_.back()));
+	}*/
+}
+
 void SHEngine::BufferContainer::Erase(GPUBuffer* buffer) {
 	std::unique_ptr<GPUBuffer> eraseBuffer;
 	for (auto& b : buffers_) {

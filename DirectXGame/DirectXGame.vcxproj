@@ -197,6 +197,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Editor\EditScene.cpp" />
     <ClCompile Include="AppSource\EffectTest\EffectTestScene.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Cylinder.cpp" />
+    <ClCompile Include="Engine\Render\Screen\IDisplay.cpp" />
     <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoDataManager.cpp" />
     <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoObjectController.cpp" />
     <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoObjectManager.cpp" />
@@ -265,7 +266,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Scene\InitializeScene.cpp" />
     <ClCompile Include="AppSource\Scene\SceneManager.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Pool\ParticlePool.cpp" />
-    <ClCompile Include="AppSource\Game\Effect\Wave\WaveEmitter.cpp" />
     <ClCompile Include="AppSource\Test\TestScene.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Subject.cpp" />
     <ClCompile Include="Engine\Core\Command\Measure\MeasureShaderTime.cpp" />
@@ -273,7 +273,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\MeshRenderer.cpp" />
     <ClCompile Include="Engine\Render\PSO\PSOManagerForMS.cpp" />
     <ClCompile Include="Engine\Render\PSO\ShelfManager.cpp" />
-    <ClCompile Include="AppSource\Game\Effect\Model\ModelEmitter.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Model\VertexEmitter.cpp" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Game\Camera\GameCamera.h" />
@@ -354,7 +354,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Core\ImGuiWrapper.h" />
     <ClInclude Include="AppSource\Game\Effect\Pool\ParticlePool.h" />
-    <ClInclude Include="AppSource\Game\Effect\Wave\WaveEmitter.h" />
     <ClInclude Include="AppSource\Test\TestScene.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\Subject.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\HitEffect.h" />
@@ -363,7 +362,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\MeshRenderer.h" />
     <ClInclude Include="Engine\Render\PSO\PSOManagerForMS.h" />
     <ClInclude Include="Engine\Render\PSO\ShelfManager.h" />
-    <ClInclude Include="AppSource\Game\Effect\Model\ModelEmitter.h" />
+    <ClInclude Include="AppSource\Game\Effect\Model\VertexEmitter.h" />
     <ClInclude Include="AppSource\Game\Effect\Base\IEmitter.h" />
   </ItemGroup>
   <ItemGroup>

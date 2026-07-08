@@ -32,7 +32,7 @@ void EditScene::Draw() {
 
 	grid_.Draw(directContext_);
 
-	display->ToTexture(directContext_->GetCurrentCmdObj());
+	display->ToTexture(directContext_);
 
 #ifdef USE_IMGUI
 
@@ -44,6 +44,6 @@ void EditScene::Draw() {
 
 	directContext_->SetRenderTarget(window, true);
 
-	engine_->DrawImGui(directContext_->GetCurrentCmdObj());
-	window->ToPresent(directContext_->GetCurrentCmdObj());
+	engine_->DrawImGui();
+	window->ToPresent(directContext_);
 }

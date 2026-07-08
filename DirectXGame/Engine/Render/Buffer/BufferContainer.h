@@ -9,6 +9,7 @@ namespace SHEngine {
 	public:
 
 		BufferContainer(uint32_t size = 32) { buffers_.reserve(size); }
+		~BufferContainer();
 		 
 		// @brief GPUBufferの作成。作られた順番に0からインデックスが振られる。Copyするときはこのインデックスを指定する。
 		// @param bufferType バッファの種類（CBV、SRV、UAVの組み合わせ）

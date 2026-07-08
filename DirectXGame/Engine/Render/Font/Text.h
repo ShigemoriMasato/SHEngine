@@ -18,7 +18,7 @@ namespace SHEngine {
 		void SetTransform(const Transform& transform);
 		void SetColor(const Vector4& color) { color_ = color; }
 		void Update(Matrix4x4 vpMat);
-		void Draw(Command::Object* cmdObj);
+		void Draw(DCC* direct);
 
 	private:
 

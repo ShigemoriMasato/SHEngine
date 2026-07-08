@@ -42,7 +42,7 @@ namespace SHEngine {
 		void ImGuiActivate(Screen::WindowsAPI* window);
 
 		// ImGuiの描画
-		void DrawImGui(CmdObj* cmdObj);
+		void DrawImGui();
 
 	public: // Getter
 		TextureManager* GetTextureManager() { return textureManager_.get(); }

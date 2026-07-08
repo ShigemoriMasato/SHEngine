@@ -4,6 +4,7 @@
 #include "IDisplay.h"
 #include <imgui/imgui.h>
 #include <memory>
+#include <Render/Command/DirectCommandContext.h>
 
 namespace SHEngine::Screen {
 
@@ -23,11 +24,17 @@ namespace SHEngine::Screen {
 		void AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor);
 		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8);
 
-		void Clear(Command::Object* cmdObject) override;
-		void ToRenderTarget(Command::Object* cmdObject) override;
-		void ToPresent(Command::Object* cmdObject) override;
-		void ToTexture(Command::Object* cmdObject) override;
-		void ToNonPixel(Command::Object* cmdObject) override;
+		/// @brief ViewPortを設定する
+		/// @param cmdObject コマンドオブジェクト
+		/// @param min ViewPortの左上座標
+		/// @param size ViewPortのサイズ(初期値の場合TextureSizeが使われる)
+		void SetViewport(DCC* dcc, Vector2 min = {0, 0}, Vector2 size = {0, 0}) override;
+
+		void Clear(DCC* dcc) override;
+		void ToRenderTarget(DCC* dcc) override;
+		void ToPresent(DCC* dcc) override;
+		void ToTexture(DCC* dcc) override;
+		void ToNonPixel(DCC* dcc) override;
 
 		/// @brief 先頭のテクスチャだけ取得する。
 		TextureData* GetTextureData() const override { return textureData_.front(); }
@@ -65,8 +72,8 @@ namespace SHEngine::Screen {
 
 		void CreateRenderTarget(SHEngine::TextureManager* textureManager, uint32_t index);
 
-		void TransitionBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after);
-		void TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after);
+		void TransitionBarrier(DCC* dcc, D3D12_RESOURCE_STATES after);
+		void TransitionDepthBarrier(DCC* dcc, D3D12_RESOURCE_STATES after);
 
 		static inline Logger logger_ = GetLogger("Engine");
 

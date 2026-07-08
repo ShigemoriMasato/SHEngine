@@ -17,24 +17,19 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num,
 
 	bufferType_ = uint8_t(bufferType);
 
-	//UAVが含まれている場合はDEFAULT、そうでない場合はUPLOADにする。UAVバッファはGPUから書き込むこともあるため、CPUからのアクセスができないヒープタイプにする必要がある。
+	//UAVが含まれている場合はDEFAULT、そうでない場合はUPLOADにする。
 	auto heapType = ((uint8_t(bufferType) & BufferType::UAV) ? D3D12_HEAP_TYPE_DEFAULT : D3D12_HEAP_TYPE_UPLOAD);
 
 	for (uint32_t i = 0; i < castedBufferNum; ++i) {
-		//頂点リソース用のヒープの設定
-		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-		uploadHeapProperties.Type = heapType;
-		//頂点リソースの設定
+		D3D12_HEAP_PROPERTIES heapProperties{};
+		heapProperties.Type = heapType;
 		D3D12_RESOURCE_DESC bufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
-		//バッファリソース、テクスチャの場合はまた別の設定をする
 		bufferResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 		bufferResourceDesc.Width = alignmentSize;
 		bufferResourceDesc.Height = 1;
-		//バッファの場合はこれにする決まり
 		bufferResourceDesc.DepthOrArraySize = 1;
 		bufferResourceDesc.MipLevels = 1;
 		bufferResourceDesc.SampleDesc.Count = 1;
-		//バッファの場合はこれにする決まり
 		bufferResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 		//UAVバッファの場合はフラグを追加する
@@ -44,9 +39,10 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num,
 
 		auto& bufferResource = resources_.emplace_back().res;
 
-		HRESULT reason = device_->GetDevice()->GetDeviceRemovedReason();
+		HRESULT hr = device_->GetDevice()->GetDeviceRemovedReason();
+		assert(SUCCEEDED(hr));
 
-		HRESULT hr = device_->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
+		hr = device_->GetDevice()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE,
 			&bufferResourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
 			IID_PPV_ARGS(&bufferResource));
 		assert(SUCCEEDED(hr));
@@ -152,7 +148,7 @@ void SHEngine::GPUBuffer::TransitionBarrier(D3D12_RESOURCE_STATES after) {
 	nextState_ = after;
 }
 
-void SHEngine::GPUBuffer::Flush(CmdObj* cmdObj) {
+void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 	uint32_t bufferIndex = currentIndex_ % resources_.size();
 	//UAVが含まれていない場合は値をコピーする
 	if (!(bufferType_ & BufferType::UAV) && !mappedData_.empty()) {
@@ -160,7 +156,7 @@ void SHEngine::GPUBuffer::Flush(CmdObj* cmdObj) {
 	}
 
 	//同じだった場合の処理と過去の状態の更新は関数内に含まれている
-	Func::InsertBarrier(cmdObj->GetCommandList(), nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
+	Func::InsertBarrier(cmdList, nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
 }
 
 BufferType operator|(BufferType a, BufferType b) {

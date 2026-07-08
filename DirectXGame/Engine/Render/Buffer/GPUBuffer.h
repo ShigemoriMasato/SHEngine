@@ -50,7 +50,7 @@ namespace SHEngine {
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
 		void TransitionBarrier(D3D12_RESOURCE_STATES after);
 		// @brief GPUBufferの状態を実際にGPUへ反映させる。
-		void Flush(CmdObj* cmdObj);
+		void Flush(ID3D12GraphicsCommandList* cmdList);
 
 		// @brief GPUBufferのGPUディスクリプタハンドルを取得する。
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(BufferType type) const;

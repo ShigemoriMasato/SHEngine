@@ -148,7 +148,7 @@ void RenderObject::CopyBufferData(int index, const void* data, size_t size) {
 	std::memcpy(gpuData.mapped, data, size);
 }
 
-void RenderObject::Draw(Command::Object* cmdObject) {
+void RenderObject::Draw(DCC* direct) {
 	//描画できる状態か確認
 	if (vbv_.size() == 0) {
 		logger_->error("=========== Draw || No vertex buffer set ===========");
@@ -167,10 +167,10 @@ void RenderObject::Draw(Command::Object* cmdObject) {
 		return;
 	}
 
-	auto cmdList = cmdObject->GetCommandList();
+	auto cmdList = direct->GetCommandList();
 
 	//パイプラインステートの設定
-	psoConfig_.rtvFormat = cmdObject->GetRenderTarget()->GetRTVFormat();
+	psoConfig_.rtvFormat = direct->GetRenderTarget()->GetRTVFormat();
 	psoEditor_->SetPSO(cmdList, psoConfig_);
 
 	//頂点バッファの設定

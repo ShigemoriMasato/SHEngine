@@ -137,10 +137,10 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
-	return std::make_unique<EffectTestScene>();
 	return std::make_unique<GameScene>();
-	return std::make_unique<EditScene>();
 	return std::make_unique<TestScene>();
+	return std::make_unique<EffectTestScene>();
+	return std::make_unique<EditScene>();
 
 	return nullptr;
 }
@@ -148,9 +148,8 @@ std::unique_ptr<IScene> InitializeScene::Update() {
 void InitializeScene::Draw() {
 	auto swapChain = commonData_->window.get();
 	auto display = commonData_->display.get();
-	auto cmdObj = directContext_->GetCurrentCmdObj();
 
-	cmdObj->SetRenderTarget(swapChain, true);
-	engine_->DrawImGui(cmdObj);
-	swapChain->ToPresent(cmdObj);
+	directContext_->SetRenderTarget(swapChain, true);
+	engine_->DrawImGui();
+	swapChain->ToPresent(directContext_);
 }

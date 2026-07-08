@@ -10,9 +10,6 @@ namespace SHEngine {
 
 		virtual ~ICommandContext() = default;
 
-		/// @brief コマンドオブジェクトを取得する。Fenceを取得するごとに切り替わるので、都度取得して使用すること。
-		CmdObj* GetCurrentCmdObj();
-
 		/// @brief コマンドを積むためのコマンドオブジェクトを準備する
 		void BeginFrame();
 
@@ -32,6 +29,10 @@ namespace SHEngine {
 
 		void WaitFenceInCPU(const Command::WaitFence& waitFence) { queue_->WaitFenceInCPU(waitFence); }
 
+		ID3D12GraphicsCommandList6* GetCommandList() { return cmdObjects_[currentCmdObjIndex_]->GetCommandList(); }
+
+		uint32_t GetCurrentID() { return cmdObjects_[currentCmdObjIndex_]->GetCurrentID(); }
+
 	public:// 計測関係
 
 		void BeginTimeStamp(std::string name);
@@ -43,6 +44,8 @@ namespace SHEngine {
 	protected:
 
 		void PrivateInitialize(DXDevice* device, Command::Type type, int initCmdObjNum = 2);
+
+		CmdObj* GetCurrentCmdObj() { return cmdObjects_[currentCmdObjIndex_].get(); }
 
 	private:
 

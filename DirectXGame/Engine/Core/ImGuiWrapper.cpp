@@ -80,11 +80,11 @@ void ImGuiWrapper::NewFrame() {
 #endif
 }
 
-void ImGuiWrapper::Render(CmdObj* cmdObj) {
+void ImGuiWrapper::Render(ID3D12GraphicsCommandList* cmdList) {
 #ifdef USE_IMGUI
 
 	ImGui::Render();
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdObj->GetCommandList());
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
 
 #endif
 }

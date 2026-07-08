@@ -1,6 +1,6 @@
 RWStructuredBuffer<uint> freeList : register(u0);
 RWStructuredBuffer<uint> freeListIndex : register(u1);
-RWStructuredBuffer<uint> type : register(u2);
+RWStructuredBuffer<float3> position : register(u2);
 
 cbuffer ParticleNum : register(b0)
 {
@@ -23,6 +23,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
         freeListIndex[0] = maxNum - 1;
     }
     
-    //パラメータの初期化
-    type[index] = 0;
+    float minValue = 1.175494351E-38;
+    position[index] = float3(minValue, minValue, minValue);
 }

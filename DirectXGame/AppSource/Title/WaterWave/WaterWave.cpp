@@ -42,9 +42,9 @@ void WaterWave::Update(float deltaTime) {
 	renderObject_->CopyBufferData(2, &baseColor_, sizeof(Vector4));
 }
 
-void WaterWave::Draw(CmdObj* window) {
+void WaterWave::Draw(DCC* dcc) {
 
-	renderObject_->Draw(window);
+	renderObject_->Draw(dcc);
 }
 
 void WaterWave::DrawImGui() {

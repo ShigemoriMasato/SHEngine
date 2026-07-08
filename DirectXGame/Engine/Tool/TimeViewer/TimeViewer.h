@@ -15,7 +15,7 @@ public:
 	void Delete(std::string name) { texts_.erase(name); }
 
 	// @brief 描画処理
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* direct);
 
 	// @brief 描画設定を行う。
 	void DrawImGui();

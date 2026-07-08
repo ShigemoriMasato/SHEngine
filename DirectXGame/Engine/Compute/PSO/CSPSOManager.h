@@ -15,7 +15,7 @@ namespace SHEngine::PSO {
 
 		void Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers);
 		
-		void SetPSO(CmdObj* cmdObj, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName);
+		void SetPSO(ID3D12GraphicsCommandList* cmdList, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName);
 
 	private:
 

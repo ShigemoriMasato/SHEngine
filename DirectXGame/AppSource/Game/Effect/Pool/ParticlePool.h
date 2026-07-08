@@ -7,7 +7,6 @@ struct Pool {
 	SHEngine::GPUBuffer* freeListIndex;
 	SHEngine::GPUBuffer* position;
 	SHEngine::GPUBuffer* color;
-	SHEngine::GPUBuffer* type;
 	SHEngine::GPUBuffer* particleNum;
 	SHEngine::GPUBuffer* deltaTime;
 	int maxParticleNum;
@@ -17,7 +16,7 @@ class ParticlePool {
 public:
 
 	//パーティクルのプールを初期化する。GPUBufferを作成して、DrawDataにセットする
-	void Initialize(SHEngine::DrawData& planeDrawData, const int kMaxParticleNum, CmdObj* cmdObj);
+	void Initialize(const int kMaxParticleNum, CCC* compute);
 
 	//全てのWorldMatrixにcamera行列をかけて、GPUに転送する
 	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime);

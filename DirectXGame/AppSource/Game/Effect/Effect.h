@@ -7,12 +7,12 @@
 class Effect {
 public:
 
-	void Initialize(SHEngine::DrawData& planeDrawData, SHEngine::Engine* engine);
+	void Initialize(SHEngine::Engine* engine);
 
 	void AddEmitter(IEmitter* emitter);
 
 	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime);
-	void Draw(SHEngine::Screen::IDisplay* display);
+	void Draw();
 
 private:
 
@@ -24,5 +24,4 @@ private:
 	std::unique_ptr<ParticlePool> particlePool_ = nullptr;
 
 	std::vector<IEmitter*> emitters_ = {};
-	uint32_t nextOffset_ = 0;
 };

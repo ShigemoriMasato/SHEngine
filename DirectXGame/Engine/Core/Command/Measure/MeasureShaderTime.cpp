@@ -1,5 +1,6 @@
 #include "MeasureShaderTime.h"
 #include <Utility/DirectUtilFuncs.h>
+#include <Core/Command/ICommandContext.h>
 
 void SHEngine::MeasureShaderTime::Initialize(DXDevice* device, ID3D12CommandQueue* queue) {
 	int bufferCount = device->GetBufferCount();
@@ -34,8 +35,8 @@ void SHEngine::MeasureShaderTime::Initialize(DXDevice* device, ID3D12CommandQueu
 	root_ = std::make_unique<TimeStamp>();
 }
 
-void SHEngine::MeasureShaderTime::NewFrame(CmdObj* cmdObj) {
-	int frameIndex = cmdObj->GetCurrentID();
+void SHEngine::MeasureShaderTime::NewFrame(ICommandContext* commandContext) {
+	int frameIndex = commandContext->GetCurrentID();
 
 	auto rowData = mappedBuffers_[frameIndex];
 
@@ -48,13 +49,13 @@ void SHEngine::MeasureShaderTime::NewFrame(CmdObj* cmdObj) {
 
 	current_ = nullptr;
 
-	Begin(cmdObj, "Default-GPUTime");
+	Begin(commandContext, "Default-GPUTime");
 }
 
-void SHEngine::MeasureShaderTime::FinFrame(CmdObj* cmdObj) {
-	End(cmdObj);
+void SHEngine::MeasureShaderTime::FinFrame(ICommandContext* commandContext) {
+	End(commandContext);
 
-	auto cmdList = cmdObj->GetCommandList();
+	auto cmdList = commandContext->GetCommandList();
 
 	if (root_->endHandle == -1) {
 		logger_->error("MeasureShaderTime: endHandleが異常値でした。");
@@ -63,18 +64,18 @@ void SHEngine::MeasureShaderTime::FinFrame(CmdObj* cmdObj) {
 	}
 
 	// クエリヒープからリードバックバッファにタイムスタンプの結果をコピー
-	cmdList->ResolveQueryData(queryHeap_[cmdObj->GetCurrentID()].ptr.Get(), D3D12_QUERY_TYPE_TIMESTAMP,
-		0, root_->endHandle, readBackBuffers_[cmdObj->GetCurrentID()].ptr.Get(), 0);
+	cmdList->ResolveQueryData(queryHeap_[commandContext->GetCurrentID()].ptr.Get(), D3D12_QUERY_TYPE_TIMESTAMP,
+		0, root_->endHandle, readBackBuffers_[commandContext->GetCurrentID()].ptr.Get(), 0);
 }
 
-void SHEngine::MeasureShaderTime::Begin(CmdObj* cmdObj, std::string name) {
+void SHEngine::MeasureShaderTime::Begin(ICommandContext* commandContext, std::string name) {
 	auto timeStamp = std::make_unique<TimeStamp>();
 	timeStamp->name = name;
 	timeStamp->startHandle = nextHandle_++;
 	timeStamp->parent = current_;
 
 	// タイムスタンプをクエリヒープに書き込む
-	PutTimeStamp(cmdObj, timeStamp->startHandle);
+	PutTimeStamp(commandContext, timeStamp->startHandle);
 	
 	//currentの設定
 	if (current_) {
@@ -86,7 +87,7 @@ void SHEngine::MeasureShaderTime::Begin(CmdObj* cmdObj, std::string name) {
 	}
 }
 
-void SHEngine::MeasureShaderTime::End(CmdObj* cmdObj) {
+void SHEngine::MeasureShaderTime::End(ICommandContext* commandContext) {
 	// currentがnullptrのときは、Beginが呼ばれていないのにEndが呼ばれたことになるので、assertで止める
 	if (!current_) {
 		logger_->error("MeasureShaderTime::Endが呼ばれましたが、Beginが呼ばれていません。");
@@ -96,7 +97,7 @@ void SHEngine::MeasureShaderTime::End(CmdObj* cmdObj) {
 
 	// Handleを割り当ててヒープに書き込む
 	current_->endHandle = nextHandle_++;
-	PutTimeStamp(cmdObj, current_->endHandle);
+	PutTimeStamp(commandContext, current_->endHandle);
 
 	// 階層を一つ下げる
 	current_ = current_->parent;
@@ -131,15 +132,15 @@ SHEngine::MeasureShaderTime::TimeStamp* SHEngine::MeasureShaderTime::FindTimeSta
 	return nullptr;
 }
 
-void SHEngine::MeasureShaderTime::PutTimeStamp(CmdObj* cmdObj, int handle) {
+void SHEngine::MeasureShaderTime::PutTimeStamp(ICommandContext* commandContext, int handle) {
 	if (handle >= queryCount_) {
 		assert(false && "MeasureShaderTime クエリの上限に達しています");
 		return;
 	}
 
-	auto cmdList = cmdObj->GetCommandList();
-	int id = cmdObj->GetCurrentID() << 24;
+	auto cmdList = commandContext->GetCommandList();
+	int id = commandContext->GetCurrentID() << 24;
 
 	// タイムスタンプをクエリヒープに書き込む
-	cmdList->EndQuery(queryHeap_[cmdObj->GetCurrentID()].ptr.Get(), D3D12_QUERY_TYPE_TIMESTAMP, handle);
+	cmdList->EndQuery(queryHeap_[commandContext->GetCurrentID()].ptr.Get(), D3D12_QUERY_TYPE_TIMESTAMP, handle);
 }

@@ -1,21 +1,22 @@
 #pragma once
 #include <Core/DXDevice.h>
-#include <Core/Command/CommandObject.h>
 
 namespace SHEngine {
+
+	class ICommandContext;
 
 	class MeasureShaderTime {
 	public:
 
 		void Initialize(DXDevice* device, ID3D12CommandQueue* queue);
 
-		void NewFrame(CmdObj* cmdObj);
+		void NewFrame(SHEngine::ICommandContext* commandContext);
 
-		void FinFrame(CmdObj* cmdObj);
+		void FinFrame(SHEngine::ICommandContext* commandContext);
 
-		void Begin(CmdObj* cmdObj, std::string name);
+		void Begin(SHEngine::ICommandContext* commandContext, std::string name);
 
-		void End(CmdObj* cmdObj);
+		void End(SHEngine::ICommandContext* commandContext);
 
 		double GetTimeStampResult(std::string name);
 
@@ -35,7 +36,7 @@ namespace SHEngine {
 
 		TimeStamp* FindTimeStamp(const std::string& name, TimeStamp* current = nullptr);
 
-		void PutTimeStamp(CmdObj* cmdObj, int handle);
+		void PutTimeStamp(ICommandContext* commandContext, int handle);
 
 		std::unique_ptr<TimeStamp> root_;
 		TimeStamp* current_ = nullptr;

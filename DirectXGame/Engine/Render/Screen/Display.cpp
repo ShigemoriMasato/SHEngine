@@ -122,6 +122,14 @@ void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, 
 	CreateRenderTarget(textureManager, uint32_t(textureData_.size() - 1));
 }
 
+void SHEngine::Screen::Display::SetViewport(DCC* dcc, Vector2 min, Vector2 size) {
+	if (size.x == 0 && size.y == 0) {
+		size = { static_cast<float>(width_), static_cast<float>(height_) };
+	}
+
+	SetViewportInPrivate(dcc, min, size);
+}
+
 void SHEngine::Screen::Display::DrawImGui() {
 #ifdef USE_IMGUI
 
@@ -262,41 +270,42 @@ void SHEngine::Screen::Display::CreateRenderTarget(SHEngine::TextureManager* tex
 	}
 }
 
-void SHEngine::Screen::Display::Clear(Command::Object* cmdObject) {
+void SHEngine::Screen::Display::Clear(DCC* dcc) {
+	auto cmdList = dcc->GetCommandList();
 	//RenderTargetをクリア
 	for (size_t i = 0; i < textureData_.size(); ++i) {
 		Vector4 color = textureData_[i]->GetClearColor();
-		cmdObject->GetCommandList()->ClearRenderTargetView(GetRTVHandle()[i], &color.x, 0, nullptr);
+		cmdList->ClearRenderTargetView(GetRTVHandle()[i], &color.x, 0, nullptr);
 	}
 
 	//DepthStencilをクリア
 	if (depthTextureData_) {
-		cmdObject->GetCommandList()->ClearDepthStencilView(*GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		cmdList->ClearDepthStencilView(*GetDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	}
 }
 
-void SHEngine::Screen::Display::ToRenderTarget(Command::Object* cmdObject) {
-	TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+void SHEngine::Screen::Display::ToRenderTarget(DCC* dcc) {
+	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
 
-void SHEngine::Screen::Display::ToPresent(Command::Object* cmdObject) {
+void SHEngine::Screen::Display::ToPresent(DCC* dcc) {
 	if (isOffScreen_) {
-		ToTexture(cmdObject);
+		ToTexture(dcc);
 	} else {
-		TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_PRESENT);
-		TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		TransitionBarrier(dcc, D3D12_RESOURCE_STATE_PRESENT);
+		TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	}
 }
 
-void SHEngine::Screen::Display::ToTexture(Command::Object* cmdObject) {
-	TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+void SHEngine::Screen::Display::ToTexture(DCC* dcc) {
+	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-void SHEngine::Screen::Display::ToNonPixel(Command::Object* cmdObject) {
-	TransitionBarrier(cmdObject, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-	TransitionDepthBarrier(cmdObject, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+void SHEngine::Screen::Display::ToNonPixel(DCC* dcc) {
+	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE* SHEngine::Screen::Display::GetRTVHandle() {
@@ -307,14 +316,16 @@ D3D12_CPU_DESCRIPTOR_HANDLE* SHEngine::Screen::Display::GetDSVHandle() {
 	return &dsvHandlePtr_;
 }
 
-void SHEngine::Screen::Display::TransitionBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
+void SHEngine::Screen::Display::TransitionBarrier(DCC* dcc, D3D12_RESOURCE_STATES after) {
+	auto cmdList = dcc->GetCommandList();
 	for (size_t i = 0; i < textureData_.size(); ++i) {
-		SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentBarrier_[i], textureData_[i]->GetResource());
+		SHEngine::Func::InsertBarrier(cmdList, after, currentBarrier_[i], textureData_[i]->GetResource());
 	}
 }
 
-void SHEngine::Screen::Display::TransitionDepthBarrier(Command::Object* cmdObject, D3D12_RESOURCE_STATES after) {
+void SHEngine::Screen::Display::TransitionDepthBarrier(DCC* dcc, D3D12_RESOURCE_STATES after) {
+	auto cmdList = dcc->GetCommandList();
 	if (depthTextureData_) {
-		SHEngine::Func::InsertBarrier(cmdObject->GetCommandList(), after, currentDepthBarrier_, depthTextureData_->GetResource());
+		SHEngine::Func::InsertBarrier(cmdList, after, currentDepthBarrier_, depthTextureData_->GetResource());
 	}
 }

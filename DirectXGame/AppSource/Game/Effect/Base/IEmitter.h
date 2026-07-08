@@ -7,9 +7,9 @@
 class IEmitter {
 public:
 
-	IEmitter(uint32_t maxParticleNum) : maxParticleNum_(maxParticleNum) {}
+	IEmitter() = default;
 
-	virtual void Initialize(SHEngine::Engine* engine, const Pool& pool, const uint32_t offset) = 0;
+	virtual void Initialize(SHEngine::Engine* engine, const Pool& pool) = 0;
 
 	virtual void Update(CmdObj* compute, float deltaTime) = 0;
 	virtual void Draw(DCC* direct) = 0;

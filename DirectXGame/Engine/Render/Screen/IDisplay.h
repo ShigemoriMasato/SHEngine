@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Command/CommandObject.h>
+#include <Render/Command/DirectCommandContext.h>
 #include <Assets/Texture/TextureData.h>
 
 namespace SHEngine::Screen {
@@ -11,22 +11,25 @@ namespace SHEngine::Screen {
 
 		static void SetDevice(DXDevice* device) { device_ = device; }
 
+		/// @brief ViewPortを設定する
+		virtual void SetViewport(DCC* dcc, Vector2 min = { 0, 0 }, Vector2 size = { 0, 0 }) = 0;
+
 		/// @brief 画面をClearColorで塗りつぶす
-		virtual void Clear(Command::Object* cmdObject) = 0;
+		virtual void Clear(DCC* dcc) = 0;
 
 		/// @brief RenderTargetのBarrierを張る
-		virtual void ToRenderTarget(Command::Object* cmdObject) = 0;
+		virtual void ToRenderTarget(DCC* dcc) = 0;
 
 		/// @brief 描画後の処理（Presentや、OffScreen用テクスチャへのコピーなど）
 		/// @param cmdObject コマンドオブジェト
-		virtual void ToPresent(Command::Object* cmdObject) = 0;
+		virtual void ToPresent(DCC* dcc) = 0;
 
 		/// @brief バリアをピクセルシェーダーで使用できるようにする
 		/// @param cmdObject コマンドオブジェクト
-		virtual void ToTexture(Command::Object* cmdObject) = 0;
+		virtual void ToTexture(DCC* dcc) = 0;
 
 		/// @brief Vertex,Computeで使用できる状態にする
-		virtual void ToNonPixel(Command::Object* cmdObject) {};
+		virtual void ToNonPixel(DCC* dcc) {};
 
 		/// @brief テクスチャ情報を取得する
 		virtual TextureData* GetTextureData() const = 0;
@@ -59,6 +62,8 @@ namespace SHEngine::Screen {
 		virtual Vector2 GetSize() { auto size = GetTextureData()->GetSize(); return Vector2(float(size.first), float(size.second)); }
 
 	protected:
+
+		void SetViewportInPrivate(DCC* dcc, Vector2 min, Vector2 size);
 
 		static inline DXDevice* device_ = nullptr;
 

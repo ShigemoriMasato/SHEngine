@@ -33,8 +33,9 @@ void SHEngine::ComputeObject::SetUseTexture(bool useTexture) {
 	useTexture_ = useTexture;
 }
 
-void ComputeObject::Execute(CmdObj* cmdObj) {
+void ComputeObject::Execute(SHEngine::ICommandContext* commandContext) {
 	//PSOのセット
+	auto cmdList = commandContext->GetCommandList();
 	int cbvNum = int(gpuBuffers_[BufferType::CBV].size());
 	int srvNum = int(gpuBuffers_[BufferType::SRV].size());
 	int uavNum = int(gpuBuffers_[BufferType::UAV].size());
@@ -43,23 +44,22 @@ void ComputeObject::Execute(CmdObj* cmdObj) {
 		samplerID_ = uint32_t(PSO::SamplerID::Default);
 	}
 
-	psoManager_->SetPSO(cmdObj, cbvNum, srvNum, uavNum, useTexture_, samplerID_, computeShaderName_);
+	psoManager_->SetPSO(cmdList, cbvNum, srvNum, uavNum, useTexture_, samplerID_, computeShaderName_);
 
-	auto cmdList = cmdObj->GetCommandList();
 	int rootIndex = 0;
 	for(const auto& cbv : gpuBuffers_[BufferType::CBV]) {
 		cbv->TransitionBarrier(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-		cbv->Flush(cmdObj);
+		cbv->Flush(cmdList);
 		cmdList->SetComputeRootConstantBufferView(rootIndex++, cbv->GetGPUDescriptorHandle(BufferType::CBV).ptr);
 	}
 	for(const auto& srv : gpuBuffers_[BufferType::SRV]) {
 		srv->TransitionBarrier(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-		srv->Flush(cmdObj);
+		srv->Flush(cmdList);
 		cmdList->SetComputeRootDescriptorTable(rootIndex++, srv->GetGPUDescriptorHandle(BufferType::SRV));
 	}
 	for(const auto& uav : gpuBuffers_[BufferType::UAV]) {
 		uav->TransitionBarrier(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-		uav->Flush(cmdObj);
+		uav->Flush(cmdList);
 		cmdList->SetComputeRootDescriptorTable(rootIndex++, uav->GetGPUDescriptorHandle(BufferType::UAV));
 	}
 	if (useTexture_) {

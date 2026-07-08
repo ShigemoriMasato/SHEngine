@@ -39,7 +39,7 @@ void Title::Update(float deltaTime) {
 	renderObject_->CopyBufferData(0, &data, sizeof(VSData));
 }
 
-void Title::Draw(CmdObj* cmdObj) {
+void Title::Draw(DCC* cmdObj) {
 	renderObject_->Draw(cmdObj);
 }
 

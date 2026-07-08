@@ -52,11 +52,10 @@ void Decorate::ObjController::Update(Camera* camera, DCC* dcc) {
 // =======================================================================================================================
 
 void Decorate::ObjController::GetIDFromGPU(DCC* dcc) {
-	auto cmdObj = dcc->GetCurrentCmdObj();
-	auto readBack = readBacks_[cmdObj->GetCurrentID()];
-	auto cmdList = cmdObj->GetCommandList();
+	auto readBack = readBacks_[dcc->GetCurrentID()];
+	auto cmdList = dcc->GetCommandList();
 
-	display_->ToNonPixel(cmdObj);
+	display_->ToNonPixel(dcc);
 
 	//前回のReadBackの内容を取得する
 	{
@@ -67,7 +66,7 @@ void Decorate::ObjController::GetIDFromGPU(DCC* dcc) {
 
 	//結果の取得を命令する
 	ansBuffer_->TransitionBarrier(D3D12_RESOURCE_STATE_COPY_SOURCE);
-	ansBuffer_->Flush(cmdObj);
+	ansBuffer_->Flush(cmdList);
 	cmdList->CopyBufferRegion(readBack.res.Get(), 0, ansBuffer_->GetResource(), 0, sizeof(uint32_t));
 
 	//マウスカーソルの座標を取得
@@ -78,14 +77,14 @@ void Decorate::ObjController::GetIDFromGPU(DCC* dcc) {
 	cursorBuffer_->CopyBuffer(&cursorPos, sizeof(cursorPos));
 
 	//computeShaderを起動
-	idGetter_->Execute(cmdObj);
+	idGetter_->Execute(dcc);
 
 	//ReadBackしてIDを取得
 	uint32_t id = 0;
 
 	//Barrier張替
 	ansBuffer_->TransitionBarrier(D3D12_RESOURCE_STATE_COPY_SOURCE);
-	ansBuffer_->Flush(cmdObj);
+	ansBuffer_->Flush(cmdList);
 
 	cmdList->CopyBufferRegion(readBack.res.Get(), 0, ansBuffer_->GetResource(), 0, sizeof(uint32_t));
 

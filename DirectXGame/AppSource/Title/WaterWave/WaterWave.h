@@ -18,7 +18,7 @@ public:
 	void Initialize(const SHEngine::DrawData& drawData, Camera* camera);
 	void Update(float deltaTime);
 	void DrawImGui();
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* dcc);
 
 	float time_ = 0.0f;
 

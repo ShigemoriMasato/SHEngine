@@ -2,11 +2,9 @@
 
 void EffectTestScene::Initialize() {
 	camera_.Initialize(input_);
-	{
-		auto drawData = drawDataManager_->GetDrawData(modelManager_->GetNodeModelData(1).drawDataIndex);
-		effect_ = std::make_unique<Effect>();
-		effect_->Initialize(drawData, engine_);
-	}
+
+	effect_ = std::make_unique<Effect>();
+	effect_->Initialize(engine_);
 
 	hitEffect_ = std::make_unique<HitEffect>();
 	hitEffect_->Initialize(engine_);
@@ -37,7 +35,7 @@ void EffectTestScene::Draw() {
 	auto window = commonData_->window.get();
 
 	directContext_->BeginTimeStamp("Particle Draw");
-	effect_->Draw(display);
+	effect_->Draw();
 	directContext_->EndTimeStamp();
 
 	directContext_->SetRenderTarget(display, false);
@@ -47,9 +45,9 @@ void EffectTestScene::Draw() {
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
 	timeViewer_->Add("Particle Draw", directContext_->GetTimeStampResult("Particle Draw"));
 	timeViewer_->Add("DeltaTime", engine_->GetDeltaTime());
-	timeViewer_->Draw(directContext_->GetCurrentCmdObj());
+	timeViewer_->Draw(directContext_);
 
-	display->ToTexture(directContext_->GetCurrentCmdObj());
+	display->ToTexture(directContext_);
 
 	display->DrawImGui();
 	timeViewer_->DrawImGui();
@@ -64,7 +62,7 @@ void EffectTestScene::Draw() {
 
 	directContext_->SetRenderTarget(window, isFill);
 
-	
-	engine_->DrawImGui(directContext_->GetCurrentCmdObj());
-	window->ToPresent(directContext_->GetCurrentCmdObj());
+
+	engine_->DrawImGui();
+	window->ToPresent(directContext_);
 }

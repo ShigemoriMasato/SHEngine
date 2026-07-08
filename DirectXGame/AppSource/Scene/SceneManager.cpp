@@ -10,7 +10,7 @@ void SceneManager::Initialize(SHEngine::Engine* engine) {
 
 void SceneManager::Update() {
 	if (nextScene_) {
-		engine_->StopGPU();
+		//engine_->StopGPU();
 		engine_->GetTextureManager()->ClearIntermediateResource();
 		nextScene_->Ready(engine_, commonData_.get());
 		nextScene_->Initialize();
@@ -25,7 +25,7 @@ void SceneManager::Update() {
 }
 
 void SceneManager::Draw() {
-	engine_->GetTextureManager()->UploadResources(engine_->GetDirectCommandContext()->GetCurrentCmdObj());
+	engine_->GetTextureManager()->UploadResources(engine_->GetDirectCommandContext()->GetCommandList());
 
 	if (currentScene_) {
 		currentScene_->Draw();

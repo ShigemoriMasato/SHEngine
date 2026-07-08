@@ -9,7 +9,7 @@ public:
 
 	void Initialize(SHEngine::DrawData& drawData, Camera* camera);
 	void Update(float deltaTime);
-	void Draw(CmdObj* cmdObj);
+	void Draw(DCC* cmdObj);
 	void DrawImGui();
 
 private:

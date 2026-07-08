@@ -57,8 +57,17 @@ void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Dir
 	window_ = std::move(window);
 }
 
-void SHEngine::Screen::SwapChain::Clear(Command::Object* cmdObject) {
-	auto cmdList = cmdObject->GetCommandList();
+void SHEngine::Screen::SwapChain::SetViewport(DCC* dcc, Vector2 min, Vector2 size) {
+	if (size.x == 0 && size.y == 0) {
+		auto [width, height] = window_->GetWindowSize();
+		size = { static_cast<float>(width), static_cast<float>(height) };
+	}
+	SetViewportInPrivate(dcc, min, size);
+}
+
+void SHEngine::Screen::SwapChain::Clear(DCC* dcc) {
+	auto cmdList = dcc->GetCommandList();
+
     float color[4];
     Vector4 clearColor = displays_[currentBufferIndex_]->GetTextureData()->GetClearColor();
     color[0] = clearColor.x;
@@ -73,14 +82,14 @@ void SHEngine::Screen::SwapChain::Present() {
     currentBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 }
 
-void SHEngine::Screen::SwapChain::ToRenderTarget(Command::Object* cmdObject) {
-	displays_[currentBufferIndex_]->ToRenderTarget(cmdObject);
+void SHEngine::Screen::SwapChain::ToRenderTarget(DCC* dcc) {
+	displays_[currentBufferIndex_]->ToRenderTarget(dcc);
 }
 
-void SHEngine::Screen::SwapChain::ToPresent(Command::Object* cmdObject) {
-	displays_[currentBufferIndex_]->ToPresent(cmdObject);
+void SHEngine::Screen::SwapChain::ToPresent(DCC* dcc) {
+	displays_[currentBufferIndex_]->ToPresent(dcc);
 }
 
-void SHEngine::Screen::SwapChain::ToTexture(Command::Object* cmdObject) {
-	displays_[currentBufferIndex_]->ToTexture(cmdObject);
+void SHEngine::Screen::SwapChain::ToTexture(DCC* dcc) {
+	displays_[currentBufferIndex_]->ToTexture(dcc);
 }

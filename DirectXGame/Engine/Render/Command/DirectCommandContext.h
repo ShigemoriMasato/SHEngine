@@ -8,7 +8,7 @@ namespace SHEngine {
 
 		void Initialize(DXDevice* device, int initCmdObjNum = 2);
 
-		void SetRenderTarget(Screen::IDisplay* display, bool clear = true);
+		void SetRenderTarget(Screen::IDisplay* display, bool clear = true, bool setViewPort = true);
 
 		Screen::IDisplay* GetRenderTarget() { return renderTarget_; }
 

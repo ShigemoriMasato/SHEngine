@@ -3,17 +3,14 @@
 using namespace SHEngine;
 
 void SHEngine::ICommandContext::BeginTimeStamp(std::string name) {
-	auto cmdObj = GetCurrentCmdObj();
-	measureShaderTime_->Begin(cmdObj, name);
+	measureShaderTime_->Begin(this, name);
 }
 
 void SHEngine::ICommandContext::EndTimeStamp() {
-	auto cmdObj = GetCurrentCmdObj();
-	measureShaderTime_->End(cmdObj);
+	measureShaderTime_->End(this);
 }
 
 double SHEngine::ICommandContext::GetTimeStampResult(std::string name) {
-	auto cmdObj = GetCurrentCmdObj();
 	return measureShaderTime_->GetTimeStampResult(name);
 }
 
@@ -37,23 +34,18 @@ void ICommandContext::PrivateInitialize(DXDevice* device, Command::Type type, in
 	measureShaderTime_->Initialize(device, queue_->GetQueue());
 }
 
-CmdObj* SHEngine::ICommandContext::GetCurrentCmdObj() {
-	auto cmdObj = cmdObjects_[currentCmdObjIndex_].get();
-	cmdObj->ResetCommandList();
-	return cmdObj;
-}
-
 void SHEngine::ICommandContext::BeginFrame() {
 	int currentCmdListIndex = cmdObjects_[currentCmdObjIndex_]->GetCurrentID();
 	queue_->WaitFenceInCPU(lastWaitFence_[currentCmdListIndex]);
 
-	auto cmdObj = GetCurrentCmdObj();
-	measureShaderTime_->NewFrame(cmdObj);
+	auto cmdObj = cmdObjects_[currentCmdObjIndex_].get();
+	cmdObj->ResetCommandList();
+	measureShaderTime_->NewFrame(this);
 }
 
 Command::WaitFence SHEngine::ICommandContext::MiddleExecute() {
 	// コマンドオブジェクトを実行して、フェンスを取得する
-	auto cmdObj = GetCurrentCmdObj();
+	auto cmdObj = cmdObjects_[currentCmdObjIndex_].get();
 	auto fence = queue_->Execute({ cmdObj });
 
 	// コマンドオブジェクトを次のものに切り替える
@@ -61,15 +53,17 @@ Command::WaitFence SHEngine::ICommandContext::MiddleExecute() {
 	if (currentCmdObjIndex_ >= cmdObjects_.size()) {
 		cmdObjects_.emplace_back(std::make_unique<Command::Object>(device_, type_, 3));
 	}
+	cmdObjects_[currentCmdObjIndex_]->ResetCommandList();
 
 	return fence;
 }
 
 void SHEngine::ICommandContext::EndFrame() {
-	auto cmdObj = GetCurrentCmdObj();
-	measureShaderTime_->FinFrame(cmdObj);
+	auto cmdObj = cmdObjects_[currentCmdObjIndex_].get();
 
-	auto fence = MiddleExecute();
+	measureShaderTime_->FinFrame(this);
+
+	auto fence = queue_->Execute({ cmdObj });
 
 	uint32_t cmdListIndex = cmdObjects_[currentCmdObjIndex_]->GetCurrentID();
 	lastWaitFence_[cmdListIndex] = fence;

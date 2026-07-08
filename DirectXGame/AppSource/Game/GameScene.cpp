@@ -58,8 +58,7 @@ void GameScene::Initialize() {
 	auto gameOverdd = drawDataManager_->GetDrawData(model.drawDataIndex);
 	gameOverText->SetDrawData(gameOverdd);
 
-	auto planeDrawData = drawDataManager_->GetDrawData(modelManager_->GetNodeModelData(1).drawDataIndex);
-	effect_->Initialize(planeDrawData, engine_);
+	effect_->Initialize(engine_);
 
 	gameoverMat = Matrix::MakeAffineMatrix(
 		Vector3(1.0f, 1.0f, 1.0f),
@@ -115,13 +114,7 @@ void GameScene::Draw() {
 	auto display = commonData_->display.get();
 	auto window = commonData_->window.get();
 
-	directContext_->BeginTimeStamp("Particle Draw");
-	effect_->Draw(display);
-	directContext_->EndTimeStamp();
-
-	auto cmdObj = directContext_->GetCurrentCmdObj();
-
-	directContext_->SetRenderTarget(display, false);
+	directContext_->SetRenderTarget(display, true);
 
 	tetris_->Draw(directContext_);
 	if (tetris_->IsGameOver()) {
@@ -132,13 +125,18 @@ void GameScene::Draw() {
 
 	subject_->Draw(directContext_);
 
+	//一番最後に描画
+	directContext_->BeginTimeStamp("Particle Draw");
+	effect_->Draw();
+	directContext_->EndTimeStamp();
+
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
 	timeViewer_->Add("Particle Draw", engine_->GetDirectCommandContext()->GetTimeStampResult("Particle Draw"));
 	timeViewer_->Add("FPS", engine_->GetDeltaTime());
 
-	timeViewer_->Draw(cmdObj);
+	timeViewer_->Draw(directContext_);
 
-	display->ToTexture(cmdObj);
+	display->ToTexture(directContext_);
 
 	forEdgeDetection_.dcc = directContext_;
 	int edgeDetectionTextureIndex = commonData_->display->GetDepthTexture()->GetHandle();
@@ -282,6 +280,6 @@ void GameScene::Draw() {
 		uint32_t(dissolve) << 8;
 #endif
 
-	engine_->DrawImGui(cmdObj);
-	window->ToPresent(cmdObj);
+	engine_->DrawImGui();
+	window->ToPresent(directContext_);
 }

@@ -20,12 +20,6 @@ namespace SHEngine::Command {
 		/// @brief コマンドリストをリセットして、コマンドを積める状態にする(実行できる状態でなかったら実行できるまで待つ)
 		void ResetCommandList();
 
-		/// @brief RenderTargetを設定する。
-		void SetRenderTarget(Screen::IDisplay* display, bool clear = true);
-
-		/// @brief RenderTargetを取得する
-		Screen::IDisplay* GetRenderTarget() const { return renderTarget_; }
-
 		/// @brief コマンドリストを取得
 		ID3D12GraphicsCommandList6* GetCommandList() { return commandLists_[currentIndex_ % uint32_t(commandLists_.size())]->GetCommandList(); }
 
@@ -61,9 +55,6 @@ namespace SHEngine::Command {
 			Close,		// コマンドリストがクローズされている状態。コマンドを積めない
 			Open,		// コマンドリストがオープンされている状態。コマンドを積める
 		} state_ = State::Close;
-
-		//描画先の管理
-		Screen::IDisplay* renderTarget_ = nullptr;
 
 
 		friend class SHEngine::FrameCounter;

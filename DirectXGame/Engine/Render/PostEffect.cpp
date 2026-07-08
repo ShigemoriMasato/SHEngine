@@ -74,7 +74,6 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 	SHEngine::Screen::IDisplay* origin = config.origin;
 	SHEngine::Screen::IDisplay* output = intermediateDisplay_.get();
 	auto dcc = config.dcc;
-	auto cmdObject = config.dcc->GetCurrentCmdObj();
 
 	int drawCount = 0;
 	for (const auto& [job, part] : parts_) {
@@ -88,7 +87,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 
 		//描画処理
 		dcc->SetRenderTarget(output);
-		origin->ToTexture(cmdObject);
+		origin->ToTexture(config.dcc);
 		//bufferにテクスチャをセット
 		int textureIndex = origin->GetTextureData()->GetHandle();
 		auto& buffer = textureIndexBuffers_.at(drawCount);
@@ -104,7 +103,7 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 
 		//描画先と描画元の入れ替え
 		std::swap(origin, output);
-		origin->ToTexture(cmdObject);
+		origin->ToTexture(config.dcc);
 		//jobを完遂したので削除
 		jobs &= ~job;
 
@@ -123,13 +122,11 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 		return;
 	}
 
-	cmdObject->SetRenderTarget(output, true);
-	origin->ToTexture(cmdObject);
 	int textureIndex = origin->GetTextureData()->GetHandle();
 
 	//描画処理
-	cmdObject->SetRenderTarget(output);
-	origin->ToTexture(cmdObject);
+	config.dcc->SetRenderTarget(output);
+	origin->ToTexture(config.dcc);
 	//bufferにテクスチャをセット
 	auto& buffer = textureIndexBuffers_.at(drawCount);
 	buffer->CopyBuffer(&textureIndex, sizeof(int));
@@ -143,5 +140,5 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 	//描画
 	renderer_->Draw(dcc);
 
-	output->ToPresent(cmdObject);
+	output->ToPresent(config.dcc);
 }

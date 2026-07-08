@@ -37,47 +37,6 @@ void SHEngine::Command::Object::WaitForAllCommandListIdle() {
 	}
 }
 
-void SHEngine::Command::Object::SetRenderTarget(Screen::IDisplay* display, bool clear) {
-	renderTarget_ = display;
-
-	auto texture = display->GetTextureData();
-	auto depthTexture = display->GetDepthTexture();
-	auto rtvHandle = display->GetRTVHandle();
-	auto dsvHandle = display->GetDSVHandle();
-	auto cmdList = GetCommandList();
-
-	if (dsvHandle->ptr == 0) {
-		dsvHandle = nullptr;
-	}
-
-	display->ToRenderTarget(this);
-
-	cmdList->OMSetRenderTargets(display->GetRenderTargetNum(), rtvHandle, FALSE, dsvHandle);
-
-	//ViewPortとScissorRectの設定
-	D3D12_VIEWPORT viewPort{};
-	viewPort.TopLeftX = 0;
-	viewPort.TopLeftY = 0;
-	viewPort.Width = static_cast<float>(texture->GetSize().first);
-	viewPort.Height = static_cast<float>(texture->GetSize().second);
-	viewPort.MinDepth = 0.0f;
-	viewPort.MaxDepth = 1.0f;
-
-	cmdList->RSSetViewports(1, &viewPort);
-
-	D3D12_RECT scissorRect{};
-	scissorRect.left = 0;
-	scissorRect.top = 0;
-	scissorRect.right = static_cast<LONG>(texture->GetSize().first);
-	scissorRect.bottom = static_cast<LONG>(texture->GetSize().second);
-
-	cmdList->RSSetScissorRects(1, &scissorRect);
-
-	if (clear) {
-		display->Clear(this);
-	}
-}
-
 void SHEngine::Command::Object::ResetCommandList() {
 	if (state_ == State::Open) {
 		// コマンドリストが開いている場合はリセットするとエラーになるのでリセットしない

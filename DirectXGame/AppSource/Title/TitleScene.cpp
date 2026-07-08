@@ -52,26 +52,25 @@ std::unique_ptr<IScene> TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-	auto cmdObj = directContext_->GetCurrentCmdObj();
 	auto window = commonData_->window.get();
 	auto display = commonData_->display.get();
 
-	cmdObj->SetRenderTarget(display);
+	directContext_->SetRenderTarget(display);
 	
-	waterWave_->Draw(cmdObj);
-	title_->Draw(cmdObj);
+	waterWave_->Draw(directContext_);
+	title_->Draw(directContext_);
 
-	display->ToTexture(cmdObj);
+	display->ToTexture(directContext_);
 
 #ifdef SH_RELEASE
 
 	postEffectConfig_.dcc = directContext_;
 	postEffect_->Draw(postEffectConfig_);
-	cmdObj->SetRenderTarget(window->GetCurrentDisplay(), false);
+	directContext_->SetRenderTarget(window->GetCurrentDisplay(), false);
 
 #else
 
-	cmdObj->SetRenderTarget(window);
+	directContext_->SetRenderTarget(window);
 
 #endif
 
@@ -83,7 +82,7 @@ void TitleScene::Draw() {
 	camera_->DrawImGui();
 #endif
 
-	engine_->DrawImGui(cmdObj);
-	window->ToPresent(cmdObj);
+	engine_->DrawImGui();
+	window->ToPresent(directContext_);
 
 }

@@ -122,7 +122,7 @@ namespace SHEngine {
 			return textureDataList_[handle]->textureResource_.Get();
 		}
 
-		void UploadResources(CmdObj* cmdObj);
+		void UploadResources(ID3D12GraphicsCommandList* cmdList);
 
 		void ClearIntermediateResource();
 

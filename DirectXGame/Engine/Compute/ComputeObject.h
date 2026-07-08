@@ -1,6 +1,6 @@
 #pragma once
 #include <Tool/Logger/Logger.h>
-#include <Core/Command/CommandObject.h>
+#include <Compute/ComputeCommandContext.h>
 #include <Compute/PSO/CSPSOManager.h>
 #include <Render/Buffer/BufferContainer.h>
 
@@ -30,8 +30,8 @@ namespace SHEngine {
 		void SetSamplerID(SHEngine::PSO::SamplerID samplerID) { samplerID_ = uint32_t(samplerID); }
 
 		// @brief 登録したCBV/SRV/UAVをComputeShaderにセットして、ComputeShaderを実行する。
-		// @param cmdObj コマンドオブジェクト。この関数の後にengine_->ExecuteCommandを呼び出すこと。
-		void Execute(CmdObj* cmdObj);
+		// @param commandContext コマンドコンテキスト。DCCでもできるため、CCCである必要はないが、CCC推奨。
+		void Execute(SHEngine::ICommandContext* commandContext);
 
 	private:
 

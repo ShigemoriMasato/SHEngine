@@ -28,7 +28,7 @@ void TimeViewer::Add(std::string name, double time) {
 	texts_[name] = std::move(text);
 }
 
-void TimeViewer::Draw(CmdObj* cmdObj) {
+void TimeViewer::Draw(DCC* direct) {
 	//座標の更新をする
 	float offsetY = 0;
 	Transform transform;
@@ -44,7 +44,7 @@ void TimeViewer::Draw(CmdObj* cmdObj) {
 
 	//描画
 	for (auto& [name, text] : texts_) {
-		text->Draw(cmdObj);
+		text->Draw(direct);
 	}
 }
 

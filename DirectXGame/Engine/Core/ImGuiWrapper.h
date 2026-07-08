@@ -17,7 +17,7 @@ namespace SHEngine {
 
 		void NewFrame();
 
-		void Render(CmdObj* cmdObj);
+		void Render(ID3D12GraphicsCommandList* cmdList);
 
 		void EndFrame();
 

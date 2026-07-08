@@ -9,7 +9,7 @@ void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device, std::map<SamplerI
 	pso_.clear();
 }
 
-void SHEngine::PSO::CSPSOManager::SetPSO(CmdObj* cmdObj, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName) {
+void SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName) {
 
 	Config config{ cbv, srv, uav, useTexture, samplerID, computeShaderName };
 	ID3D12PipelineState* pipelineState = nullptr;
@@ -37,7 +37,6 @@ void SHEngine::PSO::CSPSOManager::SetPSO(CmdObj* cmdObj, int cbv, int srv, int u
 	}
 
 	//cmdListにセットする
-	auto cmdList = cmdObj->GetCommandList();
 	cmdList->SetComputeRootSignature(rootSignature);
 	cmdList->SetPipelineState(pipelineState);
 }

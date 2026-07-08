@@ -121,8 +121,8 @@ void SHEngine::Engine::ImGuiActivate(Screen::WindowsAPI* window) {
 	imGuiWrapper_->NewFrame();
 }
 
-void SHEngine::Engine::DrawImGui(CmdObj* cmdObj) {
+void SHEngine::Engine::DrawImGui() {
 	if (imGuiWrapper_) {
-		imGuiWrapper_->Render(cmdObj);
+		imGuiWrapper_->Render(directCmdContext_->GetCommandList());
 	}
 }

@@ -5,7 +5,6 @@ struct VertexOutput
 };
 
 StructuredBuffer<float3> positions : register(t0);
-StructuredBuffer<uint> type : register(t1);
 
 cbuffer Size : register(b0)
 {
@@ -37,8 +36,10 @@ out indices uint3 triangles[2]
     int primitiveCount = 2;
     
     uint threadID = id.x + executeOffset;
+
+    float minValue = 1.175494351E-38;
     
-    if (threadID >= maxNum || type[threadID] == 0)
+    if (threadID >= maxNum || positions[threadID].x == minValue || positions[threadID].y == minValue || positions[threadID].z == minValue)
     {
         vertexCount = 0;
         primitiveCount = 0;

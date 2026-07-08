@@ -13,3 +13,5 @@ namespace SHEngine {
 	};
 
 }
+
+using CCC = SHEngine::ComputeCommandContext;

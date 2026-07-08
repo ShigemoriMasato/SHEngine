@@ -47,6 +47,6 @@ void SHEngine::Text::Update(Matrix4x4 vpMat) {
 	render_->CopyBufferData(3, &color_, sizeof(Vector4));
 }
 
-void SHEngine::Text::Draw(Command::Object* cmdObj) {
-	render_->Draw(cmdObj);
+void SHEngine::Text::Draw(DCC* direct) {
+	render_->Draw(direct);
 }

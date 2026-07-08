@@ -10,22 +10,25 @@ namespace SHEngine::Screen {
 
 		void Initialize(TextureManager* textureManager, DirectCommandContext* directContext, uint32_t clearColor, std::unique_ptr<WindowsAPI> window);
 
+		/// @brief ViewPortを設定する
+		void SetViewport(DCC* dcc, Vector2 min = { 0, 0 }, Vector2 size = { 0, 0 }) override;
+
 		/// @brief 画面をClearColorで塗りつぶす
-		void Clear(Command::Object* cmdObject) override;
+		void Clear(DCC* dcc) override;
 
 		/// @brief 描画後の処理（Present）
 		void Present();
 
 		/// @brief RenderTargetのBarrierを張る
-		void ToRenderTarget(Command::Object* cmdObject) override;
+		void ToRenderTarget(DCC* dcc) override;
 
 		/// @brief 描画後の処理
 		/// @param cmdObject コマンドオブジェト
-		void ToPresent(Command::Object* cmdObject) override;
+		void ToPresent(DCC* dcc) override;
 
 		/// @brief バリアをピクセルシェーダーで使用できるようにする
 		/// @param cmdObject コマンドオブジェクト
-		void ToTexture(Command::Object* cmdObject) override;
+		void ToTexture(DCC* dcc) override;
 
 		/// @brief テクスチャ情報を取得する
 		TextureData* GetTextureData() const override { return displays_[currentBufferIndex_]->GetTextureData(); }

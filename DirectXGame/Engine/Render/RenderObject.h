@@ -1,6 +1,6 @@
 #pragma once
 #include "DrawDataManager.h"
-#include <Core/Command/CommandObject.h>
+#include <Render/Command/DirectCommandContext.h>
 #include <Utility/Color.h>
 #include <Camera/Camera.h>
 #include <Render/PSO/PSOEditor.h>
@@ -75,7 +75,7 @@ namespace SHEngine {
 		 * @brief オブジェクトを描画
 		 * @param window 描画先ウィンドウ
 		 */
-		void Draw(Command::Object* cmdObject);
+		void Draw(DCC* direct);
 
 		/**
 		 * @brief テクスチャ使用フラグを設定
