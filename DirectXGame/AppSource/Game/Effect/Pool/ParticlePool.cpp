@@ -10,7 +10,7 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
 	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(uint32_t), 1, BufferNum::Single); // freeListIndex
 
 	pool_.position = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum); // world
-	pool_.color = container_->Create(BufferType::SRV_UAV, sizeof(Vector4), kMaxParticleNum); // color
+	pool_.color = container_->Create(BufferType::SRV_UAV, sizeof(Vector4) / 2, kMaxParticleNum); // color(float16_t4)
 	pool_.particleNum = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single); // particleNum
 	pool_.particleNum->CopyBuffer(&kMaxParticleNum, sizeof(uint32_t));//定数なので初期化しておく
 	pool_.deltaTime = container_->Create(BufferType::CBV, sizeof(float), 1); // deltaTime
@@ -33,12 +33,18 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
 }
 
 void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
-	for (int i = 0; i < drawCount_ / 65535 + 1; ++i) {
+	//drawCountに応じてレンダラーのDispatchGroupを設定する。
+	int i = 0;
+	for (i = 0; i < drawCount_ / 65535 + 1; ++i) {
 		if (renderer_.size() <= i) {
 			CreateRenderer();
 		}
 		auto& renderer = renderer_[i];
 		renderer->SetDispatchGroup(std::min(((drawCount_) - i * 65535) + 1, 65535));
+	}
+	//余ったレンダラーのDispatchGroupを0にする
+	for (i; i < renderer_.size(); ++i) {
+		renderer_[i]->SetDispatchGroup(0);
 	}
 
 	camera_.vpMatrix = vpMatrix;
@@ -80,7 +86,6 @@ void ParticlePool::CreateRenderer() {
 	renderer->SetGPUBuffer(pool_.particleNum, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(executeOffsetBuffer, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	renderer->SetDispatchGroup(1);
 	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Add);
 	renderer->SetDepthStencil(SHEngine::PSO::DepthStencilID::Transparent);
 }

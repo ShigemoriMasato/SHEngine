@@ -11,8 +11,7 @@ public:
 
 	virtual void Initialize(SHEngine::Engine* engine, const Pool& pool) = 0;
 
-	virtual void Update(CmdObj* compute, float deltaTime) = 0;
-	virtual void Draw(DCC* direct) = 0;
+	virtual void Update(CCC* compute, float deltaTime) = 0;
 
 	uint32_t GetMaxParticleNum() const { return maxParticleNum_; }
 

@@ -178,6 +178,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\WorldCursor.cpp" />
     <ClCompile Include="AppSource\Game\Camera\GameCamera.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Vertex\VertexEmitter.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\Animation.cpp" />
     <ClCompile Include="AppSource\Game\GameScene.cpp" />
     <ClCompile Include="AppSource\Game\KeyCoating\KeyCoating.cpp" />
@@ -273,10 +274,10 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\MeshRenderer.cpp" />
     <ClCompile Include="Engine\Render\PSO\PSOManagerForMS.cpp" />
     <ClCompile Include="Engine\Render\PSO\ShelfManager.cpp" />
-    <ClCompile Include="AppSource\Game\Effect\Model\VertexEmitter.cpp" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Game\Camera\GameCamera.h" />
+    <ClInclude Include="AppSource\Game\Effect\Vertex\VertexEmitter.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\Animation.h" />
     <ClInclude Include="AppSource\Game\GameScene.h" />
     <ClInclude Include="AppSource\Game\KeyCoating\KeyCoating.h" />
@@ -362,7 +363,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\MeshRenderer.h" />
     <ClInclude Include="Engine\Render\PSO\PSOManagerForMS.h" />
     <ClInclude Include="Engine\Render\PSO\ShelfManager.h" />
-    <ClInclude Include="AppSource\Game\Effect\Model\VertexEmitter.h" />
     <ClInclude Include="AppSource\Game\Effect\Base\IEmitter.h" />
   </ItemGroup>
   <ItemGroup>

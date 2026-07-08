@@ -169,7 +169,7 @@ namespace SHEngine::PSO {
 		 * @brief コンストラクタ
 		 * @param device D3D12デバイスポインタ
 		 */
-		RootSignatureShelf(ID3D12Device* device);
+		RootSignatureShelf(ID3D12Device2* device);
 
 		/**
 		 * @brief デストラクタ
@@ -202,7 +202,7 @@ namespace SHEngine::PSO {
 		 */
 		ID3D12RootSignature* CreateRootSignature(const RootSignatureConfig& config);
 
-		ID3D12Device* device_ = nullptr;  ///< D3D12デバイスポインタ
+		ID3D12Device2* device_ = nullptr;  ///< D3D12デバイスポインタ
 
 		std::map<RootSignatureConfig, ID3D12RootSignature*> rootSignatureMap_;  ///< ルートシグネチャのキャッシュマップ
 		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers_;  ///< サンプラー記述子のマップ

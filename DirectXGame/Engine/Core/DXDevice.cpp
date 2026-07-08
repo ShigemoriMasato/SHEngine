@@ -159,14 +159,29 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
     shaderSourceBuffer.Size = shaderSource->GetBufferSize();
     shaderSourceBuffer.Encoding = DXC_CP_UTF8;//utf8の文字コードであることを通知
 
+#ifdef SH_RELEASE
     LPCWSTR arguments[] = {
-        wFilePath.c_str(),	//コンパイル対象のhlslファイル名
-        L"-E", L"main",     //エントリーポイントの指定。基本的にmain以外にはしない
-        L"-T", profile.c_str(),    //ShaderProfileの設定
-        L"-Zi", L"-Qembed_debug", //デバッグ用の情報を埋め込む
-        L"-Od",     //最適化を行わない
-        L"-Zpr",     //メモリレイアウトは行優先
+        wFilePath.c_str(),	            //コンパイル対象のhlslファイル名
+        L"-E", L"main",                 //エントリーポイントの指定。基本的にmain以外にはしない
+        L"-T", profile.c_str(),         //ShaderProfileの設定
+        L"-Qstrip_debug",               //デバッグ情報を削除する
+        L"-Qstrip_reflect",             //リフレクション情報を削除する
+        L"-enable-16bit-types",         //16bit型を有効化する
+        L"-Zpr",                        //メモリレイアウトは行優先
+        L"-enable-16bit-types"          //16bit型を有効化する
     };
+#else
+    LPCWSTR arguments[] = {
+        wFilePath.c_str(),	            //コンパイル対象のhlslファイル名
+        L"-E", L"main",                 //エントリーポイントの指定。基本的にmain以外にはしない
+        L"-T", profile.c_str(),         //ShaderProfileの設定
+        L"-Zi",                         //デバッグ情報を生成する
+        L"-Qembed_debug",               //デバッグ用の情報をDXILに埋め込む
+        L"-O",                         //最適化を行わない
+        L"-Zpr",                        //メモリレイアウトは行優先
+        L"-enable-16bit-types"          //16bit型を有効化する
+    };
+#endif
     //実際にShaderをコンパイルする
     IDxcResult* shaderResult = nullptr;
     hr = dxcCompiler_->Compile(

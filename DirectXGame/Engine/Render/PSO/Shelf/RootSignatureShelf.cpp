@@ -3,7 +3,7 @@
 
 using namespace SHEngine::PSO;
 
-RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
+RootSignatureShelf::RootSignatureShelf(ID3D12Device2* device) {
 	logger_ = GetLogger("Engine");
 	device_ = device;
 	rootSignatureMap_.clear();

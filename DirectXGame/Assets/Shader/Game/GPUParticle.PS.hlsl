@@ -10,7 +10,7 @@ struct PSOutput
     float4 color : SV_TARGET;
 };
 
-StructuredBuffer<float4> colors : register(t0);
+StructuredBuffer<float16_t4> colors : register(t0);
 StructuredBuffer<uint> types : register(t1);
 
 PSOutput main(PSInput input)
