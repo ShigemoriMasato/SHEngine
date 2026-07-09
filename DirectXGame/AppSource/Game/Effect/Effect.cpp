@@ -11,8 +11,6 @@ void Effect::Initialize(SHEngine::Engine* engine) {
 	particlePool_->Initialize(int(50000000), compute_);
 
 	compute_->MiddleExecute();
-
-
 }
 
 void Effect::AddEmitter(IEmitter* emitter) {
@@ -28,10 +26,6 @@ void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix,
 	compute_->BeginTimeStamp("Particle Update");
 
 	compute_->EndTimeStamp();
-
-	//Queueに登録して実行
-	auto fence = compute_->MiddleExecute();
-	direct_->WaitFenceInGPU(fence);
 
 	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime);
 }

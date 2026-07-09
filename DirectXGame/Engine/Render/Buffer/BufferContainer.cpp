@@ -6,11 +6,12 @@ SHEngine::BufferContainer::~BufferContainer() {
 	}*/
 }
 
-void SHEngine::BufferContainer::Erase(GPUBuffer* buffer) {
+void SHEngine::BufferContainer::Erase(GPUBuffer*& buffer) {
 	std::unique_ptr<GPUBuffer> eraseBuffer;
 	for (auto& b : buffers_) {
 		if (b.get() == buffer) {
 			eraseList_.emplace_back(0, std::move(eraseBuffer));
+			buffer = nullptr;
 			return;
 		}
 	}

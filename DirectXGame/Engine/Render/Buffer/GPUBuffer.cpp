@@ -4,7 +4,16 @@
 
 SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num, BufferNum bufferNum) {
 	sizeInBytes_ = size * num;
+
+	auto HasBuffer = [&](BufferType t) noexcept -> bool {
+		return (bufferType_ & static_cast<uint8_t>(t)) != 0u;
+		};
+
 	UINT alignmentSize = (sizeInBytes_ + 255) & ~255;
+	//CBV以外はアライメントしない
+	if (!HasBuffer(BufferType::CBV)) {
+		alignmentSize = UINT(sizeInBytes_);
+	}
 
 	uint32_t castedBufferNum = uint32_t(bufferNum);
 	if (bufferNum == BufferNum::MatchSwapChain) {
@@ -52,10 +61,6 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num,
 			hr = bufferResource->Map(0, nullptr, &mapped);
 		}
 	}
-
-	auto HasBuffer = [&](BufferType t) noexcept -> bool {
-		return (bufferType_ & static_cast<uint8_t>(t)) != 0u;
-		};
 
 	assert(bufferType_ & 0b111);	//SRV/CBV/UAVのどれかが指定されていること
 

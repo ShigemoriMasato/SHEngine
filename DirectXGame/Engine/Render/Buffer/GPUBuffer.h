@@ -16,6 +16,8 @@ enum class BufferType : uint8_t {
 	Texture = 0b1000,
 	Texture2D = 0b1001,
 	DDSTexture = 0b1010,
+
+	ReadBack = 0b10000,
 };
 
 enum class BufferNum : uint8_t {
@@ -63,7 +65,7 @@ namespace SHEngine {
 			return resources_[currentIndex_ % resources_.size()].res.Get();
 		}
 
-	private:
+	protected:
 
 		friend class FrameCounter;
 		static void SetCurrentIndex(uint32_t frame) { currentIndex_ = frame; }

@@ -177,7 +177,7 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
         L"-T", profile.c_str(),         //ShaderProfileの設定
         L"-Zi",                         //デバッグ情報を生成する
         L"-Qembed_debug",               //デバッグ用の情報をDXILに埋め込む
-        L"-O",                         //最適化を行わない
+        L"-Od",                         //最適化を行わない
         L"-Zpr",                        //メモリレイアウトは行優先
         L"-enable-16bit-types"          //16bit型を有効化する
     };

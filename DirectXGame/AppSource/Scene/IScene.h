@@ -17,6 +17,7 @@ public:
 		modelManager_ = engine->GetModelManager();
 		drawDataManager_ = engine->GetDrawDataManager();
 		directContext_ = engine->GetDirectCommandContext();
+		computeContext_ = engine->GetComputeCommandContext();
 		input_ = engine->GetInput();
 		engine_ = engine;
 		commonData_ = commonData;
@@ -31,6 +32,7 @@ protected:
 	SHEngine::ModelManager* modelManager_ = nullptr;
 	SHEngine::DrawDataManager* drawDataManager_ = nullptr;
 	SHEngine::DirectCommandContext* directContext_ = nullptr;
+	SHEngine::ComputeCommandContext* computeContext_ = nullptr;
 
 	SHEngine::Input* input_ = nullptr;
 

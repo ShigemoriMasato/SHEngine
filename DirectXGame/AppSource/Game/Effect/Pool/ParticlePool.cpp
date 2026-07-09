@@ -6,8 +6,8 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
 	initialize_ = std::make_unique<SHEngine::ComputeObject>("Pool Init");
 	update_ = std::make_unique<SHEngine::ComputeObject>("Pool Update");
 
-	pool_.freeList = container_->Create(BufferType::UAV, sizeof(uint32_t), kMaxParticleNum, BufferNum::Single); // freeList
-	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(uint32_t), 1, BufferNum::Single); // freeListIndex
+	pool_.freeList = container_->Create(BufferType::UAV, sizeof(int), kMaxParticleNum, BufferNum::Single); // freeList
+	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(int), 1, BufferNum::Single); // freeListIndex
 
 	pool_.position = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum); // world
 	pool_.color = container_->Create(BufferType::SRV_UAV, sizeof(Vector4) / 2, kMaxParticleNum); // color(float16_t4)
@@ -21,7 +21,7 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
 	initialize_->SetShader("Particle/Pool/Initialize.CS.hlsl");
 	initialize_->SetGPUBuffers(BufferType::UAV, { pool_.freeList, pool_.freeListIndex, pool_.position });
 	initialize_->SetGPUBuffer(BufferType::CBV, pool_.particleNum);
-	initialize_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_);
+	initialize_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_ + 1);
 
 	initialize_->Execute(compute);
 
@@ -87,5 +87,5 @@ void ParticlePool::CreateRenderer() {
 	renderer->SetGPUBuffer(executeOffsetBuffer, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
 	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Add);
-	renderer->SetDepthStencil(SHEngine::PSO::DepthStencilID::Transparent);
+	renderer->SetDepthStencil(SHEngine::PSO::DepthStencilID::Default);
 }

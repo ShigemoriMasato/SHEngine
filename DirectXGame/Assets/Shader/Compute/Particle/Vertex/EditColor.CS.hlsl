@@ -1,10 +1,13 @@
-RWStructuredBuffer<float32_t3> positions : register(u0);
+RWStructuredBuffer<float16_t4> colors : register(u0);
 
 StructuredBuffer<uint32_t> indexList : register(t0);
-StructuredBuffer<float32_t3> vertexList : register(t1);
 
 cbuffer VertexNum : register(b0) {
     uint vertexNum;
+}
+
+cbuffer Color : register(b1) {
+    float32_t4 color;
 }
 
 [numthreads(128, 1, 1)]
@@ -13,5 +16,5 @@ void main(uint3 DTid : SV_DispatchThreadID) {
     if (index >= vertexNum) return;
 
     uint id = indexList[index];
-    positions[id] = vertexList[index];
+    colors[id] = float16_t4(color);
 }

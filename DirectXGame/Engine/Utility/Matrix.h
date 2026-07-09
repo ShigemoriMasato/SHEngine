@@ -3,7 +3,7 @@
 
 struct Matrix4x4 final {
 
-	static Matrix4x4 Identity() {
+	static constexpr Matrix4x4 Identity() {
 		return { 
 			1,0,0,0,
 			0,1,0,0,
@@ -82,7 +82,7 @@ struct Matrix4x4 final {
 		return mat;
 	}
 
-	Matrix4x4 Transpose() {
+	Matrix4x4 Transpose() const {
 		Matrix4x4 ans;
 		for (int i = 0; i < 4; ++i) {
 			for (int j = 0; j < 4; ++j) {

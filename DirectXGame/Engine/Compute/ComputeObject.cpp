@@ -18,6 +18,9 @@ void SHEngine::ComputeObject::StaticInitialize(PSO::CSPSOManager* psoManager, D3
 
 void ComputeObject::Initialize() {
 	gpuBuffers_.clear();
+	SetThreadGroupSize(1, 1, 1);
+	SetUseTexture(false);
+	SetSamplerID(0);
 }
 
 void SHEngine::ComputeObject::SetGPUBuffer(BufferType bufferType, GPUBuffer* buffer) {
