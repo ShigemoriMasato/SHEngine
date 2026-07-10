@@ -23,11 +23,8 @@ void Effect::AddEmitter(IEmitter* emitter) {
 void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
 	static Logger logger = GetLogger("Command");
 
-	compute_->BeginTimeStamp("Particle Update");
+	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime, compute_);
 
-	compute_->EndTimeStamp();
-
-	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime);
 }
 
 void Effect::Draw() {

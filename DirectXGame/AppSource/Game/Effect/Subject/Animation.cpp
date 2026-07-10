@@ -5,7 +5,9 @@ void Animation_Sub::Initialize(SHEngine::Engine* engine) {
 	auto mm = engine->GetModelManager();
 	auto ddm = engine->GetDrawDataManager();
 
-	modelData_ = mm->GetSkinningModelData(mm->LoadModel("SneekWalk"));
+	const std::string filePath = "SneekWalk";
+
+	modelData_ = mm->GetSkinningModelData(mm->LoadModel(filePath));
 	auto drawData = ddm->GetDrawData(modelData_.drawDataIndex);
 
 	renderer_ = std::make_unique<SHEngine::Renderer>(drawData);
@@ -20,7 +22,7 @@ void Animation_Sub::Initialize(SHEngine::Engine* engine) {
 	renderer_->SetGPUBuffer(wvpBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->SetGPUBuffer(boneBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
 
-	animation_ = mm->LoadAnimation("SneekWalk", 0);
+	animation_ = mm->LoadAnimation(filePath, 0);
 }
 
 void Animation_Sub::Update(float deltaTime, const Matrix4x4& vpMatrix) {

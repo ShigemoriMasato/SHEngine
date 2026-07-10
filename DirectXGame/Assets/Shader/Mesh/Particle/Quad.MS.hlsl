@@ -1,3 +1,5 @@
+static const uint THREAD_GROUP_SIZE = 64;
+
 struct VertexOutput
 {
     float4 position : SV_POSITION;
@@ -25,30 +27,41 @@ cbuffer ExecuteOffset : register(b3)
 };
 
 [outputtopology("triangle")]
-[numthreads(128, 1, 1)]
+[numthreads(THREAD_GROUP_SIZE, 1, 1)]
 void main(
-uint3 id : SV_DispatchThreadID,
-out vertices VertexOutput vertices[4], 
-out indices uint3 triangles[2]
+uint3 globalID : SV_DispatchThreadID,
+uint3 localID : SV_GroupThreadID,
+out vertices VertexOutput vertices[256], 
+out indices uint3 triangles[128]
 )
 {
-    int vertexCount = 4;
-    int primitiveCount = 2;
+    const int vertexCount = 4;
+    const int primitiveCount = 2;
     
-    uint threadID = id.x + executeOffset;
+    const uint threadID = globalID.x + executeOffset;
+    const uint vertexOffset = localID.x * vertexCount;
+    const uint triangleOffset = localID.x * primitiveCount;
 
-    float minValue = 1.175494351E-38;
+    SetMeshOutputCounts(vertexCount * THREAD_GROUP_SIZE, primitiveCount * THREAD_GROUP_SIZE);
     
-    if (threadID >= maxNum || positions[threadID].x == minValue || positions[threadID].y == minValue || positions[threadID].z == minValue)
-    {
-        vertexCount = 0;
-        primitiveCount = 0;
+    if(threadID >= maxNum) {
+        return;
     }
+
+    vertices[vertexOffset + 0].instanceID = threadID;
+    vertices[vertexOffset + 1].instanceID = threadID;
+    vertices[vertexOffset + 2].instanceID = threadID;
+    vertices[vertexOffset + 3].instanceID = threadID;
     
-    SetMeshOutputCounts(vertexCount, primitiveCount);
-    
-    if (vertexCount == 0)
-    {
+    triangles[triangleOffset + 0] = uint3(vertexOffset + 0, vertexOffset + 1, vertexOffset + 2);
+    triangles[triangleOffset + 1] = uint3(vertexOffset + 1, vertexOffset + 3, vertexOffset + 2);
+
+    static const float minValue = 1.175494351E-38;
+    if(positions[threadID].x == minValue && positions[threadID].y == minValue && positions[threadID].z == minValue) {
+        vertices[vertexOffset + 0].position = float4(0, 0, 0, 0);
+        vertices[vertexOffset + 1].position = float4(0, 0, 0, 0);
+        vertices[vertexOffset + 2].position = float4(0, 0, 0, 0);
+        vertices[vertexOffset + 3].position = float4(0, 0, 0, 0);
         return;
     }
     
@@ -62,16 +75,8 @@ out indices uint3 triangles[2]
                                 positions[threadID].x, positions[threadID].y, positions[threadID].z, 1);
     float4x4 world = mul(mul(scale, billboardMatrix), translate);
     float4x4 wvpMatrix = mul(world, vpMatrix);
-    vertices[0].position = mul(float4(-0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
-    vertices[1].position = mul(float4(0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
-    vertices[2].position = mul(float4(-0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
-    vertices[3].position = mul(float4(0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
-    
-    vertices[0].instanceID = threadID;
-    vertices[1].instanceID = threadID;
-    vertices[2].instanceID = threadID;
-    vertices[3].instanceID = threadID;
-    
-    triangles[0] = uint3(0, 1, 2);
-    triangles[1] = uint3(1, 3, 2);
+    vertices[vertexOffset + 0].position = mul(float4(-0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
+    vertices[vertexOffset + 1].position = mul(float4(0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
+    vertices[vertexOffset + 2].position = mul(float4(-0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
+    vertices[vertexOffset + 3].position = mul(float4(0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
 }

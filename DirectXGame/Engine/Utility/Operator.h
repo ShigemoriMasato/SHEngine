@@ -79,7 +79,6 @@ Matrix4x4 operator/(const Matrix4x4& a, const Matrix4x4& b);
 Matrix4x4 operator+=(Matrix4x4& a, const Matrix4x4& b);
 Matrix4x4 operator-=(Matrix4x4& a, const Matrix4x4& b);
 Matrix4x4 operator*=(Matrix4x4& a, const Matrix4x4& b);
-Matrix4x4 operator*=(Matrix4x4& a, const Matrix4x4& b);
 Matrix4x4 operator/=(Matrix4x4& a, const Matrix4x4& b);
 bool operator==(const Matrix4x4& a, const Matrix4x4& b);
 bool operator!=(const Matrix4x4& a, const Matrix4x4& b);

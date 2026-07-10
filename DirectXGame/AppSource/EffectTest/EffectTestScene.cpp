@@ -1,5 +1,9 @@
 #include "EffectTestScene.h"
 
+namespace {
+	std::string filePath = "WaterPlane";
+}
+
 void EffectTestScene::Initialize() {
 	camera_.Initialize(input_);
 
@@ -12,10 +16,8 @@ void EffectTestScene::Initialize() {
 	vertexEmitter_ = std::make_unique<VertexEmitter>();
 	effect_->AddEmitter(vertexEmitter_.get());
 
-	auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel("WaterPlane"));
+	auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel(filePath));
 	vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
-
-	readBackBuffer_ = std::make_unique<SHEngine::ReadBackBuffer>(sizeof(uint32_t) * model.positions.size());
 
 	postEffect_ = std::make_unique<PostEffect>();
 	postEffect_->Initialize(textureManager_, drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex), true);
@@ -31,33 +33,15 @@ void EffectTestScene::Initialize() {
 std::unique_ptr<IScene> EffectTestScene::Update() {
 	camera_.Update();
 
+	computeContext_->BeginTimeStamp("Particle Update");
+
 	grid_->Update(camera_.GetCenter(), camera_.GetVPMatrix());
 
-	static auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel("WaterPlane"));
-	vertexEmitter_->EditPosition(0, model.positions, computeContext_);
-	vertexEmitter_->EditColor(0, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
-
-	vertexEmitter_->CopyIndexList(0, readBackBuffer_.get(), computeContext_);
+	static auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel(filePath));
 
 	effect_->Update(camera_.GetVPMatrix(), camera_.GetBillboardMatrix(), engine_->GetDeltaTime());
 
-	void* rawdata = readBackBuffer_->GetData(computeContext_);
-
-	std::vector<uint32_t> indices(model.positions.size());
-	std::memcpy(indices.data(), rawdata, sizeof(uint32_t) * model.positions.size());
-
-	if (indices[1] > 0) {
-		static bool isFirst = true;
-		if (isFirst) {
-			isFirst = false;
-			static Logger logger = GetLogger("IndexList");
-			std::string log = "";
-			for (const auto& i : indices) {
-				log += std::to_string(i) + ",";
-			}
-			logger->info("Indices: {}", log.c_str());
-		}
-	}
+	computeContext_->EndTimeStamp();
 
 	return std::unique_ptr<IScene>();
 }

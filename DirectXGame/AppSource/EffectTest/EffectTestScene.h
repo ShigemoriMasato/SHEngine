@@ -29,7 +29,6 @@ private:
 	PostEffectConfig peConfig_{};
 
 	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
-	std::unique_ptr<SHEngine::ReadBackBuffer> readBackBuffer_ = nullptr;
 
 	std::unique_ptr<Grid> grid_ = nullptr;
 };

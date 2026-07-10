@@ -19,7 +19,7 @@ public:
 	void Initialize(const int kMaxParticleNum, CCC* compute);
 
 	//全てのWorldMatrixにcamera行列をかけて、GPUに転送する
-	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime);
+	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime, CCC* compute);
 
 	//パーティクルの描画
 	void Draw(DCC* cmdObj);
@@ -42,6 +42,8 @@ private:
 
 	SHEngine::GPUBuffer* vpMatrixBuffer_ = nullptr;
 	SHEngine::GPUBuffer* sizeBuffer_ = nullptr;
+	SHEngine::GPUBuffer* positions_ = nullptr;
+	SHEngine::GPUBuffer* colors_ = nullptr;
 	Pool pool_{};
 
 	std::vector<std::unique_ptr<SHEngine::MeshRenderer>> renderer_;
