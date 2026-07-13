@@ -22,7 +22,7 @@ namespace SHEngine::Screen {
 
 		void CreateDepthTexture(TextureManager* textureManager);
 		void AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor);
-		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8, bool unordered = false);
+		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R16G16B16A16, bool unordered = false);
 
 		/// @brief ViewPortを設定する
 		/// @param cmdObject コマンドオブジェクト

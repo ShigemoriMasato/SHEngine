@@ -34,7 +34,7 @@ void EffectTestScene::Initialize() {
 
 	unorderedTest_ = std::make_unique<SHEngine::Screen::Display>();
 	unorderedTest_->Initialize(1280, 720, "Unordered Test");
-	unorderedTest_->AddRenderTarget(textureManager_, 0x000000ff, SHEngine::Format::R8G8B8A8, true);
+	unorderedTest_->AddRenderTarget(textureManager_, 0x000000ff, SHEngine::Format::R16G16B16A16, true);
 
 	auto unorderedTestTexture = unorderedTest_->GetTextureData();
 	auto utBuffer = container_->Create(unorderedTestTexture);

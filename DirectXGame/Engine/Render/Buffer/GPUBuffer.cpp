@@ -125,10 +125,10 @@ SHEngine::GPUBuffer::GPUBuffer(TextureData* textureData) {
 	sizeInBytes_ = 0;
 	bufferType_ = uint8_t(BufferType::SRV);
 
-	descriptorHandles_[BufferType(bufferType_)].push_back(textureData->GetGPUHandle());
+	descriptorHandles_[BufferType(bufferType_)].push_back(textureData->GetSRVHandle());
 	if (textureData->IsUnordered()) {
 		bufferType_ |= uint8_t(BufferType::UAV);
-		descriptorHandles_[BufferType::UAV].push_back(textureData->GetGPUHandle());
+		descriptorHandles_[BufferType::UAV].push_back(textureData->GetUAVHandle());
 	}
 
 	//リソースはTextureDataが管理しているものを使うので、ここではダミーのリソースを作っておく
@@ -184,6 +184,10 @@ void SHEngine::GPUBuffer::TransitionBarrier(ShaderType shaderType, BufferType bu
 	};
 
 	nextState_ = states.at(shaderType).at(bufferType);
+}
+
+void SHEngine::GPUBuffer::TransitionBarrier(D3D12_RESOURCE_STATES nextState) {
+	nextState_ = nextState;
 }
 
 void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {

@@ -7,6 +7,8 @@ void SHEngine::Text::Initialize(DrawData& planeDrawData, const std::string& font
 	fontPath_ = fontPath;
 	fontSize_ = fontSize;
 
+	container_ = std::make_unique<BufferContainer>(4);
+
 	matrixBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4) * 2);
 	charPositionBuffer_ = container_->Create(BufferType::SRV, sizeof(CharPosition), maxCharNum_);
 	textureIndexBuffer_ = container_->Create(BufferType::CBV, sizeof(int));

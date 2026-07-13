@@ -149,7 +149,7 @@ void SHEngine::Screen::Display::DrawImGui() {
 		}
 		ImVec2 imageSize = ImVec2(width_ * ratio, height_ * ratio);
 
-		ImGui::Image(ImTextureRef(textureData_[i]->GetGPUHandle().ptr), imageSize);
+		ImGui::Image(ImTextureRef(textureData_[i]->GetSRVHandle().ptr), imageSize);
 		ImGui::End();
 	}
 
@@ -177,7 +177,7 @@ const ImGuiPayload* SHEngine::Screen::Display::DrawImGuiWithDD(std::string key) 
 		}
 		ImVec2 imageSize = ImVec2(width_ * ratio, height_ * ratio);
 
-		ImGui::Image(ImTextureRef(textureData_[i]->GetGPUHandle().ptr), imageSize);
+		ImGui::Image(ImTextureRef(textureData_[i]->GetSRVHandle().ptr), imageSize);
 
 		if (i == 0) {
 

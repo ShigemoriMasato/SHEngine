@@ -2,8 +2,16 @@
 #include <Render/Screen/IDisplay.h>
 
 void SHEngine::MeshRenderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType) {
-	if (shaderType == ShaderType::COMPUTE_SHADER || shaderType == ShaderType::VERTEX_SHADER) {
-		logger_->info("MeshRenderer::SetGPUBuffer: ComputeShader or VertexShader is not supported. Use Renderer instead.");
+	if (shaderType != ShaderType::MESH_SHADER && shaderType != ShaderType::PIXEL_SHADER) {
+		logger_->info("MeshRenderer::SetGPUBuffer: This Shader is not supported.");
+		return;
+	}
+	if (uint8_t(bufferType) & (uint8_t(bufferType) - 1)) {
+		logger_->error("MeshRenderer::SetGPUBuffer: Invalid BufferType. Must be CBV, SRV, or UAV.");
+		return;
+	}
+	if (bufferType == BufferType::ReadBack) {
+		logger_->error("MeshRenderer::SetGPUBuffer: ReadBack BufferType is not supported.");
 		return;
 	}
 
@@ -11,6 +19,16 @@ void SHEngine::MeshRenderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shade
 	rootParamConfig.shader = shaderType;
 	rootParamConfig.registerNumber = registerCount_[shaderType][bufferType]++;
 	rootParamConfig.bufferType = bufferType;
+
+	auto& bufferConfig = bufferConfigs_.emplace_back();
+	bufferConfig.buffer = gpuBuffer;
+	bufferConfig.shader = shaderType;
+	bufferConfig.type = bufferType;
+
+	if (shaderType == ShaderType::PIXEL_SHADER && gpuBuffer->GetBufferType() & BufferType::UAV) {
+		logger_->info("MeshRenderer::SetGPUBuffer: UAV is set in PixelShader. It will be transitioned to Common after Draw.");
+		uavBuffers_.push_back(gpuBuffer);
+	}
 }
 
 void SHEngine::MeshRenderer::SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType) {
@@ -23,8 +41,18 @@ void SHEngine::MeshRenderer::ResetGPUBuffers() {
 }
 
 void SHEngine::MeshRenderer::EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer) {
-	auto& buffers = gpuBuffers_[bufferType][shaderType];
-	buffers.erase(std::remove(buffers.begin(), buffers.end(), gpuBuffer), buffers.end());
+	int i = 0;
+	for (int i = 0; i < bufferConfigs_.size(); ++i) {
+		if (bufferConfigs_[i].buffer == gpuBuffer && bufferConfigs_[i].shader == shaderType && bufferConfigs_[i].type == bufferType) {
+			bufferConfigs_.erase(bufferConfigs_.begin() + i);
+			psoConfig_.rootConfig.rootParams.erase(psoConfig_.rootConfig.rootParams.begin() + i);
+			break;
+		}
+	}
+
+	if (i == bufferConfigs_.size()) {
+		logger_->warn("MeshRenderer::EraseGPUBuffer: GPUBuffer not found.");
+	}
 }
 
 void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
@@ -48,35 +76,14 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 	psoEditor_->SetPSO(psoConfig_, cmdList);
 
 	int rootIndex = 0;
-	for (const auto& cbv : gpuBuffers_[BufferType::CBV][ShaderType::PIXEL_SHADER]) {
-		cbv->TransitionBarrier(D3D12_RESOURCE_STATE_GENERIC_READ);
-		cbv->Flush(cmdList);
-		cmdList->SetGraphicsRootConstantBufferView(rootIndex++, cbv->GetGPUDescriptorHandle(BufferType::CBV).ptr);
-	}
-	for (const auto& cbv : gpuBuffers_[BufferType::CBV][ShaderType::MESH_SHADER]) {
-		cbv->TransitionBarrier(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-		cbv->Flush(cmdList);
-		cmdList->SetGraphicsRootConstantBufferView(rootIndex++, cbv->GetGPUDescriptorHandle(BufferType::CBV).ptr);
-	}
-	for (const auto& srv : gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER]) {
-		srv->TransitionBarrier(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-		srv->Flush(cmdList);
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, srv->GetGPUDescriptorHandle(BufferType::SRV));
-	}
-	for (const auto& srv : gpuBuffers_[BufferType::SRV][ShaderType::MESH_SHADER]) {
-		srv->TransitionBarrier(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-		srv->Flush(cmdList);
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, srv->GetGPUDescriptorHandle(BufferType::SRV));
-	}
-	for (const auto& uav : gpuBuffers_[BufferType::UAV][ShaderType::PIXEL_SHADER]) {
-		uav->TransitionBarrier(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-		uav->Flush(cmdList);
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, uav->GetGPUDescriptorHandle(BufferType::UAV));
-	}
-	for (const auto& uav : gpuBuffers_[BufferType::UAV][ShaderType::MESH_SHADER]) {
-		uav->TransitionBarrier(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-		uav->Flush(cmdList);
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, uav->GetGPUDescriptorHandle(BufferType::UAV));
+	for (auto& config : bufferConfigs_) {
+		config.buffer->TransitionBarrier(config.shader, config.type);
+		config.buffer->Flush(cmdList);
+		if (config.type == BufferType::CBV) {
+			cmdList->SetGraphicsRootConstantBufferView(rootIndex++, config.buffer->GetGPUDescriptorHandle(config.type).ptr);
+		} else  {
+			cmdList->SetGraphicsRootDescriptorTable(rootIndex++, config.buffer->GetGPUDescriptorHandle(config.type));
+		}
 	}
 
 	if (psoConfig_.rootConfig.useTexture) {
@@ -85,13 +92,9 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 
 	cmdList->DispatchMesh(groupX_, groupY_, groupZ_);
 
-	//SRVのなかで、UAVが含まれるPSResourceはCommonに直しておく
-	for (const auto& srvs : gpuBuffers_[BufferType::SRV]) {
-		for (const auto& srv : srvs.second) {
-			if (srv->GetBufferType() & uint8_t(BufferType::UAV)) {
-				srv->TransitionBarrier(D3D12_RESOURCE_STATE_COMMON);
-				srv->Flush(cmdList);
-			}
-		}
+	//UAVが含まれるPSResourceはCommonに直しておく
+	for (auto& uavBuffer : uavBuffers_) {
+		uavBuffer->TransitionBarrier(D3D12_RESOURCE_STATE_COMMON);
+		uavBuffer->Flush(cmdList);
 	}
 }

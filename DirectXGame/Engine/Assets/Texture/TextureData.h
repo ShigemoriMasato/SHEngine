@@ -11,7 +11,7 @@ namespace SHEngine {
 
 	enum class Format : uint32_t {
 		R8,
-		R8G8B8A8,
+		R16G16B16A16,
 	};
 
 	class TextureData {
@@ -29,7 +29,8 @@ namespace SHEngine {
 		void Release();
 
 		int GetHandle() const { return srvHandle_.GetHandle(); }
-		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return srvHandle_.GetGPU(); }
+		D3D12_GPU_DESCRIPTOR_HANDLE GetSRVHandle() const { return srvHandle_.GetGPU(); }
+		D3D12_GPU_DESCRIPTOR_HANDLE GetUAVHandle() const { return uavHandle_.GetGPU(); }
 		ID3D12Resource* GetResource() const { return textureResource_.Get(); }
 		std::pair<uint32_t, uint32_t> GetSize() const { return { width_, height_ }; }
 		Vector4 GetClearColor() const { return clearColor_; }
@@ -60,6 +61,7 @@ namespace SHEngine {
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_ = nullptr;
 
 		SRVHandle srvHandle_{};
+		SRVHandle uavHandle_{};
 		Vector4 clearColor_{};
 
 		Type type_ = Type::Normal;

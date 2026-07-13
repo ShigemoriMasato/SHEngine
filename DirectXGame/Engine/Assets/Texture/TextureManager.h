@@ -62,7 +62,7 @@ namespace SHEngine {
 		 * @param clearColor クリアカラー
 		 * @return テクスチャハンドル
 		 */
-		int CreateWindowTexture(uint32_t width, uint32_t height, uint32_t clearColor, Format format = Format::R8G8B8A8, bool unordered = false);
+		int CreateWindowTexture(uint32_t width, uint32_t height, uint32_t clearColor, Format format = Format::R16G16B16A16, bool unordered = false);
 
 		/**
 		 * @brief スワップチェーン用テクスチャを作成

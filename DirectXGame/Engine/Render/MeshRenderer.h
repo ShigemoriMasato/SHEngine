@@ -71,6 +71,9 @@ namespace SHEngine {
 		std::vector<BufferConfig> bufferConfigs_;
 		RegisterCounter registerCount_;
 
+		// @brief UAVが含まれているBufferのリスト。描画後、CCCでバリアを張り替えられるようにCommonに変えるために保持する
+		std::vector<GPUBuffer*> uavBuffers_;
+
 		// @brief Dispatchするインスタンスの数
 		uint32_t groupX_ = 1;
 		uint32_t groupY_ = 1;

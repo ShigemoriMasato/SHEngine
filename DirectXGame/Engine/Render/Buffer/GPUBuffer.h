@@ -34,6 +34,8 @@ namespace SHEngine {
 		virtual void CopyBuffer(const void* data, size_t dataSize);
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
 		void TransitionBarrier(ShaderType shaderType, BufferType bufferType);
+		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
+		void TransitionBarrier(D3D12_RESOURCE_STATES nextState);
 		// @brief GPUBufferの状態を実際にGPUへ反映させる。
 		void Flush(ID3D12GraphicsCommandList* cmdList);
 

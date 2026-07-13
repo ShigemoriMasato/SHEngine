@@ -74,8 +74,8 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 	case Format::R8:
 		dxgiformat = DXGI_FORMAT_R8_UNORM;
 		break;
-	case Format::R8G8B8A8:
-		dxgiformat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	case Format::R16G16B16A16:
+		dxgiformat = DXGI_FORMAT_R16G16B16A16_UNORM;
 		break;
 	}
 
@@ -107,24 +107,20 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 		clearValue.Color[i] = clearColor[i];
 	}
 
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProps, D3D12_HEAP_FLAG_NONE,
-		&desc,
-		D3D12_RESOURCE_STATE_COMMON,
-		&clearValue,
-		IID_PPV_ARGS(&textureResource_)
-	);
+	HRESULT hr = device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc, 
+		D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&textureResource_));
 	assert(SUCCEEDED(hr) && "Failed to create off-screen resource");
 
 	clearColor_ = clearColor;
 
 	// metadataがないのでフォーマットとミップ数は手動設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	srvDesc.Format = dxgiformat;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	//!mipmapを使うかどうかは今後要検討
 	srvDesc.Texture2D.MipLevels = 1;
+
 
 	// SRV用ディスクリプタ位置を確保
 	srvHandle_.UpdateHandle(srvManager, 0);
@@ -136,6 +132,19 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 	height_ = height;
 
 	textureResource_->SetName(LPCWSTR(ConvertString("WindowTexture : " + std::to_string(debugTextureCount++)).c_str()));
+
+	if (unordered) {
+		// UAVの作成
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+		uavDesc.Format = dxgiformat;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+		uavDesc.Texture2D.MipSlice = 0;
+		uavDesc.Texture2D.PlaneSlice = 0;
+		// UAV用ディスクリプタ位置を確保
+		uavHandle_.UpdateHandle(srvManager, 0);
+		// UAVを作成
+		device->CreateUnorderedAccessView(textureResource_.Get(), nullptr, &uavDesc, uavHandle_.GetCPU());
+	}
 }
 
 void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager, uint32_t clearColor) {

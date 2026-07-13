@@ -67,7 +67,18 @@ namespace SHEngine {
 		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
 
 		DrawData drawData_;
-		std::map<BufferType, std::map<ShaderType, std::vector<GPUBuffer*>>> gpuBuffers_;
+
+		struct BufferConfig {
+			BufferType type;
+			ShaderType shader;
+			GPUBuffer* buffer;
+		};
+		std::vector<BufferConfig> bufferConfigs_;
+		RegisterCounter registerCount_;
+
+		// @brief UAVが含まれているBufferのリスト。描画後、CCCでバリアを張り替えられるようにCommonに変えるために保持する
+		std::vector<GPUBuffer*> uavBuffers_;
+
 
 	};
 

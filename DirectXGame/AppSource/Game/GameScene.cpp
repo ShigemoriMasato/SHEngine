@@ -155,7 +155,7 @@ void GameScene::Draw() {
 	tetris_->DrawImGui();
 	gameCamera_->DrawImGui();
 	timeViewer_->DrawImGui();
-	auto depthPtr = commonData_->display->GetDepthTexture()->GetGPUHandle().ptr;
+	auto depthPtr = commonData_->display->GetDepthTexture()->GetSRVHandle().ptr;
 	ImGui::Begin("Depth");
 	ImGui::Image(ImTextureRef(depthPtr), ImVec2(1280 / 4, 720 / 4));
 	ImGui::End();
