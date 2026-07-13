@@ -45,7 +45,7 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 	blockRenderer_->SetGPUBuffer(vsBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
 	blockRenderer_->SetGPUBuffer(psBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
 	blockRenderer_->SetGPUBuffer(colorMapBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	blockRenderer_->SetGPUBuffer(ddsBuffer, ShaderType::PIXEL_SHADER, BufferType::DDSTexture);
+	blockRenderer_->SetGPUBuffer(ddsBuffer, ShaderType::PIXEL_SHADER, BufferType::SRV);
 
 	blockRenderer_->instanceNum_ = blockNum;
 

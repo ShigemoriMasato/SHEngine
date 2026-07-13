@@ -123,9 +123,14 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num,
 
 SHEngine::GPUBuffer::GPUBuffer(TextureData* textureData) {
 	sizeInBytes_ = 0;
-	bufferType_ = uint8_t(textureData->GetType() == TextureData::Type::Normal ? BufferType::Texture2D : BufferType::DDSTexture);
+	bufferType_ = uint8_t(BufferType::SRV);
 
 	descriptorHandles_[BufferType(bufferType_)].push_back(textureData->GetGPUHandle());
+	if (textureData->IsUnordered()) {
+		bufferType_ |= uint8_t(BufferType::UAV);
+		descriptorHandles_[BufferType::UAV].push_back(textureData->GetGPUHandle());
+	}
+
 	//リソースはTextureDataが管理しているものを使うので、ここではダミーのリソースを作っておく
 	resources_.resize(1);
 }
@@ -149,8 +154,36 @@ void SHEngine::GPUBuffer::CopyBuffer(const void* data, size_t dataSize) {
 	nextData_.assign(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data) + dataSize);
 }
 
-void SHEngine::GPUBuffer::TransitionBarrier(D3D12_RESOURCE_STATES after) {
-	nextState_ = after;
+void SHEngine::GPUBuffer::TransitionBarrier(ShaderType shaderType, BufferType bufferType) {
+	static const std::unordered_map<ShaderType, std::unordered_map<BufferType, D3D12_RESOURCE_STATES>> states = {
+		{
+			ShaderType::VERTEX_SHADER, {
+				{BufferType::CBV, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER},
+				{BufferType::SRV, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE},
+				{BufferType::UAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS}
+			}
+		}, {
+			ShaderType::PIXEL_SHADER, {
+				{BufferType::CBV, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE},
+				{BufferType::SRV, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE},
+				{BufferType::UAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS}
+			}
+		}, {
+			ShaderType::COMPUTE_SHADER, {
+				{BufferType::CBV, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER},
+				{BufferType::SRV, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE},
+				{BufferType::UAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS}
+			}
+		}, {
+			ShaderType::MESH_SHADER, {
+				{BufferType::CBV, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER},
+				{BufferType::SRV, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE},
+				{BufferType::UAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS}
+			}
+		}
+	};
+
+	nextState_ = states.at(shaderType).at(bufferType);
 }
 
 void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
@@ -161,7 +194,9 @@ void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 	}
 
 	//同じだった場合の処理と過去の状態の更新は関数内に含まれている
-	Func::InsertBarrier(cmdList, nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
+	if (resources_[bufferIndex].res) {
+		Func::InsertBarrier(cmdList, nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
+	}
 }
 
 BufferType operator|(BufferType a, BufferType b) {

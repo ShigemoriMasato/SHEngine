@@ -1,5 +1,6 @@
 #include "Title.h"
 #include <imgui/imgui.h>
+#include <Utility/Color.h>
 
 using namespace SHEngine;
 
@@ -8,13 +9,6 @@ Title::~Title() {
 }
 
 void Title::Initialize(DrawData& drawData, Camera* camera) {
-	renderObject_ = std::make_unique<RenderObject>("Title");
-	renderObject_->Initialize();
-	renderObject_->psoConfig_.vs = "Game/Block.VS.hlsl";
-	renderObject_->psoConfig_.ps = "Game/Block.PS.hlsl";
-	renderObject_->SetDrawData(drawData);
-	renderObject_->CreateSRV(sizeof(VSData), 1, ShaderType::VERTEX_SHADER, "Title::VSData");
-	renderObject_->instanceNum_ = 1;
 	camera_ = camera;
 
 	isLighting_ = false;
@@ -35,12 +29,9 @@ void Title::Update(float deltaTime) {
 	data.vp = camera_->GetVPMatrix();
 	data.color = isLighting_ ? lightColor_ : darkColor_;
 	data.outlineColor = outlineColor_;
-
-	renderObject_->CopyBufferData(0, &data, sizeof(VSData));
 }
 
 void Title::Draw(DCC* cmdObj) {
-	renderObject_->Draw(cmdObj);
 }
 
 void Title::DrawImGui() {

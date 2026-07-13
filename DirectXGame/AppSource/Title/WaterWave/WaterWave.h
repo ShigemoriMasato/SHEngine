@@ -1,5 +1,5 @@
 #pragma once
-#include <Render/RenderObject.h>
+#include <Render/Renderer.h>
 
 class WaterWave {
 public:
@@ -45,7 +45,13 @@ private:
 		float intensity;
 	};
 
-	std::unique_ptr<SHEngine::RenderObject> renderObject_ = nullptr;
+	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
+	std::unique_ptr<SHEngine::Renderer> renderer_ = nullptr;
+
+	SHEngine::GPUBuffer* uniqueBuffer_ = nullptr;
+	SHEngine::GPUBuffer* lightBuffer_ = nullptr;
+	SHEngine::GPUBuffer* baseColorBuffer_ = nullptr;
+
 	UniqueData uniqueData_{};
 	DirectionalLight light_{};
 	Vector4 baseColor_ = { 0.0f, 0.3f, 0.5f, 1.0f };

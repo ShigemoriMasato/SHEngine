@@ -6,6 +6,22 @@
 #include <Tool/Logger/Logger.h>
 #include "ShaderShelf.h"
 
+enum class BufferType : uint8_t {
+	CBV = 1 << 0,
+	SRV = 1 << 1,
+	UAV = 1 << 2,
+
+	CBV_SRV = 0b011,
+	//CBV_UAV = 0b101,		使えないやつ
+	SRV_UAV = 0b110,
+	//CBV_SRV_UAV = 0b111,	使えないやつ
+
+	ReadBack = 0b10000,
+};
+
+uint8_t operator&(uint8_t a, BufferType b);
+uint8_t operator~(BufferType a);
+
 namespace SHEngine::PSO {
 
 	/**
@@ -35,44 +51,14 @@ namespace SHEngine::PSO {
 		ClampClamp_MinMagNearest = 1 << 13,  ///< S座標・T座標共に
 	};
 
-	/**
-	 * @brief SamplerIDのビットOR演算子
-	 * @param a 左オペランド
-	 * @param b 右オペランド
-	 * @return ビットORの結果
-	 */
 	uint32_t operator|(SamplerID a, SamplerID b);
-
-	/**
-	 * @brief uint32_tとSamplerIDのビットOR演算子
-	 * @param a 左オペランド（uint32_t型）
-	 * @param b 右オペランド（SamplerID型）
-	 * @return ビットORの結果
-	 */
 	uint32_t operator|(uint32_t a, SamplerID b);
-
-	/**
-	 * @brief SamplerIDの比較演算子
-	 * @param a 左オペランド
-	 * @param b 右オペランド
-	 * @return a < bの結果
-	 */
 	bool operator<(SamplerID a, SamplerID b);
 
-	struct PartitionShader {
-		int vertex = 0;
-		int pixel = 0;
-		int compute = 0;
-		int mesh = 0;
-		bool operator==(const PartitionShader& other) const {
-			return vertex == other.vertex && pixel == other.pixel && compute == other.compute && mesh == other.mesh;
-		}
-		bool operator<(const PartitionShader& other) const {
-			if (vertex != other.vertex) return vertex < other.vertex;
-			if (pixel != other.pixel) return pixel < other.pixel;
-			if (compute != other.compute) return compute < other.compute;
-			return mesh < other.mesh;
-		}
+	struct RootParam {
+		ShaderType shader;
+		int registerNumber;
+		BufferType bufferType;
 	};
 
 	/**
@@ -83,76 +69,16 @@ namespace SHEngine::PSO {
 	 * テクスチャ、サンプラーの設定をまとめた構造体。
 	 */
 	struct RootSignatureConfig {
-		PartitionShader cbvNums{};                         ///< 定数バッファ数<Vertex, Pixel>
-		PartitionShader srvNums{};                         ///< シェーダーリソース数<Vertex, Pixel>（上限8）
-		PartitionShader uavNums{};
-		PartitionShader textureNums{};
-		PartitionShader ddsNums{};
+		std::vector<RootParam> rootParams;                      ///< ルートパラメータのリスト
+
 		bool useTexture = false;                                ///< テクスチャ配列を使用するか
 		uint32_t samplers = uint32_t(SamplerID::Default);        ///< サンプラーIDのビットマスク
 
-		/**
-		 * @brief 比較演算子（less than）
-		 * @param other 比較対象
-		 * @return この設定が他の設定より小さい場合true
-		 */
 		bool operator<(const RootSignatureConfig& other) const;
-
-		/**
-		 * @brief 等価演算子
-		 * @param other 比較対象
-		 * @return この設定が他の設定と等しい場合true
-		 */
 		bool operator==(const RootSignatureConfig& other) const;
 	};
 
 } // namespace SHEngine
-
-namespace std {
-	template<>
-	struct hash<SHEngine::PSO::PartitionShader> {
-		size_t operator()(const SHEngine::PSO::PartitionShader& cfg) const {
-			size_t h = 0;
-			hash_combine(h, hash<int>()(cfg.vertex));
-			hash_combine(h, hash<int>()(cfg.pixel));
-			hash_combine(h, hash<int>()(cfg.compute));
-			hash_combine(h, hash<int>()(cfg.mesh));
-			return h;
-		}
-	private:
-		static void hash_combine(size_t& seed, size_t value) {
-			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-		}
-	};
-
-	template<>
-	struct hash<SHEngine::PSO::RootSignatureConfig> {
-		/**
-		* @brief ハッシュ値を計算
-		* @param cfg ハッシュ計算対象の設定
-		* @return 計算されたハッシュ値
-		*/
-		size_t operator()(const SHEngine::PSO::RootSignatureConfig& cfg) const {
-			size_t h = 0;
-			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.cbvNums));
-			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.srvNums));
-			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.uavNums));
-			hash_combine(h, hash<SHEngine::PSO::PartitionShader>()(cfg.textureNums));
-			hash_combine(h, hash<bool>()(cfg.useTexture));
-			hash_combine(h, hash<uint32_t>()(cfg.samplers));
-			return h;
-		}
-	private:
-		/**
-		 * @brief ハッシュ値を結合
-		 * @param seed 既存のハッシュ値
-		 * @param value 結合する値
-		 */
-		static void hash_combine(size_t& seed, size_t value) {
-			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-		}
-	};
-}
 
 namespace SHEngine::PSO {
 	/**
@@ -165,15 +91,8 @@ namespace SHEngine::PSO {
 	class RootSignatureShelf {
 	public:
 
-		/**
-		 * @brief コンストラクタ
-		 * @param device D3D12デバイスポインタ
-		 */
 		RootSignatureShelf(ID3D12Device2* device);
 
-		/**
-		 * @brief デストラクタ
-		 */
 		~RootSignatureShelf();
 
 		/**
@@ -212,3 +131,41 @@ namespace SHEngine::PSO {
 	};
 
 } // namespace SHEngine
+
+
+
+
+
+// unordered_mapで使用するハッシュ関数たち
+namespace std {
+	template<>
+	struct hash<SHEngine::PSO::RootParam> {
+		size_t operator()(const SHEngine::PSO::RootParam& param) const {
+			size_t h = 0;
+			hash_combine(h, hash<int>()(param.registerNumber));
+			hash_combine(h, hash<uint8_t>()(uint8_t(param.bufferType)));
+			return h;
+		}
+	private:
+		static void hash_combine(size_t& seed, size_t value) {
+			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		}
+	};
+
+	template<>
+	struct hash<SHEngine::PSO::RootSignatureConfig> {
+		size_t operator()(const SHEngine::PSO::RootSignatureConfig& cfg) const {
+			size_t h = 0;
+			for (const auto& param : cfg.rootParams) {
+				hash_combine(h, hash<SHEngine::PSO::RootParam>()(param));
+			}
+			hash_combine(h, hash<bool>()(cfg.useTexture));
+			hash_combine(h, hash<uint32_t>()(cfg.samplers));
+			return h;
+		}
+	private:
+		static void hash_combine(size_t& seed, size_t value) {
+			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		}
+	};
+}

@@ -126,10 +126,10 @@ int TextureManager::LoadTexture(const std::string& filePath) {
 	return offset;
 }
 
-int TextureManager::CreateWindowTexture(uint32_t width, uint32_t height, uint32_t clearColor, Format format) {
+int TextureManager::CreateWindowTexture(uint32_t width, uint32_t height, uint32_t clearColor, Format format, bool unordered) {
 	auto textureData = std::make_unique<TextureData>();
 	Vector4 clearColorVec = ConvertColor(clearColor);
-	textureData->Create(width, height, clearColorVec, format, device_->GetDevice(), srvManager_);
+	textureData->Create(width, height, clearColorVec, format, unordered, device_->GetDevice(), srvManager_);
 	int offset = textureData->GetHandle();
 	textureData->textureManager_ = this;
 	textureDataList_[offset] = std::move(textureData);

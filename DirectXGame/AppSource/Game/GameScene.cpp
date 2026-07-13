@@ -48,16 +48,6 @@ void GameScene::Initialize() {
 	forEdgeDetection_.output = intermediateDisplay_.get();
 	forEdgeDetection_.jobs_ = uint32_t(PostEffectJob::EdgeDetection);
 
-	gameOverText = std::make_unique<RenderObject>("GameOverText");
-	gameOverText->Initialize();
-	gameOverText->CreateCBV(sizeof(Matrix4x4), ShaderType::VERTEX_SHADER, "GameOverText::WVPMatrix");
-	gameOverText->psoConfig_.vs = "Simple.VS.hlsl";
-	gameOverText->psoConfig_.ps = "White.PS.hlsl";
-	int modelIndex = modelManager_->LoadModel("GameOver");
-	model = modelManager_->GetNodeModelData(modelIndex);
-	auto gameOverdd = drawDataManager_->GetDrawData(model.drawDataIndex);
-	gameOverText->SetDrawData(gameOverdd);
-
 	effect_->Initialize(engine_);
 
 	gameoverMat = Matrix::MakeAffineMatrix(
@@ -118,9 +108,7 @@ void GameScene::Draw() {
 
 	tetris_->Draw(directContext_);
 	if (tetris_->IsGameOver()) {
-		Matrix4x4 wvp = gameoverMat * worldCamera_->GetVPMatrix();
-		gameOverText->CopyBufferData(0, &wvp, sizeof(Matrix4x4));
-		//gameOverText->Draw(cmdObj);
+		//GameOverの文字を描画
 	}
 
 	subject_->Draw(directContext_);

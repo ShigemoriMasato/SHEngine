@@ -1,6 +1,6 @@
 #pragma once
 #include <Assets/Fonts/FontLoader.h>
-#include "../RenderObject.h"
+#include <Render/Renderer.h>
 
 namespace SHEngine {
 
@@ -16,7 +16,7 @@ namespace SHEngine {
 		void SetText(const std::wstring& text);
 		void SetSize(float size);
 		void SetTransform(const Transform& transform);
-		void SetColor(const Vector4& color) { color_ = color; }
+		void SetColor(const Vector4& color);
 		void Update(Matrix4x4 vpMat);
 		void Draw(DCC* direct);
 
@@ -29,9 +29,15 @@ namespace SHEngine {
 		std::string fontPath_ = "";
 		int fontSize_ = 0;
 
-		std::unique_ptr<RenderObject> render_ = nullptr;
+		std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
+		std::unique_ptr<SHEngine::Renderer> renderer_ = nullptr;
+
+		SHEngine::GPUBuffer* matrixBuffer_ = nullptr;
+		SHEngine::GPUBuffer* charPositionBuffer_ = nullptr;
+		SHEngine::GPUBuffer* textureIndexBuffer_ = nullptr;
+		SHEngine::GPUBuffer* colorBuffer_ = nullptr;
+
 		std::vector<CharPosition> charPositions_{};
-		Vector4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		Matrix4x4 charSizeMat_ = Matrix4x4::Identity();
 		Matrix4x4 worldMat_ = Matrix4x4::Identity();

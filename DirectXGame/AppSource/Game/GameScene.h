@@ -30,8 +30,6 @@ private:
 	std::unique_ptr<PostEffect> postEffect_;
 	std::unique_ptr<Effect> effect_ = nullptr;
 
-	std::unique_ptr<SHEngine::RenderObject> gameOverText = nullptr;
-
 	PostEffectConfig postEffectConfig_{};
 
 	std::unique_ptr<Subject> subject_ = nullptr;

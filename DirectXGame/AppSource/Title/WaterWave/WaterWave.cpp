@@ -9,15 +9,19 @@ WaterWave::~WaterWave() {
 
 void WaterWave::Initialize(const DrawData& drawData, Camera* camera) {
 	camera_ = camera;
-	renderObject_ = std::make_unique<RenderObject>("WaterWave");
-	renderObject_->Initialize();
-	renderObject_->psoConfig_.vs = "Water/WaterPlane.VS.hlsl";
-	renderObject_->psoConfig_.ps = "Water/WaterPlane.PS.hlsl";
-	renderObject_->SetDrawData(drawData);
-	renderObject_->CreateCBV(sizeof(UniqueData), ShaderType::VERTEX_SHADER, "WaterWave::UniqueData");
-	renderObject_->CreateCBV(sizeof(DirectionalLight), ShaderType::PIXEL_SHADER, "WaterWave::DirectionalLight");
-	renderObject_->CreateCBV(sizeof(Vector4), ShaderType::PIXEL_SHADER, "WaterWave::BaseColor");
-	renderObject_->instanceNum_ = 1;
+	container_ = std::make_unique<BufferContainer>();
+
+	uniqueBuffer_ = container_->Create(BufferType::CBV, sizeof(UniqueData));
+	lightBuffer_ = container_->Create(BufferType::CBV, sizeof(DirectionalLight));
+	baseColorBuffer_ = container_->Create(BufferType::CBV, sizeof(Vector4));
+
+	renderer_ = std::make_unique<Renderer>(drawData);
+	renderer_->SetVS("Water/WaterPlane.VS.hlsl");
+	renderer_->SetPS("Water/WaterPlane.PS.hlsl");
+	renderer_->SetGPUBuffer(uniqueBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
+	renderer_->SetGPUBuffer(lightBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer_->SetGPUBuffer(baseColorBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
+
 	binaryManager_ = std::make_unique<BinaryManager>();
 	Load();
 
@@ -37,14 +41,12 @@ void WaterWave::Update(float deltaTime) {
 		uniqueData_.waveCount++;
 	}
 
-	renderObject_->CopyBufferData(0, &uniqueData_, sizeof(UniqueData));
-	renderObject_->CopyBufferData(1, &light_, sizeof(DirectionalLight));
-	renderObject_->CopyBufferData(2, &baseColor_, sizeof(Vector4));
+	uniqueBuffer_->CopyBuffer(&uniqueData_, sizeof(UniqueData));
 }
 
 void WaterWave::Draw(DCC* dcc) {
 
-	renderObject_->Draw(dcc);
+	renderer_->Draw(dcc);
 }
 
 void WaterWave::DrawImGui() {
@@ -95,6 +97,9 @@ void WaterWave::DrawImGui() {
 		}
 		uniqueData_.waveCount++;
 	}
+
+	lightBuffer_->CopyBuffer(&light_, sizeof(DirectionalLight));
+	baseColorBuffer_->CopyBuffer(&baseColor_, sizeof(Vector4));
 #endif
 }
 
@@ -141,4 +146,8 @@ void WaterWave::Load() {
 	} else {
 		waves_.resize(8);
 	}
+
+
+	lightBuffer_->CopyBuffer(&light_, sizeof(DirectionalLight));
+	baseColorBuffer_->CopyBuffer(&baseColor_, sizeof(Vector4));
 }

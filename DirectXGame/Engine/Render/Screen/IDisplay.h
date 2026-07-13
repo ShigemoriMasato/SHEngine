@@ -29,7 +29,10 @@ namespace SHEngine::Screen {
 		virtual void ToTexture(DCC* dcc) = 0;
 
 		/// @brief Vertex,Computeで使用できる状態にする
-		virtual void ToNonPixel(DCC* dcc) {};
+		virtual void ToNonPixel(DCC* dcc) = 0;
+
+		/// @brief UAVで使用できる状態にする
+		virtual void ToUnordered(DCC* dcc, bool depthToo = false) = 0;
 
 		/// @brief テクスチャ情報を取得する
 		virtual TextureData* GetTextureData() const = 0;

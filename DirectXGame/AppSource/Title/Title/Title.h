@@ -1,5 +1,5 @@
 #pragma once
-#include <Render/RenderObject.h>
+#include <Render/Renderer.h>
 #include <Tool/Binary/BinaryManager.h>
 
 class Title {
@@ -26,7 +26,6 @@ private:
 	} data;
 
 	Camera* camera_ = nullptr;
-	std::unique_ptr<SHEngine::RenderObject> renderObject_{};
 
 	uint32_t lightColor_ = 0xffffffff;
 	uint32_t darkColor_ = 0xff202020;

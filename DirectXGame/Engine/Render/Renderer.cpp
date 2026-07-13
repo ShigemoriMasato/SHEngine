@@ -5,10 +5,16 @@ SHEngine::Renderer::Renderer(const DrawData& drawData) : drawData_(drawData) {
 }
 
 void SHEngine::Renderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType) {
-	assert(shaderType != ShaderType::COMPUTE_SHADER);
-	gpuBuffer->GetBufferType();
+	if (shaderType != ShaderType::VERTEX_SHADER && shaderType != ShaderType::PIXEL_SHADER) {
+		assert(false && "Renderer::SetGPUBuffer Not use Resource of VS or PS");	//VERTEX_SHADERかPIXEL_SHADER以外は使えない
+	}
 	assert((gpuBuffer->GetBufferType() & bufferType) != 0);	//gpuBufferがbufferTypeのどれかには当てはまっているか
 	gpuBuffers_[bufferType][shaderType].push_back(gpuBuffer);
+
+	auto& rootParamConfig = psoConfig_.rootConfig.rootParams.emplace_back();
+	rootParamConfig.shader = shaderType;
+	rootParamConfig.registerNumber = int(gpuBuffers_[bufferType][shaderType].size() - 1);
+	rootParamConfig.bufferType = bufferType;
 }
 
 void SHEngine::Renderer::SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType) {
@@ -38,28 +44,6 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	auto cmdList = dcc->GetCommandList();
 	auto display = dcc->GetRenderTarget();
 
-	//PSOConfigを調整
-	psoConfig_.rootConfig.cbvNums = {
-		int(gpuBuffers_[BufferType::CBV][ShaderType::VERTEX_SHADER].size()),
-		int(gpuBuffers_[BufferType::CBV][ShaderType::PIXEL_SHADER].size())
-	};
-	psoConfig_.rootConfig.srvNums = {
-		int(gpuBuffers_[BufferType::SRV][ShaderType::VERTEX_SHADER].size()),
-		int(gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER].size())
-	};
-	psoConfig_.rootConfig.uavNums = {
-		int(gpuBuffers_[BufferType::UAV][ShaderType::VERTEX_SHADER].size()),
-		int(gpuBuffers_[BufferType::UAV][ShaderType::PIXEL_SHADER].size())
-	};
-	psoConfig_.rootConfig.textureNums = {
-		int(gpuBuffers_[BufferType::Texture2D][ShaderType::VERTEX_SHADER].size()),
-		int(gpuBuffers_[BufferType::Texture2D][ShaderType::PIXEL_SHADER].size())
-	};
-	psoConfig_.rootConfig.ddsNums = {
-		int(gpuBuffers_[BufferType::DDSTexture][ShaderType::VERTEX_SHADER].size()),
-		int(gpuBuffers_[BufferType::DDSTexture][ShaderType::PIXEL_SHADER].size())
-	};
-	
 	psoConfig_.rtvFormat = display->GetRTVFormat();
 	psoConfig_.rtvNum = display->GetRenderTargetNum();
 
@@ -102,18 +86,6 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 		uav->TransitionBarrier(D3D12_RESOURCE_STATE_GENERIC_READ);
 		uav->Flush(cmdList);
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, uav->GetGPUDescriptorHandle(BufferType::UAV));
-	}
-	for (const auto& texture2D : gpuBuffers_[BufferType::Texture2D][ShaderType::VERTEX_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, texture2D->GetGPUDescriptorHandle(BufferType::Texture2D));
-	}
-	for (const auto& texture2D : gpuBuffers_[BufferType::Texture2D][ShaderType::PIXEL_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, texture2D->GetGPUDescriptorHandle(BufferType::Texture2D));
-	}
-	for (const auto& DDStexture : gpuBuffers_[BufferType::DDSTexture][ShaderType::VERTEX_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, DDStexture->GetGPUDescriptorHandle(BufferType::DDSTexture));
-	}
-	for (const auto& DDStexture : gpuBuffers_[BufferType::DDSTexture][ShaderType::PIXEL_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, DDStexture->GetGPUDescriptorHandle(BufferType::DDSTexture));
 	}
 
 	if (psoConfig_.rootConfig.useTexture) {

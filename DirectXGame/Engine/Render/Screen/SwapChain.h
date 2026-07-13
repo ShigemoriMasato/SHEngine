@@ -30,6 +30,12 @@ namespace SHEngine::Screen {
 		/// @param cmdObject コマンドオブジェクト
 		void ToTexture(DCC* dcc) override;
 
+		/// @brief Vertex,Computeで使用できる状態にする
+		void ToNonPixel(DCC* dcc) override { displays_[currentBufferIndex_]->ToNonPixel(dcc); }
+		
+		/// @brief SwapChainはUAVに対応しない。
+		void ToUnordered(DCC* dcc, bool depthToo = false) override {}
+		
 		/// @brief テクスチャ情報を取得する
 		TextureData* GetTextureData() const override { return displays_[currentBufferIndex_]->GetTextureData(); }
 

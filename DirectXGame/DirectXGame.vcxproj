@@ -224,7 +224,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\Font\Text.cpp" />
     <ClCompile Include="Engine\Render\PostEffect.cpp" />
     <ClCompile Include="Engine\Render\Renderer.cpp" />
-    <ClCompile Include="Engine\Render\RenderObject.cpp" />
     <ClCompile Include="Engine\Tool\Binary\BinaryManager.cpp" />
     <ClCompile Include="Engine\Assets\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Assets\Audio\Data\AudioData.cpp" />
@@ -325,7 +324,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\PostEffect.h" />
     <ClInclude Include="Engine\Render\PostEffectData.h" />
     <ClInclude Include="Engine\Render\Renderer.h" />
-    <ClInclude Include="Engine\Render\RenderObject.h" />
     <ClInclude Include="Engine\Tool\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Assets\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Tool\Binary\Value.h" />

@@ -20,7 +20,7 @@ void Subject::Initialize(SHEngine::Engine* engine) {
 	cube_->SetVS("Test/DDS/Cube.VS.hlsl");
 	cube_->SetPS("Test/DDS/Cube.PS.hlsl");
 	cube_->SetGPUBuffer(wvp_, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	cube_->SetGPUBuffer(ddsBuffer, ShaderType::PIXEL_SHADER, BufferType::DDSTexture);
+	cube_->SetGPUBuffer(ddsBuffer, ShaderType::PIXEL_SHADER, BufferType::SRV);
 
 	animation_ = std::make_unique<Animation_Sub>();
 	animation_->Initialize(engine_);

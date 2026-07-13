@@ -2,7 +2,6 @@
 #include <Tool/Dump/CreateDump.h>
 #include <Render/Screen/IDisplay.h>
 #include <Render/Buffer/ReadBackBuffer.h>
-#include <Render/RenderObject.h>
 #include <Compute/ComputeObject.h>
 #include <Render/Font/Text.h>
 #include <Render/Renderer.h>
@@ -69,7 +68,6 @@ void Engine::Initialize(HINSTANCE hInstance) {
 
 	Screen::IDisplay::SetDevice(device_.get());
 	ReadBackBuffer::SetDevice(device_.get());
-	RenderObject::StaticInitialize(device_.get(), psoEditor_.get());
 	Renderer::SetPSOEditor(psoEditor_.get(), device_->GetSRVManager()->GetStartPtr());
 	MeshRenderer::SetPSOEditor(psoManagerForMS_.get(), device_->GetSRVManager()->GetStartPtr());
 	GPUBuffer::SetDevice(device_.get());

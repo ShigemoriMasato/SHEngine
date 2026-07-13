@@ -68,7 +68,7 @@ void TextureData::Release() {
 	textureManager_->DeleteTexture(this);
 }
 
-void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, ID3D12Device* device, SRVManager* srvManager) {
+void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, bool unordered, ID3D12Device* device, SRVManager* srvManager) {
 	DXGI_FORMAT dxgiformat;
 	switch (format) {
 	case Format::R8:
@@ -80,6 +80,7 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 	}
 
 	format_ = dxgiformat;
+	unordered_ = unordered;
 
 	//OffScreen用のリソースの作成
 	D3D12_RESOURCE_DESC desc = {};
@@ -92,6 +93,10 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 	desc.SampleDesc.Count = 1;
 	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	if (unordered) {
+		desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
 
 	D3D12_HEAP_PROPERTIES heapProps = {};
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;              // defaultのヒープを使用

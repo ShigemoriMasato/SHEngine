@@ -22,7 +22,7 @@ namespace SHEngine::Screen {
 
 		void CreateDepthTexture(TextureManager* textureManager);
 		void AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor);
-		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8);
+		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8, bool unordered = false);
 
 		/// @brief ViewPortを設定する
 		/// @param cmdObject コマンドオブジェクト
@@ -35,6 +35,7 @@ namespace SHEngine::Screen {
 		void ToPresent(DCC* dcc) override;
 		void ToTexture(DCC* dcc) override;
 		void ToNonPixel(DCC* dcc) override;
+		void ToUnordered(DCC* dcc, bool depthToo = false) override;
 
 		/// @brief 先頭のテクスチャだけ取得する。
 		TextureData* GetTextureData() const override { return textureData_.front(); }
@@ -103,6 +104,7 @@ namespace SHEngine::Screen {
 		Vector2 imguiPos_ = { 0.0f, 0.0f };
 
 		bool isOffScreen_ = true;
+		bool unordered_ = false;
 	};
 
 }

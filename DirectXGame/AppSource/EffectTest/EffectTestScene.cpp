@@ -7,6 +7,8 @@ namespace {
 void EffectTestScene::Initialize() {
 	camera_.Initialize(input_);
 
+	container_ = std::make_unique<SHEngine::BufferContainer>();
+
 	effect_ = std::make_unique<Effect>();
 	effect_->Initialize(engine_);
 
@@ -28,6 +30,19 @@ void EffectTestScene::Initialize() {
 
 	timeViewer_ = std::make_unique<TimeViewer>();
 	timeViewer_->Initialize(engine_);
+
+
+	unorderedTest_ = std::make_unique<SHEngine::Screen::Display>();
+	unorderedTest_->Initialize(1280, 720, "Unordered Test");
+	unorderedTest_->AddRenderTarget(textureManager_, 0x000000ff, SHEngine::Format::R8G8B8A8, true);
+
+	auto unorderedTestTexture = unorderedTest_->GetTextureData();
+	auto utBuffer = container_->Create(unorderedTestTexture);
+
+	unorderedTestCom_ = std::make_unique<SHEngine::ComputeObject>();
+	unorderedTestCom_->SetShader("Test/UnorderedTest.CS.hlsl");
+	unorderedTestCom_->SetThreadGroupSize(1280 * 720 / 128 + 1, 1, 1);
+	unorderedTestCom_->SetGPUBuffer(BufferType::UAV, utBuffer);
 }
 
 std::unique_ptr<IScene> EffectTestScene::Update() {
@@ -42,6 +57,10 @@ std::unique_ptr<IScene> EffectTestScene::Update() {
 	effect_->Update(camera_.GetVPMatrix(), camera_.GetBillboardMatrix(), engine_->GetDeltaTime());
 
 	computeContext_->EndTimeStamp();
+
+	unorderedTest_->ToUnordered(directContext_, true);
+	unorderedTestCom_->Execute(directContext_);
+	unorderedTest_->ToTexture(directContext_);
 
 	return std::unique_ptr<IScene>();
 }

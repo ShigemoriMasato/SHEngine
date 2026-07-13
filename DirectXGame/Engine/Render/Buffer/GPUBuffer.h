@@ -2,23 +2,9 @@
 #include <Core/DXDevice.h>
 #include <Core/Command/CommandObject.h>
 #include <Assets/Texture/TextureData.h>
+#include <Render/PSO/Shelf/RootSignatureShelf.h>
 
-enum class BufferType : uint8_t {
-	CBV = 1 << 0,
-	SRV = 1 << 1,
-	UAV = 1 << 2,
-
-	CBV_SRV = 0b011,
-	//CBV_UAV = 0b101,		使えないやつ
-	SRV_UAV = 0b110,
-	//CBV_SRV_UAV = 0b111,	使えないやつ
-
-	Texture = 0b1000,
-	Texture2D = 0b1001,
-	DDSTexture = 0b1010,
-
-	ReadBack = 0b10000,
-};
+using RegisterCounter = std::unordered_map<ShaderType, std::unordered_map<BufferType, int>>;
 
 enum class BufferNum : uint8_t {
 	MatchSwapChain,
@@ -26,9 +12,6 @@ enum class BufferNum : uint8_t {
 	Double,
 	Triple,
 };
-
-uint8_t operator&(uint8_t a, BufferType b);
-uint8_t operator~(BufferType a);
 
 namespace SHEngine {
 
@@ -50,7 +33,7 @@ namespace SHEngine {
 		// @brief GPUBufferへデータコピーをするときの値を変更する。Flush時に実際にGPUへコピーされる。UAVバッファにはコピーできない。
 		virtual void CopyBuffer(const void* data, size_t dataSize);
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
-		void TransitionBarrier(D3D12_RESOURCE_STATES after);
+		void TransitionBarrier(ShaderType shaderType, BufferType bufferType);
 		// @brief GPUBufferの状態を実際にGPUへ反映させる。
 		void Flush(ID3D12GraphicsCommandList* cmdList);
 

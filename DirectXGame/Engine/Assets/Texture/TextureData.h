@@ -33,15 +33,16 @@ namespace SHEngine {
 		ID3D12Resource* GetResource() const { return textureResource_.Get(); }
 		std::pair<uint32_t, uint32_t> GetSize() const { return { width_, height_ }; }
 		Vector4 GetClearColor() const { return clearColor_; }
-		Type GetType() const { return type_; }
+		bool IsUnordered() const { return unordered_; }
 		DXGI_FORMAT GetFormat() const { return format_; }
 
 	private:
 
 		friend class TextureManager;
+		//TextureDataの読み込み
 		DirectX::ScratchImage Create(std::string filePath, ID3D12Device* device, SRVManager* srvManager);
 		//Window用のテクスチャを作成
-		void Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, ID3D12Device* device, SRVManager* srvManager);
+		void Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, bool unordered, ID3D12Device* device, SRVManager* srvManager);
 		//SwapChain用のテクスチャを作成
 		void Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager, uint32_t clearColor);
 		//Depth用のテクスチャを作成
@@ -66,6 +67,8 @@ namespace SHEngine {
 		TextureManager* textureManager_ = nullptr;
 
 		DXGI_FORMAT format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		bool unordered_ = false;
 	};
 
 }

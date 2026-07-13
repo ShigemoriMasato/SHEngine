@@ -33,21 +33,21 @@ namespace SHEngine {
 		void EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer);
 
 		// @brief VertexShaderのファイル名をセットする。デフォルトは"Simple.VS.hlsl"。
-		void SetMS(const std::string& ms) { ms_ = ms; }
+		void SetMS(const std::string& ms) { psoConfig_.ms = ms; }
 		// @brief PixelShaderのファイル名をセットする。デフォルトは"White.PS.hlsl"。
-		void SetPS(const std::string& ps) { ps_ = ps; }
+		void SetPS(const std::string& ps) { psoConfig_.ps = ps; }
 		// @brief ブレンドステートIDをセットする。デフォルトはPSO::BlendStateID::Normal。
-		void SetBlendState(PSO::BlendStateID id, int index = 0) { blendID_[index] = id; }
+		void SetBlendState(PSO::BlendStateID id, int index = 0) { psoConfig_.blendID[index] = id; }
 		// @brief 深度ステンシルIDをセットする。デフォルトはPSO::DepthStencilID::Default。
-		void SetDepthStencil(PSO::DepthStencilID id) { depthStencilID_ = id; }
+		void SetDepthStencil(PSO::DepthStencilID id) { psoConfig_.depthStencilID = id; }
 		// @brief ラスタライザーIDをセットする。デフォルトはPSO::RasterizerID::Fill。
-		void SetRasterizer(PSO::RasterizerID id) { rasterizerID_ = id; }
+		void SetRasterizer(PSO::RasterizerID id) { psoConfig_.rasterizerID = id; }
 		// @brief スワップチェーン用かどうかをセットする。デフォルトはfalse。
-		void SetUseTexture(bool use) { isUseTexture_ = use; }
+		void SetUseTexture(bool use) { psoConfig_.rootConfig.useTexture = use; }
 		// @brief Samplerの設定
-		void SetSampler(uint32_t samplerFlag) { samplerFlag_ = samplerFlag; }
+		void SetSampler(uint32_t samplerFlag) { psoConfig_.rootConfig.samplers = samplerFlag; }
 		// @brief Samplerの設定
-		void SetSampler(PSO::SamplerID samplerFlag) { samplerFlag_ = uint32_t(samplerFlag); }
+		void SetSampler(PSO::SamplerID samplerFlag) { psoConfig_.rootConfig.samplers = uint32_t(samplerFlag); }
 
 		// @brief Dispatchするインスタンスの数をセットする。デフォルトは1。
 		void SetDispatchGroup(uint32_t groupX, uint32_t groupY = 1, uint32_t groupZ = 1) { groupX_ = groupX; groupY_ = groupY; groupZ_ = groupZ; }
@@ -61,22 +61,15 @@ namespace SHEngine {
 		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
 		static inline Logger logger_ = GetLogger("Engine");
 
-		/// @brief 頂点シェーダーファイル名
-		std::string ms_ = "Simple.MS.hlsl";
-		/// @brief ピクセルシェーダーファイル名
-		std::string ps_ = "White.PS.hlsl";
-		/// @brief ブレンドステートID
-		PSO::BlendStateID blendID_[8];
-		/// @brief 深度ステンシルID
-		PSO::DepthStencilID depthStencilID_ = PSO::DepthStencilID::Default;
-		/// @brief ラスタライザーID
-		PSO::RasterizerID rasterizerID_ = PSO::RasterizerID::Fill;
-		/// @brief 画像を使用するかどうか
-		bool isUseTexture_ = false;
-		/// @brief Samplerフラグ
-		uint32_t samplerFlag_ = uint32_t(PSO::SamplerID::Default);
+		PSO::ConfigMSType psoConfig_;
 
-		std::map<BufferType, std::map<ShaderType, std::vector<GPUBuffer*>>> gpuBuffers_;
+		struct BufferConfig {
+			BufferType type;
+			ShaderType shader;
+			GPUBuffer* buffer;
+		};
+		std::vector<BufferConfig> bufferConfigs_;
+		RegisterCounter registerCount_;
 
 		// @brief Dispatchするインスタンスの数
 		uint32_t groupX_ = 1;

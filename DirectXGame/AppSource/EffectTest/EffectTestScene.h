@@ -22,6 +22,8 @@ private:
 
 	DebugCamera camera_;
 
+	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
+
 	std::unique_ptr<Effect> effect_ = nullptr;
 	std::unique_ptr<VertexEmitter> vertexEmitter_ = nullptr;
 
@@ -31,4 +33,7 @@ private:
 	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
 
 	std::unique_ptr<Grid> grid_ = nullptr;
+
+	std::unique_ptr<SHEngine::Screen::Display> unorderedTest_ = nullptr;
+	std::unique_ptr<SHEngine::ComputeObject> unorderedTestCom_ = nullptr;
 };

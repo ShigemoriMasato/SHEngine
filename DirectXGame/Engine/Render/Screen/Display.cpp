@@ -106,17 +106,18 @@ void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, 
 	CreateRenderTarget(textureManager, 0);
 }
 
-void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format) {
+void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format, bool unordered) {
 	if (!isOffScreen_) {
 		//初期値がtrueで、falseにできるのがswapchain用のAddRenderTargetだけなので、ここでfalseであれば、既にSwapchain用のDisplayが作成されていることになる。
 		assert(isOffScreen_ && "既にSwapchain用のDisplayが作成されています。");
 		return;
 	}
 
+	unordered_ = unordered;
 	isOffScreen_ = true;
 	rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-	int textureHandle = textureManager->CreateWindowTexture(width_, height_, clearColor, format);
+	int textureHandle = textureManager->CreateWindowTexture(width_, height_, clearColor, format, unordered);
 	textureData_.push_back(textureManager->GetTextureData(textureHandle));
 
 	CreateRenderTarget(textureManager, uint32_t(textureData_.size() - 1));
@@ -306,6 +307,20 @@ void SHEngine::Screen::Display::ToTexture(DCC* dcc) {
 void SHEngine::Screen::Display::ToNonPixel(DCC* dcc) {
 	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 	TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+}
+
+void SHEngine::Screen::Display::ToUnordered(DCC* dcc, bool depthToo) {
+	if (!unordered_) {
+		logger_->warn("Display {} is not created as unordered access. Do ToUnordered() instead of ToTexture().", windowName_);
+		ToTexture(dcc);
+	}
+
+	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	if (depthToo) {
+		TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	} else {
+		TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	}
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE* SHEngine::Screen::Display::GetRTVHandle() {

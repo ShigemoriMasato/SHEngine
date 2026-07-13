@@ -7,7 +7,10 @@ void SHEngine::MeshRenderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shade
 		return;
 	}
 
-	gpuBuffers_[bufferType][shaderType].push_back(gpuBuffer);
+	auto& rootParamConfig = psoConfig_.rootConfig.rootParams.emplace_back();
+	rootParamConfig.shader = shaderType;
+	rootParamConfig.registerNumber = registerCount_[shaderType][bufferType]++;
+	rootParamConfig.bufferType = bufferType;
 }
 
 void SHEngine::MeshRenderer::SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType) {
@@ -17,7 +20,6 @@ void SHEngine::MeshRenderer::SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuf
 }
 
 void SHEngine::MeshRenderer::ResetGPUBuffers() {
-	gpuBuffers_.clear();
 }
 
 void SHEngine::MeshRenderer::EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer) {
@@ -29,7 +31,7 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 	auto cmdList = dcc->GetCommandList();
 	auto display = dcc->GetRenderTarget();
 
-	if (ms_.empty() || ps_.empty()) {
+	if (psoConfig_.ms.empty() || psoConfig_.ps.empty()) {
 		logger_->error("MeshRenderer::Draw: MS or PS is not set.");
 		return;
 	}
@@ -38,43 +40,12 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 		return;
 	}
 
-	PSO::ConfigMSType psoConfig;
-	psoConfig.ms = ms_;
-	psoConfig.ps = ps_;
-	for (int i = 0; i < 8; ++i) {
-		psoConfig.blendID[i] = blendID_[i];
+	psoConfig_.rtvNum = display->GetRenderTargetNum();
+	for (uint32_t i = 0; i < psoConfig_.rtvNum; ++i) {
+		psoConfig_.rtvFormats[i] = display->GetRTVFormat();
 	}
-	psoConfig.depthStencilID = depthStencilID_;
-	psoConfig.rasterizerID = rasterizerID_;
 
-	psoConfig.rtvNum = display->GetRTVNum();
-	for (uint32_t i = 0; i < psoConfig.rtvNum; ++i) {
-		psoConfig.rtvFormats[i] = display->GetRTVFormat();
-	}
-	psoConfig.dsvFormat = display->GetDepthTexture()->GetFormat();
-
-	psoConfig.rootConfig.samplers = samplerFlag_;
-	psoConfig.rootConfig.useTexture = isUseTexture_;
-	psoConfig.rootConfig.cbvNums = { 
-		0,
-		(int)gpuBuffers_[BufferType::CBV][ShaderType::PIXEL_SHADER].size(),
-		0,
-		(int)gpuBuffers_[BufferType::CBV][ShaderType::MESH_SHADER].size(),
-	};
-	psoConfig.rootConfig.srvNums = { 
-		0,
-		(int)gpuBuffers_[BufferType::SRV][ShaderType::PIXEL_SHADER].size(),
-		0,
-		(int)gpuBuffers_[BufferType::SRV][ShaderType::MESH_SHADER].size(),
-	};
-	psoConfig.rootConfig.uavNums = { 
-		0,
-		(int)gpuBuffers_[BufferType::UAV][ShaderType::PIXEL_SHADER].size(),
-		0,
-		(int)gpuBuffers_[BufferType::UAV][ShaderType::MESH_SHADER].size(),
-	};
-
-	psoEditor_->SetPSO(psoConfig, cmdList);
+	psoEditor_->SetPSO(psoConfig_, cmdList);
 
 	int rootIndex = 0;
 	for (const auto& cbv : gpuBuffers_[BufferType::CBV][ShaderType::PIXEL_SHADER]) {
@@ -107,20 +78,8 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 		uav->Flush(cmdList);
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, uav->GetGPUDescriptorHandle(BufferType::UAV));
 	}
-	for (const auto& texture2D : gpuBuffers_[BufferType::Texture2D][ShaderType::PIXEL_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, texture2D->GetGPUDescriptorHandle(BufferType::Texture2D));
-	}
-	for (const auto& texture2D : gpuBuffers_[BufferType::Texture2D][ShaderType::MESH_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, texture2D->GetGPUDescriptorHandle(BufferType::Texture2D));
-	}
-	for (const auto& DDStexture : gpuBuffers_[BufferType::DDSTexture][ShaderType::PIXEL_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, DDStexture->GetGPUDescriptorHandle(BufferType::DDSTexture));
-	}
-	for (const auto& DDStexture : gpuBuffers_[BufferType::DDSTexture][ShaderType::MESH_SHADER]) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, DDStexture->GetGPUDescriptorHandle(BufferType::DDSTexture));
-	}
 
-	if (isUseTexture_) {
+	if (psoConfig_.rootConfig.useTexture) {
 		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, textureStartHandle_);
 	}
 
