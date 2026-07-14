@@ -5,9 +5,11 @@
 #include <Game/Effect/Subject/HitEffect.h>
 #include <Render/PostEffect.h>
 #include <Tool/TimeViewer/TimeViewer.h>
-#include <Game/Effect/Vertex/VertexEmitter.h>
 #include <Render/Buffer/ReadBackBuffer.h>
 #include <Tool/Grid/Grid.h>
+
+#include <Game/Effect/Vertex/VertexEmitter.h>
+#include <Game/Effect/Polygon/PolygonEmitter.h>
 
 class EffectTestScene : public IScene {
 public:
@@ -26,6 +28,7 @@ private:
 
 	std::unique_ptr<Effect> effect_ = nullptr;
 	std::unique_ptr<VertexEmitter> vertexEmitter_ = nullptr;
+	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
 
 	std::unique_ptr<PostEffect> postEffect_ = nullptr;
 	PostEffectConfig peConfig_{};

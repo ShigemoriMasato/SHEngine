@@ -172,6 +172,40 @@ SkinningModelData& ModelManager::GetSkinningModelData(int id) {
 	}
 }
 
+PolygonList SHEngine::ModelManager::CreatePolygonList(int id) {
+	for (const auto& [filePath, modelId] : modelFilePaths_) {
+		if (modelId == id) {
+			return CreatePolygonList(filePath);
+		}
+	}
+	assert(false && "ModelManager::CreatePolygonList: Model ID not found");
+	return PolygonList{}; // IDが見つからない場合は空のPolygonListを返す
+}
+
+PolygonList SHEngine::ModelManager::CreatePolygonList(std::string modelPath) {
+	std::string fileName = FilePathChecker(modelPath);
+	
+	auto it = modelFilePaths_.find(modelPath);
+	if (it == modelFilePaths_.end()) {
+		LoadModel(modelPath);
+		it = modelFilePaths_.find(modelPath);
+		if (it == modelFilePaths_.end()) {
+			logger_->error("Model not found: {}", modelPath);
+			assert(false && "ModelManager::CreatePolygonList: Model not found");
+			return PolygonList{};
+		}
+	}
+	
+	//Assimp
+	Assimp::Importer importer;
+	std::string path = (modelPath + "/" + fileName);
+	const aiScene* scene = nullptr;
+	scene = importer.ReadFile(path.c_str(), aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
+	assert(scene && "ModelManager::CreatePolygonList: Failed to load model");
+
+	return ModelLoader::LoadPolygonList(scene);
+}
+
 std::string ModelManager::FilePathChecker(std::string& filePath) {
 	//Assets/から始まっているか確認(Assets/Modelの可能性もあるのでAssets/のみ確認)
 	std::string formatFirst = "Assets/";

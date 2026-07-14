@@ -117,3 +117,16 @@ struct SkinningModelData {
 	std::vector<Material> materials{};
 	int drawDataIndex = -1;
 };
+
+//三角面化されたポリゴンのデータ
+struct PolygonData {
+	Vector3 a;
+	Vector3 b;
+	Vector3 c;
+};
+
+struct PolygonList {
+	std::vector<PolygonData> polygons;
+	std::vector<float> areas;
+	float totalArea;
+};

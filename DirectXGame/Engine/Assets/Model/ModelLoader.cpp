@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 #include <Utility/MatrixFactory.h>
+#include <Utility/MyMath.h>
 
 using namespace SHEngine;
 
@@ -305,4 +306,49 @@ std::vector<Animation> ModelLoader::LoadAnimations(const aiScene* scene) {
 	}
 
 	return animations;
+}
+
+PolygonList ModelLoader::LoadPolygonList(const aiScene* scene) {
+	PolygonList polygonList{};
+
+	auto getVertexPosition = [](const aiMesh* mesh, uint32_t vertexIndex) -> Vector3 {
+		return { mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, mesh->mVertices[vertexIndex].z };
+		};
+
+	auto getArea = [](Vector3 a, Vector3 b, Vector3 c) -> float {
+		Vector3 ab = b - a;
+		Vector3 ac = c - a;
+		Vector3 cross = MyMath::cross(ab, ac);
+		return 0.5f * cross.Length();
+		};
+
+	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
+		aiMesh* ai_mesh = scene->mMeshes[mesh];
+
+		//メモリ確保
+		polygonList.polygons.reserve(polygonList.polygons.size() + ai_mesh->mNumFaces);
+		polygonList.areas.reserve(polygonList.areas.size() + ai_mesh->mNumFaces);
+
+		for (uint32_t face = 0; face < ai_mesh->mNumFaces; ++face) {
+			aiFace* ai_face = &ai_mesh->mFaces[face];
+
+			//三角面化されていない場合はエラー
+			if (ai_face->mNumIndices != 3) {
+				throw std::runtime_error("Not a Triangle Face!!");
+			}
+
+			//頂点と面積を入力
+			PolygonData& polygon = polygonList.polygons.emplace_back();
+			polygon.a = getVertexPosition(ai_mesh, ai_face->mIndices[0]);
+			polygon.b = getVertexPosition(ai_mesh, ai_face->mIndices[1]);
+			polygon.c = getVertexPosition(ai_mesh, ai_face->mIndices[2]);
+
+			float& area = polygonList.areas.emplace_back();
+			area = getArea(polygon.a, polygon.b, polygon.c);
+
+			polygonList.totalArea += area;
+		}
+	}
+
+	return polygonList;
 }

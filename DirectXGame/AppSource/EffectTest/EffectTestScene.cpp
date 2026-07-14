@@ -1,7 +1,7 @@
 #include "EffectTestScene.h"
 
 namespace {
-	std::string filePath = "Title";
+	std::string filePath = "WaterPlane";
 }
 
 void EffectTestScene::Initialize() {
@@ -20,7 +20,13 @@ void EffectTestScene::Initialize() {
 	effect_->AddEmitter(vertexEmitter_.get());
 
 	auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel(filePath));
-	vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
+	//vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
+
+	polygonEmitter_ = std::make_unique<PolygonEmitter>();
+	effect_->AddEmitter(polygonEmitter_.get());
+
+	auto polygonList = modelManager_->CreatePolygonList(modelManager_->LoadModel(filePath));
+	polygonEmitter_->AddPolygon(polygonList, Matrix::MakeTranslationMatrix({0, 0, 0}), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 100);
 
 	postEffect_ = std::make_unique<PostEffect>();
 	postEffect_->Initialize(textureManager_, drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex), true);

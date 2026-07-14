@@ -70,6 +70,11 @@ namespace SHEngine {
 		 */
 		SkinningModelData& GetSkinningModelData(int id);
 
+		// @brief モデルIDからポリゴンリストを取得
+		PolygonList CreatePolygonList(int id);
+		// @brief モデル名からポリゴンリストを取得
+		PolygonList CreatePolygonList(std::string modelPath);
+
 	private:
 
 		/**

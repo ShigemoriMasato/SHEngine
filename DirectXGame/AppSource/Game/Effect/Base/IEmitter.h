@@ -10,9 +10,7 @@ public:
 	IEmitter() = default;
 
 	virtual void Initialize(SHEngine::Engine* engine, const Pool& pool) = 0;
-
 	virtual void Update(CCC* compute, float deltaTime) = 0;
-
 	uint32_t GetMaxParticleNum() const { return maxParticleNum_; }
 
 protected:

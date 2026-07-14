@@ -167,7 +167,6 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
         L"-Qstrip_debug",               //デバッグ情報を削除する
         L"-Qstrip_reflect",             //リフレクション情報を削除する
 		L"-O3",                         //最適化レベル3
-        L"-enable-16bit-types",         //16bit型を有効化する
         L"-Zpr",                        //メモリレイアウトは行優先
         L"-enable-16bit-types"          //16bit型を有効化する
     };

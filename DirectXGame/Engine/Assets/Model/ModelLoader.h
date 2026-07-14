@@ -20,4 +20,6 @@ namespace ModelLoader {
 	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, Skeleton& skeleton, std::unordered_set<std::string>& boneNames, const Matrix4x4 parentAccumulated);
 
 	std::vector<Animation> LoadAnimations(const aiScene* scene);
+
+	PolygonList LoadPolygonList(const aiScene* scene);
 }

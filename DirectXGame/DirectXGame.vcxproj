@@ -274,6 +274,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\PSO\PSOManagerForMS.cpp" />
     <ClCompile Include="Engine\Render\PSO\ShelfManager.cpp" />
     <ClCompile Include="Engine\Render\Buffer\ReadBackBuffer.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Polygon\PolygonEmitter.cpp" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Game\Camera\GameCamera.h" />
@@ -366,6 +367,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Game\Effect\Base\IEmitter.h" />
     <ClInclude Include="Engine\Render\Buffer\ReadBackBuffer.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\GPUParticle.h" />
+    <ClInclude Include="AppSource\Game\Effect\Polygon\PolygonEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />
