@@ -32,7 +32,7 @@ namespace SHEngine::Screen {
 		virtual void ToNonPixel(DCC* dcc) = 0;
 
 		/// @brief UAVで使用できる状態にする
-		virtual void ToUnordered(DCC* dcc, bool depthToo = false) = 0;
+		virtual void ToUnordered(SHEngine::ICommandContext* dcc, bool depthToo = false) {};
 
 		/// @brief テクスチャ情報を取得する
 		virtual TextureData* GetTextureData() const = 0;

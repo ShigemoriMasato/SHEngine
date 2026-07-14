@@ -24,5 +24,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
     }
     
     float32_t minValue = 1.175494351E-38;
-    position[index] = float3(0, 0, 0);
+    position[index] = float3(minValue, minValue, minValue);
 }

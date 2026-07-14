@@ -29,9 +29,14 @@ void Subject::Initialize(SHEngine::Engine* engine) {
 	hitEffect_->Initialize(engine_);
 
 	cylinder_ = std::make_unique<Cylinder>(engine_);
+
+	gpuParticle_ = std::make_unique<GPUParticle>();
+	auto plane = ddm->GetDrawData(mm->GetNodeModelData(1).drawDataIndex);
+	gpuParticle_->Initialize(engine_->GetComputeCommandContext(), plane);
 }
 
-void Subject::Update(const Matrix4x4& vpMat) {
+void Subject::Update(Camera* camera) {
+	Matrix4x4 vpMat = camera->GetVPMatrix();
 	float deltatime = engine_->GetDeltaTime();
 	Matrix4x4 wvp = Matrix::MakeScaleMatrix({512, 512, 512}) * vpMat;
 	wvp_->CopyBuffer(&wvp, sizeof(wvp));
@@ -39,6 +44,7 @@ void Subject::Update(const Matrix4x4& vpMat) {
 	animation_->Update(deltatime, vpMat);
 	hitEffect_->Update(deltatime, vpMat);
 	cylinder_->Update(deltatime, vpMat);
+	gpuParticle_->Update(engine_->GetComputeCommandContext(), vpMat, camera->GetBillboardMatrix(), deltatime);
 }
 
 void Subject::Draw(DCC* cmdObj) {
@@ -49,4 +55,6 @@ void Subject::Draw(DCC* cmdObj) {
 	hitEffect_->Draw(cmdObj);
 
 	cylinder_->Draw(cmdObj);
+
+	gpuParticle_->Draw(cmdObj);
 }

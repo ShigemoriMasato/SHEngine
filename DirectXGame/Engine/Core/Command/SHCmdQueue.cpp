@@ -79,7 +79,7 @@ void SHEngine::Command::Queue::WaitFenceInCPU(const WaitFence& fence) {
 }
 
 void SHEngine::Command::Queue::WaitFenceInGPU(const WaitFence& fence) {
-	commandQueue_->Wait(fence.fence, fence.value);
+	commandQueue_->Wait(fence.fence, fence.value - 1);
 }
 
 void SHEngine::Command::Queue::StopGPU() {

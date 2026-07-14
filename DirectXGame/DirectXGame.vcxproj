@@ -336,6 +336,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Core\ImGuiWrapper.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Subject\HitEffect.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Base\IEmitter.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Subject\GPUParticle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Utility\src\Operator.cpp" />
     <ClCompile Include="Engine\Utility\src\MatrixFactory.cpp" />
@@ -364,6 +365,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\PSO\ShelfManager.h" />
     <ClInclude Include="AppSource\Game\Effect\Base\IEmitter.h" />
     <ClInclude Include="Engine\Render\Buffer\ReadBackBuffer.h" />
+    <ClInclude Include="AppSource\Game\Effect\Subject\GPUParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

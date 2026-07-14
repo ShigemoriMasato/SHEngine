@@ -31,6 +31,7 @@ void SHEngine::Renderer::ResetGPUBuffers() {
 	bufferConfigs_.clear();
 	registerCount_.clear();
 	uavBuffers_.clear();
+	psoConfig_.rootConfig.rootParams.clear();
 }
 
 void SHEngine::Renderer::EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer) {
@@ -58,6 +59,8 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 
 	psoConfig_.rtvFormat = display->GetRTVFormat();
 	psoConfig_.rtvNum = display->GetRenderTargetNum();
+	psoConfig_.isDSV = display->GetDepthTexture() != nullptr;
+	psoConfig_.dsvFormat = display->GetDepthTexture() ? display->GetDepthTexture()->GetFormat() : DXGI_FORMAT_UNKNOWN;
 
 	if (!display->GetDepthTexture()) {
 		psoConfig_.depthStencilID = PSO::DepthStencilID::None;

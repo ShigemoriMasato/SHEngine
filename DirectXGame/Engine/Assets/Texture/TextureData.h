@@ -10,8 +10,11 @@
 namespace SHEngine {
 
 	enum class Format : uint32_t {
-		R8,
-		R16G16B16A16,
+		R8_UNORM,
+		R8G8B8A8_UNORM,
+		R32G32B32A32_UINT,
+		R32_UINT,
+
 	};
 
 	class TextureData {

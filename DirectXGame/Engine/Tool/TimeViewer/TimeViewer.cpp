@@ -21,11 +21,10 @@ void TimeViewer::Add(std::string name, double time) {
 	}
 
 	//なければ新しく作る
-	auto text = std::make_unique<SHEngine::Text>();
+	auto& text = texts_[name];
+	text = std::make_unique<SHEngine::Text>();
 	text->Initialize(drawData_, "Assets/Fonts/YDWbananaslipplus.otf", 64, name);
 	text->SetText(std::format(L"{}: {:.2f} ms", ConvertString(name), time * 1000.0));
-
-	texts_[name] = std::move(text);
 }
 
 void TimeViewer::Draw(DCC* direct) {
@@ -40,10 +39,6 @@ void TimeViewer::Draw(DCC* direct) {
 		text->SetColor(color_);
 
 		text->Update(orthoCamera_.GetVPMatrix());
-	}
-
-	//描画
-	for (auto& [name, text] : texts_) {
 		text->Draw(direct);
 	}
 }

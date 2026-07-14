@@ -64,7 +64,6 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 		return;
 	}
 	if (groupX_ <= 0 || groupY_ <= 0 || groupZ_ <= 0) {
-		logger_->error("MeshRenderer::Draw: Dispatch group is not set.");
 		return;
 	}
 

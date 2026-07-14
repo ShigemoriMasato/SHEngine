@@ -5,12 +5,13 @@
 #include "Animation.h"
 #include "HitEffect.h"
 #include "Cylinder.h"
+#include "GPUParticle.h"
 
 class Subject {
 public:
 
 	void Initialize(SHEngine::Engine* engine);
-	void Update(const Matrix4x4& vpMat);
+	void Update(Camera* camera);
 	void Draw(DCC* cmdObj);
 
 private:
@@ -25,4 +26,6 @@ private:
 	std::unique_ptr<Animation_Sub> animation_;
 	std::unique_ptr<HitEffect> hitEffect_;
 	std::unique_ptr<Cylinder> cylinder_;
+
+	std::unique_ptr<GPUParticle> gpuParticle_;
 };

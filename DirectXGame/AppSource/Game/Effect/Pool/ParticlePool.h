@@ -1,6 +1,7 @@
 #pragma once
 #include <Compute/ComputeObject.h>
 #include <Render/MeshRenderer.h>
+#include <Render/Screen/Display.h>
 
 struct Pool {
 	SHEngine::GPUBuffer* freeList;
@@ -16,13 +17,13 @@ class ParticlePool {
 public:
 
 	//パーティクルのプールを初期化する。GPUBufferを作成して、DrawDataにセットする
-	void Initialize(const int kMaxParticleNum, CCC* compute);
+	void Initialize(const int kMaxParticleNum, CCC* compute, SHEngine::TextureManager* textureManager, SHEngine::Screen::IDisplay* renderTarget, const SHEngine::DrawData& pedd);
 
 	//全てのWorldMatrixにcamera行列をかけて、GPUに転送する
 	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime, CCC* compute);
 
 	//パーティクルの描画
-	void Draw(DCC* cmdObj);
+	void Draw(DCC* dcc, CCC* ccc);
 
 	//パーティクルの共通要素に関する操作
 	void DrawImGui();
@@ -38,12 +39,9 @@ private:
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 
 	std::unique_ptr<SHEngine::ComputeObject> initialize_;
-	std::unique_ptr<SHEngine::ComputeObject> update_;
 
 	SHEngine::GPUBuffer* vpMatrixBuffer_ = nullptr;
 	SHEngine::GPUBuffer* sizeBuffer_ = nullptr;
-	SHEngine::GPUBuffer* positions_ = nullptr;
-	SHEngine::GPUBuffer* colors_ = nullptr;
 	Pool pool_{};
 
 	std::vector<std::unique_ptr<SHEngine::MeshRenderer>> renderer_;

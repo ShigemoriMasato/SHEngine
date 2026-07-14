@@ -5,10 +5,6 @@
 
 using namespace SHEngine;
 
-namespace {
-	Matrix4x4 gameoverMat;
-}
-
 GameScene::GameScene() {
 	tetris_ = std::make_unique<Tetris>();
 	debugCamera_ = std::make_unique<DebugCamera>();
@@ -48,13 +44,7 @@ void GameScene::Initialize() {
 	forEdgeDetection_.output = intermediateDisplay_.get();
 	forEdgeDetection_.jobs_ = uint32_t(PostEffectJob::EdgeDetection);
 
-	effect_->Initialize(engine_);
-
-	gameoverMat = Matrix::MakeAffineMatrix(
-		Vector3(1.0f, 1.0f, 1.0f),
-		Vector3(),
-		Vector3(0.0f, 0.0f, -5.0f)
-	);
+	effect_->Initialize(engine_, commonData_->display.get(), pedd);
 
 	subject_ = std::make_unique<Subject>();
 	subject_->Initialize(engine_);
@@ -68,7 +58,7 @@ std::unique_ptr<IScene> GameScene::Update() {
 
 	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
 
-	subject_->Update(worldCamera_->GetVPMatrix());
+	subject_->Update(worldCamera_);
 
 	input_->Update();
 	commonData_->keyManager->Update();
@@ -104,7 +94,7 @@ void GameScene::Draw() {
 	auto display = commonData_->display.get();
 	auto window = commonData_->window.get();
 
-	directContext_->SetRenderTarget(display, true);
+	directContext_->SetRenderTarget(display);
 
 	tetris_->Draw(directContext_);
 	if (tetris_->IsGameOver()) {
@@ -117,6 +107,9 @@ void GameScene::Draw() {
 	directContext_->BeginTimeStamp("Particle Draw");
 	effect_->Draw();
 	directContext_->EndTimeStamp();
+
+	//Effectで一度実行されるので、もう一度Setしなおす
+	directContext_->SetRenderTarget(display, false);
 
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
 	timeViewer_->Add("Particle Draw", engine_->GetDirectCommandContext()->GetTimeStampResult("Particle Draw"));

@@ -1,10 +1,9 @@
 #include "ParticlePool.h"
 #include <imgui/imgui.h>
 
-void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
+void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine::TextureManager* textureManager, SHEngine::Screen::IDisplay* renderTarget, const SHEngine::DrawData& pedd) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	initialize_ = std::make_unique<SHEngine::ComputeObject>("Pool Init");
-	update_ = std::make_unique<SHEngine::ComputeObject>("Pool Update");
 
 	pool_.freeList = container_->Create(BufferType::UAV, sizeof(int), kMaxParticleNum, BufferNum::Single); // freeList
 	pool_.freeListIndex = container_->Create(BufferType::UAV, sizeof(int), 1, BufferNum::Single); // freeListIndex
@@ -20,8 +19,6 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
 	//描画用バッファ
 	vpMatrixBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4) * 2, 1); // viewProjectionMatrix
 	sizeBuffer_ = container_->Create(BufferType::CBV, sizeof(float), 1); // size
-	positions_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum, BufferNum::Single); // world
-	colors_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector4) / 2, kMaxParticleNum, BufferNum::Single); // color(float16_t4)
 
 	initialize_->SetShader("Particle/Pool/Initialize.CS.hlsl");
 	initialize_->SetGPUBuffers(BufferType::UAV, { pool_.freeList, pool_.freeListIndex, pool_.position });
@@ -29,13 +26,6 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute) {
 	initialize_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_ + 1);
 
 	initialize_->Execute(compute);
-
-	update_ = std::make_unique<SHEngine::ComputeObject>("Pool Update");
-	update_->SetShader("Particle/Pool/Update.CS.hlsl");
-	update_->SetGPUBuffers(BufferType::UAV, { positions_, colors_ });
-	update_->SetGPUBuffers(BufferType::SRV, { pool_.position, pool_.color });
-	update_->SetGPUBuffer(BufferType::CBV, pool_.particleNum);
-	update_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_ + 1);
 
 	CreateRenderer();
 
@@ -65,13 +55,11 @@ void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardM
 	vpMatrixBuffer_->CopyBuffer(&camera_, sizeof(camera_));
 	sizeBuffer_->CopyBuffer(&size_, sizeof(size_));
 	pool_.deltaTime->CopyBuffer(&deltaTime, sizeof(float));
-
-	update_->Execute(compute);
 }
 
-void ParticlePool::Draw(DCC* cmdObj) {
-	for (int i = 0; i < drawCount_ / 65535 + 1; ++i) {
-		renderer_[i]->Draw(cmdObj);
+void ParticlePool::Draw(DCC* dcc, CCC* ccc) {
+	for (int i = 0; i < renderer_.size(); ++i) {
+		renderer_[i]->Draw(dcc);
 	}
 }
 
@@ -95,12 +83,12 @@ void ParticlePool::CreateRenderer() {
 
 	renderer->SetMS("Mesh/Particle/Quad.MS.hlsl");
 	renderer->SetPS("Game/GPUParticle.PS.hlsl");
-	renderer->SetGPUBuffer(positions_, ShaderType::MESH_SHADER, BufferType::SRV);
+	renderer->SetGPUBuffer(pool_.position, ShaderType::MESH_SHADER, BufferType::SRV);
 	renderer->SetGPUBuffer(sizeBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(vpMatrixBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(pool_.particleNum, ShaderType::MESH_SHADER, BufferType::CBV);
 	renderer->SetGPUBuffer(executeOffsetBuffer, ShaderType::MESH_SHADER, BufferType::CBV);
-	renderer->SetGPUBuffer(colors_, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	renderer->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
 	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Add);
 	renderer->SetDepthStencil(SHEngine::PSO::DepthStencilID::Default);
 }

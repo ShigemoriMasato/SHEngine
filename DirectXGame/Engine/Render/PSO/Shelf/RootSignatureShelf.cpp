@@ -255,39 +255,21 @@ namespace SHEngine::PSO {
 	}
 
 	bool RootSignatureConfig::operator<(const RootSignatureConfig& other) const {
-		bool isLess = false;
-		isLess |= useTexture < other.useTexture;
-		isLess |= samplers < other.samplers;
-		isLess |= rootParams.size() < other.rootParams.size();
-
-		if (!isLess) {
-			//rootParams以外の要素が一致しており、これ以上の調査が必要かどうかを確かめる。
-			bool sizeEqual = rootParams.size() == other.rootParams.size() && samplers == other.samplers && useTexture == other.useTexture;
-			//sizeEqual == false : すでにもう片方がでかいことが確定しているので、ループを続ける必要はない。
-			for (int i = 0; !(sizeEqual && i >= (int)rootParams.size()); ++i) {
-				isLess |= rootParams[i].bufferType < other.rootParams[i].bufferType;
-				isLess |= rootParams[i].registerNumber < other.rootParams[i].registerNumber;
-				isLess |= rootParams[i].shader < other.rootParams[i].shader;
-			}
-		}
-		return isLess;
+		return std::tie(rootParams, useTexture, samplers) < std::tie(other.rootParams, other.useTexture, other.samplers);
 	}
 
 	bool RootSignatureConfig::operator==(const RootSignatureConfig& other) const {
-		bool ans = useTexture == other.useTexture || samplers == other.samplers || rootParams.size() == other.rootParams.size();
-		if (ans) {
-			for (int i = 0; i < (int)rootParams.size(); ++i) {
-				if (rootParams[i].bufferType != other.rootParams[i].bufferType ||
-					rootParams[i].registerNumber != other.rootParams[i].registerNumber ||
-					rootParams[i].shader != other.rootParams[i].shader) {
+		return rootParams == other.rootParams &&
+			useTexture == other.useTexture &&
+			samplers == other.samplers;
+	}
 
-					ans = false;
-					break;
+	bool RootParam::operator<(const RootParam& other) const {
+		return std::tie(shader, registerNumber, bufferType) < std::tie(other.shader, other.registerNumber, other.bufferType);
+	}
 
-				}
-			}
-		}
-		return ans;
+	bool RootParam::operator==(const RootParam& other) const {
+		return std::tie(shader, registerNumber, bufferType) == std::tie(other.shader, other.registerNumber, other.bufferType);
 	}
 
 }

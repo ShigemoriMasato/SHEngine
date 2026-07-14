@@ -7,7 +7,7 @@
 class Effect {
 public:
 
-	void Initialize(SHEngine::Engine* engine);
+	void Initialize(SHEngine::Engine* engine, SHEngine::Screen::IDisplay* renderTarget, const SHEngine::DrawData& pedd);
 
 	void AddEmitter(IEmitter* emitter);
 

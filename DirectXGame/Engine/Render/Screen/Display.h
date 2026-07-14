@@ -22,7 +22,7 @@ namespace SHEngine::Screen {
 
 		void CreateDepthTexture(TextureManager* textureManager);
 		void AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor);
-		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R16G16B16A16, bool unordered = false);
+		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8_UNORM, bool unordered = false);
 
 		/// @brief ViewPortを設定する
 		/// @param cmdObject コマンドオブジェクト
@@ -35,7 +35,7 @@ namespace SHEngine::Screen {
 		void ToPresent(DCC* dcc) override;
 		void ToTexture(DCC* dcc) override;
 		void ToNonPixel(DCC* dcc) override;
-		void ToUnordered(DCC* dcc, bool depthToo = false) override;
+		void ToUnordered(SHEngine::ICommandContext* dcc, bool depthToo = false) override;
 
 		/// @brief 先頭のテクスチャだけ取得する。
 		TextureData* GetTextureData() const override { return textureData_.front(); }
@@ -73,8 +73,8 @@ namespace SHEngine::Screen {
 
 		void CreateRenderTarget(SHEngine::TextureManager* textureManager, uint32_t index);
 
-		void TransitionBarrier(DCC* dcc, D3D12_RESOURCE_STATES after);
-		void TransitionDepthBarrier(DCC* dcc, D3D12_RESOURCE_STATES after);
+		void TransitionBarrier(SHEngine::ICommandContext* dcc, D3D12_RESOURCE_STATES after);
+		void TransitionDepthBarrier(SHEngine::ICommandContext* dcc, D3D12_RESOURCE_STATES after);
 
 		static inline Logger logger_ = GetLogger("Engine");
 

@@ -11,12 +11,13 @@ void SHEngine::Text::Initialize(DrawData& planeDrawData, const std::string& font
 
 	matrixBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4) * 2);
 	charPositionBuffer_ = container_->Create(BufferType::SRV, sizeof(CharPosition), maxCharNum_);
-	textureIndexBuffer_ = container_->Create(BufferType::CBV, sizeof(int));
+	textureIndexBuffer_ = container_->Create(BufferType::CBV, sizeof(int), 1, BufferNum::Single);
 	colorBuffer_ = container_->Create(BufferType::CBV, sizeof(Vector4));
+	textureIndexBuffer_->CopyBuffer(&textureIndex_, sizeof(int));
 
 	renderer_ = std::make_unique<Renderer>(planeDrawData);
 	renderer_->SetVS("Engine/FontBasic.VS.hlsl");
-	renderer_->SetVS("Engine/FontBasic.PS.hlsl");
+	renderer_->SetPS("Engine/FontBasic.PS.hlsl");
 	renderer_->SetGPUBuffer(matrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->SetGPUBuffer(charPositionBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
 	renderer_->SetGPUBuffers({ textureIndexBuffer_, colorBuffer_ }, ShaderType::PIXEL_SHADER, BufferType::CBV);
@@ -33,9 +34,9 @@ void SHEngine::Text::SetText(const std::wstring& text) {
 		charPositions_.push_back(fontLoader_->GetCharPosition(fontPath_, character, fontSize_));
 	}
 	charPositionBuffer_->CopyBuffer(charPositions_.data(), sizeof(CharPosition) * charPositions_.size());
-	charPositions_.clear();
-
 	renderer_->instanceNum_ = static_cast<uint32_t>(charPositions_.size());
+
+	charPositions_.clear();
 }
 
 void SHEngine::Text::SetSize(float size) {

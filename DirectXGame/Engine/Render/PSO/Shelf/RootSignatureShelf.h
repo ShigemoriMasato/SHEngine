@@ -59,6 +59,9 @@ namespace SHEngine::PSO {
 		ShaderType shader;
 		int registerNumber;
 		BufferType bufferType;
+
+		bool operator<(const RootParam& other) const;
+		bool operator==(const RootParam& other) const;
 	};
 
 	/**

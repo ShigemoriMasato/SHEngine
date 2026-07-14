@@ -1,5 +1,4 @@
 #pragma once
-#include "Shelf/ShaderShelf.h"
 #include "Shelf/BlendStateShelf.h"
 #include "Shelf/DepthStencilShelf.h"
 #include "Shelf/RasterizerShelf.h"
@@ -92,6 +91,7 @@ namespace SHEngine::PSO {
  * @brief std::hash特殊化（PSOConfigをunordered_mapのキーとして使用可能にする）
  */
 namespace std {
+
 	template<>
 	struct hash<SHEngine::PSO::Config> {
 		/**

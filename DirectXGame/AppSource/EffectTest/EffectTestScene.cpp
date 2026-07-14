@@ -1,7 +1,7 @@
 #include "EffectTestScene.h"
 
 namespace {
-	std::string filePath = "WaterPlane";
+	std::string filePath = "Title";
 }
 
 void EffectTestScene::Initialize() {
@@ -9,8 +9,9 @@ void EffectTestScene::Initialize() {
 
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 
+	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
 	effect_ = std::make_unique<Effect>();
-	effect_->Initialize(engine_);
+	effect_->Initialize(engine_, commonData_->display.get(), pedd);
 
 	grid_ = std::make_unique<Grid>();
 	grid_->Initialize(drawDataManager_);
@@ -34,7 +35,7 @@ void EffectTestScene::Initialize() {
 
 	unorderedTest_ = std::make_unique<SHEngine::Screen::Display>();
 	unorderedTest_->Initialize(1280, 720, "Unordered Test");
-	unorderedTest_->AddRenderTarget(textureManager_, 0x000000ff, SHEngine::Format::R16G16B16A16, true);
+	unorderedTest_->AddRenderTarget(textureManager_, 0x000000ff, SHEngine::Format::R8G8B8A8_UNORM, true);
 
 	auto unorderedTestTexture = unorderedTest_->GetTextureData();
 	auto utBuffer = container_->Create(unorderedTestTexture);
@@ -71,16 +72,18 @@ void EffectTestScene::Draw() {
 
 	directContext_->SetRenderTarget(display);
 
+	effect_->Draw();
+	
+	directContext_->SetRenderTarget(display, false);
+
 	//grid_->Draw(directContext_);
 
-	directContext_->BeginTimeStamp("Particle Draw");
-	effect_->Draw();
-	directContext_->EndTimeStamp();
-
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
-	timeViewer_->Add("Particle Draw", directContext_->GetTimeStampResult("Particle Draw"));
+	//timeViewer_->Add("Particle Draw", directContext_->GetTimeStampResult("Particle Draw"));
 	timeViewer_->Add("DeltaTime", engine_->GetDeltaTime());
 	timeViewer_->Draw(directContext_);
+
+	display->ToNonPixel(directContext_);
 
 	display->ToTexture(directContext_);
 
@@ -96,7 +99,6 @@ void EffectTestScene::Draw() {
 #endif
 
 	directContext_->SetRenderTarget(window, isFill);
-
 
 	engine_->DrawImGui();
 	window->ToPresent(directContext_);

@@ -106,7 +106,6 @@ void SHEngine::MeasureShaderTime::End(ICommandContext* commandContext) {
 double SHEngine::MeasureShaderTime::GetTimeStampResult(std::string name) {
 	auto timeStamp = FindTimeStamp(name);
 	if (!timeStamp) {
-		logger_->error("タイムスタンプ '{}' が見つかりません。", name);
 		return 0.0;
 	}
 

@@ -278,9 +278,7 @@ void BlockRender::DrawImGui() {
 
 		//色編集
 		ImGui::ColorEdit4("Color", &colorMap_[colorMapEditID_].color.x);
-
 		ImGui::ColorEdit4("OutlineColor", &colorMap_[colorMapEditID_].outlineColor.x);
-
 		ImGui::DragFloat("Reflect", &psData_.strength, 0.01f, 0.0f, 1.0f);
 	}
 	ImGui::End();

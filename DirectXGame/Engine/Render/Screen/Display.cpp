@@ -309,10 +309,9 @@ void SHEngine::Screen::Display::ToNonPixel(DCC* dcc) {
 	TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
-void SHEngine::Screen::Display::ToUnordered(DCC* dcc, bool depthToo) {
+void SHEngine::Screen::Display::ToUnordered(SHEngine::ICommandContext* dcc, bool depthToo) {
 	if (!unordered_) {
-		logger_->warn("Display {} is not created as unordered access. Do ToUnordered() instead of ToTexture().", windowName_);
-		ToTexture(dcc);
+		logger_->warn("Display {} is not created as unordered access. ToUnordered() is ignore.", windowName_);
 	}
 
 	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
@@ -331,14 +330,14 @@ D3D12_CPU_DESCRIPTOR_HANDLE* SHEngine::Screen::Display::GetDSVHandle() {
 	return &dsvHandlePtr_;
 }
 
-void SHEngine::Screen::Display::TransitionBarrier(DCC* dcc, D3D12_RESOURCE_STATES after) {
+void SHEngine::Screen::Display::TransitionBarrier(SHEngine::ICommandContext* dcc, D3D12_RESOURCE_STATES after) {
 	auto cmdList = dcc->GetCommandList();
 	for (size_t i = 0; i < textureData_.size(); ++i) {
 		SHEngine::Func::InsertBarrier(cmdList, after, currentBarrier_[i], textureData_[i]->GetResource());
 	}
 }
 
-void SHEngine::Screen::Display::TransitionDepthBarrier(DCC* dcc, D3D12_RESOURCE_STATES after) {
+void SHEngine::Screen::Display::TransitionDepthBarrier(SHEngine::ICommandContext* dcc, D3D12_RESOURCE_STATES after) {
 	auto cmdList = dcc->GetCommandList();
 	if (depthTextureData_) {
 		SHEngine::Func::InsertBarrier(cmdList, after, currentDepthBarrier_, depthTextureData_->GetResource());

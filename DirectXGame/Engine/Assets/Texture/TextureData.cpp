@@ -69,13 +69,19 @@ void TextureData::Release() {
 }
 
 void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, bool unordered, ID3D12Device* device, SRVManager* srvManager) {
-	DXGI_FORMAT dxgiformat;
+	DXGI_FORMAT dxgiformat = DXGI_FORMAT_UNKNOWN;
 	switch (format) {
-	case Format::R8:
+	case Format::R8_UNORM:
 		dxgiformat = DXGI_FORMAT_R8_UNORM;
 		break;
-	case Format::R16G16B16A16:
-		dxgiformat = DXGI_FORMAT_R16G16B16A16_UNORM;
+	case Format::R8G8B8A8_UNORM:
+		dxgiformat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	case Format::R32G32B32A32_UINT:
+		dxgiformat = DXGI_FORMAT_R32G32B32A32_UINT;
+		break;
+	case Format::R32_UINT:
+		dxgiformat = DXGI_FORMAT_R32_UINT;
 		break;
 	}
 
@@ -185,6 +191,8 @@ void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVMana
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	//!mipmapを使うかどうかは今後要検討
 	srvDesc.Texture2D.MipLevels = 1;
+
+	format_ = DXGI_FORMAT_R32_FLOAT;
 
 	// SRV用ディスクリプタ位置を確保
 	srvHandle_.UpdateHandle(manager, 0);
