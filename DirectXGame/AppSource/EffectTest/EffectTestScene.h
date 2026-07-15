@@ -10,17 +10,22 @@
 
 #include <Game/Effect/Vertex/VertexEmitter.h>
 #include <Game/Effect/Polygon/PolygonEmitter.h>
+#include <Game/Effect/Wave/WaveEmitter.h>
 
 class EffectTestScene : public IScene {
 public:
 
-	EffectTestScene() {};
+	EffectTestScene() { Load(); };
+	~EffectTestScene() { Save(); };
 
 	void Initialize() override;
 	std::unique_ptr<IScene> Update() override;
 	void Draw() override;
 
 private:
+
+	void Save();
+	void Load();
 
 	DebugCamera camera_;
 
@@ -29,6 +34,10 @@ private:
 	std::unique_ptr<Effect> effect_ = nullptr;
 	std::unique_ptr<VertexEmitter> vertexEmitter_ = nullptr;
 	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
+
+	std::unique_ptr<WaveEmitter> waveEmitter_ = nullptr;
+	WaveEmitter::Config waveEmitterConfig_{};
+	WaveEmitter::WaveData waveData_{};
 
 	std::unique_ptr<PostEffect> postEffect_ = nullptr;
 	PostEffectConfig peConfig_{};
@@ -39,4 +48,8 @@ private:
 
 	std::unique_ptr<SHEngine::Screen::Display> unorderedTest_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> unorderedTestCom_ = nullptr;
+
+	bool drawGrid_ = false;
+
+	const std::string savefile_ = "EffectTestScene.bin";
 };

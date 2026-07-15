@@ -49,7 +49,7 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 
 
 void PolygonEmitter::Update(CCC* compute, float deltaTime) {
-	uint32_t seed = randomDistribution_(randomEngine_);
+	uint32_t seed = GetRandU();
 	seed_->CopyBuffer(&seed, sizeof(uint32_t));
 
 	for (const auto& [id, set] : polygonSets_) {
@@ -57,7 +57,9 @@ void PolygonEmitter::Update(CCC* compute, float deltaTime) {
 		emit_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, position_, color_, velocity_, currentTime_ });
 		emit_->SetGPUBuffers(BufferType::SRV, { set.polygonList, set.chanceList, indexList_ });
 		emit_->SetGPUBuffers(BufferType::CBV, { set.emitNum, set.color, set.worldMatrix, speed_, set.chanceListNum, seed_ });
-		emit_->SetThreadGroupSize(std::min(65535, (int)set.emitNumValue / 128 + 1));
+		uint32_t emitNum = uint32_t(std::round(float(set.emitNumValue) * deltaTime));
+		set.emitNum->CopyBuffer(&emitNum, sizeof(uint32_t));
+		emit_->SetThreadGroupSize(std::min(65535, (int)emitNum/ 128 + 1));
 		emit_->Execute(compute);
 	}
 
@@ -109,6 +111,5 @@ void PolygonEmitter::EditPolygon(uint32_t index, Matrix4x4 worldMatrix, Vector4 
 	auto& set = it->second;
 	set.worldMatrix->CopyBuffer(&worldMatrix, sizeof(Matrix4x4));
 	set.color->CopyBuffer(&color, sizeof(Vector4));
-	set.emitNum->CopyBuffer(&emitNum, sizeof(uint32_t));
 	set.emitNumValue = emitNum;
 }

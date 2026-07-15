@@ -6,15 +6,14 @@ cbuffer deltaTime : register(b1)
 {
     float deltaTime;
 };
-cbuffer ID : register(b2)
+cbuffer LifeTime : register(b2)
 {
-    uint id;
+    float lifetime;
 };
-cbuffer CSData : register(b3)
+cbuffer UpdateData : register(b3)
 {
     float4x4 parentMatrix;
-    float lifetime;
-    float3 fieldSize;
+    float colorIntensity;
 };
 
 struct Wave
@@ -30,23 +29,24 @@ struct Wave
     float maxlifetime;
     float thickness;
 };
-cbuffer WaveBuffer : register(b4)
-{
-    Wave waves[16];
-}
 
-RWStructuredBuffer<uint> freeList : register(u0);
-RWStructuredBuffer<uint> freeListIndex : register(u1);
-RWStructuredBuffer<float3> outPositions : register(u2);
-RWStructuredBuffer<float4> outColors : register(u3);
-RWStructuredBuffer<uint> type : register(u4);
-RWStructuredBuffer<float3> velocities : register(u5);
-RWStructuredBuffer<float> lifetimes : register(u6);
-RWStructuredBuffer<float3> positions : register(u7);
-RWStructuredBuffer<uint> isUse : register(u8);
-RWStructuredBuffer<float4> colors : register(u9);
+StructuredBuffer<Wave> waves : register(t0);
+static const uint kWaveNum = 16;
 
-[numthreads(64, 1, 1)]
+StructuredBuffer<int> indexList : register(t1);
+
+RWStructuredBuffer<int> freeList : register(u0);
+RWStructuredBuffer<int> freeListIndex : register(u1);
+RWStructuredBuffer<float32_t3> positions : register(u2);
+RWStructuredBuffer<float16_t4> colors : register(u3);
+RWStructuredBuffer<float16_t3> velocities : register(u4);
+RWStructuredBuffer<float16_t> currentTimes : register(u5);
+RWStructuredBuffer<float16_t3> basePositions : register(u6);
+
+static const float32_t kMinValue32 = 1.175494351E-38;
+static const float16_t kMinValue16 = 6.103515625E-05;
+
+[numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint index = DTid.x;
@@ -55,24 +55,20 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
-    if (isUse[index] == 0)
+    if (basePositions[index].x == kMinValue16)
     {
-        outPositions[index] = float3(0, 0, 0);
-        outColors[index] = float4(0, 0, 0, 0);
-        type[index] = 0;
         return;
     }
     
-    type[index] = id;
-    positions[index] += velocities[index] * deltaTime;
+    int globalIndex = indexList[index];
+    basePositions[index] += velocities[index] * float16_t(deltaTime);
     
     //波の処理
-    float3 pos = positions[index];
-    float3 col = colors[index].rgb;
-    const int kWaveNum = 16;
-    for (int i = 0; i < 16; ++i)
+    float16_t3 pos = basePositions[index];
+    float16_t3 col = colors[index].rgb;
+    for (int i = 0; i < kWaveNum; ++i)
     {
-        if (waves[i].lifetime >= waves[i].maxlifetime || waves[i].maxlifetime == 0)
+        if (waves[i].lifetime >= waves[i].maxlifetime)
         {
             continue;
         }
@@ -86,23 +82,24 @@ void main(uint3 DTid : SV_DispatchThreadID)
         {
             float decay = 1.0f - (waves[i].lifetime / waves[i].maxlifetime);
             float intensity = (1.0f - abs(diff) / range) * waves[i].intensity * decay;
-            pos += float3(0, intensity, 0);
-            col += waves[i].color * intensity;
+            pos += float16_t3(0, intensity, 0);
+            col += float16_t3(waves[i].color * intensity * colorIntensity);
         }
     }
     
     //出力先に値を書き込む
-    float alpha = abs(float(lifetimes[index] / (lifetime * 0.5f)) - 1);
-    outColors[index] = float4(col, alpha);
-    outPositions[index] = mul(float4(pos, 1), parentMatrix).xyz;
+    float16_t normalzed = currentTimes[index] / float16_t(lifetime);
+    float16_t alpha = float16_t(abs((normalzed * 2) - 1));
+    colors[globalIndex] = float16_t4(col, alpha);
+    positions[globalIndex] = mul(float4(pos, 1), parentMatrix).xyz;
     
-    lifetimes[index] -= deltaTime;
-    if (lifetimes[index] <= 0.0f)
+    currentTimes[index] += float16_t(deltaTime);
+    if ((currentTimes[index] >= float16_t(lifetime)))
     {
         uint freeIndex;
         InterlockedAdd(freeListIndex[0], 1, freeIndex);
         freeList[freeIndex + 1] = index;
-        type[index] = 0;
-        isUse[index] = 0;
+        positions[globalIndex] = float32_t3(kMinValue32, kMinValue32, kMinValue32);
+        basePositions[index] = float16_t3(kMinValue16, kMinValue16, kMinValue16);
     }
 }

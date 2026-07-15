@@ -78,7 +78,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     uint index = freeList[freeIndex];
 
-    uint seed = randSeed + id;
+    uint seed = randSeed ^ id;
     
     //生成するポリゴンを抽選
     int chanceIndex = randu(seed, chanceListSize - 1);

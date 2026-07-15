@@ -38,6 +38,10 @@ void SHEngine::ComputeObject::SetUseTexture(bool useTexture) {
 }
 
 void ComputeObject::Execute(SHEngine::ICommandContext* commandContext) {
+	if (threadGroupSize_.x == 0 || threadGroupSize_.y == 0 || threadGroupSize_.z == 0) {
+		return;
+	}
+
 	//PSOのセット
 	auto cmdList = commandContext->GetCommandList();
 	int cbvNum = int(gpuBuffers_[BufferType::CBV].size());

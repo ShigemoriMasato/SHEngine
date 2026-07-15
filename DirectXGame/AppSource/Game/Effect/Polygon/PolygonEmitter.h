@@ -51,7 +51,4 @@ private:
 	SHEngine::GPUBuffer* color_ = nullptr;
 
 	const uint32_t kMaxParticleNum_;
-
-	std::mt19937 randomEngine_{ std::random_device{}() };
-	std::uniform_int_distribution<uint32_t> randomDistribution_{ 0, UINT32_MAX };
 };

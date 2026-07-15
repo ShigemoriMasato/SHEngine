@@ -44,7 +44,7 @@ private:
 
 	std::unique_ptr<SHEngine::MeshRenderer> renderer_;
 
-	float size_ = 0.2f;
+	float size_ = 0.01f;
 	struct Camera {
 		Matrix4x4 vpMatrix;
 		Matrix4x4 billboardMatrix;

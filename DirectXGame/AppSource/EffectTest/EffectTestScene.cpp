@@ -18,15 +18,16 @@ void EffectTestScene::Initialize() {
 
 	vertexEmitter_ = std::make_unique<VertexEmitter>();
 	effect_->AddEmitter(vertexEmitter_.get());
-
 	auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel(filePath));
 	vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
 
-	polygonEmitter_ = std::make_unique<PolygonEmitter>();
+	polygonEmitter_ = std::make_unique<PolygonEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(polygonEmitter_.get());
-
 	auto polygonList = modelManager_->CreatePolygonList(modelManager_->LoadModel(filePath));
-	polygonEmitter_->AddPolygon(polygonList, Matrix::MakeTranslationMatrix({0, 3, 0}), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 100);
+	polygonEmitter_->AddPolygon(polygonList, Matrix::MakeTranslationMatrix({0, 3, 0}), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 6000);
+	
+	waveEmitter_ = std::make_unique<WaveEmitter>(65535 * 128 - 1);
+	effect_->AddEmitter(waveEmitter_.get());
 
 	postEffect_ = std::make_unique<PostEffect>();
 	postEffect_->Initialize(textureManager_, drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex), true);
@@ -54,6 +55,13 @@ void EffectTestScene::Initialize() {
 
 std::unique_ptr<IScene> EffectTestScene::Update() {
 	camera_.Update();
+
+	waveEmitterConfig_.DrawImGui();
+	waveEmitter_->SetConfig(waveEmitterConfig_);
+
+	if (waveData_.DrawImGui()) {
+		waveEmitter_->AddWave(waveData_);
+	}
 
 	computeContext_->BeginTimeStamp("Particle Update");
 
@@ -84,7 +92,7 @@ void EffectTestScene::Draw() {
 	
 	directContext_->SetRenderTarget(display, false);
 
-	grid_->Draw(directContext_);
+	//grid_->Draw(directContext_);
 
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
 	timeViewer_->Add("Particle Draw", directContext_->GetTimeStampResult("Particle Draw"));
@@ -110,4 +118,23 @@ void EffectTestScene::Draw() {
 
 	engine_->DrawImGui();
 	window->ToPresent(directContext_);
+}
+
+void EffectTestScene::Save() {
+	BinaryManager binaryManager;
+	binaryManager.Register(&drawGrid_);
+	waveEmitterConfig_.Save(binaryManager);
+	waveData_.Save(binaryManager);
+	binaryManager.Write(savefile_);
+}
+
+void EffectTestScene::Load() {
+	BinaryManager binaryManager;
+	if (!binaryManager.Boot(savefile_)) {
+		return;
+	}
+
+	drawGrid_ = binaryManager.Reverse<bool>();
+	waveEmitterConfig_.Load(binaryManager);
+	waveData_.Load(binaryManager);
 }
