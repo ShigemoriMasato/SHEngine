@@ -27,28 +27,28 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine:
 
 	initialize_->Execute(compute);
 
-	CreateRenderer();
+	renderer_ = std::make_unique<SHEngine::MeshRenderer>();
 
+	renderer_->SetAS("Mesh/Particle/Quad.AS.hlsl");
+	renderer_->SetMS("Mesh/Particle/Quad.MS.hlsl");
+	renderer_->SetPS("Game/GPUParticle.PS.hlsl");
+	renderer_->SetGPUBuffer(pool_.position, ShaderType::MESH_SHADER, BufferType::SRV);
+	renderer_->SetGPUBuffer(sizeBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
+	renderer_->SetGPUBuffer(vpMatrixBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
+	renderer_->SetGPUBuffer(pool_.particleNum, ShaderType::MESH_SHADER, BufferType::CBV);
+	renderer_->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	renderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add);
+	renderer_->SetDepthStencil(SHEngine::PSO::DepthStencilID::Default);
 	pool_.maxParticleNum = kMaxParticleNum;
 
 	drawCount_ = kMaxParticleNum / 64 / 2;
-	drawCount_ = 60194;
+	drawCount_ = 1;
 }
 
 void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime, CCC* compute) {
 	//drawCountに応じてレンダラーのDispatchGroupを設定する。
-	int i = 0;
-	for (i = 0; i < drawCount_ / 65535 + 1; ++i) {
-		if (renderer_.size() <= i) {
-			CreateRenderer();
-		}
-		auto& renderer = renderer_[i];
-		renderer->SetDispatchGroup(std::min(((drawCount_)-i * 65535) + 1, 65535));
-	}
-	//余ったレンダラーのDispatchGroupを0にする
-	for (i; i < renderer_.size(); ++i) {
-		renderer_[i]->SetDispatchGroup(0);
-	}
+	static constexpr int kExecuteNum = 64 * 32;
+	renderer_->SetDispatchGroup(drawCount_ / kExecuteNum + 1, 1, 1);
 
 	camera_.vpMatrix = vpMatrix;
 	camera_.billboardMatrix = billboardMatrix;
@@ -58,37 +58,16 @@ void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardM
 }
 
 void ParticlePool::Draw(DCC* dcc, CCC* ccc) {
-	for (int i = 0; i < renderer_.size(); ++i) {
-		renderer_[i]->Draw(dcc);
-	}
+	renderer_->Draw(dcc);
 }
 
 void ParticlePool::DrawImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Particle Common");
 	ImGui::DragFloat("Size", &size_, 0.01f);
-	ImGui::SliderInt("RenderNum", &drawCount_, 1, pool_.maxParticleNum / 64);
+	ImGui::SliderInt("RenderNum", &drawCount_, 1, pool_.maxParticleNum);
 	ImGui::End();
 
 	sizeBuffer_->CopyBuffer(&size_, sizeof(size_));
 #endif
-}
-
-void ParticlePool::CreateRenderer() {
-	auto& renderer = renderer_.emplace_back(std::make_unique<SHEngine::MeshRenderer>());
-
-	auto executeOffsetBuffer = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single);
-	int executeOffset = int(renderer_.size() - 1) * 65535 * 64;
-	executeOffsetBuffer->CopyBuffer(&executeOffset, sizeof(executeOffset));
-
-	renderer->SetMS("Mesh/Particle/Quad.MS.hlsl");
-	renderer->SetPS("Game/GPUParticle.PS.hlsl");
-	renderer->SetGPUBuffer(pool_.position, ShaderType::MESH_SHADER, BufferType::SRV);
-	renderer->SetGPUBuffer(sizeBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
-	renderer->SetGPUBuffer(vpMatrixBuffer_, ShaderType::MESH_SHADER, BufferType::CBV);
-	renderer->SetGPUBuffer(pool_.particleNum, ShaderType::MESH_SHADER, BufferType::CBV);
-	renderer->SetGPUBuffer(executeOffsetBuffer, ShaderType::MESH_SHADER, BufferType::CBV);
-	renderer->SetGPUBuffer(pool_.color, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Add);
-	renderer->SetDepthStencil(SHEngine::PSO::DepthStencilID::Default);
 }

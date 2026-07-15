@@ -2,7 +2,7 @@
 #include <Render/Screen/IDisplay.h>
 
 void SHEngine::MeshRenderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType) {
-	if (shaderType != ShaderType::MESH_SHADER && shaderType != ShaderType::PIXEL_SHADER) {
+	if (shaderType != ShaderType::MESH_SHADER && shaderType != ShaderType::PIXEL_SHADER && shaderType != ShaderType::AMPLIFICATION_SHADER) {
 		logger_->info("MeshRenderer::SetGPUBuffer: This Shader is not supported.");
 		return;
 	}

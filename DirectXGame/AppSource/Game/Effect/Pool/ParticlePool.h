@@ -32,8 +32,6 @@ public:
 
 private:
 
-	void CreateRenderer();
-
 	constexpr static inline int kThreadGroupSize_ = 1024;
 
 	std::unique_ptr<SHEngine::BufferContainer> container_;
@@ -44,7 +42,7 @@ private:
 	SHEngine::GPUBuffer* sizeBuffer_ = nullptr;
 	Pool pool_{};
 
-	std::vector<std::unique_ptr<SHEngine::MeshRenderer>> renderer_;
+	std::unique_ptr<SHEngine::MeshRenderer> renderer_;
 
 	float size_ = 0.2f;
 	struct Camera {

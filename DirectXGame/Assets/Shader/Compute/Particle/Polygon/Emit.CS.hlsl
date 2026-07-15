@@ -99,11 +99,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
     float3 p = polygon.a + u * (polygon.b - polygon.a) + v * (polygon.c - polygon.a);
 
-    velocities[index] = normalize(float16_t3(
-            randf(seed) * 2.0f - 1.0f,
-            randf(seed) * 2.0f - 1.0f,
-            randf(seed) * 2.0f - 1.0f
-          )) * speed;
+    velocities[index] = float16_t3(normalize(float3(randf(seed) * 2.0f - 1.0f, randf(seed) * 2.0f - 1.0f, randf(seed) * 2.0f - 1.0f)) * speed);
     currentTime[index] = 0.0f;
 
     int globalIndex = indexList[index];

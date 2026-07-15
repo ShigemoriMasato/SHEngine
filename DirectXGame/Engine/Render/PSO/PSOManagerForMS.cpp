@@ -15,6 +15,7 @@ void SHEngine::PSO::ManagerMSType::SetPSO(const ConfigMSType& config, ID3D12Grap
 
 		auto rootSignature = shelfManager_->GetRootSignature(config.rootConfig);
 		psoStream.rootSignature = CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE(rootSignature);
+		psoStream.as = CD3DX12_PIPELINE_STATE_STREAM_AS(shelfManager_->GetShaderBytecode(ShaderType::AMPLIFICATION_SHADER, config.as));
 		psoStream.ms = CD3DX12_PIPELINE_STATE_STREAM_MS(shelfManager_->GetShaderBytecode(ShaderType::MESH_SHADER, config.ms));
 		psoStream.ps = CD3DX12_PIPELINE_STATE_STREAM_PS(shelfManager_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps));
 		psoStream.blend = CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC(CD3DX12_BLEND_DESC(shelfManager_->GetBlendState(config.blendID)));

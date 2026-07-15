@@ -1,4 +1,5 @@
 static const uint THREAD_GROUP_SIZE = 64;
+static const uint AS_WAVE = 16;
 
 struct VertexOutput
 {
@@ -21,14 +22,16 @@ cbuffer MaxNum : register(b2)
 {
     int maxNum;
 };
-cbuffer ExecuteOffset : register(b3)
+
+struct Payload
 {
-    int executeOffset;
+    uint threadID;
 };
 
 [outputtopology("triangle")]
 [numthreads(THREAD_GROUP_SIZE, 1, 1)]
 void main(
+in payload Payload asID, //ASのDispatchThreadID
 uint3 globalID : SV_DispatchThreadID,
 uint3 localID : SV_GroupThreadID,
 out vertices VertexOutput vertices[256], 
@@ -38,7 +41,7 @@ out indices uint3 triangles[128]
     const int vertexCount = 4;
     const int primitiveCount = 2;
     
-    const uint threadID = globalID.x + executeOffset;
+    const uint threadID = globalID.x + THREAD_GROUP_SIZE * AS_WAVE * asID.threadID;
     const uint vertexOffset = localID.x * vertexCount;
     const uint triangleOffset = localID.x * primitiveCount;
 

@@ -18,7 +18,7 @@ PSOutput main(PSInput input)
     PSOutput output;
     output.color = colors[input.instanceID];
     if(output.color.a < 0.01f){
-        discard;
+        output.color = float4(1, 0, 1, 1);
     }
     return output;
 }

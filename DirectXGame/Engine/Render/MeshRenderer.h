@@ -32,6 +32,8 @@ namespace SHEngine {
 		/// @param gpuBuffer リセットするGPUBuffer
 		void EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer);
 
+		// @brief AmplificationShaderのファイル名をセットする。デフォルトは"Simple.AS.hlsl"。
+		void SetAS(const std::string& as) { psoConfig_.as = as; }
 		// @brief VertexShaderのファイル名をセットする。デフォルトは"Simple.VS.hlsl"。
 		void SetMS(const std::string& ms) { psoConfig_.ms = ms; }
 		// @brief PixelShaderのファイル名をセットする。デフォルトは"White.PS.hlsl"。

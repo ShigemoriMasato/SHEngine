@@ -8,7 +8,7 @@ void Effect::Initialize(SHEngine::Engine* engine, SHEngine::Screen::IDisplay* re
 
 	particlePool_ = std::make_unique<ParticlePool>();
 	// メモリを確保する
-	particlePool_->Initialize(int(50000000), compute_, textureManager_, renderTarget, pedd);
+	particlePool_->Initialize(int(100000000), compute_, textureManager_, renderTarget, pedd);
 
 	compute_->MiddleExecute();
 }

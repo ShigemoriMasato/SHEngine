@@ -20,6 +20,7 @@ enum class ShaderType {
 	PIXEL_SHADER,   ///< ピクセルシェーダー
 	COMPUTE_SHADER, ///< コンピュートシェーダー
 	MESH_SHADER,
+	AMPLIFICATION_SHADER,
 
 	Count           ///< シェーダータイプの総数
 };
@@ -111,7 +112,8 @@ namespace SHEngine {
 			{ShaderType::VERTEX_SHADER, L"vs_6_5"},
 			{ShaderType::PIXEL_SHADER, L"ps_6_5"},
 			{ShaderType::COMPUTE_SHADER, L"cs_6_5"},
-			{ ShaderType::MESH_SHADER, L"ms_6_5" }
+			{ShaderType::MESH_SHADER, L"ms_6_5"},
+			{ShaderType::AMPLIFICATION_SHADER, L"as_6_5"}
 		};
 
 	};

@@ -1,7 +1,7 @@
 #include "EffectTestScene.h"
 
 namespace {
-	std::string filePath = "WaterPlane";
+	std::string filePath = "Title";
 }
 
 void EffectTestScene::Initialize() {
@@ -20,13 +20,13 @@ void EffectTestScene::Initialize() {
 	effect_->AddEmitter(vertexEmitter_.get());
 
 	auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel(filePath));
-	//vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
+	vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
 
 	polygonEmitter_ = std::make_unique<PolygonEmitter>();
 	effect_->AddEmitter(polygonEmitter_.get());
 
 	auto polygonList = modelManager_->CreatePolygonList(modelManager_->LoadModel(filePath));
-	polygonEmitter_->AddPolygon(polygonList, Matrix::MakeTranslationMatrix({0, 0, 0}), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 100);
+	polygonEmitter_->AddPolygon(polygonList, Matrix::MakeTranslationMatrix({0, 3, 0}), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 100);
 
 	postEffect_ = std::make_unique<PostEffect>();
 	postEffect_->Initialize(textureManager_, drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex), true);
@@ -78,14 +78,16 @@ void EffectTestScene::Draw() {
 
 	directContext_->SetRenderTarget(display);
 
+	directContext_->BeginTimeStamp("Particle Draw");
 	effect_->Draw();
+	directContext_->EndTimeStamp();
 	
 	directContext_->SetRenderTarget(display, false);
 
-	//grid_->Draw(directContext_);
+	grid_->Draw(directContext_);
 
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
-	//timeViewer_->Add("Particle Draw", directContext_->GetTimeStampResult("Particle Draw"));
+	timeViewer_->Add("Particle Draw", directContext_->GetTimeStampResult("Particle Draw"));
 	timeViewer_->Add("DeltaTime", engine_->GetDeltaTime());
 	timeViewer_->Draw(directContext_);
 
