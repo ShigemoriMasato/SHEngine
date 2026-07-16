@@ -7,7 +7,7 @@ using namespace SHEngine;
 void ModelLoader::CreateNodes(const aiNode* node, std::vector<Node>& nodes, uint32_t parentIndex) {
 	uint32_t nodeIndex = static_cast<uint32_t>(nodes.size());
 	Node newNode = nodes.emplace_back();
-	
+
 	//ローカル座標の読み込み
 	aiVector3D scale, position;
 	aiQuaternion rotate;
@@ -111,7 +111,7 @@ std::vector<VertexInfluence> ModelLoader::LoadVertexInfluences(const aiMesh* ai_
 		for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
 			aiVertexWeight weight = bone->mWeights[weightIndex];
 			VertexInfluence& vertexInfluence = vertexInfluences[weight.mVertexId];
-			
+
 			//空いてるとこに挿入(オーバーしたら諦める)
 			for (int i = 0; i < MAX_JOINTS_PER_VERTEX; ++i) {
 				if (vertexInfluence.weight[i] == 0.0f) {
@@ -153,16 +153,12 @@ std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::stri
 	return materials;
 }
 
-std::vector<uint32_t> ModelLoader::LoadMaterialIndices(const aiScene* scene) {
+std::vector<uint32_t> ModelLoader::LoadMaterialIndices(const aiMesh* ai_mesh) {
 	std::vector<uint32_t> result;
 
-	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
-		aiMesh* ai_mesh = scene->mMeshes[mesh];
-
-		for (uint32_t f = 0; f < ai_mesh->mNumFaces; ++f) {
-			for (uint32_t i = 0; i < ai_mesh->mFaces[f].mNumIndices; ++i) {
-				result.push_back(ai_mesh->mMaterialIndex);
-			}
+	for (uint32_t f = 0; f < ai_mesh->mNumFaces; ++f) {
+		for (uint32_t i = 0; i < ai_mesh->mFaces[f].mNumIndices; ++i) {
+			result.push_back(ai_mesh->mMaterialIndex);
 		}
 	}
 
@@ -171,7 +167,7 @@ std::vector<uint32_t> ModelLoader::LoadMaterialIndices(const aiScene* scene) {
 
 std::map<std::string, Skin> ModelLoader::LoadSkinCluster(const aiScene* scene) {
 	std::map<std::string, Skin> skinClusterData;
-
+	
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 
@@ -199,7 +195,7 @@ std::map<std::string, Skin> ModelLoader::LoadSkinCluster(const aiScene* scene) {
 	return skinClusterData;
 }
 
-Skeleton ModelLoader::CreateSkelton(const Node& rootNode, const aiScene* scene) {
+Skeleton ModelLoader::CreateSkeleton(const Node& rootNode, const aiScene* scene) {
 	Skeleton skeleton{};
 	std::unordered_set<std::string> boneNames;
 

@@ -71,7 +71,7 @@ struct Material {
     int normalTexture = -1;
 };
 
-struct Bone {
+struct Joint {
     std::string name;
     uint32_t nodeIndex;
     Matrix4x4 inverseBindMatrix;
@@ -79,7 +79,7 @@ struct Bone {
 
 struct Skeleton {
     uint32_t rootNode;
-    std::vector<Bone> bones;
+    std::vector<Joint> joints;
 };
 
 struct Model {
