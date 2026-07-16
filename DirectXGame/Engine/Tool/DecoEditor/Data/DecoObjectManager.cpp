@@ -39,7 +39,7 @@ void Decorate::ObjManager::Update(Camera* camera) {
 		if (!renderer) {
 			auto ddm = engine_->GetDrawDataManager();
 			auto mm = engine_->GetModelManager();
-			auto modelData = mm->GetNodeModelData(mm->LoadModel(path));
+			auto modelData = mm->GetModelData(mm->LoadModel(path));
 			auto drawData = ddm->GetDrawData(modelData.drawDataIndex);
 			int textureIndex = modelData.materials[modelData.materialIndex.front()].textureIndex;
 			renderer = std::make_unique<ObjRenderer>(drawData, textureIndex);

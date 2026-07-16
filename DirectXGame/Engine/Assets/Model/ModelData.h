@@ -1,132 +1,90 @@
 #pragma once
-#include <Utility/Vector.h>
-#include <Utility/Matrix.h>
-#include <Utility/Quaternion.h>
-#include <Utility/DataStructures.h>
-#include <vector>
-#include <string>
-#include <optional>
-#include <map>
-#include <unordered_map>
-
-struct Material {
-	int textureIndex = -1;
-	int normalMapIndex = -1;
-	Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Vector4 emissiveColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Vector4 specularColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	float shininess = 1.0f;
-};
+#include <Utility/MyMath.h>
 
 struct Node {
-	QuaternionTransform transform;
-	Matrix4x4 localMatrix;
-	std::string name;
-	std::vector<Node> children;
+    std::string name;
+
+    QuaternionTransform localTransform;
+
+    Matrix4x4 localMatrix;
+    Matrix4x4 globalMatrix;
+
+    int parent = -1;
+    std::vector<uint32_t> children;
+
+    int meshIndex = -1;
+    int skinIndex = -1;
 };
 
-template <typename T>
-struct Keyframe {
-	float time;
-	T value;
-};
-using KeyframeVector3 = Keyframe<Vector3>;
-using KeyframeQuaternion = Keyframe<Quaternion>;
-
-template<typename T>
-struct AnimationCurve {
-	std::vector<Keyframe<T>> keyframes;
+static constexpr int MAX_JOINTS_PER_VERTEX = 4;
+struct VertexInfluence {
+    uint32_t joint[MAX_JOINTS_PER_VERTEX];
+    float weight[MAX_JOINTS_PER_VERTEX];
 };
 
-struct NodeAnimation {
-	AnimationCurve<Vector3> position;
-	AnimationCurve<Quaternion> rotate;
-	AnimationCurve<Vector3> scale;
+enum class VertexType : uint8_t {
+    None            = 0,
+    Position        = 1 << 0,
+	Texcoord        = 1 << 1,
+    Normal          = 1 << 2,
+	Color           = 1 << 3,
+	Influence       = 1 << 4
 };
 
-struct Animation {
-	float duration;
-	std::unordered_map<std::string, NodeAnimation> nodeAnimations;
+uint8_t operator|(VertexType a, VertexType b);
+uint8_t operator|(uint8_t a, VertexType b);
+uint8_t operator&(VertexType a, VertexType b);
+uint8_t operator&(uint8_t a, VertexType b);
+uint8_t operator~(VertexType a);
+
+struct Primitive {
+    uint32_t indexOffset;
+    uint32_t indexCount = 3;
+    uint32_t materialIndex;
 };
 
-struct NodeModelData {
-	//VertexBufferView関連
-	std::vector<VertexData> vertices{};
-	std::vector<uint32_t> materialIndex{};
-	std::vector<Vector3> positions{};
+struct Mesh {
+    std::string name;
 
-	//IndexBufferView関連
-	std::vector<uint32_t> indices{};
+    std::vector<Vector4> position;
+    std::vector<Vector3> normal;
+	std::vector<Vector2> texcoord;
+    std::vector<Vector4> color;
+	std::vector<VertexInfluence> vertexInfluences;
 
-	//その他
-	Node rootNode{};
-	std::vector<Material> materials{};
-	int drawDataIndex = -1;
+    std::vector<uint32_t> indices;
+
+    std::vector<Primitive> primitives;
+
+	std::array<int, 32> drawDataIndices;
 };
 
-struct Joint {
-	QuaternionTransform transform;
-	Matrix4x4 localMatrix;
-	Matrix4x4 skeletonSpaceMatrix;
-	std::string name;
-	std::vector<int32_t> children;
-	int32_t index;
-	std::optional<int32_t> parent;
+struct Material {
+    std::string name;
+
+    Vector4 baseColor = { 1,1,1,1 };
+
+    float metallic = 1.0f;
+    float roughness = 1.0f;
+
+    int textureIndex = -1;
+    int normalTexture = -1;
+};
+
+struct Bone {
+    std::string name;
+    uint32_t nodeIndex;
+    Matrix4x4 inverseBindMatrix;
 };
 
 struct Skeleton {
-	int32_t root;
-	Matrix4x4 rootMatrix = Matrix4x4::Identity();
-	std::map<std::string, int32_t> jointMap;
-	std::vector<Joint> joints;
+    uint32_t rootNode;
+    std::vector<Bone> bones;
 };
 
-struct VertexWeightData {
-	float weight;
-	uint32_t vertexIndex;
-};
-
-struct JointWeightData {
-	Matrix4x4 inverseBindPoseMatrix{};
-	std::vector<VertexWeightData> vertexWeights;
-};
-
-const uint32_t kMaxInfluences = 4;
-struct VertexInfluence {
-	float weights[kMaxInfluences];
-	int jointIndices[kMaxInfluences];
-};
-
-struct WellForGPU {
-	Matrix4x4 skeletonSpaceMatrix;//位置用
-	Matrix4x4 skeletonSpaceInverseTransposeMatrix;//normal用
-};
-
-struct SkinningModelData {
-	//VertexBufferView関連
-	std::vector<VertexData> vertices{};
-	std::vector<VertexInfluence> vertexInfluences{};
-	std::vector<uint32_t> materialIndex{};
-
-	//IndexBufferView関連
-	std::vector<uint32_t> indices{};
-
-	//その他
-	Skeleton skeleton{};
-	std::map<std::string, JointWeightData> skinClusterData{};
-	std::vector<Material> materials{};
-	int drawDataIndex = -1;
-};
-
-//三角面化されたポリゴンのデータ
-struct PolygonData {
-	Vector3 a;
-	Vector3 b;
-	Vector3 c;
-};
-
-struct PolygonList {
-	std::vector<PolygonData> polygons;
-	std::vector<float> areas;
-	float totalArea;
+struct Model {
+    std::vector<Node> nodes;
+    std::vector<Mesh> meshes;
+    std::vector<Material> materials;
+    Skeleton skeleton;
 };

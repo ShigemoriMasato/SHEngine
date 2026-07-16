@@ -4,7 +4,7 @@
 void TimeViewer::Initialize(SHEngine::Engine* engine) {
 	auto ddm = engine->GetDrawDataManager();
 	auto mm = engine->GetModelManager();
-	drawData_ = ddm->GetDrawData(mm->GetNodeModelData(1).drawDataIndex);
+	drawData_ = ddm->GetDrawData(mm->GetModelData(1).drawDataIndex);
 
 	orthoCamera_.SetProjectionMatrix(OrthographicDesc());
 	orthoCamera_.MakeMatrix();

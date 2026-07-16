@@ -49,10 +49,13 @@ namespace SHEngine {
 		 */
 		int LoadTexture(const std::string& filePath);
 
-		/**
-		 * @brief エラーテクスチャのハンドルを取得
-		 * @return エラーテクスチャハンドル
-		 */
+		/// @brief 白色の1x1テクスチャのハンドルを取得
+		int GetWhite1x1Texture() const { return 0; }
+
+		/// @brief UVCheckerのハンドルを取得
+		int GetUVChecker() const { return 1; }
+
+		/// @brief エラーテクスチャのハンドルを取得
 		int GetErrorTextureHandle() const { return 2; }
 
 		/**

@@ -5,21 +5,24 @@
 #include <Assets/Texture/TextureManager.h>
 
 namespace ModelLoader {
-	Node ReadNode(const aiNode* node);
+	void CreateNodes(const aiNode* node, std::vector<Node>& nodes, uint32_t parentIndex);
 
-	std::vector<VertexData> LoadVertices(const aiScene* scene);
-	std::vector<Vector3> LoadOnlyPositions(const aiScene* scene);
-	std::vector<VertexInfluence> LoadVertexInfluences(const aiScene* scene);
-	std::vector<uint32_t> LoadIndices(const aiScene* scene);
+	std::vector<Node> LoadNodes(const aiScene* scene);
+	std::vector<Vector4> LoadPositions(const aiMesh* ai_mesh);
+	std::vector<Vector3> LoadNormals(const aiMesh* ai_mesh);
+	std::vector<Vector2> LoadTexcoords(const aiMesh* ai_mesh);
+	std::vector<Vector4> LoadColors(const aiMesh* ai_mesh);
+	std::vector<VertexInfluence> LoadVertexInfluences(const aiMesh* ai_mesh);
+	std::vector<uint32_t> LoadIndices(const aiMesh* ai_mesh);
 
 	std::vector<Material> LoadMaterials(const aiScene* scene, std::string directoryPath, SHEngine::TextureManager* textureManager);
-	std::vector<uint32_t> LoadMaterialIndices(const aiScene* scene);
+	std::vector<uint32_t> LoadMaterialIndices(const aiMesh* ai_mesh);
 
-	std::map<std::string, JointWeightData> LoadSkinCluster(const aiScene* scene);
+	std::map<std::string, Skin> LoadSkinCluster(const aiScene* scene);
 	Skeleton CreateSkelton(const Node& rootNode, const aiScene* scene);
 	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, Skeleton& skeleton, std::unordered_set<std::string>& boneNames, const Matrix4x4 parentAccumulated);
 
-	std::vector<Animation> LoadAnimations(const aiScene* scene);
+	std::unordered_map<std::string, Animation>  LoadAnimations(const aiScene* scene);
 
 	PolygonList LoadPolygonList(const aiScene* scene);
 }

@@ -150,7 +150,7 @@ void HitEffect::Initialize(SHEngine::Engine* engine) {
 	}
 
 	{
-		auto modelData = mm->GetNodeModelData(mm->LoadModel("donut"));
+		auto modelData = mm->GetModelData(mm->LoadModel("donut"));
 		auto drawData = ddm->GetDrawData(modelData.drawDataIndex);
 		int textureIndex = tm->LoadTexture("gradationLine.png");
 

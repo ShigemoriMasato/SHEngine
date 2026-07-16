@@ -54,21 +54,14 @@ namespace SHEngine {
 		 * @param index アニメーションインデックス
 		 * @return アニメーションデータ
 		 */
-		Animation LoadAnimation(std::string filePath, int index);
+		Animation LoadAnimation(std::string filePath, std::string animationName = "");
 
 		/**
 		 * @brief ノードモデルデータを取得（失敗時はLogとキューブを返す）
 		 * @param id モデルID
 		 * @return NodeModelDataの参照
 		 */
-		NodeModelData& GetNodeModelData(int id);
-
-		/**
-		 * @brief スキニングモデルデータを取得（失敗時はLogとキューブを返す）
-		 * @param id モデルID
-		 * @return SkinningModelDataの参照
-		 */
-		SkinningModelData& GetSkinningModelData(int id);
+		ModelData& GetModelData(int id);
 
 		// @brief モデルIDからポリゴンリストを取得
 		PolygonList CreatePolygonList(int id);
@@ -84,31 +77,15 @@ namespace SHEngine {
 		 */
 		std::string FilePathChecker(std::string& filePath);
 
-		/**
-		 * @brief ノードモデルデータを書き込む
-		 * @param scene Assimpシーン
-		 * @param filePath ファイルパス
-		 * @return ノードモデルデータ
-		 */
-		NodeModelData WritingNodeModelData(const aiScene* scene, std::string filePath);
-
-		/**
-		 * @brief スキニングモデルデータを書き込む
-		 * @param scene Assimpシーン
-		 * @param filePath ファイルパス
-		 * @return スキニングモデルデータ
-		 */
-		SkinningModelData WritingSkinningModelData(const aiScene* scene, std::string filePath);
+		ModelData CreateModelData(const aiScene* scene, std::string filePath);
 
 	private://Model
 
 		/// @brief モデルファイルパスとIDのマップ
 		std::unordered_map<std::string, int> modelFilePaths_{};
 
-		/// @brief ノードモデルデータのリスト
-		std::vector<NodeModelData> nodeModelDatas_{};
-		/// @brief スキニングモデルデータのリスト
-		std::vector<SkinningModelData> skinningModelDatas_{};
+		/// @brief ModelDataのリスト
+		std::vector<ModelData> modelData_{};
 
 		/// @brief 次に割り当てるID
 		int nextID_ = 0;
@@ -121,7 +98,7 @@ namespace SHEngine {
 	private://Animation
 
 		/// @brief アニメーションデータのマップ
-		std::unordered_map<std::string, std::vector<Animation>> animations_{};
+		std::unordered_map<std::string, std::unordered_map<std::string, Animation>> animations_{};
 
 	private://Debug
 
@@ -135,7 +112,7 @@ namespace SHEngine {
 Matrix4x4 AnimationUpdate(const Animation& animation, float time, const Node& node);
 void AnimationUpdate(const Animation& animation, float time, Skeleton& skeleton);
 void SkeletonUpdate(Skeleton& skeleton);
-void SkinningUpdate(std::vector<WellForGPU>& result, std::map<std::string, JointWeightData> skinCluster, const Skeleton& skeleton);
+void SkinningUpdate(std::vector<WellForGPU>& result, const std::vector<Skin>& skinCluster, const Skeleton& skeleton);
 
 Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
 Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);

@@ -4,130 +4,129 @@
 
 using namespace SHEngine;
 
-Node ModelLoader::ReadNode(const aiNode* node) {
-	Node result;
-
-	//Transformの読み込み
+void ModelLoader::CreateNodes(const aiNode* node, std::vector<Node>& nodes, uint32_t parentIndex) {
+	uint32_t nodeIndex = static_cast<uint32_t>(nodes.size());
+	Node newNode = nodes.emplace_back();
+	
+	//ローカル座標の読み込み
 	aiVector3D scale, position;
 	aiQuaternion rotate;
 	node->mTransformation.Decompose(scale, rotate, position);
-	result.transform.scale = { scale.x, scale.y, scale.z };
-	result.transform.rotate = { rotate.x, rotate.y, rotate.z, rotate.w };
-	result.transform.position = { position.x, position.y, position.z };
+	newNode.localTransform.scale = { scale.x, scale.y, scale.z };
+	newNode.localTransform.rotate = { rotate.x, rotate.y, rotate.z, rotate.w };
+	newNode.localTransform.position = { position.x, position.y, position.z };
+	newNode.localMatrix = Matrix::MakeScaleMatrix(newNode.localTransform.scale) *
+		newNode.localTransform.rotate.ToMatrix() *
+		Matrix::MakeTranslationMatrix(newNode.localTransform.position);
 
-	//ローカル行列の計算
-	result.localMatrix = 
-		Matrix::MakeScaleMatrix(result.transform.scale) * 
-		result.transform.rotate.ToMatrix() * 
-		Matrix::MakeTranslationMatrix(result.transform.position);
+	newNode.name = node->mName.C_Str();
 
-	// Node名を格納
-	result.name = node->mName.C_Str();
+	newNode.parent = parentIndex;
+
+	//メッシュ情報登録
+	if (node->mNumMeshes > 0) {
+		//メッシュは1ノードに1つしかない前提
+		uint32_t meshIndex = node->mMeshes[0];
+		newNode.meshIndex = meshIndex;
+	}
 
 	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
 		//再帰的に読んで階層構造を作っていく
-		result.children.push_back(ReadNode(node->mChildren[childIndex]));
+		CreateNodes(node->mChildren[childIndex], nodes, nodeIndex);
 	}
-
-	return result;
 }
 
-std::vector<VertexData> ModelLoader::LoadVertices(const aiScene* scene) {
-	std::vector<VertexData> vertices;
-
-	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
-		aiMesh* ai_mesh = scene->mMeshes[mesh];
-		for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
-			VertexData vertex{};
-			//位置
-			vertex.position.x = ai_mesh->mVertices[v].x;
-			vertex.position.y = ai_mesh->mVertices[v].y;
-			vertex.position.z = ai_mesh->mVertices[v].z;
-			vertex.position.w = 1.0f;
-			//法線
-			if (ai_mesh->HasNormals()) {
-				vertex.normal.x = ai_mesh->mNormals[v].x;
-				vertex.normal.y = ai_mesh->mNormals[v].y;
-				vertex.normal.z = ai_mesh->mNormals[v].z;
-			}
-			//UV
-			if (ai_mesh->HasTextureCoords(0)) {
-				vertex.texcoord.x = ai_mesh->mTextureCoords[0][v].x;
-				vertex.texcoord.y = ai_mesh->mTextureCoords[0][v].y;
-			}
-			vertices.push_back(vertex);
-		}
-	}
-
-	return vertices;
+std::vector<Node> ModelLoader::LoadNodes(const aiScene* scene) {
+	int parentIndex = -1;
+	std::vector<Node> nodes;
+	aiNode* rootNode = scene->mRootNode;
+	CreateNodes(rootNode, nodes, -1);
+	return nodes;
 }
 
-std::vector<Vector3> ModelLoader::LoadOnlyPositions(const aiScene* scene) {
-	std::vector<Vector3> positions;
+std::vector<Vector4> ModelLoader::LoadPositions(const aiMesh* ai_mesh) {
+	std::vector<Vector4> positions;
 
-	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
-		aiMesh* ai_mesh = scene->mMeshes[mesh];
-		for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
-			Vector3 position{};
-			position.x = ai_mesh->mVertices[v].x;
-			position.y = ai_mesh->mVertices[v].y;
-			position.z = ai_mesh->mVertices[v].z;
-			positions.push_back(position);
-		}
+	positions.resize(ai_mesh->mNumVertices);
+	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+		//位置
+		positions[v].x = ai_mesh->mVertices[v].x;
+		positions[v].y = ai_mesh->mVertices[v].y;
+		positions[v].z = ai_mesh->mVertices[v].z;
+		positions[v].w = 1.0f;
 	}
 
 	return positions;
 }
 
-std::vector<VertexInfluence> ModelLoader::LoadVertexInfluences(const aiScene* scene) {
-	std::vector<VertexInfluence> vertexInfluences;
-	//頂点数分の空のデータを作成
-	uint32_t totalVertexCount = 0;
-	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
-		aiMesh* mesh = scene->mMeshes[meshIndex];
-		totalVertexCount += mesh->mNumVertices;
+std::vector<Vector3> ModelLoader::LoadNormals(const aiMesh* ai_mesh) {
+	std::vector<Vector3> normals;
+
+	normals.resize(ai_mesh->mNumVertices);
+	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+		//法線
+		normals[v].x = ai_mesh->mNormals[v].x;
+		normals[v].y = ai_mesh->mNormals[v].y;
+		normals[v].z = ai_mesh->mNormals[v].z;
 	}
-	vertexInfluences.resize(totalVertexCount);
-	//各メッシュのボーン情報を読み込み
-	uint32_t vertexOffset = 0;
-	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
-		aiMesh* mesh = scene->mMeshes[meshIndex];
-		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
-			aiBone* bone = mesh->mBones[boneIndex];
-			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
-				aiVertexWeight weight = bone->mWeights[weightIndex];
-				VertexInfluence& vertexInfluence = vertexInfluences[vertexOffset + weight.mVertexId];
-				//影響度を追加
-				for (int i = 0; i < kMaxInfluences; ++i) {
-					if (vertexInfluence.weights[i] == 0.0f) {
-						vertexInfluence.weights[i] = weight.mWeight;
-						vertexInfluence.jointIndices[i] = boneIndex; //ボーンのインデックスを格納
-						break;
-					}
+
+	return normals;
+}
+
+std::vector<Vector2> ModelLoader::LoadTexcoords(const aiMesh* ai_mesh) {
+	std::vector<Vector2> texcoords;
+
+	texcoords.resize(ai_mesh->mNumVertices);
+	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+		//UV
+		texcoords[v].x = ai_mesh->mTextureCoords[0][v].x;
+		texcoords[v].y = ai_mesh->mTextureCoords[0][v].y;
+	}
+
+	return texcoords;
+}
+
+std::vector<Vector4> ModelLoader::LoadColors(const aiMesh* ai_mesh) {
+	std::vector<Vector4> colors;
+
+	colors.resize(ai_mesh->mNumVertices);
+	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+		//色情報
+		colors[v].x = ai_mesh->mColors[0][v].r;
+		colors[v].y = ai_mesh->mColors[0][v].g;
+		colors[v].z = ai_mesh->mColors[0][v].b;
+		colors[v].w = ai_mesh->mColors[0][v].a;
+	}
+
+	return colors;
+}
+
+std::vector<VertexInfluence> ModelLoader::LoadVertexInfluences(const aiMesh* ai_mesh) {
+	std::vector<VertexInfluence> vertexInfluences;
+	vertexInfluences.resize(ai_mesh->mNumVertices);
+
+	for (uint32_t boneIndex = 0; boneIndex < ai_mesh->mNumBones; ++boneIndex) {
+		aiBone* bone = ai_mesh->mBones[boneIndex];
+
+		for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+			aiVertexWeight weight = bone->mWeights[weightIndex];
+			VertexInfluence& vertexInfluence = vertexInfluences[weight.mVertexId];
+			
+			//空いてるとこに挿入(オーバーしたら諦める)
+			for (int i = 0; i < MAX_JOINTS_PER_VERTEX; ++i) {
+				if (vertexInfluence.weight[i] == 0.0f) {
+					vertexInfluence.weight[i] = weight.mWeight;
+					vertexInfluence.joint[i] = boneIndex;
+					break;
 				}
 			}
 		}
-		vertexOffset += mesh->mNumVertices;
 	}
 	return vertexInfluences;
 }
 
-std::vector<uint32_t> ModelLoader::LoadIndices(const aiScene* scene) {
-	std::vector<uint32_t> indices;
-
-	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
-		aiMesh* ai_mesh = scene->mMeshes[mesh];
-
-		for (uint32_t f = 0; f < ai_mesh->mNumFaces; ++f) {
-			aiFace& face = ai_mesh->mFaces[f];
-
-			for (uint32_t i = 0; i < face.mNumIndices; ++i) {
-				indices.push_back(face.mIndices[i]);
-			}
-		}
-	}
-
-	return indices;
+std::vector<uint32_t> ModelLoader::LoadIndices(const aiMesh* ai_mesh) {
+	return std::vector<uint32_t>();
 }
 
 std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::string directoryPath, TextureManager* textureManager) {
@@ -143,10 +142,10 @@ std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::stri
 			std::string path = texturePath.C_Str();
 			material.textureIndex = textureManager->LoadTexture(directoryPath + "/" + path);
 		} else {
-			material.textureIndex = 0; //テクスチャが無い場合はデフォルトテクスチャを使う
+			material.textureIndex = textureManager->GetWhite1x1Texture();
 		}
 
-		
+
 
 		materials.push_back(material);
 	}
@@ -170,8 +169,8 @@ std::vector<uint32_t> ModelLoader::LoadMaterialIndices(const aiScene* scene) {
 	return result;
 }
 
-std::map<std::string, JointWeightData> ModelLoader::LoadSkinCluster(const aiScene* scene) {
-	std::map<std::string, JointWeightData> skinClusterData;
+std::map<std::string, Skin> ModelLoader::LoadSkinCluster(const aiScene* scene) {
+	std::map<std::string, Skin> skinClusterData;
 
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
@@ -179,7 +178,7 @@ std::map<std::string, JointWeightData> ModelLoader::LoadSkinCluster(const aiScen
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
 			aiBone* bone = mesh->mBones[boneIndex];
 			std::string jointName = bone->mName.C_Str();
-			JointWeightData& jointWeightData = skinClusterData[jointName];
+			Skin& jointWeightData = skinClusterData[jointName];
 
 			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
 			aiVector3D scale, translate;
@@ -242,7 +241,7 @@ int32_t ModelLoader::CreateJoint(const Node& node, const std::optional<int32_t>&
 
 	joints.push_back(joint);
 
-	if(!parent.has_value()) {
+	if (!parent.has_value()) {
 		skeleton.rootMatrix = parentAccumulated;
 	}
 
@@ -254,16 +253,16 @@ int32_t ModelLoader::CreateJoint(const Node& node, const std::optional<int32_t>&
 	return joint.index;
 }
 
-std::vector<Animation> ModelLoader::LoadAnimations(const aiScene* scene) {
-	std::vector<Animation> animations{};
+std::unordered_map<std::string, Animation> ModelLoader::LoadAnimations(const aiScene* scene) {
+	std::unordered_map<std::string, Animation> animations{};
 
-	if(scene->mNumAnimations == 0) {
+	if (scene->mNumAnimations == 0) {
 		return animations;
 	}
 
 	for (uint32_t i = 0; i < scene->mNumAnimations; ++i) {
-		Animation animation{};
 		aiAnimation* ai_animation = scene->mAnimations[i];
+		Animation& animation = animations[ai_animation->mName.C_Str()];
 
 		animation.duration = static_cast<float>(ai_animation->mDuration / ai_animation->mTicksPerSecond);
 
@@ -302,7 +301,6 @@ std::vector<Animation> ModelLoader::LoadAnimations(const aiScene* scene) {
 			animation.nodeAnimations[ai_nodeAnim->mNodeName.C_Str()] = nodeAnimation;
 		}
 
-		animations.push_back(animation);
 	}
 
 	return animations;

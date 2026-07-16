@@ -21,10 +21,11 @@ void WaveEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	auto freeListIndex = container_->Create(BufferType::UAV, sizeof(int), 1, BufferNum::Single);
 	auto indexList = container_->Create(BufferType::SRV_UAV, sizeof(int), kMaxParticleNum_, BufferNum::Single);
 	auto basePositions = container_->Create(BufferType::UAV, sizeof(Vector3) / 2, kMaxParticleNum_, BufferNum::Single); //float16_t3(ローカル座標なので、でかくならないはずと予想)
+	auto baseColors = container_->Create(BufferType::UAV, sizeof(Vector3) / 2, kMaxParticleNum_, BufferNum::Single); //float16_t3
 	auto velocity = container_->Create(BufferType::UAV, sizeof(Vector3) / 2, kMaxParticleNum_, BufferNum::Single);	// float16_t3
 	auto currentTime = container_->Create(BufferType::UAV, sizeof(float) / 2, kMaxParticleNum_, BufferNum::Single); // float16_t
 
-	waveBuffer_ = container_->Create(BufferType::SRV_UAV, sizeof(WaveData), kMaxWaveNum_, BufferNum::Single);
+	waveBuffer_ = container_->Create(BufferType::SRV, sizeof(WaveData), kMaxWaveNum_);
 
 	auto maxParticleNum = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single);
 	updateData_ = container_->Create(BufferType::CBV, sizeof(UpdateData));
@@ -35,7 +36,7 @@ void WaveEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 
 	initialize_ = std::make_unique<SHEngine::ComputeObject>();
 	initialize_->SetShader("Particle/Wave/Initialize.CS.hlsl");
-	initialize_->SetGPUBuffers(BufferType::UAV, { pool.freeList, pool.freeListIndex, freeList, freeListIndex, indexList, basePositions });
+	initialize_->SetGPUBuffers(BufferType::UAV, { freeList, freeListIndex, pool.freeList, pool.freeListIndex, indexList, basePositions });
 	initialize_->SetGPUBuffers(BufferType::CBV, { maxParticleNum });
 	CCC* ccc = engine->GetComputeCommandContext();
 	initialize_->SetThreadGroupSize(kMaxParticleNum_ / 1024 + 1);
@@ -43,21 +44,26 @@ void WaveEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 
 	emit_ = std::make_unique<SHEngine::ComputeObject>();
 	emit_->SetShader("Particle/Wave/Emit.CS.hlsl");
-	emit_->SetGPUBuffers(BufferType::UAV, { freeList, freeListIndex, basePositions, pool.color, velocity, currentTime });
+	emit_->SetGPUBuffers(BufferType::UAV, { freeList, freeListIndex, basePositions, baseColors, velocity, currentTime });
 	emit_->SetGPUBuffer(BufferType::SRV, indexList);
-	emit_->SetGPUBuffers(BufferType::CBV, { maxParticleNum, lifeTime_ });
+	emit_->SetGPUBuffers(BufferType::CBV, { emitData_, lifeTime_ });
 	emit_->SetUseTexture(true);
 
 	update_ = std::make_unique<SHEngine::ComputeObject>();
 	update_->SetShader("Particle/Wave/Update.CS.hlsl");
-	update_->SetGPUBuffers(BufferType::UAV, { freeList, freeListIndex, pool.position, pool.color, velocity, currentTime, basePositions });
+	update_->SetGPUBuffers(BufferType::UAV, { freeList, freeListIndex, pool.position, pool.color, velocity, currentTime, basePositions, baseColors });
 	update_->SetGPUBuffers(BufferType::SRV, { waveBuffer_, indexList });
 	update_->SetGPUBuffers(BufferType::CBV, { maxParticleNum, pool.deltaTime, lifeTime_, updateData_ });
 	update_->SetThreadGroupSize(kMaxParticleNum_ / 128 + 1);
+
+	waves_.resize(16);
 }
 
 void WaveEmitter::Update(CCC* ccc, float deltaTime) {
 	emitValue_.seed = GetRandU();
+	for (auto& wave : waves_) {
+		wave.lifetime += deltaTime;
+	}
 	CopyConfig(deltaTime);
 
 	emit_->SetThreadGroupSize(config_.emitNum / 128 + 1);
@@ -82,6 +88,18 @@ void WaveEmitter::AddWave(const std::vector<WaveData>& waves) {
 	}
 }
 
+void WaveEmitter::DrawImGui() {
+#ifdef USE_IMGUI
+	ImGui::Begin("WaveEmitter::Lifetime");
+
+	for (int i = 0; i < waves_.size(); ++i) {
+		ImGui::Text("Wave %d: %.2f", i, waves_[i].lifetime);
+	}
+
+	ImGui::End();
+#endif
+}
+
 void WaveEmitter::CopyConfig(float deltaTime) {
 	emitValue_.speed = config_.speed;
 	emitValue_.emitNum = int(float(config_.emitNum) * deltaTime);
@@ -94,6 +112,7 @@ void WaveEmitter::CopyConfig(float deltaTime) {
 
 	lifeTime_->CopyBuffer(&config_.lifeTime, sizeof(float));
 
+	waveBuffer_->CopyBuffer(waves_.data(), sizeof(WaveData) * waves_.size());
 	updateData_->CopyBuffer(&updateValue_, sizeof(UpdateData));
 	emitData_->CopyBuffer(&emitValue_, sizeof(EmitData));
 }

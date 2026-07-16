@@ -18,7 +18,7 @@ void EffectTestScene::Initialize() {
 
 	vertexEmitter_ = std::make_unique<VertexEmitter>();
 	effect_->AddEmitter(vertexEmitter_.get());
-	auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel(filePath));
+	auto model = modelManager_->GetModelData(modelManager_->LoadModel(filePath));
 	vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
 
 	polygonEmitter_ = std::make_unique<PolygonEmitter>(65535 * 128 - 1);
@@ -63,11 +63,13 @@ std::unique_ptr<IScene> EffectTestScene::Update() {
 		waveEmitter_->AddWave(waveData_);
 	}
 
+	waveEmitter_->DrawImGui();
+
 	computeContext_->BeginTimeStamp("Particle Update");
 
 	grid_->Update(camera_.GetCenter(), camera_.GetVPMatrix());
 
-	static auto model = modelManager_->GetNodeModelData(modelManager_->LoadModel(filePath));
+	static auto model = modelManager_->GetModelData(modelManager_->LoadModel(filePath));
 
 	effect_->Update(camera_.GetVPMatrix(), camera_.GetBillboardMatrix(), engine_->GetDeltaTime());
 

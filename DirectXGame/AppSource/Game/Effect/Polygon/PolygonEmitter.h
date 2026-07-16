@@ -13,8 +13,11 @@ public:
 	uint32_t AddPolygon(const PolygonList& polygonList, Matrix4x4 worldMatrix = Matrix4x4::Identity(), Vector4 color = {1,1,1,1}, uint32_t emitNum = 1);
 
 	void EditPolygon(uint32_t index, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum);
+	void EditPolygon(uint32_t index, const PolygonList& polygonList, bool isCreateChanceList);
 
 private:
+
+	std::vector<int> CreateChanceList(const PolygonList& polygonList);
 
 	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> initialize_ = nullptr;

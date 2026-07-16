@@ -29,9 +29,9 @@ public:
 		float speed = 48.0f;
 		Vector3 color = { 1.0f, 1.0f, 1.0f };
 		float intensity = 1.0f;
-		float lifetime = 100000.0f;				//勝手に起動しないように大きな数字にする
+		float lifetime = 0.0f;				//勝手に起動しないように大きな数字にする
 		float decayRate = 0.1f;
-		float maxlifetime = 3.0f;
+		float maxlifetime = 0.0f;
 		float thickness = 4.0f;
 
 		bool DrawImGui();
@@ -52,6 +52,8 @@ public:
 	void SetWave(const std::vector<WaveData>& waves) { waves_ = waves; }
 
 	void SetConfig(const Config& config) { config_ = config; }
+
+	void DrawImGui();
 
 private:
 

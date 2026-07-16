@@ -17,7 +17,7 @@ cbuffer LifeTime : register(b1)
 RWStructuredBuffer<int> freeList : register(u0);
 RWStructuredBuffer<int> freeListIndex : register(u1);
 RWStructuredBuffer<float16_t3> basePositions : register(u2);
-RWStructuredBuffer<float16_t4> colors : register(u3);
+RWStructuredBuffer<float16_t3> baseColors : register(u3);
 RWStructuredBuffer<float16_t3> velocities : register(u4);
 RWStructuredBuffer<float16_t> currentTime : register(u5);
 
@@ -74,8 +74,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
     uint localIndex = freeList[freeIndex];
     uint index = indexList[localIndex];
     
-    basePositions[index] = float16_t3(position * fieldSize - fieldSize * 0.5);
-    velocities[index] = float16_t3(normalize(float32_t3(Rand(state), Rand(state), Rand(state)) * 2 - float3(1, 1, 1)) * speed);
-    currentTime[index] = 0;
-    colors[index] = float16_t4(clamp(float4(color.rgb * texColor.rgb, 1.0f), float4(0, 0, 0, 0), float4(1, 1, 1, 1)));
+    basePositions[localIndex] = float16_t3(position * fieldSize - fieldSize * 0.5);
+    velocities[localIndex] = float16_t3(normalize(float32_t3(Rand(state), Rand(state), Rand(state)) * 2 - float3(1, 1, 1)) * speed);
+    currentTime[localIndex] = 0;
+    baseColors[localIndex] = float16_t3(clamp(float3(color.rgb * texColor.rgb), float3(0, 0, 0), float3(1, 1, 1)));
 }

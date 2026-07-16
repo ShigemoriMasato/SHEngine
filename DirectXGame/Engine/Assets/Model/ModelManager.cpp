@@ -113,22 +113,33 @@ void ModelManager::LoadAllModels() {
 	}
 }
 
-Animation ModelManager::LoadAnimation(std::string filePath, int index) {
+Animation ModelManager::LoadAnimation(std::string filePath, std::string animationName) {
 
 	std::string fileName = FilePathChecker(filePath);
 
-	auto it = animations_.find(filePath);
-	if (it != animations_.end()) {
-		logger_->debug("Animation already loaded: {}", filePath);
+	{
+		auto it = animations_.find(filePath);
+		if (it != animations_.end()) {
+			logger_->debug("Animation already loaded: {}", filePath);
 
-		if(it->second.empty()) {
-			logger_->error("No animations found in file: {}", filePath);
-			assert(false && "ModelManager::LoadAnimation: No animations found");
-			return Animation{};
+			if (it->second.empty()) {
+				logger_->error("No animations found in file: {}", filePath);
+				assert(false && "ModelManager::LoadAnimation: No animations found");
+				return Animation{};
+			}
+
+			if (animationName.empty()) {
+				return it->second.begin()->second;
+			}
+
+			auto it2 = it->second.find(animationName);
+			if (it2 == it->second.end()) {
+				logger_->error("Animation not found: {} in file: {}", animationName, filePath);
+				assert(false && "ModelManager::LoadAnimation: Animation not found");
+				return Animation{};
+			}
+			return it2->second;
 		}
-
-		index = std::clamp(index, 0, int(it->second.size() - 1));
-		return it->second[index];
 	}
 
 	//Assimp
@@ -148,27 +159,28 @@ Animation ModelManager::LoadAnimation(std::string filePath, int index) {
 	}
 
 	animations_[filePath] = animations;
-	index = std::clamp(index, 0, int(animations.size() - 1));
-	return animations_[filePath][index];
+
+	if (animationName.empty()) {
+		return animations.begin()->second;
+	}
+
+	auto it = animations_[filePath].find(animationName);
+	if (it == animations_[filePath].end()) {
+		logger_->error("Animation not found: {} in file: {}", animationName, filePath);
+		assert(false && "ModelManager::LoadAnimation: Animation not found");
+		return Animation{};
+	}
+
+	return it->second;
 }
 
-NodeModelData& ModelManager::GetNodeModelData(int id) {
+ModelData& ModelManager::GetModelData(int id) {
 	if (nodeModelDatas_.size() > id) {
 		return nodeModelDatas_[id];
 	} else {
 		logger_->error("Model ID not found: {}", id);
-		assert(false && "ModelManager::GetNodeModelData: Model ID not found");
+		assert(false && "ModelManager::GetModelData: Model ID not found");
 		return nodeModelDatas_[0]; //キューブをセット
-	}
-}
-
-SkinningModelData& ModelManager::GetSkinningModelData(int id) {
-	if (skinningModelDatas_.size() > id) {
-		return skinningModelDatas_[id];
-	} else {
-		logger_->error("Model ID not found: {}", id);
-		assert(false && "ModelManager::GetSkinningModelData: Model ID not found");
-		return skinningModelDatas_[0]; //キューブをセット
 	}
 }
 
@@ -232,59 +244,12 @@ std::string ModelManager::FilePathChecker(std::string& filePath) {
 	return fileName;
 }
 
-NodeModelData ModelManager::WritingNodeModelData(const aiScene* scene, std::string filePath) {
-	NodeModelData result;
+ModelData SHEngine::ModelManager::CreateModelData(const aiScene* scene, std::string filePath) {
+	ModelData result;
 	//コードがごちゃつくのでModelLoaderに処理を投げる
-	result.vertices = ModelLoader::LoadVertices(scene);
-	result.indices = ModelLoader::LoadIndices(scene);
-	result.positions = ModelLoader::LoadOnlyPositions(scene);
+	result.rootNode = ModelLoader::ReadNode(scene, scene->mRootNode);
 	result.materials = ModelLoader::LoadMaterials(scene, filePath, textureManager_);
-	result.materialIndex = ModelLoader::LoadMaterialIndices(scene);
-	result.rootNode = ModelLoader::ReadNode(scene->mRootNode);
-
-	//読み込めているかの確認
-	bool isCorrect = true;
-	if (result.vertices.empty()) {
-		logger_->warn("Vertex is Empty!");
-		isCorrect = false;
-	}
-	if (result.indices.empty()) {
-		logger_->warn("Index is Empty!");
-		isCorrect = false;
-	}
-	if (result.materials.empty()) {
-		logger_->warn("Material is Empty!");
-		isCorrect = false;
-	}
-	if (result.materialIndex.empty()) {
-		logger_->warn("MaterialIndex is Empty!");
-		isCorrect = false;
-	}
-
-	if (!isCorrect) {
-		logger_->error("Failed to Load Model, So setting Cube instead.");
-		assert(false && "ModelManager::LoadModel: Failed to load model");
-		result = nodeModelDatas_[0]; //キューブをセット
-	} else {
-		//DrawDataの作成
-		drawDataManager_->AddVertexBuffer(result.vertices);
-		drawDataManager_->AddIndexBuffer(result.indices);
-		int drawDataIndex = drawDataManager_->CreateDrawData();
-		result.drawDataIndex = drawDataIndex;
-	}
-
-	return result;
-}
-
-SkinningModelData ModelManager::WritingSkinningModelData(const aiScene* scene, std::string filePath) {
-	SkinningModelData result;
-	//コードがごちゃつくのでModelLoaderに処理を投げる
-	result.vertices = ModelLoader::LoadVertices(scene);
-	result.vertexInfluences = ModelLoader::LoadVertexInfluences(scene);
-	result.indices = ModelLoader::LoadIndices(scene);
-	result.materials = ModelLoader::LoadMaterials(scene, filePath, textureManager_);
-	result.materialIndex = ModelLoader::LoadMaterialIndices(scene);
-	result.skeleton = ModelLoader::CreateSkelton(ModelLoader::ReadNode(scene->mRootNode), scene);
+	result.skeleton = ModelLoader::CreateSkelton(result.rootNode, scene);
 	result.skinClusterData = ModelLoader::LoadSkinCluster(scene);
 
 	//読み込めているかの確認
@@ -328,7 +293,6 @@ SkinningModelData ModelManager::WritingSkinningModelData(const aiScene* scene, s
 	}
 
 	return result;
-
 }
 
 Matrix4x4 AnimationUpdate(const Animation& animation, float time, const Node& node) {
@@ -365,13 +329,13 @@ void SkeletonUpdate(Skeleton& skeleton) {
 	}
 }
 
-void SkinningUpdate(std::vector<WellForGPU>& result, std::map<std::string, JointWeightData> skinCluster, const Skeleton& skeleton) {
+void SkinningUpdate(std::vector<WellForGPU>& result, const std::map<std::string, Skin>& skinCluster, const Skeleton& skeleton) {
 	result.resize(skeleton.joints.size());
 	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
 		assert(jointIndex < skeleton.joints.size());
 		std::string key = skeleton.joints[jointIndex].name;
 		result[jointIndex].skeletonSpaceMatrix = 
-			skinCluster[key].inverseBindPoseMatrix * skeleton.joints[jointIndex].skeletonSpaceMatrix;
+			skinCluster.at(key).inverseBindPoseMatrix * skeleton.joints[jointIndex].skeletonSpaceMatrix;
 
 		result[jointIndex].skeletonSpaceInverseTransposeMatrix =
 			Matrix::TransMatrix(result[jointIndex].skeletonSpaceMatrix.Inverse());

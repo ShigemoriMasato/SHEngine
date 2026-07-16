@@ -14,7 +14,7 @@ void Subject::Initialize(SHEngine::Engine* engine) {
 	auto ddsBuffer = container_->Create(ddsData);
 	wvp_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4));
 
-	auto drawData = ddm->GetDrawData(mm->GetNodeModelData(mm->LoadModel("Innenr_Cube")).drawDataIndex);
+	auto drawData = ddm->GetDrawData(mm->GetModelData(mm->LoadModel("Innenr_Cube")).drawDataIndex);
 
 	cube_ = std::make_unique<SHEngine::Renderer>(drawData);
 	cube_->SetVS("Test/DDS/Cube.VS.hlsl");
@@ -31,7 +31,7 @@ void Subject::Initialize(SHEngine::Engine* engine) {
 	cylinder_ = std::make_unique<Cylinder>(engine_);
 
 	gpuParticle_ = std::make_unique<GPUParticle>();
-	auto plane = ddm->GetDrawData(mm->GetNodeModelData(1).drawDataIndex);
+	auto plane = ddm->GetDrawData(mm->GetModelData(1).drawDataIndex);
 	gpuParticle_->Initialize(engine_->GetComputeCommandContext(), plane);
 }
 

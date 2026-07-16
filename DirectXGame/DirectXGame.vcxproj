@@ -175,6 +175,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Tool\AnimationModel\AnimationModel.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\WorldCursor.cpp" />
     <ClCompile Include="AppSource\Game\Camera\GameCamera.cpp" />
@@ -242,7 +243,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Core\View\DSVManager.cpp" />
     <ClCompile Include="Engine\Core\View\RTVManager.cpp" />
     <ClCompile Include="Engine\Core\View\SRVManager.cpp" />
-    <ClCompile Include="Engine\Tool\Dump\CreateDump.cpp" />
     <ClCompile Include="Engine\Utility\src\Color.cpp" />
     <ClCompile Include="Engine\Core\DXDevice.cpp" />
     <ClCompile Include="Engine\Core\View\ViewFunc.cpp" />
@@ -276,6 +276,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\PSO\ShelfManager.cpp" />
     <ClCompile Include="Engine\Render\Buffer\ReadBackBuffer.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Polygon\PolygonEmitter.cpp" />
+    <ClCompile Include="Engine\Tool\AnimationModel\SkinningModel.cpp" />
+    <ClInclude Include="Engine\Tool\AnimationModel\AnimationModel.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
     <ClInclude Include="AppSource\Game\Camera\GameCamera.h" />
@@ -370,6 +372,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\Buffer\ReadBackBuffer.h" />
     <ClInclude Include="AppSource\Game\Effect\Subject\GPUParticle.h" />
     <ClInclude Include="AppSource\Game\Effect\Polygon\PolygonEmitter.h" />
+    <ClInclude Include="Engine\Tool\AnimationModel\SkinningModel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />
@@ -389,7 +392,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Core\View\DSVManager.h" />
     <ClInclude Include="Engine\Core\View\RTVManager.h" />
     <ClInclude Include="Engine\Core\View\SRVManager.h" />
-    <ClInclude Include="Engine\Tool\Dump\CreateDump.h" />
+    <ClInclude Include="Engine\Utility\CreateDump.h" />
     <ClInclude Include="Engine\Utility\Color.h" />
     <ClInclude Include="Engine\Core\DXDevice.h" />
     <ClInclude Include="Engine\Render\PSO\PSOConfig.h" />

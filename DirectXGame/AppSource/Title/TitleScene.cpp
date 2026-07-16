@@ -12,12 +12,12 @@ TitleScene::~TitleScene() {
 
 void TitleScene::Initialize() {
 	int modelIndex = modelManager_->LoadModel("WaterPlane");
-	auto model = modelManager_->GetNodeModelData(modelIndex);
+	auto model = modelManager_->GetModelData(modelIndex);
 	auto drawData = drawDataManager_->GetDrawData(model.drawDataIndex);
 	waterWave_->Initialize(drawData, camera_.get());
 
 	modelIndex = modelManager_->LoadModel("Title");
-	model = modelManager_->GetNodeModelData(modelIndex);
+	model = modelManager_->GetModelData(modelIndex);
 	drawData = drawDataManager_->GetDrawData(model.drawDataIndex);
 	title_->Initialize(drawData, camera_.get());
 

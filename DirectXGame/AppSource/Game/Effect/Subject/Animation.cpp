@@ -22,7 +22,7 @@ void Animation_Sub::Initialize(SHEngine::Engine* engine) {
 	renderer_->SetGPUBuffer(wvpBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->SetGPUBuffer(boneBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
 
-	animation_ = mm->LoadAnimation(filePath, 0);
+	animation_ = mm->LoadAnimation(filePath);
 }
 
 void Animation_Sub::Update(float deltaTime, const Matrix4x4& vpMatrix) {

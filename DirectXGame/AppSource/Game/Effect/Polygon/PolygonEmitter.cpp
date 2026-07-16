@@ -67,15 +67,7 @@ void PolygonEmitter::Update(CCC* compute, float deltaTime) {
 }
 
 uint32_t PolygonEmitter::AddPolygon(const PolygonList& polygonList, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum) {
-	std::vector<int> chanceList;
-
-	//Particleの生成がせまい場所に偏る用であればこの値を上げること。
-	const float kChanceScale = 1 / (polygonList.totalArea / (float)polygonList.polygons.size());
-	for (int i = 0; i < polygonList.areas.size(); ++i) {
-		const auto& area = polygonList.areas[i];
-		uint32_t chance = std::max(1u, static_cast<uint32_t>(area * kChanceScale));
-		chanceList.insert(chanceList.end(), chance, i);
-	}
+	std::vector<int> chanceList = CreateChanceList(polygonList);
 	int chanceListNum = static_cast<int>(chanceList.size());
 
 	uint32_t id = nextID_++;
@@ -95,7 +87,6 @@ uint32_t PolygonEmitter::AddPolygon(const PolygonList& polygonList, Matrix4x4 wo
 	set.polygonList->CopyBuffer(polygonList.polygons.data(), sizeof(PolygonData) * polygonList.polygons.size());
 	set.worldMatrix->CopyBuffer(&worldMatrix, sizeof(Matrix4x4));
 	set.color->CopyBuffer(&color, sizeof(Vector4));
-	set.emitNum->CopyBuffer(&emitNum, sizeof(uint32_t));
 	set.emitNumValue = emitNum;
 
 	return id;
@@ -112,4 +103,37 @@ void PolygonEmitter::EditPolygon(uint32_t index, Matrix4x4 worldMatrix, Vector4 
 	set.worldMatrix->CopyBuffer(&worldMatrix, sizeof(Matrix4x4));
 	set.color->CopyBuffer(&color, sizeof(Vector4));
 	set.emitNumValue = emitNum;
+}
+
+void PolygonEmitter::EditPolygon(uint32_t index, const PolygonList& polygonList, bool isCreateChanceList) {
+	const auto& it = polygonSets_.find(index);
+	if (it == polygonSets_.end()) {
+		assert(false && "PolygonEmitter: EditPolygon failed. index not found.");
+		return;
+	}
+
+	auto& set = it->second;
+	set.polygonList->CopyBuffer(polygonList.polygons.data(), sizeof(PolygonData) * polygonList.polygons.size());
+
+	if (isCreateChanceList) {
+		auto chanceList = CreateChanceList(polygonList);
+		int chanceListNum = static_cast<int>(chanceList.size());
+		set.chanceList->CopyBuffer(chanceList.data(), sizeof(int) * chanceListNum);
+		set.chanceListNum->CopyBuffer(&chanceListNum, sizeof(int));
+	}
+}
+
+std::vector<int> PolygonEmitter::CreateChanceList(const PolygonList& polygonList) {
+	std::vector<int> chanceList;
+	chanceList.reserve(polygonList.polygons.size() * 5);
+
+	//Particleの生成がせまい場所に偏る用であればこの値をどうにかする
+	const float kChanceScale = 1.0f / (polygonList.totalArea / (float)polygonList.polygons.size());
+	for (int i = 0; i < polygonList.areas.size(); ++i) {
+		const auto& area = polygonList.areas[i];
+		uint32_t chance = std::max(1u, static_cast<uint32_t>(area * kChanceScale));
+		chanceList.insert(chanceList.end(), chance, i);
+	}
+
+	return chanceList;
 }
