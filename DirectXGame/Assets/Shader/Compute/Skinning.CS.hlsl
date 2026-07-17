@@ -40,11 +40,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
     //必要なデータの抽出
     Vertex input = vertices[vertexIndex];
     VertexInfluence influence = influences[vertexIndex];
-        
+    
     //Skinning後の頂点
     Vertex skinned;
     skinned.texcoord = input.texcoord;
-        
+    
     if (influence.weight.x + influence.weight.y + influence.weight.z + influence.weight.w == 0.0)
     {
         skinned.position = input.position;

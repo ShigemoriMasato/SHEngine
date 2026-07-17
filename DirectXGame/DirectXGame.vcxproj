@@ -175,6 +175,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Render\DrawData.cpp" />
     <ClCompile Include="Engine\Tool\AnimationModel\AnimationModel.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\WorldCursor.cpp" />
@@ -222,7 +223,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Core\FrameCounter.cpp" />
     <ClCompile Include="Engine\Render\Buffer\BufferContainer.cpp" />
     <ClCompile Include="Engine\Render\Buffer\GPUBuffer.cpp" />
-    <ClCompile Include="Engine\Render\DrawDataManager.cpp" />
     <ClCompile Include="Engine\Render\Font\Text.cpp" />
     <ClCompile Include="Engine\Render\PostEffect.cpp" />
     <ClCompile Include="Engine\Render\Renderer.cpp" />
@@ -277,6 +277,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\Buffer\ReadBackBuffer.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Polygon\PolygonEmitter.cpp" />
     <ClCompile Include="Engine\Tool\AnimationModel\SkinningModel.cpp" />
+    <ClInclude Include="Engine\Render\DrawData.h" />
     <ClInclude Include="Engine\Tool\AnimationModel\AnimationModel.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\WorldCursor.h" />
@@ -324,7 +325,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Core\FrameCounter.h" />
     <ClInclude Include="Engine\Render\Buffer\BufferContainer.h" />
     <ClInclude Include="Engine\Render\Buffer\GPUBuffer.h" />
-    <ClInclude Include="Engine\Render\DrawDataManager.h" />
     <ClInclude Include="Engine\Render\Font\Text.h" />
     <ClInclude Include="Engine\Render\PostEffect.h" />
     <ClInclude Include="Engine\Render\PostEffectData.h" />

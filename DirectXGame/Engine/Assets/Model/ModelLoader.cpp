@@ -44,6 +44,23 @@ std::vector<Node> ModelLoader::LoadNodes(const aiScene* scene) {
 	return nodes;
 }
 
+std::vector<Mesh> ModelLoader::LoadMeshes(const aiScene* scene) {
+	std::vector<Mesh> meshes;
+	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
+		const aiMesh* ai_mesh = scene->mMeshes[mesh];
+		Mesh newMesh{};
+		newMesh.name = ai_mesh->mName.C_Str();
+		newMesh.position = LoadPositions(ai_mesh);
+		newMesh.normal = LoadNormals(ai_mesh);
+		newMesh.texcoord = LoadTexcoords(ai_mesh);
+		newMesh.color = LoadColors(ai_mesh);
+		newMesh.vertexInfluences = LoadVertexInfluences(ai_mesh);
+		newMesh.indices = LoadIndices(ai_mesh);
+		meshes.push_back(newMesh);
+	}
+	return meshes;
+}
+
 std::vector<Vector4> ModelLoader::LoadPositions(const aiMesh* ai_mesh) {
 	std::vector<Vector4> positions;
 
@@ -142,10 +159,28 @@ std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::stri
 			std::string path = texturePath.C_Str();
 			material.textureIndex = textureManager->LoadTexture(directoryPath + "/" + path);
 		} else {
-			material.textureIndex = textureManager->GetWhite1x1Texture();
+			material.textureIndex = textureManager->GetErrorTextureHandle();
 		}
 
+		aiString normalTexturePath;
+		if (ai_material->GetTexture(aiTextureType_NORMALS, 0, &normalTexturePath) == AI_SUCCESS) {
+			std::string path = normalTexturePath.C_Str();
+			material.normalTexture = textureManager->LoadTexture(directoryPath + "/" + path);
+		} else {
+			material.normalTexture = textureManager->GetErrorTextureHandle();
+		}
 
+		if (ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, *(aiColor4D*)&material.baseColor) != AI_SUCCESS) {
+			material.baseColor = { 1,1,1,1 };
+		}
+
+		if (ai_material->Get(AI_MATKEY_SHININESS, material.roughness) != AI_SUCCESS) {
+			material.roughness = 1.0f;
+		}
+
+		if (ai_material->Get(AI_MATKEY_REFLECTIVITY, material.metallic) != AI_SUCCESS) {
+			material.metallic = 1.0f;
+		}
 
 		materials.push_back(material);
 	}
@@ -165,88 +200,49 @@ std::vector<uint32_t> ModelLoader::LoadMaterialIndices(const aiMesh* ai_mesh) {
 	return result;
 }
 
-std::map<std::string, Skin> ModelLoader::LoadSkinCluster(const aiScene* scene) {
-	std::map<std::string, Skin> skinClusterData;
-	
-	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
-		aiMesh* mesh = scene->mMeshes[meshIndex];
+Skeleton ModelLoader::CreateSkeleton(std::vector<Node>& nodes, const aiScene* scene) {
+	Skeleton skeleton{};
+	std::unordered_map<std::string, int> boneNameToIndex;
 
-		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
-			aiBone* bone = mesh->mBones[boneIndex];
-			std::string jointName = bone->mName.C_Str();
-			Skin& jointWeightData = skinClusterData[jointName];
+	if (!scene->HasSkeletons()) {
+		return skeleton;
+	}
 
-			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
-			aiVector3D scale, translate;
-			aiQuaternion rotate;
-			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
-			Matrix4x4 bindPoseMatrix =
-				Matrix::MakeScaleMatrix({ scale.x, scale.y, scale.z }) *
-				Quaternion(rotate.x, rotate.y, rotate.z, rotate.w).ToMatrix() *
-				Matrix::MakeTranslationMatrix({ translate.x, translate.y, translate.z });
-			jointWeightData.inverseBindPoseMatrix = bindPoseMatrix.Inverse();
+	for (int i = 0; i < nodes.size(); ++i) {
+		const Node& node = nodes[i];
+		if (node.meshIndex != -1) {
+			aiMesh* mesh = scene->mMeshes[node.meshIndex];
+			for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+				aiBone* bone = mesh->mBones[boneIndex];
+				std::string boneName = bone->mName.C_Str();
 
-			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
-				jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
+				const auto& it = boneNameToIndex.find(boneName);
+				if (it == boneNameToIndex.end()) {
+					boneNameToIndex[boneName] = static_cast<int>(skeleton.joints.size());
+					skeleton.joints.push_back(Joint{});
+				}
+
+				auto& joint = skeleton.joints[boneNameToIndex[boneName]];
+				joint.name = boneName;
+
+				aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+				aiVector3D scale, translate;
+				aiQuaternion rotate;
+				bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+
+				Matrix4x4 bindPoseMatrix =
+					Matrix::MakeScaleMatrix({ scale.x, scale.y, scale.z }) *
+					Quaternion(rotate.x, rotate.y, rotate.z, rotate.w).ToMatrix() *
+					Matrix::MakeTranslationMatrix({ translate.x, translate.y, translate.z });
+
+				joint.inverseBindMatrix = bindPoseMatrix.Inverse();
+
+				joint.nodeIndex = i;
 			}
 		}
 	}
 
-	return skinClusterData;
-}
-
-Skeleton ModelLoader::CreateSkeleton(const Node& rootNode, const aiScene* scene) {
-	Skeleton skeleton{};
-	std::unordered_set<std::string> boneNames;
-
-	for (uint32_t i = 0; i < scene->mNumMeshes; ++i) {
-		for (uint32_t b = 0; b < scene->mMeshes[i]->mNumBones; ++b) {
-			boneNames.insert(scene->mMeshes[i]->mBones[b]->mName.C_Str());
-		}
-	}
-	skeleton.root = CreateJoint(rootNode, {}, skeleton, boneNames, Matrix4x4::Identity());
-
-	//名前とindexのマッピング
-	for (const Joint& joint : skeleton.joints) {
-		skeleton.jointMap[joint.name] = joint.index;
-	}
-
 	return skeleton;
-}
-
-int32_t ModelLoader::CreateJoint(const Node& node, const std::optional<int32_t>& parent, Skeleton& skeleton, std::unordered_set<std::string>& boneNames, Matrix4x4 parentAccumulated) {
-	Matrix4x4 currentAccumulated = parentAccumulated * node.localMatrix;
-
-	auto& joints = skeleton.joints;
-	if (!boneNames.contains(node.name)) {
-		// Jointにしないが、子は見る
-		for (const Node& child : node.children) {
-			skeleton.rootMatrix = node.localMatrix * skeleton.rootMatrix;
-			CreateJoint(child, parent, skeleton, boneNames, currentAccumulated);
-		}
-		return -1;
-	}
-
-	Joint joint{};
-	joint.name = node.name;
-	joint.localMatrix = node.localMatrix;
-	joint.skeletonSpaceMatrix = Matrix4x4::Identity();
-	joint.transform = node.transform;
-	joint.index = static_cast<int32_t>(joints.size());
-	joint.parent = parent;
-
-	joints.push_back(joint);
-
-	if (!parent.has_value()) {
-		skeleton.rootMatrix = parentAccumulated;
-	}
-
-	for (const Node& child : node.children) {
-		int32_t childIndex = CreateJoint(child, joint.index, skeleton, boneNames, Matrix4x4::Identity());
-		joints[joint.index].children.push_back(childIndex);
-	}
-
-	return joint.index;
 }
 
 std::unordered_map<std::string, Animation> ModelLoader::LoadAnimations(const aiScene* scene) {
@@ -300,49 +296,4 @@ std::unordered_map<std::string, Animation> ModelLoader::LoadAnimations(const aiS
 	}
 
 	return animations;
-}
-
-PolygonList ModelLoader::LoadPolygonList(const aiScene* scene) {
-	PolygonList polygonList{};
-
-	auto getVertexPosition = [](const aiMesh* mesh, uint32_t vertexIndex) -> Vector3 {
-		return { mesh->mVertices[vertexIndex].x, mesh->mVertices[vertexIndex].y, mesh->mVertices[vertexIndex].z };
-		};
-
-	auto getArea = [](Vector3 a, Vector3 b, Vector3 c) -> float {
-		Vector3 ab = b - a;
-		Vector3 ac = c - a;
-		Vector3 cross = MyMath::cross(ab, ac);
-		return 0.5f * cross.Length();
-		};
-
-	for (uint32_t mesh = 0; mesh < scene->mNumMeshes; ++mesh) {
-		aiMesh* ai_mesh = scene->mMeshes[mesh];
-
-		//メモリ確保
-		polygonList.polygons.reserve(polygonList.polygons.size() + ai_mesh->mNumFaces);
-		polygonList.areas.reserve(polygonList.areas.size() + ai_mesh->mNumFaces);
-
-		for (uint32_t face = 0; face < ai_mesh->mNumFaces; ++face) {
-			aiFace* ai_face = &ai_mesh->mFaces[face];
-
-			//三角面化されていない場合はエラー
-			if (ai_face->mNumIndices != 3) {
-				throw std::runtime_error("Not a Triangle Face!!");
-			}
-
-			//頂点と面積を入力
-			PolygonData& polygon = polygonList.polygons.emplace_back();
-			polygon.a = getVertexPosition(ai_mesh, ai_face->mIndices[0]);
-			polygon.b = getVertexPosition(ai_mesh, ai_face->mIndices[1]);
-			polygon.c = getVertexPosition(ai_mesh, ai_face->mIndices[2]);
-
-			float& area = polygonList.areas.emplace_back();
-			area = getArea(polygon.a, polygon.b, polygon.c);
-
-			polygonList.totalArea += area;
-		}
-	}
-
-	return polygonList;
 }

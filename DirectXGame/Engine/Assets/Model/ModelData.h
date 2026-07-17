@@ -5,9 +5,7 @@ struct Node {
     std::string name;
 
     QuaternionTransform localTransform;
-
-    Matrix4x4 localMatrix;
-    Matrix4x4 globalMatrix;
+	Matrix4x4 localMatrix;
 
     int parent = -1;
     std::vector<uint32_t> children;
@@ -22,20 +20,6 @@ struct VertexInfluence {
     float weight[MAX_JOINTS_PER_VERTEX];
 };
 
-enum class VertexType : uint8_t {
-    None            = 0,
-    Position        = 1 << 0,
-	Texcoord        = 1 << 1,
-    Normal          = 1 << 2,
-	Color           = 1 << 3,
-	Influence       = 1 << 4
-};
-
-uint8_t operator|(VertexType a, VertexType b);
-uint8_t operator|(uint8_t a, VertexType b);
-uint8_t operator&(VertexType a, VertexType b);
-uint8_t operator&(uint8_t a, VertexType b);
-uint8_t operator~(VertexType a);
 
 struct Primitive {
     uint32_t indexOffset;
@@ -55,8 +39,6 @@ struct Mesh {
     std::vector<uint32_t> indices;
 
     std::vector<Primitive> primitives;
-
-	std::array<int, 32> drawDataIndices;
 };
 
 struct Material {
@@ -79,12 +61,39 @@ struct Joint {
 
 struct Skeleton {
     uint32_t rootNode;
+	Matrix4x4 rootMatrix;
     std::vector<Joint> joints;
 };
 
-struct Model {
+struct ModelData {
     std::vector<Node> nodes;
     std::vector<Mesh> meshes;
     std::vector<Material> materials;
     Skeleton skeleton;
+};
+
+// Animation =======================================================================================
+
+template <typename T>
+struct Keyframe {
+    float time;
+    T value;
+};
+using KeyframeVector3 = Keyframe<Vector3>;
+using KeyframeQuaternion = Keyframe<Quaternion>;
+
+template<typename T>
+struct AnimationCurve {
+    std::vector<Keyframe<T>> keyframes;
+};
+
+struct NodeAnimation {
+    AnimationCurve<Vector3> position;
+    AnimationCurve<Quaternion> rotate;
+    AnimationCurve<Vector3> scale;
+};
+
+struct Animation {
+    float duration;
+    std::unordered_map<std::string, NodeAnimation> nodeAnimations;
 };

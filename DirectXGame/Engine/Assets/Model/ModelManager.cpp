@@ -28,13 +28,10 @@ namespace {
 	}
 }
 
-void ModelManager::Initialize(TextureManager* textureManager, DrawDataManager* drawDataManager) {
+void ModelManager::Initialize(TextureManager* textureManager) {
 	modelFilePaths_.clear();
-	nodeModelDatas_.clear();
-	skinningModelDatas_.clear();
+	modelData_.clear();
 	textureManager_ = textureManager;
-	drawDataManager_ = drawDataManager;
-	nextID_ = 0;
 
 	logger_ = GetLogger("Engine");
 
@@ -45,7 +42,7 @@ void ModelManager::Initialize(TextureManager* textureManager, DrawDataManager* d
 	LoadModel("Assets/.EngineResource/Model/DefaultDesc");
 }
 
-int ModelManager::LoadModel(std::string filePath) {
+const ModelData* ModelManager::LoadModel(std::string filePath) {
 	// ファイルパスの確認と修正
 	std::string fileName = FilePathChecker(filePath);
 
@@ -59,13 +56,10 @@ int ModelManager::LoadModel(std::string filePath) {
 	const auto it = modelFilePaths_.find(filePath);
 	if (it != modelFilePaths_.end()) {
 		logger_->debug("Model already loaded: {}", filePath);
-		return it->second;
+		return modelData_[it->second].get();
 	}
 
 	logger_->info("Loading Model: {}/{}", filePath, fileName);
-
-	//idの設定
-	int id = -1;
 
 	//Assimp
 	Assimp::Importer importer;
@@ -78,31 +72,12 @@ int ModelManager::LoadModel(std::string filePath) {
 	}
 
 	//読み込み
-	
-	bool isSkinningModel = false;
-	for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
-		aiMesh* mesh = scene->mMeshes[m];
-		if (mesh->HasBones()) {
-			isSkinningModel = true;
-			break;
-		}
-	}
-
-	if (isSkinningModel) {
-		SkinningModelData result = WritingSkinningModelData(scene, filePath);
-
-		id = int(skinningModelDatas_.size());
-		skinningModelDatas_.push_back(result);
-	} else {
-		NodeModelData result = WritingNodeModelData(scene, filePath);
-
-		id = int(nodeModelDatas_.size());
-		nodeModelDatas_.push_back(result);
-	}
-
+	int id = int(modelData_.size());
+	auto& modelData = modelData_.emplace_back(std::make_unique<ModelData>());
+	*modelData = CreateModelData(scene, filePath);
 	modelFilePaths_[filePath] = id;
 
-	return id;
+	return modelData.get();
 }
 
 void ModelManager::LoadAllModels() {
@@ -174,50 +149,6 @@ Animation ModelManager::LoadAnimation(std::string filePath, std::string animatio
 	return it->second;
 }
 
-ModelData& ModelManager::GetModelData(int id) {
-	if (nodeModelDatas_.size() > id) {
-		return nodeModelDatas_[id];
-	} else {
-		logger_->error("Model ID not found: {}", id);
-		assert(false && "ModelManager::GetModelData: Model ID not found");
-		return nodeModelDatas_[0]; //キューブをセット
-	}
-}
-
-PolygonList SHEngine::ModelManager::CreatePolygonList(int id) {
-	for (const auto& [filePath, modelId] : modelFilePaths_) {
-		if (modelId == id) {
-			return CreatePolygonList(filePath);
-		}
-	}
-	assert(false && "ModelManager::CreatePolygonList: Model ID not found");
-	return PolygonList{}; // IDが見つからない場合は空のPolygonListを返す
-}
-
-PolygonList SHEngine::ModelManager::CreatePolygonList(std::string modelPath) {
-	std::string fileName = FilePathChecker(modelPath);
-	
-	auto it = modelFilePaths_.find(modelPath);
-	if (it == modelFilePaths_.end()) {
-		LoadModel(modelPath);
-		it = modelFilePaths_.find(modelPath);
-		if (it == modelFilePaths_.end()) {
-			logger_->error("Model not found: {}", modelPath);
-			assert(false && "ModelManager::CreatePolygonList: Model not found");
-			return PolygonList{};
-		}
-	}
-	
-	//Assimp
-	Assimp::Importer importer;
-	std::string path = (modelPath + "/" + fileName);
-	const aiScene* scene = nullptr;
-	scene = importer.ReadFile(path.c_str(), aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
-	assert(scene && "ModelManager::CreatePolygonList: Failed to load model");
-
-	return ModelLoader::LoadPolygonList(scene);
-}
-
 std::string ModelManager::FilePathChecker(std::string& filePath) {
 	//Assets/から始まっているか確認(Assets/Modelの可能性もあるのでAssets/のみ確認)
 	std::string formatFirst = "Assets/";
@@ -247,50 +178,7 @@ std::string ModelManager::FilePathChecker(std::string& filePath) {
 ModelData SHEngine::ModelManager::CreateModelData(const aiScene* scene, std::string filePath) {
 	ModelData result;
 	//コードがごちゃつくのでModelLoaderに処理を投げる
-	result.rootNode = ModelLoader::ReadNode(scene, scene->mRootNode);
-	result.materials = ModelLoader::LoadMaterials(scene, filePath, textureManager_);
-	result.skeleton = ModelLoader::CreateSkelton(result.rootNode, scene);
-	result.skinClusterData = ModelLoader::LoadSkinCluster(scene);
-
-	//読み込めているかの確認
-	bool isCorrect = true;
-	if (result.vertices.empty()) {
-		logger_->warn("Vertex is Empty!");
-		isCorrect = false;
-	}
-	if (result.vertices.empty()) {
-		logger_->warn("VertexInfluence is Empty!");
-		isCorrect = false;
-	}
-	if (result.indices.empty()) {
-		logger_->warn("Index is Empty!");
-		isCorrect = false;
-	}
-	if (result.materials.empty()) {
-		logger_->warn("Material is Empty!");
-		isCorrect = false;
-	}
-	if (result.materialIndex.empty()) {
-		logger_->warn("MaterialIndex is Empty!");
-		isCorrect = false;
-	}
-	if (result.skeleton.joints.empty()) {
-		logger_->warn("Skeleton is Empty!");
-		isCorrect = false;
-	}
-
-	if (!isCorrect) {
-		logger_->error("Failed to Load Model, So setting Cube instead.");
-		assert(false && "ModelManager::LoadModel: Failed to load model");
-		result = skinningModelDatas_[1]; //キューブをセット
-	} else {
-		//DrawDataの作成
-		drawDataManager_->AddVertexBuffer(result.vertices);
-		drawDataManager_->AddVertexBuffer(result.vertexInfluences);
-		drawDataManager_->AddIndexBuffer(result.indices);
-		int drawDataIndex = drawDataManager_->CreateDrawData();
-		result.drawDataIndex = drawDataIndex;
-	}
+	result.nodes = ModelLoader::LoadNodes(scene);
 
 	return result;
 }
@@ -302,8 +190,8 @@ Matrix4x4 AnimationUpdate(const Animation& animation, float time, const Node& no
 	return Matrix::MakeScaleMatrix(scale) * rotation.ToMatrix() * Matrix::MakeTranslationMatrix(position);
 }
 
-void AnimationUpdate(const Animation& animation, float time, Skeleton& skeleton) {
-	for(Joint& joint : skeleton.joints) {
+std::vector<> AnimationUpdate(const Animation& animation, float time, const Skeleton& skeleton) {
+	for(const Joint& joint : skeleton.joints) {
 		if(auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
 			Vector3 position = CalculateValue(it->second.position.keyframes, time);
 			Quaternion rotation = CalculateValue(it->second.rotate.keyframes, time);

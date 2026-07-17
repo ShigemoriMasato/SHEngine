@@ -2,8 +2,10 @@
 #include <Utility/DirectUtilFuncs.h>
 #include <DirectXTex/d3dx12.h>
 
-SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t size, uint32_t num, BufferNum bufferNum) {
-	sizeInBytes_ = size * num;
+SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint32_t num, BufferNum bufferNum) {
+	sizeInBytes_ = strideInBytes * num;
+	strideInBytes_ = strideInBytes;
+	num_ = num;
 
 	auto HasBuffer = [&](BufferType t) noexcept -> bool {
 		return (bufferType_ & static_cast<uint8_t>(t)) != 0u;

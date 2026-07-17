@@ -25,7 +25,7 @@ namespace SHEngine {
 		// @param size バッファのサイズ（バイト単位）
 		// @param num バッファの数（デフォルトは1）
 		// @param bufferNum バッファの数（デフォルトは3、スワップチェーンのバッファ数に合わせる）
-		GPUBuffer(BufferType bufferType, size_t size, uint32_t num = 1, BufferNum bufferNum = BufferNum::MatchSwapChain);
+		GPUBuffer(BufferType bufferType, size_t strideInBytes, uint32_t num = 1, BufferNum bufferNum = BufferNum::MatchSwapChain);
 
 		// @brief Texture用のGPUBufferの作成
 		GPUBuffer(TextureData* textureData);
@@ -50,6 +50,10 @@ namespace SHEngine {
 			return resources_[currentIndex_ % resources_.size()].res.Get();
 		}
 
+		size_t GetSizeInBytes() const { return sizeInBytes_; }
+		size_t GetStrideInBytes() const { return strideInBytes_; }
+		uint32_t GetNum() const { return num_; }
+
 	protected:
 
 		friend class FrameCounter;
@@ -69,6 +73,8 @@ namespace SHEngine {
 		std::vector<std::unique_ptr<SRVHandle>> uavHandles_;
 
 		size_t sizeInBytes_ = 0;
+		size_t strideInBytes_ = 0;
+		uint32_t num_ = 0;
 		std::vector<void*> mappedData_ = {};
 
 		std::vector<D3D12_RESOURCE_STATES> currentState_ = {};

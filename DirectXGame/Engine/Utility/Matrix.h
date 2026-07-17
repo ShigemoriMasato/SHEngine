@@ -8,10 +8,16 @@ struct Matrix4x4 final {
 			1,0,0,0,
 			0,1,0,0,
 			0,0,1,0,
-			0,0,0,1 };
+			0,0,0,1 
+		};
 	}
 
-	float m[4][4];
+	float m[4][4] = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	};
 
 	Matrix4x4 Inverse() const {
 		Matrix4x4 mat = *this;
