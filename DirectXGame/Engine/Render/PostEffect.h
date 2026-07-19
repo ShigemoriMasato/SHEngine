@@ -33,7 +33,7 @@ struct PostEffectConfig {
 class PostEffect {
 public:
 
-	void Initialize(SHEngine::TextureManager* textureManager, SHEngine::DrawData drawData, bool copyOnly = false);
+	void Initialize(SHEngine::TextureManager* textureManager, bool copyOnly = false);
 	template<typename T>
 	void CopyBuffer(PostEffectJob job, const T& data);
 	void Draw(const PostEffectConfig& config);
@@ -43,6 +43,9 @@ private:
 	std::unique_ptr<SHEngine::Screen::Display> intermediateDisplay_ = nullptr;
 	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
 	std::unique_ptr<SHEngine::Renderer> renderer_{};
+
+	static inline std::unique_ptr<SHEngine::GPUBuffer> vertexPos_ = nullptr;
+	static inline std::unique_ptr<SHEngine::GPUBuffer> vertexUV_ = nullptr;
 
 	struct Part {
 		std::string name;

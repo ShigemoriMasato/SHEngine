@@ -2,6 +2,18 @@
 #include <Game/Effect/Base/IEmitter.h>
 #include <random>
 
+struct PolygonData {
+	Vector3 a;
+	Vector3 b;
+	Vector3 c;
+};
+
+struct PolygonList {
+	std::vector<PolygonData> polygons;
+	std::vector<float> areas;
+	float totalArea = 0.0f;
+};
+
 class PolygonEmitter : public IEmitter {
 public:
 
@@ -14,6 +26,8 @@ public:
 
 	void EditPolygon(uint32_t index, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum);
 	void EditPolygon(uint32_t index, const PolygonList& polygonList, bool isCreateChanceList);
+
+	PolygonList CreatePolygonList(const std::vector<Vector3>& vertices, const std::vector<uint32_t>& indices);
 
 private:
 

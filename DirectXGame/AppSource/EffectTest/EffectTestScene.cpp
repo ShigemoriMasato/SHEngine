@@ -9,22 +9,19 @@ void EffectTestScene::Initialize() {
 
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 
-	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
 	effect_ = std::make_unique<Effect>();
-	effect_->Initialize(engine_, commonData_->display.get(), pedd);
+	effect_->Initialize(engine_);
 
 	grid_ = std::make_unique<Grid>();
-	grid_->Initialize(drawDataManager_);
+	grid_->Initialize();
 
 	vertexEmitter_ = std::make_unique<VertexEmitter>();
 	effect_->AddEmitter(vertexEmitter_.get());
-	auto model = modelManager_->GetModelData(modelManager_->LoadModel(filePath));
-	vertexEmitter_->AddModel(model.positions, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
+	auto model = modelManager_->LoadModel(filePath);
+	vertexEmitter_->AddModel(model->meshes.front().position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
 
 	polygonEmitter_ = std::make_unique<PolygonEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(polygonEmitter_.get());
-	auto polygonList = modelManager_->CreatePolygonList(modelManager_->LoadModel(filePath));
-	polygonEmitter_->AddPolygon(polygonList, Matrix::MakeTranslationMatrix({0, 3, 0}), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 6000);
 	
 	waveEmitter_ = std::make_unique<WaveEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(waveEmitter_.get());
@@ -69,7 +66,7 @@ std::unique_ptr<IScene> EffectTestScene::Update() {
 
 	grid_->Update(camera_.GetCenter(), camera_.GetVPMatrix());
 
-	static auto model = modelManager_->GetModelData(modelManager_->LoadModel(filePath));
+	static auto model = modelManager_->LoadModel(filePath);
 
 	effect_->Update(camera_.GetVPMatrix(), camera_.GetBillboardMatrix(), engine_->GetDeltaTime());
 

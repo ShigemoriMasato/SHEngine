@@ -4,7 +4,7 @@
 class Grid {
 public:
 
-	void Initialize(SHEngine::DrawDataManager* drawDataManager);
+	void Initialize();
 	void Update(Vector3 middle, const Matrix4x4& vpMatrix);
 	void Draw(DCC* dcc);
 
@@ -20,7 +20,6 @@ private:
 	const float interval_ = 1.0f;
 	const int thickInterval_ = 5;
 	const int lineNum_ = static_cast<int>(length_ / interval_) + 1;
-
 
 	struct LineConfig {
 		Vector3 start;

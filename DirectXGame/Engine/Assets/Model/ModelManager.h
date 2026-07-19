@@ -5,13 +5,20 @@
 #include <unordered_map>
 #include <assimp/scene.h>
 #include <Tool/Logger/Logger.h>
-#include <Render/DrawDataManager.h>
 
 #include "ModelData.h"
 
 namespace SHEngine {
 
 	class TextureManager;
+
+	enum class TestModel {
+		Cube,
+		Plane,
+		Sphere,
+		SimpleSkin,
+		Desc,
+	};
 
 	/**
 	 * @class ModelManager
@@ -42,6 +49,8 @@ namespace SHEngine {
 		 * @return モデルID
 		 */
 		const ModelData* LoadModel(std::string filePath);
+
+		const ModelData* GetModelData(TestModel model);
 
 		/**
 		 * @brief Assets/Models/以下にあるすべてのモデルファイルを読み込む

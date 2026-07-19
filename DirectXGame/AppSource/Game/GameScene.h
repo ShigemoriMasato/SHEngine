@@ -5,7 +5,6 @@
 #include <Render/PostEffect.h>
 #include <Game/Camera/GameCamera.h>
 #include <Game/Effect/Effect.h>
-#include <Game/Effect/Subject/Subject.h>
 #include <Tool/TimeViewer/TimeViewer.h>
 
 class GameScene : public IScene {
@@ -31,8 +30,6 @@ private:
 	std::unique_ptr<Effect> effect_ = nullptr;
 
 	PostEffectConfig postEffectConfig_{};
-
-	std::unique_ptr<Subject> subject_ = nullptr;
 
 	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
 

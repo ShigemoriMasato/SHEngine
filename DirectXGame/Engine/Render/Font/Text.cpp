@@ -2,7 +2,7 @@
 
 using namespace Matrix;
 
-void SHEngine::Text::Initialize(DrawData& planeDrawData, const std::string& fontPath, int fontSize, std::string debugName) {
+void SHEngine::Text::Initialize(const Mesh& planeMesh, const std::string& fontPath, int fontSize, std::string debugName) {
 	textureIndex_ = fontLoader_->Load(fontPath, fontSize);
 	fontPath_ = fontPath;
 	fontSize_ = fontSize;
@@ -15,7 +15,20 @@ void SHEngine::Text::Initialize(DrawData& planeDrawData, const std::string& font
 	colorBuffer_ = container_->Create(BufferType::CBV, sizeof(Vector4));
 	textureIndexBuffer_->CopyBuffer(&textureIndex_, sizeof(int));
 
-	renderer_ = std::make_unique<Renderer>(planeDrawData);
+	auto positionBuffer = container_->Create(BufferType::CBV, sizeof(Vector3), 4, BufferNum::Single);
+	auto texcoordBuffer = container_->Create(BufferType::CBV, sizeof(Vector2), 4, BufferNum::Single);
+	auto normalBuffer = container_->Create(BufferType::CBV, sizeof(Vector3), 4, BufferNum::Single);
+	auto indexBuffer = container_->Create(BufferType::CBV, sizeof(uint32_t), 6, BufferNum::Single);
+	positionBuffer->CopyBuffer(planeMesh.position.data(), sizeof(Vector3) * planeMesh.position.size());
+	texcoordBuffer->CopyBuffer(planeMesh.texcoord.data(), sizeof(Vector2) * planeMesh.texcoord.size());
+	normalBuffer->CopyBuffer(planeMesh.normal.data(), sizeof(Vector3) * planeMesh.normal.size());
+	indexBuffer->CopyBuffer(planeMesh.indices.data(), sizeof(uint32_t) * planeMesh.indices.size());
+
+	renderer_ = std::make_unique<Renderer>();
+	renderer_->SetVertexData(VertexType::Position, positionBuffer);
+	renderer_->SetVertexData(VertexType::Texcoord, texcoordBuffer);
+	renderer_->SetVertexData(VertexType::Normal, normalBuffer);
+	renderer_->SetIndexData(indexBuffer);
 	renderer_->SetVS("Engine/FontBasic.VS.hlsl");
 	renderer_->SetPS("Engine/FontBasic.PS.hlsl");
 	renderer_->SetGPUBuffer(matrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);

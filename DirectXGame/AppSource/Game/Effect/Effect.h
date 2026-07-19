@@ -2,12 +2,11 @@
 #include "Pool/ParticlePool.h"
 #include "Wave/WaveEmitter.h"
 #include <SHEngine.h>
-#include "Subject/Subject.h"
 
 class Effect {
 public:
 
-	void Initialize(SHEngine::Engine* engine, SHEngine::Screen::IDisplay* renderTarget, const SHEngine::DrawData& pedd);
+	void Initialize(SHEngine::Engine* engine);
 
 	void AddEmitter(IEmitter* emitter);
 

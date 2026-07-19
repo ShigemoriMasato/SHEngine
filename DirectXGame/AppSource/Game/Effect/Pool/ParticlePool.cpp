@@ -1,7 +1,7 @@
 #include "ParticlePool.h"
 #include <imgui/imgui.h>
 
-void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine::TextureManager* textureManager, SHEngine::Screen::IDisplay* renderTarget, const SHEngine::DrawData& pedd) {
+void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine::TextureManager* textureManager) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	initialize_ = std::make_unique<SHEngine::ComputeObject>("Pool Init");
 

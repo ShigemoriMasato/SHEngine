@@ -17,7 +17,7 @@ class ParticlePool {
 public:
 
 	//パーティクルのプールを初期化する。GPUBufferを作成して、DrawDataにセットする
-	void Initialize(const int kMaxParticleNum, CCC* compute, SHEngine::TextureManager* textureManager, SHEngine::Screen::IDisplay* renderTarget, const SHEngine::DrawData& pedd);
+	void Initialize(const int kMaxParticleNum, CCC* compute, SHEngine::TextureManager* textureManager);
 
 	//全てのWorldMatrixにcamera行列をかけて、GPUに転送する
 	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime, CCC* compute);

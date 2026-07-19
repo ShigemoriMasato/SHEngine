@@ -3,7 +3,6 @@
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
 #include <Render/MeshRenderer.h>
-#include <Game/Effect/Subject/Cylinder.h>
 
 class TestScene : public IScene {
 public:
@@ -18,6 +17,5 @@ private:
 	std::unique_ptr<Grid> grid_;
 
 	std::unique_ptr<SHEngine::MeshRenderer> meshRenderer_;
-	std::unique_ptr<Cylinder> cylinder_ = nullptr;
 
 };

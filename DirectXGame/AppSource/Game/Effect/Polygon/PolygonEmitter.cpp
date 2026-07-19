@@ -123,6 +123,22 @@ void PolygonEmitter::EditPolygon(uint32_t index, const PolygonList& polygonList,
 	}
 }
 
+PolygonList PolygonEmitter::CreatePolygonList(const std::vector<Vector3>& vertices, const std::vector<uint32_t>& indices) {
+	PolygonList list;
+
+	for (uint32_t i = 0; i < indices.size(); i += 3) {
+		PolygonData polygon;
+		polygon.a = vertices[indices[i]];
+		polygon.b = vertices[indices[i + 1]];
+		polygon.c = vertices[indices[i + 2]];
+		list.polygons.push_back(polygon);
+		float area = 0.5f * ((polygon.b - polygon.a).Normalize().Length() * (polygon.c - polygon.a).Normalize().Length());
+		list.areas.push_back(area);
+		list.totalArea += area;
+	}
+	return list;
+}
+
 std::vector<int> PolygonEmitter::CreateChanceList(const PolygonList& polygonList) {
 	std::vector<int> chanceList;
 	chanceList.reserve(polygonList.polygons.size() * 5);

@@ -11,8 +11,7 @@ TitleScene::~TitleScene() {
 }
 
 void TitleScene::Initialize() {
-	int modelIndex = modelManager_->LoadModel("WaterPlane");
-	auto model = modelManager_->GetModelData(modelIndex);
+	auto model = modelManager_->LoadModel("WaterPlane");
 	auto drawData = drawDataManager_->GetDrawData(model.drawDataIndex);
 	waterWave_->Initialize(drawData, camera_.get());
 

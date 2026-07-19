@@ -83,55 +83,6 @@ Matrix4x4 operator/=(Matrix4x4& a, const Matrix4x4& b);
 bool operator==(const Matrix4x4& a, const Matrix4x4& b);
 bool operator!=(const Matrix4x4& a, const Matrix4x4& b);
 
-//Easing用
 Quaternion operator+(const Quaternion& a, const Quaternion& b);
 Quaternion operator-(const Quaternion& a, const Quaternion& b);
 Quaternion operator*(const Quaternion& a, const float b);
-
-//Bit演算子
-template <typename T>
-uint32_t operator|(T a, T b) {
-	return static_cast<uint32_t>(a) | static_cast<uint32_t>(b);
-}
-template <typename T>
-uint32_t operator|(uint32_t a, T b) {
-	return a | static_cast<uint32_t>(b);
-}
-template <typename T>
-uint32_t operator|=(uint32_t& a, T b) {
-	a |= static_cast<uint32_t>(b);
-	return a;
-}
-template <typename T>
-uint32_t operator&(T a, T b) {
-	return static_cast<uint32_t>(a) & static_cast<uint32_t>(b);
-}
-template <typename T>
-uint32_t operator&(uint32_t a, T b) {
-	return a & static_cast<uint32_t>(b);
-}
-template <typename T>
-uint32_t operator&=(uint32_t& a, T b) {
-	a &= static_cast<uint32_t>(b);
-	return a;
-}
-template <typename T>
-uint32_t operator~(T a) {
-	return ~static_cast<uint32_t>(a);
-}
-template <typename T>
-uint32_t operator^(T a, T b) {
-	return static_cast<uint32_t>(a) ^ static_cast<uint32_t>(b);
-}
-template <typename T>
-uint32_t operator^(uint32_t a, T b) {
-	return a ^ static_cast<uint32_t>(b);
-}
-template <typename T>
-uint32_t operator<<(T a, int b) {
-	return static_cast<uint32_t>(a) << b;
-}
-template <typename T>
-uint32_t operator>>(T a, int b) {
-	return static_cast<uint32_t>(a) >> b;
-}

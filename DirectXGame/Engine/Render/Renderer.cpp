@@ -1,9 +1,6 @@
 #include "Renderer.h"
 #include <Render/Screen/IDisplay.h>
 
-SHEngine::Renderer::Renderer(const DrawData& drawData) : drawData_(drawData) {
-}
-
 void SHEngine::Renderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType) {
 	if (shaderType != ShaderType::VERTEX_SHADER && shaderType != ShaderType::PIXEL_SHADER) {
 		assert(false && "Renderer::SetGPUBuffer Not use Resource of VS or PS");	//VERTEX_SHADERかPIXEL_SHADER以外は使えない
@@ -16,7 +13,7 @@ void SHEngine::Renderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderTyp
 	rootParamConfig.bufferType = bufferType;
 
 	auto& bufferConfig = bufferConfigs_.emplace_back();
-	bufferConfig.buffer = gpuBuffer;
+	bufferConfig.buffers.push_back(gpuBuffer);
 	bufferConfig.shader = shaderType;
 	bufferConfig.type = bufferType;
 }
@@ -34,21 +31,6 @@ void SHEngine::Renderer::ResetGPUBuffers() {
 	psoConfig_.rootConfig.rootParams.clear();
 }
 
-void SHEngine::Renderer::EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer) {
-	int i = 0;
-	for (int i = 0; i < bufferConfigs_.size(); ++i) {
-		if (bufferConfigs_[i].buffer == gpuBuffer && bufferConfigs_[i].shader == shaderType && bufferConfigs_[i].type == bufferType) {
-			bufferConfigs_.erase(bufferConfigs_.begin() + i);
-			psoConfig_.rootConfig.rootParams.erase(psoConfig_.rootConfig.rootParams.begin() + i);
-			break;
-		}
-	}
-
-	if (i == bufferConfigs_.size()) {
-		assert(false && "Renderer::EraseGPUBuffer: GPUBuffer not found.");
-	}
-}
-
 void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	if (instanceNum_ <= 0) {
 		return;
@@ -57,36 +39,59 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	auto cmdList = dcc->GetCommandList();
 	auto display = dcc->GetRenderTarget();
 
-	psoConfig_.rtvFormat = display->GetRTVFormat();
-	psoConfig_.rtvNum = display->GetRenderTargetNum();
-	psoConfig_.isDSV = display->GetDepthTexture() != nullptr;
-	psoConfig_.dsvFormat = display->GetDepthTexture() ? display->GetDepthTexture()->GetFormat() : DXGI_FORMAT_UNKNOWN;
+	for (uint32_t i = 0; i < drawData_.size(); ++i) {
+		auto& drawData = drawData_[i];
 
-	if (!display->GetDepthTexture()) {
-		psoConfig_.depthStencilID = PSO::DepthStencilID::None;
-	}
+		uint32_t vertexCount = drawData.GetVertexCount();
+		uint32_t indexCount = drawData.GetIndexCount();
 
-	psoEditor_->SetPSO(cmdList, psoConfig_);
+		if (vertexCount <= 0) {
+			assert(false && "Renderer::Draw: VertexCount or IndexCount is zero.");
+			return;
+		}
 
-	cmdList->IASetVertexBuffers(0, UINT(drawData_.vbv.size()), drawData_.vbv.data());
-	cmdList->IASetIndexBuffer(&drawData_.ibv);
+		psoConfig_.rtvFormat = display->GetRTVFormat();
+		psoConfig_.rtvNum = display->GetRenderTargetNum();
+		psoConfig_.isDSV = display->GetDepthTexture() != nullptr;
+		psoConfig_.dsvFormat = display->GetDepthTexture() ? display->GetDepthTexture()->GetFormat() : DXGI_FORMAT_UNKNOWN;
 
-	int rootIndex = 0;
-	for (auto& config : bufferConfigs_) {
-		config.buffer->TransitionBarrier(config.shader, config.type);
-		config.buffer->Flush(cmdList);
-		if (config.type == BufferType::CBV) {
-			cmdList->SetGraphicsRootConstantBufferView(rootIndex++, config.buffer->GetGPUDescriptorHandle(config.type).ptr);
+		if (!display->GetDepthTexture()) {
+			psoConfig_.depthStencilID = PSO::DepthStencilID::None;
+		}
+
+		auto vbvs = drawData.GetVertexBufferView();
+		auto ibv = drawData.GetIndexBufferView();
+
+		psoEditor_->SetPSO(cmdList, psoConfig_);
+
+		cmdList->IASetVertexBuffers(0, UINT(vbvs.size()), vbvs.data());
+		if (indexCount > 0) {
+			cmdList->IASetIndexBuffer(&ibv);
+		}
+
+		int rootIndex = 0;
+		for (auto& config : bufferConfigs_) {
+			auto& buffer = config.buffers[i % config.buffers.size()];
+
+			buffer->TransitionBarrier(config.shader, config.type);
+			buffer->Flush(cmdList);
+			if (config.type == BufferType::CBV) {
+				cmdList->SetGraphicsRootConstantBufferView(rootIndex++, buffer->GetGPUDescriptorHandle(config.type).ptr);
+			} else {
+				cmdList->SetGraphicsRootDescriptorTable(rootIndex++, buffer->GetGPUDescriptorHandle(config.type));
+			}
+		}
+
+		if (psoConfig_.rootConfig.useTexture) {
+			cmdList->SetGraphicsRootDescriptorTable(rootIndex++, textureStartHandle_);
+		}
+
+		if (indexCount > 0) {
+			cmdList->DrawIndexedInstanced(indexCount, instanceNum_, 0, 0, 0);
 		} else {
-			cmdList->SetGraphicsRootDescriptorTable(rootIndex++, config.buffer->GetGPUDescriptorHandle(config.type));
+			cmdList->DrawInstanced(vertexCount, instanceNum_, 0, 0);
 		}
 	}
-
-	if (psoConfig_.rootConfig.useTexture) {
-		cmdList->SetGraphicsRootDescriptorTable(rootIndex++, textureStartHandle_);
-	}
-
-	cmdList->DrawIndexedInstanced(drawData_.indexNum, instanceNum_, 0, 0, 0);
 
 	//SRVのなかで、UAVが含まれるPSResourceはCommonに直しておく
 	for (auto& uavBuffer : uavBuffers_) {

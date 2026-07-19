@@ -1,5 +1,8 @@
 #pragma once
 #include <Utility/MyMath.h>
+#include <Utility/DataStructures.h>
+#include <string>
+#include <unordered_map>
 
 struct Node {
     std::string name;
@@ -30,7 +33,7 @@ struct Primitive {
 struct Mesh {
     std::string name;
 
-    std::vector<Vector4> position;
+    std::vector<Vector3> position;
     std::vector<Vector3> normal;
 	std::vector<Vector2> texcoord;
     std::vector<Vector4> color;

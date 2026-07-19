@@ -1,5 +1,5 @@
 #pragma once
-#include "DrawDataManager.h"
+#include "DrawData.h"
 #include "Buffer/BufferContainer.h"
 #include "PSO/PSOEditor.h"
 #include "Command/DirectCommandContext.h"
@@ -12,7 +12,7 @@ namespace SHEngine {
 
 		static void SetPSOEditor(PSO::Editor* psoEditor, D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle) { psoEditor_ = psoEditor; textureStartHandle_ = textureStartHandle; }
 
-		Renderer(const DrawData& drawData);
+		Renderer(const ModelData* modelData);
 
 		/// @brief GPUBufferをセットする。register順。
 		/// @param gpuBuffer 使用するBuffer
@@ -24,20 +24,22 @@ namespace SHEngine {
 		/// @param shaderType シェーダーの種類
 		/// @param bufferType バッファの種類
 		void SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType);
+
+		/// @brief GPUBufferをセットする。描画するMesh毎に切り替わる。Meshの数がGPUBufferを超えた場合、最初のBufferに戻る。
+		void SetSwitchingGPUBuffer(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType);
+
 		/// @brief GPUBufferをリセットする。今までSetしたBufferの設定が消える。Buffer自体は解放されない
 		void ResetGPUBuffers();
-		/// @brief 指定したGPUBufferをリセットする。Buffer自体は解放されない
-		/// @param bufferType リセットするBufferをSetしたときに設定したバッファの種類
-		/// @param shaderType リセットするBufferをSetしたときに設定したシェーダーの種類
-		/// @param gpuBuffer リセットするGPUBuffer
-		void EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer);
+
+		// @brief 頂点データをSetする。すでにある場合は上書きする
+		void SetVertexData(VertexType type, GPUBuffer* gpuBuffer);
+		// @brief インデックスデータをSetする。すでにある場合は上書きする
+		void SetIndexData(GPUBuffer* gpuBuffer);
 
 		// @brief VertexShaderのファイル名をセットする。デフォルトは"Simple.VS.hlsl"。
 		void SetVS(const std::string& vs) { psoConfig_.vs = vs; }
 		// @brief PixelShaderのファイル名をセットする。デフォルトは"White.PS.hlsl"。
 		void SetPS(const std::string& ps) { psoConfig_.ps = ps; }
-		// @brief 入力レイアウトIDをセットする。デフォルトはPSO::InputLayoutID::Default。
-		void SetInputLayout(PSO::InputLayoutID id) { psoConfig_.inputLayoutID = id; }
 		// @brief ブレンドステートIDをセットする。デフォルトはPSO::BlendStateID::Normal。
 		void SetBlendState(PSO::BlendStateID id, int index = 0) { psoConfig_.blendID[index] = id; }
 		// @brief 深度ステンシルIDをセットする。デフォルトはPSO::DepthStencilID::Default。
@@ -66,20 +68,18 @@ namespace SHEngine {
 		static inline PSO::Editor* psoEditor_ = nullptr;
 		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
 
-		DrawData drawData_;
+		std::vector<DrawData> drawData_;
 
 		struct BufferConfig {
 			BufferType type;
 			ShaderType shader;
-			GPUBuffer* buffer;
+			std::vector<GPUBuffer*> buffers;
 		};
 		std::vector<BufferConfig> bufferConfigs_;
 		RegisterCounter registerCount_;
 
 		// @brief UAVが含まれているBufferのリスト。描画後、CCCでバリアを張り替えられるようにCommonに変えるために保持する
 		std::vector<GPUBuffer*> uavBuffers_;
-
-
 	};
 
 }

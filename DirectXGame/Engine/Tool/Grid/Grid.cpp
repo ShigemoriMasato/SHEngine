@@ -1,26 +1,18 @@
 #include "Grid.h"
 
-void Grid::Initialize(SHEngine::DrawDataManager* drawDataManager) {
-	static int drawDataIndex = -1;
-	if (drawDataIndex == -1) {
-		std::vector<Vector3> vertices = { {}, {} };
-		drawDataManager->AddVertexBuffer(vertices);
-		drawDataIndex = drawDataManager->CreateDrawData();
-	}
-
-	auto drawData = drawDataManager->GetDrawData(drawDataIndex);
+void Grid::Initialize() {
+	auto positionBuffer = container_->Create(BufferType::CBV, sizeof(Vector3), 2, BufferNum::Single);
 
 	container_ = std::make_unique<SHEngine::BufferContainer>(2);
 
 	configBuffer_ = container_->Create(BufferType::SRV, sizeof(LineConfig), lineNum_ * 2);
 	vpBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4));
 
-	renderer_ = std::make_unique<SHEngine::Renderer>(drawData);
+	renderer_ = std::make_unique<SHEngine::Renderer>();
 	renderer_->SetVS("Engine/Grid.VS.hlsl");
 	renderer_->SetPS("Engine/Grid.PS.hlsl");
 	renderer_->SetGPUBuffer(configBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
 	renderer_->SetGPUBuffer(vpBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	renderer_->SetInputLayout(SHEngine::PSO::InputLayoutID::Vector3);
 	renderer_->SetTopology(SHEngine::PSO::Topology::Line);
 	renderer_->instanceNum_ = lineNum_ * 2;
 

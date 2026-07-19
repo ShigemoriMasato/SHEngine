@@ -9,7 +9,7 @@ namespace ModelLoader {
 
 	std::vector<Node> LoadNodes(const aiScene* scene);
 	std::vector<Mesh> LoadMeshes(const aiScene* scene);
-	std::vector<Vector4> LoadPositions(const aiMesh* ai_mesh);
+	std::vector<Vector3> LoadPositions(const aiMesh* ai_mesh);
 	std::vector<Vector3> LoadNormals(const aiMesh* ai_mesh);
 	std::vector<Vector2> LoadTexcoords(const aiMesh* ai_mesh);
 	std::vector<Vector4> LoadColors(const aiMesh* ai_mesh);

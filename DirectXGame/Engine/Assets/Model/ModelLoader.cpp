@@ -61,8 +61,8 @@ std::vector<Mesh> ModelLoader::LoadMeshes(const aiScene* scene) {
 	return meshes;
 }
 
-std::vector<Vector4> ModelLoader::LoadPositions(const aiMesh* ai_mesh) {
-	std::vector<Vector4> positions;
+std::vector<Vector3> ModelLoader::LoadPositions(const aiMesh* ai_mesh) {
+	std::vector<Vector3> positions;
 
 	positions.resize(ai_mesh->mNumVertices);
 	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
@@ -70,7 +70,6 @@ std::vector<Vector4> ModelLoader::LoadPositions(const aiMesh* ai_mesh) {
 		positions[v].x = ai_mesh->mVertices[v].x;
 		positions[v].y = ai_mesh->mVertices[v].y;
 		positions[v].z = ai_mesh->mVertices[v].z;
-		positions[v].w = 1.0f;
 	}
 
 	return positions;

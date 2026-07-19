@@ -39,14 +39,6 @@ void InitializeScene::Initialize() {
 	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 
-	std::vector<VertexData> vertices = {
-		{{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-		{{3.0f, 1.0f, 0.0f, 1.0f}, {2.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-		{{-1.0f, -3.0f, 0.0f, 1.0f}, {0.0f, 2.0f}, {0.0f, 0.0f, -1.0f}}
-	};
-	drawDataManager_->AddVertexBuffer(vertices);
-	commonData_->postEffectDrawDataIndex = drawDataManager_->CreateDrawData();
-
 	engine_->ImGuiActivate(commonData_->window->GetWindowsAPI());
 
 	textureManager_->LoadAllTextures();

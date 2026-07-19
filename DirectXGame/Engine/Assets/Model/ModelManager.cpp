@@ -80,6 +80,10 @@ const ModelData* ModelManager::LoadModel(std::string filePath) {
 	return modelData.get();
 }
 
+const ModelData* SHEngine::ModelManager::GetModelData(TestModel model) {
+	return modelData_[static_cast<int>(model)].get();
+}
+
 void ModelManager::LoadAllModels() {
 	auto files = SearchDirectoryNames("Assets/Model/");
 
@@ -181,87 +185,4 @@ ModelData SHEngine::ModelManager::CreateModelData(const aiScene* scene, std::str
 	result.nodes = ModelLoader::LoadNodes(scene);
 
 	return result;
-}
-
-Matrix4x4 AnimationUpdate(const Animation& animation, float time, const Node& node) {
-	Vector3 position = CalculateValue(animation.nodeAnimations.at(node.name).position.keyframes, time);
-	Quaternion rotation = CalculateValue(animation.nodeAnimations.at(node.name).rotate.keyframes, time);
-	Vector3 scale = CalculateValue(animation.nodeAnimations.at(node.name).scale.keyframes, time);
-	return Matrix::MakeScaleMatrix(scale) * rotation.ToMatrix() * Matrix::MakeTranslationMatrix(position);
-}
-
-std::vector<> AnimationUpdate(const Animation& animation, float time, const Skeleton& skeleton) {
-	for(const Joint& joint : skeleton.joints) {
-		if(auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
-			Vector3 position = CalculateValue(it->second.position.keyframes, time);
-			Quaternion rotation = CalculateValue(it->second.rotate.keyframes, time);
-			Vector3 scale = CalculateValue(it->second.scale.keyframes, time);
-			joint.transform.position = position;
-			joint.transform.rotate = rotation;
-			joint.transform.scale = scale;
-		}
-	}
-}
-
-void SkeletonUpdate(Skeleton& skeleton) {
-	for (Joint& joint : skeleton.joints) {
-		joint.localMatrix = Matrix::MakeScaleMatrix(joint.transform.scale) *
-			joint.transform.rotate.ToMatrix() *
-			Matrix::MakeTranslationMatrix(joint.transform.position);
-
-		if (joint.parent) {
-			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton.joints[*joint.parent].skeletonSpaceMatrix;
-		} else {
-			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton.rootMatrix;
-		}
-	}
-}
-
-void SkinningUpdate(std::vector<WellForGPU>& result, const std::map<std::string, Skin>& skinCluster, const Skeleton& skeleton) {
-	result.resize(skeleton.joints.size());
-	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
-		assert(jointIndex < skeleton.joints.size());
-		std::string key = skeleton.joints[jointIndex].name;
-		result[jointIndex].skeletonSpaceMatrix = 
-			skinCluster.at(key).inverseBindPoseMatrix * skeleton.joints[jointIndex].skeletonSpaceMatrix;
-
-		result[jointIndex].skeletonSpaceInverseTransposeMatrix =
-			Matrix::TransMatrix(result[jointIndex].skeletonSpaceMatrix.Inverse());
-	}
-}
-
-Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {
-	assert(!keyframes.empty());
-	if (keyframes.size() == 1 || time <= keyframes[0].time) {
-		return keyframes[0].value;
-	}
-
-	for(size_t index = 0; index < keyframes.size() - 1; ++index) {
-		size_t nextIndex = index + 1;
-
-		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
-			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
-			return lerp(keyframes[index].value, keyframes[nextIndex].value, t);
-		}
-	}
-
-	return keyframes.back().value;
-}
-
-Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time) {
-	assert(!keyframes.empty());
-	if (keyframes.size() == 1 || time <= keyframes[0].time) {
-		return keyframes[0].value;
-	}
-
-	for (size_t index = 0; index < keyframes.size() - 1; ++index) {
-		size_t nextIndex = index + 1;
-
-		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
-			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
-			return lerp(keyframes[index].value, keyframes[nextIndex].value, t);
-		}
-	}
-
-	return keyframes.back().value;
 }

@@ -22,15 +22,14 @@ GameScene::GameScene() {
 void GameScene::Initialize() {
 	keyCoating_ = std::make_unique<KeyCoating>(commonData_->keyManager.get());
 	debugCamera_->Initialize(input_);
-	auto model = modelManager_->GetModelData(0);	//Cube
+	auto model = modelManager_->GetModelData(SHEngine::TestModel::Cube);	//Cube
 	DrawData drawData = drawDataManager_->GetDrawData(model.drawDataIndex);
 
 	auto ddsTexture = textureManager_->GetTextureData(textureManager_->LoadTexture("rostock_laage_airport_4k.dds"));
 	tetris_->Initialize(keyCoating_.get(), worldCamera_, drawData, ddsTexture);
 
 	//PostEffectの初期化
-	auto pedd = drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex);
-	postEffect_->Initialize(textureManager_, pedd);		//描画だけするやつなのでコピーオンリー
+	postEffect_->Initialize(textureManager_);		//描画だけするやつなのでコピーオンリー
 	postEffectConfig_.origin = commonData_->display.get();
 	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
 
@@ -39,15 +38,12 @@ void GameScene::Initialize() {
 	intermediateDisplay_->AddRenderTarget(textureManager_, 0xff);
 
 	edgeDetection_ = std::make_unique<PostEffect>();
-	edgeDetection_->Initialize(textureManager_, pedd);
+	edgeDetection_->Initialize(textureManager_);
 	forEdgeDetection_.origin = commonData_->display.get();
 	forEdgeDetection_.output = intermediateDisplay_.get();
 	forEdgeDetection_.jobs_ = uint32_t(PostEffectJob::EdgeDetection);
 
-	effect_->Initialize(engine_, commonData_->display.get(), pedd);
-
-	subject_ = std::make_unique<Subject>();
-	subject_->Initialize(engine_);
+	effect_->Initialize(engine_);
 
 	timeViewer_ = std::make_unique<TimeViewer>();
 	timeViewer_->Initialize(engine_);
@@ -57,8 +53,6 @@ std::unique_ptr<IScene> GameScene::Update() {
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
 
 	effect_->Update(worldCamera_->GetVPMatrix(), worldCamera_->GetBillboardMatrix(), deltaTime);
-
-	subject_->Update(worldCamera_);
 
 	input_->Update();
 	commonData_->keyManager->Update();
@@ -100,8 +94,6 @@ void GameScene::Draw() {
 	if (tetris_->IsGameOver()) {
 		//GameOverの文字を描画
 	}
-
-	subject_->Draw(directContext_);
 
 	//一番最後に描画
 	directContext_->BeginTimeStamp("Particle Draw");

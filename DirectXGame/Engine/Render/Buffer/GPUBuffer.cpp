@@ -34,7 +34,7 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint
 	for (uint32_t i = 0; i < castedBufferNum; ++i) {
 		D3D12_HEAP_PROPERTIES heapProperties{};
 		heapProperties.Type = heapType;
-		D3D12_RESOURCE_DESC bufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
+		D3D12_RESOURCE_DESC bufferResourceDesc{};
 		bufferResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 		bufferResourceDesc.Width = alignmentSize;
 		bufferResourceDesc.Height = 1;
@@ -89,7 +89,7 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint
 			srvDesc.Buffer.FirstElement = 0;
 			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 			srvDesc.Buffer.NumElements = num;
-			srvDesc.Buffer.StructureByteStride = UINT(size);
+			srvDesc.Buffer.StructureByteStride = UINT(strideInBytes_);
 
 			device_->GetDevice()->CreateShaderResourceView(res.Get(), &srvDesc, srvHandle->GetCPU());
 
@@ -114,7 +114,7 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint
 			uavDesc.Buffer.NumElements = num;
 			uavDesc.Buffer.CounterOffsetInBytes = 0;
 			uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-			uavDesc.Buffer.StructureByteStride = UINT(size);
+			uavDesc.Buffer.StructureByteStride = UINT(strideInBytes_);
 
 			device_->GetDevice()->CreateUnorderedAccessView(res.Get(), nullptr, &uavDesc, uavHandle->GetCPU());
 

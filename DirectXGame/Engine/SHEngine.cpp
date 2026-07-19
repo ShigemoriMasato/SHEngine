@@ -46,11 +46,8 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	fontLoader_ = std::make_unique<FontLoader>();
 	fontLoader_->Initialize(textureManager_.get());
 
-	drawDataManager_ = std::make_unique<DrawDataManager>();
-	drawDataManager_->Initialize(device_.get());
-
 	modelManager_ = std::make_unique<ModelManager>();
-	modelManager_->Initialize(textureManager_.get(), drawDataManager_.get());
+	modelManager_->Initialize(textureManager_.get());
 
 	input_ = std::make_unique<Input>();
 	input_->Initialize(hInstance);

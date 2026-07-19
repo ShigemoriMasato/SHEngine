@@ -17,6 +17,7 @@
 #include <Core/FrameCounter.h>
 #include <Render/Command/DirectCommandContext.h>
 #include <Compute/ComputeCommandContext.h>
+#include <Utility/DirectUtilFuncs.h>
 
 namespace SHEngine {
 
@@ -48,7 +49,6 @@ namespace SHEngine {
 		TextureManager* GetTextureManager() { return textureManager_.get(); }
 		FontLoader* GetFontLoader() { return fontLoader_.get(); }
 		ModelManager* GetModelManager() { return modelManager_.get(); }
-		DrawDataManager* GetDrawDataManager() { return drawDataManager_.get(); }
 		DirectCommandContext* GetDirectCommandContext() { return directCmdContext_.get(); }
 		ComputeCommandContext* GetComputeCommandContext() { return computeCmdContext_.get(); }
 		Input* GetInput() { return input_.get(); }
@@ -71,7 +71,6 @@ namespace SHEngine {
 		std::unique_ptr<TextureManager> textureManager_;
 		std::unique_ptr<FontLoader> fontLoader_;
 		std::unique_ptr<ModelManager> modelManager_;
-		std::unique_ptr<DrawDataManager> drawDataManager_;
 		std::unique_ptr<DirectCommandContext> directCmdContext_;
 		std::unique_ptr<ComputeCommandContext> computeCmdContext_;
 
