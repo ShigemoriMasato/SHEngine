@@ -154,7 +154,7 @@ std::vector<int> PolygonEmitter::CreateChanceList(const PolygonList& polygonList
 	chanceList.reserve(polygonList.polygons.size() * 5);
 
 	//Particleの生成がせまい場所に偏る用であればこの値をどうにかする
-	const float kChanceScale = 1.0f / (polygonList.totalArea / (float)polygonList.polygons.size());
+	const float kChanceScale = 1.0f / (polygonList.totalArea / (float)polygonList.polygons.size() / 10.f);
 	for (int i = 0; i < polygonList.areas.size(); ++i) {
 		const auto& area = polygonList.areas[i];
 		uint32_t chance = std::max(1u, static_cast<uint32_t>(area * kChanceScale));

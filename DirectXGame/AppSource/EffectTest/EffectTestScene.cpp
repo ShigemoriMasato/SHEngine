@@ -18,13 +18,17 @@ void EffectTestScene::Initialize() {
 	vertexEmitter_ = std::make_unique<VertexEmitter>();
 	effect_->AddEmitter(vertexEmitter_.get());
 	auto model = modelManager_->LoadModel(filePath);
-	vertexEmitter_->AddModel(model->meshes.front().position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
+	//vertexEmitter_->AddModel(model->meshes.front().position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
 
 	polygonEmitter_ = std::make_unique<PolygonEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(polygonEmitter_.get());
 
-	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(0.0f, 3.0f, 0.0f)), Vector4(0.95f, 0.92f, 0.6f, 1.0f), 8192);
-	
+	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(0.0f, 3.0f, 0.0f)), Vector4(0.1f, 0.2f, 0.1f, 1.0f), 2000000);
+	model = modelManager_->GetModelData(SHEngine::TestModel::Desc);
+	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(5.0f, 0.0f, 0.0f)), Vector4(0.2f, 0.1f, 0.1f, 1.0f), 2000000);
+	model = modelManager_->LoadModel("Bunny");
+	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(-3.0f, 0.0f, 0.0f)), Vector4(0.1f, 0.1f, 0.2f, 1.0f), 2000000);
+
 	waveEmitter_ = std::make_unique<WaveEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(waveEmitter_.get());
 	waveEmitterConfig_.textureID = textureManager_->GetUVChecker();

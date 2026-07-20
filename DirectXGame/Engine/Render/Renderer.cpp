@@ -30,7 +30,7 @@ SHEngine::Renderer::Renderer(VertexType type, const Mesh& modelData) {
 		if (static_cast<uint32_t>(type) & static_cast<uint32_t>(vertexType)) {
 			auto buffer = container_->Create(BufferType::CBV, vertexStrideInBytes.at(static_cast<uint32_t>(vertexType)), vertexCount, BufferNum::Single);
 			vertexBuffers_[static_cast<uint32_t>(vertexType)] = buffer;
-			switch (type) {
+			switch (vertexType) {
 			case VertexType::Position:
 				buffer->CopyBuffer(modelData.position.data(), vertexCount * vertexStrideInBytes.at(static_cast<uint32_t>(vertexType)));
 				break;
@@ -58,16 +58,20 @@ SHEngine::Renderer::Renderer(VertexType type, const Mesh& modelData) {
 		
 		drawData_.SetIndexBuffer(indexBuffer_);
 	}
+
+	vertexType_ = type;
 }
 
 SHEngine::Renderer::Renderer(VertexType type) {
 	vertexBuffers_.resize(uint32_t(VertexType::Count));
 	drawData_.Initialize();
+	vertexType_ = type;
 }
 
 void SHEngine::Renderer::SetVertexBuffer(VertexType type, GPUBuffer* gpuBuffer) {
 	vertexBuffers_[uint32_t(type)] = gpuBuffer;
 	drawData_.AddVertexBuffer(type, gpuBuffer);
+	vertexType_ = static_cast<VertexType>(static_cast<uint32_t>(vertexType_) | static_cast<uint32_t>(type));
 }
 
 void SHEngine::Renderer::SetIndexBuffer(GPUBuffer* gpuBuffer) {
@@ -126,6 +130,7 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	psoConfig_.rtvNum = display->GetRenderTargetNum();
 	psoConfig_.isDSV = display->GetDepthTexture() != nullptr;
 	psoConfig_.dsvFormat = display->GetDepthTexture() ? display->GetDepthTexture()->GetFormat() : DXGI_FORMAT_UNKNOWN;
+	psoConfig_.inputLayoutID = vertexType_;
 
 	if (!display->GetDepthTexture()) {
 		psoConfig_.depthStencilID = PSO::DepthStencilID::None;

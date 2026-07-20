@@ -91,6 +91,9 @@ std::vector<Vector3> ModelLoader::LoadNormals(const aiMesh* ai_mesh) {
 
 std::vector<Vector2> ModelLoader::LoadTexcoords(const aiMesh* ai_mesh) {
 	std::vector<Vector2> texcoords;
+	if (ai_mesh->GetNumUVChannels() == 0) {
+		return texcoords;
+	}
 
 	texcoords.resize(ai_mesh->mNumVertices);
 	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {

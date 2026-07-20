@@ -25,8 +25,8 @@ void PostEffect::StaticInitialize() {
 	vertexUV_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Vector2), 3);
 	std::vector<Vector3> pos = {
 		{-1.0f, 1.0f, 0.0f},
-		{2.0f, 1.0f, 0.0f},
-		{-1.0f, -2.0f, 0.0f},
+		{3.0f, 1.0f, 0.0f},
+		{-1.0f, -3.0f, 0.0f},
 	};
 	std::vector<Vector2> uv = {
 		{0.0f, 0.0f},
@@ -51,7 +51,7 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, bool copyO
 	renderer_->SetVertexBuffer(SHEngine::VertexType::Position, vertexPos_.get());
 	renderer_->SetVertexBuffer(SHEngine::VertexType::Texcoord, vertexUV_.get());
 	renderer_->SetVS("PostEffect/PostEffect.VS.hlsl");
-	renderer_->SetSampler(SHEngine::PSO::SamplerID::MagNearest);
+	renderer_->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 	renderer_->SetUseTexture(true);
 
 	//最後のコピー用に一つ
