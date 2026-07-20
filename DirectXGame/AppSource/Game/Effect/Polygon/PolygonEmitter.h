@@ -22,14 +22,14 @@ public:
 	void Initialize(SHEngine::Engine* engine, const Pool& pool) override;
 	void Update(CCC* compute, float deltaTime) override;
 
-	uint32_t AddPolygon(const PolygonList& polygonList, Matrix4x4 worldMatrix = Matrix4x4::Identity(), Vector4 color = {1,1,1,1}, uint32_t emitNum = 1);
+	uint32_t AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix = Matrix4x4::Identity(), Vector4 color = {1,1,1,1}, uint32_t emitNum = 1);
 
 	void EditPolygon(uint32_t index, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum);
 	void EditPolygon(uint32_t index, const PolygonList& polygonList, bool isCreateChanceList);
 
-	PolygonList CreatePolygonList(const std::vector<Vector3>& vertices, const std::vector<uint32_t>& indices);
-
 private:
+
+	PolygonList CreatePolygonList(const std::vector<Mesh>& meshes);
 
 	std::vector<int> CreateChanceList(const PolygonList& polygonList);
 

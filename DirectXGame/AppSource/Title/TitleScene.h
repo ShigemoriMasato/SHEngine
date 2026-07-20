@@ -1,7 +1,6 @@
 #pragma once
 #include <Scene/IScene.h>
 #include <Title/WaterWave/WaterWave.h>
-#include <Title/Title/Title.h>
 #include <Render/PostEffect.h>
 
 class TitleScene : public IScene {
@@ -18,7 +17,6 @@ private:
 
 	std::unique_ptr<Camera> camera_ = nullptr;
 
-	std::unique_ptr<Title> title_ = nullptr;
 	std::unique_ptr<WaterWave> waterWave_ = nullptr;
 	std::unique_ptr<PostEffect> postEffect_ = nullptr;
 	PostEffectConfig postEffectConfig_{};

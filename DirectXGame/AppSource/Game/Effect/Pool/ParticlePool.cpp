@@ -41,7 +41,7 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine:
 	renderer_->SetDepthStencil(SHEngine::PSO::DepthStencilID::Default);
 	pool_.maxParticleNum = kMaxParticleNum;
 
-	drawCount_ = kMaxParticleNum / 64;
+	drawCount_ = kMaxParticleNum / 2;
 }
 
 void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime, CCC* compute) {

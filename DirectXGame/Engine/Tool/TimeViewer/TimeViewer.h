@@ -27,7 +27,7 @@ private:
 
 private:
 
-	SHEngine::DrawData drawData_;
+	Mesh planeMesh_;
 
 	Camera orthoCamera_;
 

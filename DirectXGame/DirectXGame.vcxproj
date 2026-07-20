@@ -194,10 +194,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Tetris\Tetris.cpp" />
     <ClCompile Include="AppSource\Scene\CommonData.cpp" />
     <ClCompile Include="AppSource\Title\TitleScene.cpp" />
-    <ClCompile Include="AppSource\Title\Title\Title.cpp" />
     <ClCompile Include="AppSource\Title\WaterWave\WaterWave.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Effect.cpp" />
-    <ClCompile Include="AppSource\Editor\EditScene.cpp" />
     <ClCompile Include="AppSource\EffectTest\EffectTestScene.cpp" />
     <ClCompile Include="Engine\Render\Screen\IDisplay.cpp" />
     <ClCompile Include="Engine\Compute\ComputeCommandContext.cpp" />
@@ -288,10 +286,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Game\Tetris\Tetris.h" />
     <ClInclude Include="AppSource\Scene\CommonData.h" />
     <ClInclude Include="AppSource\Title\TitleScene.h" />
-    <ClInclude Include="AppSource\Title\Title\Title.h" />
     <ClInclude Include="AppSource\Title\WaterWave\WaterWave.h" />
     <ClInclude Include="AppSource\Game\Effect\Effect.h" />
-    <ClInclude Include="AppSource\Editor\EditScene.h" />
     <ClInclude Include="AppSource\EffectTest\EffectTestScene.h" />
     <ClInclude Include="Engine\Compute\ComputeCommandContext.h" />
     <ClInclude Include="Engine\Core\Command\ICommandContext.h" />

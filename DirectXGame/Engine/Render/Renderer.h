@@ -12,7 +12,14 @@ namespace SHEngine {
 
 		static void SetPSOEditor(PSO::Editor* psoEditor, D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle) { psoEditor_ = psoEditor; textureStartHandle_ = textureStartHandle; }
 
-		Renderer(const ModelData* modelData);
+		Renderer(VertexType type, const Mesh& modelData);
+		/// @brief 頂点情報の種類を指定してRendererを作成する。頂点情報は自前で作る必要がある。
+		Renderer(VertexType type);
+
+		/// @brief 頂点情報に変化がある場合に使用する。自前で作ったリソースをVertexBufferとしてセットする。
+		void SetVertexBuffer(VertexType type, GPUBuffer* gpuBuffer);
+		/// @brief インデックス情報に変化がある場合に使用する。自前で作ったリソースをIndexBufferとしてセットする。
+		void SetIndexBuffer(GPUBuffer* gpuBuffer);
 
 		/// @brief GPUBufferをセットする。register順。
 		/// @param gpuBuffer 使用するBuffer
@@ -25,16 +32,8 @@ namespace SHEngine {
 		/// @param bufferType バッファの種類
 		void SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType);
 
-		/// @brief GPUBufferをセットする。描画するMesh毎に切り替わる。Meshの数がGPUBufferを超えた場合、最初のBufferに戻る。
-		void SetSwitchingGPUBuffer(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType);
-
 		/// @brief GPUBufferをリセットする。今までSetしたBufferの設定が消える。Buffer自体は解放されない
 		void ResetGPUBuffers();
-
-		// @brief 頂点データをSetする。すでにある場合は上書きする
-		void SetVertexData(VertexType type, GPUBuffer* gpuBuffer);
-		// @brief インデックスデータをSetする。すでにある場合は上書きする
-		void SetIndexData(GPUBuffer* gpuBuffer);
 
 		// @brief VertexShaderのファイル名をセットする。デフォルトは"Simple.VS.hlsl"。
 		void SetVS(const std::string& vs) { psoConfig_.vs = vs; }
@@ -67,13 +66,18 @@ namespace SHEngine {
 
 		static inline PSO::Editor* psoEditor_ = nullptr;
 		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
+		static inline Logger logger_ = GetLogger("Engine");
 
-		std::vector<DrawData> drawData_;
+		std::unique_ptr<BufferContainer> container_;
+		std::vector<GPUBuffer*> vertexBuffers_;
+		GPUBuffer* indexBuffer_;
+		DrawData drawData_;
+		VertexType vertexType_;
 
 		struct BufferConfig {
 			BufferType type;
 			ShaderType shader;
-			std::vector<GPUBuffer*> buffers;
+			GPUBuffer* buffer;
 		};
 		std::vector<BufferConfig> bufferConfigs_;
 		RegisterCounter registerCount_;

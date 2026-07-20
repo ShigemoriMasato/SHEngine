@@ -23,10 +23,9 @@ void GameScene::Initialize() {
 	keyCoating_ = std::make_unique<KeyCoating>(commonData_->keyManager.get());
 	debugCamera_->Initialize(input_);
 	auto model = modelManager_->GetModelData(SHEngine::TestModel::Cube);	//Cube
-	DrawData drawData = drawDataManager_->GetDrawData(model.drawDataIndex);
 
 	auto ddsTexture = textureManager_->GetTextureData(textureManager_->LoadTexture("rostock_laage_airport_4k.dds"));
-	tetris_->Initialize(keyCoating_.get(), worldCamera_, drawData, ddsTexture);
+	tetris_->Initialize(keyCoating_.get(), worldCamera_, model->meshes.front(), ddsTexture);
 
 	//PostEffectの初期化
 	postEffect_->Initialize(textureManager_);		//描画だけするやつなのでコピーオンリー

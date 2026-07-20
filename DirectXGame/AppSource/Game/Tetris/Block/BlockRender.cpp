@@ -10,7 +10,7 @@ BlockRender::~BlockRender() {
 	Save();
 }
 
-void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const DrawData& drawData, SHEngine::TextureData* ddsTexture) {
+void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const Mesh& cubeMesh, SHEngine::TextureData* ddsTexture) {
 	logger_ = GetLogger("Tetris");
 
 	fieldWidth_ = fieldWidth;
@@ -28,7 +28,7 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 	blockNum += 4 * 5;
 
 	//GPU準備
-	blockRenderer_ = std::make_unique<SHEngine::Renderer>(drawData);
+	blockRenderer_ = std::make_unique<SHEngine::Renderer>(VertexType::Default, cubeMesh);
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 
 	bool reflect = true;

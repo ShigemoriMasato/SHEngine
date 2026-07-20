@@ -6,7 +6,7 @@ using namespace SHEngine;
 
 void ModelLoader::CreateNodes(const aiNode* node, std::vector<Node>& nodes, uint32_t parentIndex) {
 	uint32_t nodeIndex = static_cast<uint32_t>(nodes.size());
-	Node newNode = nodes.emplace_back();
+	Node& newNode = nodes.emplace_back();
 
 	//ローカル座標の読み込み
 	aiVector3D scale, position;
@@ -104,6 +104,9 @@ std::vector<Vector2> ModelLoader::LoadTexcoords(const aiMesh* ai_mesh) {
 
 std::vector<Vector4> ModelLoader::LoadColors(const aiMesh* ai_mesh) {
 	std::vector<Vector4> colors;
+	if (ai_mesh->GetNumColorChannels() == 0) {
+		return colors;
+	}
 
 	colors.resize(ai_mesh->mNumVertices);
 	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
@@ -142,7 +145,14 @@ std::vector<VertexInfluence> ModelLoader::LoadVertexInfluences(const aiMesh* ai_
 }
 
 std::vector<uint32_t> ModelLoader::LoadIndices(const aiMesh* ai_mesh) {
-	return std::vector<uint32_t>();
+	std::vector<uint32_t> indices;
+	
+	for (uint32_t face = 0; face < ai_mesh->mNumFaces; ++face) {
+		for (uint32_t i = 0; i < ai_mesh->mFaces[face].mNumIndices; ++i) {
+			indices.push_back(ai_mesh->mFaces[face].mIndices[i]);
+		}
+	}
+	return indices;
 }
 
 std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::string directoryPath, TextureManager* textureManager) {

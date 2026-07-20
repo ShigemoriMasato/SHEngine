@@ -1,6 +1,6 @@
 struct VSInput
 {
-    float4 position : POSITION0;
+    float3 position : POSITION0;
     float2 texCoord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
@@ -44,7 +44,7 @@ VSOutput main(VSInput input, uint id : SV_InstanceID)
                                 0, 0, 1, 0,
                                 positions[id].x, positions[id].y, positions[id].z, 1);
     float4x4 world = mul(mul(scale, billboardMatrix), translate);
-    output.position = mul(input.position, mul(world, vpMatrix));
+    output.position = mul(float4(input.position, 1.0f), mul(world, vpMatrix));
     output.instanceID = id;
 	return output;
 }

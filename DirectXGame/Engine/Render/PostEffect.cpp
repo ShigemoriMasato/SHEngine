@@ -20,31 +20,36 @@ bool operator<(PostEffectJob a, PostEffectJob b) {
 	return uint32_t(a) < uint32_t(b);
 }
 
-void PostEffect::Initialize(SHEngine::TextureManager* textureManager, bool copyOnly) {
-	if (!vertexPos_) {
-		vertexPos_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Vector3), 3);
-		vertexUV_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Vector2), 3);
-		std::vector<Vector3> pos = {
-			{-1.0f, 1.0f, 0.0f},
-			{2.0f, 1.0f, 0.0f},
-			{-1.0f, -2.0f, 0.0f},
-		};
-		std::vector<Vector2> uv = {
-			{0.0f, 0.0f},
-			{2.0f, 0.0f},
-			{0.0f, 2.0f},
-		};
-		vertexPos_->CopyBuffer(pos.data(), pos.size() * sizeof(Vector3));
-		vertexUV_->CopyBuffer(uv.data(), uv.size() * sizeof(Vector2));
-	}
+void PostEffect::StaticInitialize() {
+	vertexPos_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Vector3), 3);
+	vertexUV_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Vector2), 3);
+	std::vector<Vector3> pos = {
+		{-1.0f, 1.0f, 0.0f},
+		{2.0f, 1.0f, 0.0f},
+		{-1.0f, -2.0f, 0.0f},
+	};
+	std::vector<Vector2> uv = {
+		{0.0f, 0.0f},
+		{2.0f, 0.0f},
+		{0.0f, 2.0f},
+	};
+	vertexPos_->CopyBuffer(pos.data(), pos.size() * sizeof(Vector3));
+	vertexUV_->CopyBuffer(uv.data(), uv.size() * sizeof(Vector2));
+}
 
+void PostEffect::StaticFinalize() {
+	vertexPos_.reset();
+	vertexUV_.reset();
+}
+
+void PostEffect::Initialize(SHEngine::TextureManager* textureManager, bool copyOnly) {
 	//containerの用意
 	container_ = std::make_unique<SHEngine::BufferContainer>(64);
 
 	//使用する
-	renderer_ = std::make_unique<SHEngine::Renderer>();
-	renderer_->SetVertexData(SHEngine::VertexType::Position, vertexPos_.get());
-	renderer_->SetVertexData(SHEngine::VertexType::Texcoord, vertexUV_.get());
+	renderer_ = std::make_unique<SHEngine::Renderer>(SHEngine::VertexType::PostEffect);
+	renderer_->SetVertexBuffer(SHEngine::VertexType::Position, vertexPos_.get());
+	renderer_->SetVertexBuffer(SHEngine::VertexType::Texcoord, vertexUV_.get());
 	renderer_->SetVS("PostEffect/PostEffect.VS.hlsl");
 	renderer_->SetSampler(SHEngine::PSO::SamplerID::MagNearest);
 	renderer_->SetUseTexture(true);

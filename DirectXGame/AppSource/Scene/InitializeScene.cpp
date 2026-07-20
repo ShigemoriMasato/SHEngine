@@ -3,7 +3,6 @@
 #include <Game/GameScene.h>
 #include <Title/TitleScene.h>
 #include <Test/TestScene.h>
-#include <Editor/EditScene.h>
 #include <EffectTest/EffectTestScene.h>
 
 #ifdef USE_IMGUI
@@ -131,7 +130,6 @@ std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
 	return std::make_unique<GameScene>();
 	return std::make_unique<EffectTestScene>();
-	return std::make_unique<EditScene>();
 	return std::make_unique<TestScene>();
 
 	return nullptr;

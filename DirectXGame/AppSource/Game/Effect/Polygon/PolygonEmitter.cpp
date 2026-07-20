@@ -32,7 +32,7 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	initialize_->SetShader("Particle/Polygon/Initialize.CS.hlsl");
 	initialize_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, pool.freeList, pool.freeListIndex, indexList_ });
 	initialize_->SetGPUBuffer(BufferType::CBV, maxParticleNum_);
-	initialize_->SetThreadGroupSize(kMaxParticleNum_ / 1024);
+	initialize_->SetThreadGroupSize(kMaxParticleNum_ / 1024 + 1);
 	CCC* ccc = engine->GetComputeCommandContext();
 	initialize_->Execute(ccc);
 
@@ -66,7 +66,8 @@ void PolygonEmitter::Update(CCC* compute, float deltaTime) {
 	update_->Execute(compute);
 }
 
-uint32_t PolygonEmitter::AddPolygon(const PolygonList& polygonList, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum) {
+uint32_t PolygonEmitter::AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum) {
+	PolygonList polygonList = CreatePolygonList(meshes);
 	std::vector<int> chanceList = CreateChanceList(polygonList);
 	int chanceListNum = static_cast<int>(chanceList.size());
 
@@ -123,20 +124,29 @@ void PolygonEmitter::EditPolygon(uint32_t index, const PolygonList& polygonList,
 	}
 }
 
-PolygonList PolygonEmitter::CreatePolygonList(const std::vector<Vector3>& vertices, const std::vector<uint32_t>& indices) {
-	PolygonList list;
+PolygonList PolygonEmitter::CreatePolygonList(const std::vector<Mesh>& meshes) {
+	PolygonList polygonList;
 
-	for (uint32_t i = 0; i < indices.size(); i += 3) {
-		PolygonData polygon;
-		polygon.a = vertices[indices[i]];
-		polygon.b = vertices[indices[i + 1]];
-		polygon.c = vertices[indices[i + 2]];
-		list.polygons.push_back(polygon);
-		float area = 0.5f * ((polygon.b - polygon.a).Normalize().Length() * (polygon.c - polygon.a).Normalize().Length());
-		list.areas.push_back(area);
-		list.totalArea += area;
+	for (const auto& mesh : meshes) {
+		if (mesh.indices.size() % 3 != 0) {
+			throw std::runtime_error("PolygonEmitter: Mesh indices size is not a multiple of 3.");
+		}
+
+		for (uint32_t i = 0; i < mesh.indices.size(); i += 3) {
+			PolygonData polygon;
+			polygon.a = mesh.position[mesh.indices[i]];
+			polygon.b = mesh.position[mesh.indices[i + 1]];
+			polygon.c = mesh.position[mesh.indices[i + 2]];
+
+			float area = 0.5f * MyMath::cross(polygon.b - polygon.a, polygon.c - polygon.a).Length();
+
+			polygonList.polygons.push_back(polygon);
+			polygonList.areas.push_back(area);
+			polygonList.totalArea += area;
+		}
 	}
-	return list;
+
+	return polygonList;
 }
 
 std::vector<int> PolygonEmitter::CreateChanceList(const PolygonList& polygonList) {

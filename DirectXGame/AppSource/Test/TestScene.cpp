@@ -1,5 +1,4 @@
 #include "TestScene.h"
-#include <Editor/EditScene.h>
 
 void TestScene::Initialize() {
 	debugCamera_ = std::make_unique<DebugCamera>();
@@ -21,15 +20,6 @@ std::unique_ptr<IScene> TestScene::Update() {
 	grid_->Update(debugCamera_->GetCenter(), debugCamera_->GetVPMatrix());
 
 	float deltaTime = engine_->GetDeltaTime();
-
-#ifdef USE_IMGUI
-	ImGui::Begin("Debug");
-	if (ImGui::Button("EditScene")) {
-		ImGui::End();
-		return std::make_unique<EditScene>();
-	}
-	ImGui::End();
-#endif
 
 	return nullptr;
 }

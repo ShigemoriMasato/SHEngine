@@ -1,14 +1,16 @@
 #include "Grid.h"
 
 void Grid::Initialize() {
+	container_ = std::make_unique<SHEngine::BufferContainer>(3);
+
 	auto positionBuffer = container_->Create(BufferType::CBV, sizeof(Vector3), 2, BufferNum::Single);
-
-	container_ = std::make_unique<SHEngine::BufferContainer>(2);
-
 	configBuffer_ = container_->Create(BufferType::SRV, sizeof(LineConfig), lineNum_ * 2);
 	vpBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4));
 
-	renderer_ = std::make_unique<SHEngine::Renderer>();
+	Mesh dummyMesh;
+	dummyMesh.position.resize(2);
+
+	renderer_ = std::make_unique<SHEngine::Renderer>(SHEngine::VertexType::Position, dummyMesh);
 	renderer_->SetVS("Engine/Grid.VS.hlsl");
 	renderer_->SetPS("Engine/Grid.PS.hlsl");
 	renderer_->SetGPUBuffer(configBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);

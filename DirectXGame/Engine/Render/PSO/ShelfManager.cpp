@@ -37,8 +37,12 @@ ID3D12RootSignature* SHEngine::PSO::ShelfManager::GetRootSignature(const RootSig
 	return rootSignatureShelf_->GetRootSignature(config);
 }
 
-D3D12_INPUT_LAYOUT_DESC SHEngine::PSO::ShelfManager::GetInputLayoutDesc(InputLayoutID id) {
-	return inputLayoutShelf_->GetInputLayoutDesc(id);
+std::vector<D3D12_INPUT_ELEMENT_DESC> SHEngine::PSO::ShelfManager::GetInfluenceDesc() const {
+	return inputLayoutShelf_->GetInfluenceDesc();
+}
+
+D3D12_INPUT_ELEMENT_DESC SHEngine::PSO::ShelfManager::GetInputLayoutDesc(uint32_t vertexType) const {
+	return inputLayoutShelf_->GetInputLayoutDesc(vertexType);
 }
 
 D3D12_PRIMITIVE_TOPOLOGY_TYPE SHEngine::PSO::ShelfManager::GetD3D12Topology(Topology id) const {

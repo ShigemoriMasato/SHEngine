@@ -80,6 +80,13 @@ namespace SHEngine::PSO {
 		/// @brief ログ出力用logger
 		std::shared_ptr<spdlog::logger> logger_ = nullptr;
 
+		static inline const std::vector<VertexType> allVertexTypes_ = {
+			VertexType::Position,
+			VertexType::Texcoord,
+			VertexType::Normal,
+			VertexType::Color,
+			VertexType::Influence
+		};
 	};
 
 }

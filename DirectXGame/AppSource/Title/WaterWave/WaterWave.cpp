@@ -7,7 +7,7 @@ WaterWave::~WaterWave() {
 	Save();
 }
 
-void WaterWave::Initialize(const DrawData& drawData, Camera* camera) {
+void WaterWave::Initialize(const Mesh& mesh, Camera* camera) {
 	camera_ = camera;
 	container_ = std::make_unique<BufferContainer>();
 
@@ -15,7 +15,7 @@ void WaterWave::Initialize(const DrawData& drawData, Camera* camera) {
 	lightBuffer_ = container_->Create(BufferType::CBV, sizeof(DirectionalLight));
 	baseColorBuffer_ = container_->Create(BufferType::CBV, sizeof(Vector4));
 
-	renderer_ = std::make_unique<Renderer>(drawData);
+	renderer_ = std::make_unique<Renderer>(VertexType::Default, mesh);
 	renderer_->SetVS("Water/WaterPlane.VS.hlsl");
 	renderer_->SetPS("Water/WaterPlane.PS.hlsl");
 	renderer_->SetGPUBuffer(uniqueBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);

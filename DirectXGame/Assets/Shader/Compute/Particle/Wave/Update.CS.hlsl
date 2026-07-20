@@ -84,8 +84,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
         {
             float decay = 1.0f - (waves[i].lifetime / waves[i].maxlifetime);
             float intensity = sqrt((1.0f - abs(diff) / range) * waves[i].intensity * decay);
-            pos += float16_t3(0, intensity, 0);
-            col += float16_t3(waves[i].color * intensity * colorIntensity);
+            float timeIntensity = 1.0f - (waves[i].lifetime / waves[i].maxlifetime);
+            pos += float16_t3(0, intensity * sqrt(timeIntensity), 0);
+            col += float16_t3(waves[i].color * intensity * colorIntensity * timeIntensity);
         }
     }
     

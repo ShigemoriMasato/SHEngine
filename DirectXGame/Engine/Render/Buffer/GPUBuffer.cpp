@@ -200,7 +200,7 @@ void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 	}
 
 	//同じだった場合の処理と過去の状態の更新は関数内に含まれている
-	if (resources_[bufferIndex].res) {
+	if (resources_[bufferIndex].res && cmdList) {
 		Func::InsertBarrier(cmdList, nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
 	}
 }

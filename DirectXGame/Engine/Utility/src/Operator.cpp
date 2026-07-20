@@ -407,9 +407,10 @@ Matrix4x4 operator-(const Matrix4x4& a, const Matrix4x4& b) {
 }
 
 Matrix4x4 operator*(const Matrix4x4& a, const Matrix4x4& b) {
-	Matrix4x4 result = {};
+	Matrix4x4 result;
 	for (int i = 0; i < 4; ++i) {
 		for (int j = 0; j < 4; ++j) {
+			result.m[i][j] = 0;
 			for (int k = 0; k < 4; ++k) {
 				result.m[i][j] += a.m[i][k] * b.m[k][j];
 			}

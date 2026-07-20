@@ -12,7 +12,7 @@ public:
 	Tetris() = default;
 	~Tetris() = default;
 
-	void Initialize(KeyCoating* keys, Camera* camera, const SHEngine::DrawData& drawData, SHEngine::TextureData* ddsTexture);
+	void Initialize(KeyCoating* keys, Camera* camera, const Mesh& cubeMesh, SHEngine::TextureData* ddsTexture);
 	void Update(float deltaTime);
 	void Draw(DCC* cmdObj);
 	void DrawImGui();

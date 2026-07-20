@@ -43,12 +43,32 @@ void Manager::CreatePSO(PSO::Config config) {
 	psoDesc.DepthStencilState = shelfManager_->GetDepthStencilDesc(config.depthStencilID);
 	psoDesc.BlendState = shelfManager_->GetBlendState(config.blendID);
 	psoDesc.RasterizerState = shelfManager_->GetRasterizerDesc(config.rasterizerID);
-	psoDesc.InputLayout = shelfManager_->GetInputLayoutDesc(config.inputLayoutID);
 	psoDesc.NumRenderTargets = config.rtvNum;
 	for (uint32_t i = 0; i < config.rtvNum; ++i) {
 		psoDesc.RTVFormats[i] = config.rtvFormat;
 	}
 	psoDesc.PrimitiveTopologyType = shelfManager_->GetD3D12Topology(config.topology);
+	//InputLayout
+	std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
+	int index = 0;
+	for (const auto& type : allVertexTypes_) {
+		if ((uint32_t(config.inputLayoutID) & uint32_t(type)) != 0) {
+			if (type == VertexType::Influence) {
+				auto influenceDescs = shelfManager_->GetInfluenceDesc();
+				influenceDescs.front().InputSlot = index;
+				influenceDescs.back().InputSlot = index;
+				inputElementDescs.insert(inputElementDescs.end(), influenceDescs.begin(), influenceDescs.end());
+				index++;
+			} else {
+				inputElementDescs.push_back(shelfManager_->GetInputLayoutDesc(uint32_t(type)));
+				inputElementDescs.back().InputSlot = index;
+				index++;
+			}
+		}
+	}
+
+	psoDesc.InputLayout.pInputElementDescs = inputElementDescs.data();
+	psoDesc.InputLayout.NumElements = static_cast<UINT>(inputElementDescs.size());
 
 	ID3D12PipelineState* pso = nullptr;
 

@@ -13,7 +13,7 @@ StructuredBuffer<Well> matrixPallete : register(t0);
 
 struct VSInput
 {
-    float4 position : POSITION0;
+    float3 position : POSITION0;
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
     float4 weight : WEIGHT0;
@@ -32,7 +32,7 @@ VSOutput Skinning(VSInput input)
     if (input.weight.x + input.weight.y + input.weight.z + input.weight.w == 0.0)
     {
         VSOutput output;
-        output.position = input.position;
+        output.position = float4(input.position, 1.0f);
         output.texcoord = input.texcoord;
         output.normal = input.normal;
         return output;
@@ -40,10 +40,10 @@ VSOutput Skinning(VSInput input)
     
     float4 skinnedPosition = float4(0.0, 0.0, 0.0, 0.0);
     float3 skinnedNormal = float3(0.0, 0.0, 0.0);
-    skinnedPosition = mul(input.position, matrixPallete[input.boneIndex.x].skeletonSpaceMatrix) * input.weight.x;
-    skinnedPosition += mul(input.position, matrixPallete[input.boneIndex.y].skeletonSpaceMatrix) * input.weight.y;
-    skinnedPosition += mul(input.position, matrixPallete[input.boneIndex.z].skeletonSpaceMatrix) * input.weight.z;
-    skinnedPosition += mul(input.position, matrixPallete[input.boneIndex.w].skeletonSpaceMatrix) * input.weight.w;
+    skinnedPosition = mul(float4(input.position, 1.0f), matrixPallete[input.boneIndex.x].skeletonSpaceMatrix) * input.weight.x;
+    skinnedPosition += mul(float4(input.position, 1.0f), matrixPallete[input.boneIndex.y].skeletonSpaceMatrix) * input.weight.y;
+    skinnedPosition += mul(float4(input.position, 1.0f), matrixPallete[input.boneIndex.z].skeletonSpaceMatrix) * input.weight.z;
+    skinnedPosition += mul(float4(input.position, 1.0f), matrixPallete[input.boneIndex.w].skeletonSpaceMatrix) * input.weight.w;
 
     skinnedNormal = normalize(mul(input.normal, (float3x3) matrixPallete[input.boneIndex.x].skeletonSpaceInverseTransposeMatrix)) * input.weight.x;
     skinnedNormal += normalize(mul(input.normal, (float3x3) matrixPallete[input.boneIndex.y].skeletonSpaceInverseTransposeMatrix)) * input.weight.y;

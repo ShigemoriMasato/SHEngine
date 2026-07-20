@@ -183,6 +183,9 @@ ModelData SHEngine::ModelManager::CreateModelData(const aiScene* scene, std::str
 	ModelData result;
 	//コードがごちゃつくのでModelLoaderに処理を投げる
 	result.nodes = ModelLoader::LoadNodes(scene);
+	result.meshes = ModelLoader::LoadMeshes(scene);
+	result.materials = ModelLoader::LoadMaterials(scene, filePath, textureManager_);
+	result.skeleton = ModelLoader::CreateSkeleton(result.nodes, scene);
 
 	return result;
 }

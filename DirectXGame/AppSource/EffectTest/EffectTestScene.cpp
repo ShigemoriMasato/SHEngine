@@ -22,12 +22,15 @@ void EffectTestScene::Initialize() {
 
 	polygonEmitter_ = std::make_unique<PolygonEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(polygonEmitter_.get());
+
+	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(0.0f, 3.0f, 0.0f)), Vector4(0.95f, 0.92f, 0.6f, 1.0f), 8192);
 	
 	waveEmitter_ = std::make_unique<WaveEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(waveEmitter_.get());
+	waveEmitterConfig_.textureID = textureManager_->GetUVChecker();
 
 	postEffect_ = std::make_unique<PostEffect>();
-	postEffect_->Initialize(textureManager_, drawDataManager_->GetDrawData(commonData_->postEffectDrawDataIndex), true);
+	postEffect_->Initialize(textureManager_, true);
 	peConfig_.origin = commonData_->display.get();
 	peConfig_.output = commonData_->window.get();
 	peConfig_.jobs_ = uint32_t(PostEffectJob::None);
@@ -56,7 +59,7 @@ std::unique_ptr<IScene> EffectTestScene::Update() {
 	waveEmitterConfig_.DrawImGui();
 	waveEmitter_->SetConfig(waveEmitterConfig_);
 
-	if (waveData_.DrawImGui()) {
+	if (waveData_.DrawImGui() || (input_->GetKeyState(DIK_F1) && !input_->GetPreKeyState(DIK_F1))) {
 		waveEmitter_->AddWave(waveData_);
 	}
 

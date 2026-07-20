@@ -11,7 +11,7 @@ public:
 	BlockRender() = default;
 	~BlockRender();
 
-	void Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const SHEngine::DrawData& drawData, SHEngine::TextureData* ddsTexture);
+	void Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* camera, const Mesh& cubeMesh, SHEngine::TextureData* ddsTexture);
 
 	void Update(float deltaTime);
 

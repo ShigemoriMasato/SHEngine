@@ -15,20 +15,7 @@ void SHEngine::Text::Initialize(const Mesh& planeMesh, const std::string& fontPa
 	colorBuffer_ = container_->Create(BufferType::CBV, sizeof(Vector4));
 	textureIndexBuffer_->CopyBuffer(&textureIndex_, sizeof(int));
 
-	auto positionBuffer = container_->Create(BufferType::CBV, sizeof(Vector3), 4, BufferNum::Single);
-	auto texcoordBuffer = container_->Create(BufferType::CBV, sizeof(Vector2), 4, BufferNum::Single);
-	auto normalBuffer = container_->Create(BufferType::CBV, sizeof(Vector3), 4, BufferNum::Single);
-	auto indexBuffer = container_->Create(BufferType::CBV, sizeof(uint32_t), 6, BufferNum::Single);
-	positionBuffer->CopyBuffer(planeMesh.position.data(), sizeof(Vector3) * planeMesh.position.size());
-	texcoordBuffer->CopyBuffer(planeMesh.texcoord.data(), sizeof(Vector2) * planeMesh.texcoord.size());
-	normalBuffer->CopyBuffer(planeMesh.normal.data(), sizeof(Vector3) * planeMesh.normal.size());
-	indexBuffer->CopyBuffer(planeMesh.indices.data(), sizeof(uint32_t) * planeMesh.indices.size());
-
-	renderer_ = std::make_unique<Renderer>();
-	renderer_->SetVertexData(VertexType::Position, positionBuffer);
-	renderer_->SetVertexData(VertexType::Texcoord, texcoordBuffer);
-	renderer_->SetVertexData(VertexType::Normal, normalBuffer);
-	renderer_->SetIndexData(indexBuffer);
+	renderer_ = std::make_unique<Renderer>(SHEngine::VertexType::Default, planeMesh);
 	renderer_->SetVS("Engine/FontBasic.VS.hlsl");
 	renderer_->SetPS("Engine/FontBasic.PS.hlsl");
 	renderer_->SetGPUBuffer(matrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
@@ -38,7 +25,7 @@ void SHEngine::Text::Initialize(const Mesh& planeMesh, const std::string& fontPa
 }
 
 void SHEngine::Text::SetText(const std::wstring& text) {
-	if(text.size() > maxCharNum_) {
+	if (text.size() > maxCharNum_) {
 		return;
 	}
 
@@ -57,7 +44,7 @@ void SHEngine::Text::SetSize(float size) {
 }
 
 void SHEngine::Text::SetTransform(const Transform& transform) {
-	worldMat_ = charSizeMat_ * MakeScaleMatrix(transform.scale)* MakeRotationMatrix(transform.rotate)* MakeTranslationMatrix(transform.position);
+	worldMat_ = charSizeMat_ * MakeScaleMatrix(transform.scale) * MakeRotationMatrix(transform.rotate) * MakeTranslationMatrix(transform.position);
 }
 
 void SHEngine::Text::SetColor(const Vector4& color) {

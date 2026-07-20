@@ -33,6 +33,9 @@ struct PostEffectConfig {
 class PostEffect {
 public:
 
+	static void StaticInitialize();
+	static void StaticFinalize();
+
 	void Initialize(SHEngine::TextureManager* textureManager, bool copyOnly = false);
 	template<typename T>
 	void CopyBuffer(PostEffectJob job, const T& data);

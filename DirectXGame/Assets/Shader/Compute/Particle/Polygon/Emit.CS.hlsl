@@ -68,16 +68,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
 
-    uint freeIndex = freeListIndex[id];
+    uint freeIndex = 0;
     InterlockedAdd(freeListIndex[0], -1, freeIndex);
     if(freeIndex < 0)
     {
-        InterlockedAdd(freeListIndex[0], 1, freeIndex);
+        InterlockedAdd(freeListIndex[0], 1);
         return;
     }
     
     uint index = freeList[freeIndex];
-
+    uint globalIndex = indexList[index];
     uint seed = randSeed ^ id;
     
     //生成するポリゴンを抽選
@@ -102,7 +102,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
     velocities[index] = float16_t3(normalize(float3(randf(seed) * 2.0f - 1.0f, randf(seed) * 2.0f - 1.0f, randf(seed) * 2.0f - 1.0f)) * speed);
     currentTime[index] = 0.0f;
 
-    int globalIndex = indexList[index];
     positions[globalIndex] = mul(float4(p, 1.0f), worldMatrix).xyz;
     colors[globalIndex] = float16_t4(color.rgb, 1.0f);
 }

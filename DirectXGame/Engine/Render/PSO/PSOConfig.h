@@ -30,7 +30,7 @@ namespace SHEngine::PSO {
 		/// @brief ルートシグネチャ設定
 		RootSignatureConfig rootConfig = {};
 		/// @brief 入力レイアウトID
-		InputLayoutID inputLayoutID = InputLayoutID::Default;
+		VertexType inputLayoutID = VertexType::Default;
 		/// @brief ブレンドステートID
 		BlendStateID blendID[8] = {};
 		/// @brief 深度ステンシルID

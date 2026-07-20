@@ -2,9 +2,8 @@
 #include <Utility/ConvertString.h>
 
 void TimeViewer::Initialize(SHEngine::Engine* engine) {
-	auto ddm = engine->GetDrawDataManager();
 	auto mm = engine->GetModelManager();
-	drawData_ = ddm->GetDrawData(mm->GetModelData(1).drawDataIndex);
+	planeMesh_ = mm->GetModelData(SHEngine::TestModel::Plane)->meshes.front();
 
 	orthoCamera_.SetProjectionMatrix(OrthographicDesc());
 	orthoCamera_.MakeMatrix();
@@ -23,7 +22,7 @@ void TimeViewer::Add(std::string name, double time) {
 	//なければ新しく作る
 	auto& text = texts_[name];
 	text = std::make_unique<SHEngine::Text>();
-	text->Initialize(drawData_, "Assets/Fonts/YDWbananaslipplus.otf", 64, name);
+	text->Initialize(planeMesh_, "Assets/Fonts/YDWbananaslipplus.otf", 64, name);
 	text->SetText(std::format(L"{}: {:.2f} ms", ConvertString(name), time * 1000.0));
 }
 

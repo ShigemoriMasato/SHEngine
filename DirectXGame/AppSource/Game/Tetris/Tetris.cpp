@@ -1,11 +1,11 @@
 #include "Tetris.h"
 
-void Tetris::Initialize(KeyCoating* keys, Camera* camera, const SHEngine::DrawData& drawData, SHEngine::TextureData* ddsTexture) {
+void Tetris::Initialize(KeyCoating* keys, Camera* camera, const Mesh& cubeMesh, SHEngine::TextureData* ddsTexture) {
 	field_ = std::make_unique<Field>(fieldWidth_, fieldHeight_);
 	field_->Initialize(camera);
 
 	blockRender_ = std::make_unique<BlockRender>();
-	blockRender_->Initialize(fieldWidth_, fieldHeight_, camera, drawData, ddsTexture);
+	blockRender_->Initialize(fieldWidth_, fieldHeight_, camera, cubeMesh, ddsTexture);
 
 	tetrimino_ = std::make_unique<Tetrimino>();
 	std::random_device rd;

@@ -2,7 +2,7 @@
 
 struct VSInput
 {
-    float4 position : POSITION0;
+    float3 position : POSITION0;
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
@@ -31,7 +31,7 @@ StructuredBuffer<ParticleData> data : register(t0);
 VSOutput main(VSInput input, uint instance : SV_InstanceID)
 {
     VSOutput output;
-    output.position = mul(input.position, mul(data[instance].world, data[instance].vp));
+    output.position = mul(float4(input.position, 1.0f), mul(data[instance].world, data[instance].vp));
     output.texCoord = input.texcoord;
     output.color = ConvertColor(data[instance].color);
     output.outlineColor = ConvertColor(data[instance].outlineColor);

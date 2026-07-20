@@ -2,7 +2,6 @@
 #include <Scene/IScene.h>
 #include <Camera/DebugCamera.h>
 #include <Game/Effect/Effect.h>
-#include <Game/Effect/Subject/HitEffect.h>
 #include <Render/PostEffect.h>
 #include <Tool/TimeViewer/TimeViewer.h>
 #include <Render/Buffer/ReadBackBuffer.h>

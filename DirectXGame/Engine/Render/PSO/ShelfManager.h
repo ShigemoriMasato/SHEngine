@@ -13,7 +13,8 @@ namespace SHEngine::PSO {
 		D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc(DepthStencilID id);
 		D3D12_RASTERIZER_DESC GetRasterizerDesc(RasterizerID id);
 		ID3D12RootSignature* GetRootSignature(const RootSignatureConfig& config);
-		D3D12_INPUT_LAYOUT_DESC GetInputLayoutDesc(InputLayoutID id);
+		D3D12_INPUT_ELEMENT_DESC GetInputLayoutDesc(uint32_t vertexType) const;
+		std::vector<D3D12_INPUT_ELEMENT_DESC> GetInfluenceDesc() const;
 
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE GetD3D12Topology(Topology id) const;
 		D3D_PRIMITIVE_TOPOLOGY GetD3Topology(Topology id) const;

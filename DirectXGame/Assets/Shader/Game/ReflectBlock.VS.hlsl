@@ -1,6 +1,6 @@
 struct VSInput
 {
-    float4 position : POSITION0;
+    float3 position : POSITION0;
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
@@ -49,10 +49,10 @@ float absOne(float value)
 VSOutput main(VSInput input, uint instance : SV_InstanceID)
 {
     VSOutput output;
-    output.position = mul(input.position, data[instance].wvp);
+    output.position = mul(float4(input.position, 1.0f), data[instance].wvp);
     output.texCoord = input.texcoord;
     output.normal = mul(input.normal, (float3x3) data[instance].world);
-    output.world = mul(input.position, data[instance].world).xyz;
+    output.world = mul(float4(input.position, 1.0f), data[instance].world).xyz;
     output.colorID = data[instance].colorID;
     return output;
 }

@@ -20,7 +20,7 @@ cbuffer CBPerObject : register(b0)
 
 struct VSInput
 {
-    float4 pos : POSITION0;
+    float3 pos : POSITION0;
     float2 uv : TEXCOORD0;
     float3 normal : NORMAL0;
 };
@@ -42,7 +42,7 @@ float kFromWavelength(float wavelength)
 VSOutput main(VSInput input)
 {
     VSOutput o;
-    float3 pos = mul(input.pos, world).xyz; // pos.y is baseline (0)
+    float3 pos = mul(float4(input.pos, 1.0f), world).xyz; // pos.y is baseline (0)
     float3 displaced = pos;
     float3 tangent = float3(1, 0, 0);
     float3 bitangent = float3(0, 0, 1);

@@ -1,6 +1,6 @@
 struct VSInput
 {
-    float4 position : POSITION0;
+    float3 position : POSITION0;
     float2 texCoord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
@@ -34,7 +34,7 @@ float4 EncodeIDToColor(uint id)
 VSOutput main(VSInput input, uint instanceID : SV_InstanceID)
 {
     VSOutput output;
-    output.position = mul(input.position, mul(worlds[instanceID], vpMat));
+    output.position = mul(float4(input.position, 1.0f), mul(worlds[instanceID], vpMat));
     output.texCoord = input.texCoord;
     output.normal = mul(float4(input.normal, 1.0f), worlds[instanceID]).xyz;
     output.colorID = EncodeIDToColor(idBuffer[instanceID]);

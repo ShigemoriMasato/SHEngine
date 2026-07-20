@@ -2,21 +2,30 @@
 #include <vector>
 #include <cstdint>
 #include <d3d12.h>
+#include <map>
+
+namespace SHEngine {
+
+	enum class VertexType {
+		Position = 1 << 0,
+		Texcoord = 1 << 1,
+		Normal = 1 << 2,
+		Color = 1 << 3,
+		Influence = 1 << 4,
+
+		Default = Position | Texcoord | Normal,
+		Skinning = Position | Texcoord | Normal | Influence,
+
+		PostEffect = Position | Texcoord,
+
+		All = Position | Texcoord | Normal | Color | Influence,
+
+		Count = 5
+	};
+
+}
 
 namespace SHEngine::PSO {
-
-	/**
-	 * @enum InputLayoutID
-	 * @brief 入力レイアウトのID
-	 */
-	enum class InputLayoutID : uint8_t {
-		Default = 0,    ///< デフォルト(位置、法線、UV)
-		Textured,       ///< テクスチャ付き
-		Vector3,        ///< 位置のみ
-		Skinning,       ///< スキニング用(ボーン情報含む)
-
-		Count           ///< 入力レイアウトの総数
-	};
 
 	/**
 	 * @class InputLayoutShelf
@@ -36,12 +45,15 @@ namespace SHEngine::PSO {
 		 * @param id 入力レイアウトID
 		 * @return 入力レイアウト記述
 		 */
-		D3D12_INPUT_LAYOUT_DESC GetInputLayoutDesc(InputLayoutID id) const;
+		D3D12_INPUT_ELEMENT_DESC GetInputLayoutDesc(uint32_t vertexType) const;
+
+		std::vector<D3D12_INPUT_ELEMENT_DESC> GetInfluenceDesc() const { return influenceDesc_; }
 
 	private:
 
 		/// @brief 入力要素記述の配列(各レイアウト用)
-		std::vector<std::vector<D3D12_INPUT_ELEMENT_DESC>> inputElementsList_;
+		std::map<uint32_t, D3D12_INPUT_ELEMENT_DESC> inputElementDescs_;
+		std::vector<D3D12_INPUT_ELEMENT_DESC> influenceDesc_;
 		/// @brief 入力レイアウト記述の配列
 		std::vector<D3D12_INPUT_LAYOUT_DESC> inputLayouts_;
 

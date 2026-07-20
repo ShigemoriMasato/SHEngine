@@ -1,6 +1,6 @@
 struct Vertex
 {
-    float4 position;
+    float3 position;
     float2 texcoord;
     float3 normal;
 };
@@ -54,17 +54,17 @@ void main(uint3 DTid : SV_DispatchThreadID)
     {
         float4 skinnedPosition = float4(0.0, 0.0, 0.0, 0.0);
         float3 skinnedNormal = float3(0.0, 0.0, 0.0);
-        skinnedPosition = mul(input.position, matrices[influence.index.x].skeletonSpaceMatrix) * influence.weight.x;
-        skinnedPosition += mul(input.position, matrices[influence.index.y].skeletonSpaceMatrix) * influence.weight.y;
-        skinnedPosition += mul(input.position, matrices[influence.index.z].skeletonSpaceMatrix) * influence.weight.z;
-        skinnedPosition += mul(input.position, matrices[influence.index.w].skeletonSpaceMatrix) * influence.weight.w;
+        skinnedPosition = mul(float4(input.position, 1.0f), matrices[influence.index.x].skeletonSpaceMatrix) * influence.weight.x;
+        skinnedPosition += mul(float4(input.position, 1.0f), matrices[influence.index.y].skeletonSpaceMatrix) * influence.weight.y;
+        skinnedPosition += mul(float4(input.position, 1.0f), matrices[influence.index.z].skeletonSpaceMatrix) * influence.weight.z;
+        skinnedPosition += mul(float4(input.position, 1.0f), matrices[influence.index.w].skeletonSpaceMatrix) * influence.weight.w;
 
         skinnedNormal = normalize(mul(input.normal, (float3x3) matrices[influence.index.x].skeletonSpaceInverseTransposeMatrix)) * influence.weight.x;
         skinnedNormal += normalize(mul(input.normal, (float3x3) matrices[influence.index.y].skeletonSpaceInverseTransposeMatrix)) * influence.weight.y;
         skinnedNormal += normalize(mul(input.normal, (float3x3) matrices[influence.index.z].skeletonSpaceInverseTransposeMatrix)) * influence.weight.z;
         skinnedNormal += normalize(mul(input.normal, (float3x3) matrices[influence.index.w].skeletonSpaceInverseTransposeMatrix)) * influence.weight.w;
         
-        skinned.position = skinnedPosition;
+        skinned.position = skinnedPosition.xyz;
         skinned.normal = skinnedNormal;
     }
     

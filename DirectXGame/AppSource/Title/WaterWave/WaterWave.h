@@ -15,7 +15,7 @@ public:
 		Vector3 pad;
 	};
 
-	void Initialize(const SHEngine::DrawData& drawData, Camera* camera);
+	void Initialize(const Mesh& mesh, Camera* camera);
 	void Update(float deltaTime);
 	void DrawImGui();
 	void Draw(DCC* dcc);
