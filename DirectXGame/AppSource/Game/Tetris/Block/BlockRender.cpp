@@ -28,24 +28,16 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 	blockNum += 4 * 5;
 
 	//GPU準備
-	blockRenderer_ = std::make_unique<SHEngine::Renderer>(VertexType::Default, cubeMesh);
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 
-	bool reflect = true;
-
-	blockRenderer_->SetVS("Game/ReflectBlock.VS.hlsl");
-	blockRenderer_->SetPS("Game/ReflectBlock.PS.hlsl");
-
 	vsBuffer_ = container_->Create(BufferType::SRV, sizeof(VSData), blockNum);
-	//数適当
 	colorMapBuffer_ = container_->Create(BufferType::SRV, sizeof(ColorMap), 32);
-	psBuffer_ = container_->Create(BufferType::CBV, sizeof(PSData));
-	auto ddsBuffer = container_->Create(ddsTexture);
 
+	blockRenderer_ = std::make_unique<SHEngine::Renderer>(VertexType::Default, cubeMesh);
+	blockRenderer_->SetVS("Game/Block.VS.hlsl");
+	blockRenderer_->SetPS("Game/Block.PS.hlsl");
 	blockRenderer_->SetGPUBuffer(vsBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
-	blockRenderer_->SetGPUBuffer(psBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
 	blockRenderer_->SetGPUBuffer(colorMapBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
-	blockRenderer_->SetGPUBuffer(ddsBuffer, ShaderType::PIXEL_SHADER, BufferType::SRV);
 
 	blockRenderer_->instanceNum_ = blockNum;
 
