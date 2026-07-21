@@ -114,9 +114,6 @@ void BlockRender::Update(float deltaTime) {
 	vsBuffer_->CopyBuffer(vsData_.data(), sizeof(VSData) * vsData_.size());
 
 	colorMapBuffer_->CopyBuffer(colorMap_.data(), sizeof(ColorMap) * colorMap_.size());
-
-	psData_.cameraPos = camera_->GetPosition();
-	psBuffer_->CopyBuffer(&psData_, sizeof(psData_));
 }
 
 void BlockRender::SetStageData(std::vector<std::vector<int>> fieldData, const MovableMino& mino) {
@@ -271,7 +268,6 @@ void BlockRender::DrawImGui() {
 		//色編集
 		ImGui::ColorEdit4("Color", &colorMap_[colorMapEditID_].color.x);
 		ImGui::ColorEdit4("OutlineColor", &colorMap_[colorMapEditID_].outlineColor.x);
-		ImGui::DragFloat("Reflect", &psData_.strength, 0.01f, 0.0f, 1.0f);
 	}
 	ImGui::End();
 #endif

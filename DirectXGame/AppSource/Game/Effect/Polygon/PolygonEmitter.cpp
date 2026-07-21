@@ -14,16 +14,15 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	freeListIndex_ = container_->Create(BufferType::UAV, sizeof(int), 1, BufferNum::Single);
 	indexList_ = container_->Create(BufferType::SRV_UAV, sizeof(int), kMaxParticleNum_, BufferNum::Single);
 	currentTime_ = container_->Create(BufferType::SRV_UAV, sizeof(float), kMaxParticleNum_, BufferNum::Single);
-	velocity_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3) / 2, kMaxParticleNum_, BufferNum::Single);// float16_t3
+	basePosition_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum_, BufferNum::Single);
 
 	lifeTime_ = container_->Create(BufferType::CBV, sizeof(float));
 	seed_ = container_->Create(BufferType::CBV, sizeof(uint32_t));
-	speed_ = container_->Create(BufferType::CBV, sizeof(float));
+	ignoreBallNum_ = container_->Create(BufferType::CBV, sizeof(int));
+	ignoreBall_ = container_->Create(BufferType::SRV, sizeof(IgnoreBall), kMaxIgnoreBallNum_);
 
-	float initLifeTime = 1.0f;
-	float initSpeed = 0.1f;
+	float initLifeTime = 2.0f;
 	lifeTime_->CopyBuffer(&initLifeTime, sizeof(float));
-	speed_->CopyBuffer(&initSpeed, sizeof(float));
 
 	position_ = pool.position;
 	color_ = pool.color;
@@ -39,8 +38,8 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	update_ = std::make_unique<SHEngine::ComputeObject>();
 	update_->SetShader("Particle/Polygon/Update.CS.hlsl");
 	update_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, currentTime_, position_, color_ });
-	update_->SetGPUBuffers(BufferType::SRV, { velocity_, indexList_ });
-	update_->SetGPUBuffers(BufferType::CBV, { maxParticleNum_, lifeTime_, pool.deltaTime });
+	update_->SetGPUBuffers(BufferType::SRV, { indexList_, ignoreBall_, basePosition_ });
+	update_->SetGPUBuffers(BufferType::CBV, { maxParticleNum_, lifeTime_, pool.deltaTime, ignoreBallNum_ });
 	update_->SetThreadGroupSize(kMaxParticleNum_ / 128 + 1);
 
 	emit_ = std::make_unique<SHEngine::ComputeObject>();
@@ -54,9 +53,9 @@ void PolygonEmitter::Update(CCC* compute, float deltaTime) {
 
 	for (const auto& [id, set] : polygonSets_) {
 		emit_->Initialize();
-		emit_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, position_, color_, velocity_, currentTime_ });
+		emit_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, position_, color_, currentTime_, basePosition_ });
 		emit_->SetGPUBuffers(BufferType::SRV, { set.polygonList, set.chanceList, indexList_ });
-		emit_->SetGPUBuffers(BufferType::CBV, { set.emitNum, set.color, set.worldMatrix, speed_, set.chanceListNum, seed_ });
+		emit_->SetGPUBuffers(BufferType::CBV, { set.emitNum, set.color, set.worldMatrix, set.chanceListNum, seed_ });
 		uint32_t emitNum = uint32_t(std::round(float(set.emitNumValue) * deltaTime));
 		set.emitNum->CopyBuffer(&emitNum, sizeof(uint32_t));
 		emit_->SetThreadGroupSize(std::min(65535, (int)emitNum/ 128 + 1));
@@ -66,7 +65,7 @@ void PolygonEmitter::Update(CCC* compute, float deltaTime) {
 	update_->Execute(compute);
 }
 
-uint32_t PolygonEmitter::AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum) {
+PolygonEmitter::Config PolygonEmitter::AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum) {
 	PolygonList polygonList = CreatePolygonList(meshes);
 	std::vector<int> chanceList = CreateChanceList(polygonList);
 	int chanceListNum = static_cast<int>(chanceList.size());
@@ -90,26 +89,29 @@ uint32_t PolygonEmitter::AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 w
 	set.color->CopyBuffer(&color, sizeof(Vector4));
 	set.emitNumValue = emitNum;
 
-	return id;
+	Config config(id);
+
+	return config;
 }
 
-void PolygonEmitter::EditPolygon(uint32_t index, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum) {
-	const auto& it = polygonSets_.find(index);
+void PolygonEmitter::SetConfig(const Config& config) {
+	const auto& it = polygonSets_.find(config.id);
 	if (it == polygonSets_.end()) {
-		assert(false && "PolygonEmitter: EditPolygon failed. index not found.");
+		assert(false && "PolygonEmitter: SetConfig failed. index not found.");
 		return;
 	}
 
 	auto& set = it->second;
-	set.worldMatrix->CopyBuffer(&worldMatrix, sizeof(Matrix4x4));
-	set.color->CopyBuffer(&color, sizeof(Vector4));
-	set.emitNumValue = emitNum;
+	Matrix4x4 worldMat = config.transform.Matrix();
+	set.worldMatrix->CopyBuffer(&worldMat, sizeof(Matrix4x4));
+	set.color->CopyBuffer(&config.color, sizeof(Vector4));
+	set.emitNumValue = config.emitNum;
 }
 
 void PolygonEmitter::EditPolygon(uint32_t index, const PolygonList& polygonList, bool isCreateChanceList) {
 	const auto& it = polygonSets_.find(index);
 	if (it == polygonSets_.end()) {
-		assert(false && "PolygonEmitter: EditPolygon failed. index not found.");
+		assert(false && "PolygonEmitter: SetConfig failed. index not found.");
 		return;
 	}
 
@@ -122,6 +124,16 @@ void PolygonEmitter::EditPolygon(uint32_t index, const PolygonList& polygonList,
 		set.chanceList->CopyBuffer(chanceList.data(), sizeof(int) * chanceListNum);
 		set.chanceListNum->CopyBuffer(&chanceListNum, sizeof(int));
 	}
+}
+
+void PolygonEmitter::SetCommonConfig(float lifeTime) {
+	lifeTime_->CopyBuffer(&lifeTime, sizeof(float));
+}
+
+void PolygonEmitter::SetIgnoreBalls(const std::vector<IgnoreBall>& ignoreBalls) {
+	uint32_t ignoreBallNum = static_cast<uint32_t>(std::min(ignoreBalls.size(), (size_t)kMaxIgnoreBallNum_));
+	ignoreBallNum_->CopyBuffer(&ignoreBallNum, sizeof(uint32_t));
+	ignoreBall_->CopyBuffer(ignoreBalls.data(), sizeof(IgnoreBall) * ignoreBallNum);
 }
 
 PolygonList PolygonEmitter::CreatePolygonList(const std::vector<Mesh>& meshes) {
@@ -162,4 +174,30 @@ std::vector<int> PolygonEmitter::CreateChanceList(const PolygonList& polygonList
 	}
 
 	return chanceList;
+}
+
+void PolygonEmitter::Config::DrawImGui() {
+#ifdef USE_IMGUI
+
+	ImGui::PushID(id);
+	ImGui::DragFloat3("Scale", &transform.scale.x, 0.01f);
+	ImGui::DragFloat3("Rotate", &transform.rotate.x, 0.01f);
+	ImGui::DragFloat3("Position", &transform.position.x, 0.01f);
+	ImGui::ColorEdit4("Color", &color.x);
+	ImGui::DragInt("EmitNum", reinterpret_cast<int*>(&emitNum), 1, 0, 500000);
+	ImGui::PopID();
+
+#endif // USE_IMGUI
+}
+
+void PolygonEmitter::Config::Save(BinaryManager& bin) const {
+	bin.Register(&transform);
+	bin.Register(&color);
+	bin.Register(&emitNum);
+}
+
+void PolygonEmitter::Config::Load(BinaryManager& bin) {
+	transform = bin.Reverse<Transform>();
+	color = bin.Reverse<Vector4>();
+	emitNum = bin.Reverse<uint32_t>();
 }

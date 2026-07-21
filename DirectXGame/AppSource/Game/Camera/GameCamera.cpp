@@ -2,6 +2,10 @@
 #include <Utility/Easing.h>
 #include <imgui/imgui.h>
 
+namespace {
+	bool stackBeginningT = false;
+}
+
 GameCamera::~GameCamera() {
 	Save();
 }
@@ -35,7 +39,9 @@ void GameCamera::Update(float deltaTime) {
 	Vector3 factPos = lerp(position_ + shakeOffset, beginningPos_, beginningT_, EaseType::EaseInQuint);
 	Vector3 factRot = lerp(rotation_, beginningRot_, beginningT_, EaseType::EaseInQuint);
 
-	beginningT_ = std::max(0.0f, beginningT_ - deltaTime);
+	if (!stackBeginningT) {
+		beginningT_ = std::max(0.0f, beginningT_ - deltaTime);
+	}
 
 	camera_->SetTransform(Matrix::MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), factRot, factPos));
 	camera_->MakeMatrix();
@@ -53,6 +59,19 @@ void GameCamera::Shake(float intensity, float duration) {
 void GameCamera::DrawImGui() {
 #ifdef USE_IMGUI
 
+	ImGui::Begin("GameCamera");
+
+	ImGui::DragFloat3("Position", &position_.x, 0.01f);
+	ImGui::DragFloat3("Rotation", &rotation_.x, 0.01f);
+	ImGui::DragFloat3("BeginningPos", &beginningPos_.x, 0.01f);
+	ImGui::DragFloat3("BeginningRot", &beginningRot_.x, 0.01f);
+	
+	if (ImGui::Checkbox("Stack", &stackBeginningT)) {
+		beginningT_ = 1.0f;
+	}
+
+	ImGui::End();
+
 #endif
 }
 
@@ -60,6 +79,8 @@ void GameCamera::Save() {
 	binaryManager_->Boot(saveFile_);
 	binaryManager_->Register(&beginningPos_);
 	binaryManager_->Register(&beginningRot_);
+	binaryManager_->Register(&position_);
+	binaryManager_->Register(&rotation_);
 	binaryManager_->Write(saveFile_);
 }
 
@@ -72,4 +93,6 @@ void GameCamera::Load() {
 
 	beginningPos_ = binaryManager_->Reverse<Vector3>();
 	beginningRot_ = binaryManager_->Reverse<Vector3>();
+	position_ = binaryManager_->Reverse<Vector3>();
+	rotation_ = binaryManager_->Reverse<Vector3>();
 }

@@ -11,7 +11,7 @@ public:
 	~Player() = default;
 
 	void Initialize(Field* field, Tetrimino* tetrimino);
-	void Update(float deltaTime, std::unordered_map<Key, bool> key);
+	bool Update(float deltaTime, std::unordered_map<Key, bool> key);
 	void SetDownTime(float dropTimer) { normalDropTime_ = dropTimer; }
 
 	bool SpawnMino(Tetrimino::Type tetriminoType = Tetrimino::None);
@@ -19,6 +19,8 @@ public:
 	MovableMino GetMoveMino() const { return moveMino_; }
 	bool GetHasMoveMino() const { return hasMoveMino_; }
 	Tetrimino::Type GetHoldMino() const { return holdMino_; }
+
+	bool GetIsTSpin() const;
 
 private:
 
@@ -75,4 +77,6 @@ private:
 
 	bool gameOver_ = false;
 	bool holded_ = false;
+
+	bool isTSpin_ = false;
 };

@@ -17,15 +17,39 @@ struct PolygonList {
 class PolygonEmitter : public IEmitter {
 public:
 
+	struct Config {
+		Config(uint32_t inID) : id(inID) {}
+		const uint32_t id;
+		Transform transform;
+		Vector4 color = {1,1,1,1};
+		uint32_t emitNum = 1;
+
+		void DrawImGui();
+
+		void Save(BinaryManager& bin) const;
+		void Load(BinaryManager& bin);
+	};
+
+	struct IgnoreBall {
+		Vector3 position;
+		float radius;
+	};
+
+public:
+
 	PolygonEmitter(uint32_t maxParticleNum = 1000000) : kMaxParticleNum_(maxParticleNum) {};
 
 	void Initialize(SHEngine::Engine* engine, const Pool& pool) override;
 	void Update(CCC* compute, float deltaTime) override;
 
-	uint32_t AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix = Matrix4x4::Identity(), Vector4 color = {1,1,1,1}, uint32_t emitNum = 1);
+	Config AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix = Matrix4x4::Identity(), Vector4 color = {1,1,1,1}, uint32_t emitNum = 1);
 
-	void EditPolygon(uint32_t index, Matrix4x4 worldMatrix, Vector4 color, uint32_t emitNum);
+	void SetConfig(const Config& config);
 	void EditPolygon(uint32_t index, const PolygonList& polygonList, bool isCreateChanceList);
+
+	void SetCommonConfig(float lifeTime);
+
+	void SetIgnoreBalls(const std::vector<IgnoreBall>& ignoreBalls);
 
 private:
 
@@ -58,14 +82,16 @@ private:
 	SHEngine::GPUBuffer* freeListIndex_ = nullptr;
 	SHEngine::GPUBuffer* indexList_ = nullptr;
 	SHEngine::GPUBuffer* currentTime_ = nullptr;
-	SHEngine::GPUBuffer* velocity_ = nullptr;
+	SHEngine::GPUBuffer* basePosition_ = nullptr;
 
 	SHEngine::GPUBuffer* lifeTime_ = nullptr;
 	SHEngine::GPUBuffer* seed_ = nullptr;
-	SHEngine::GPUBuffer* speed_ = nullptr;
+	SHEngine::GPUBuffer* ignoreBallNum_ = nullptr;
+	SHEngine::GPUBuffer* ignoreBall_ = nullptr;
 
 	SHEngine::GPUBuffer* position_ = nullptr;
 	SHEngine::GPUBuffer* color_ = nullptr;
 
 	const uint32_t kMaxParticleNum_;
+	const uint32_t kMaxIgnoreBallNum_ = 16;
 };

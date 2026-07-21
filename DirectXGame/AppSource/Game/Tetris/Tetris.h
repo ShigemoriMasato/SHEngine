@@ -2,6 +2,7 @@
 #include <Game/Tetris/Field/Field.h>
 #include <Game/Tetris/Block/BlockRender.h>
 #include <Game/Tetris/Mino/Tetrimino.h>
+#include <Game/Tetris/Score/ScoreManager.h>
 #include <Game/KeyCoating/KeyCoating.h>
 #include <Game/Tetris/Player/Player.h>
 #include <Assets/Texture/TextureData.h>
@@ -35,11 +36,13 @@ private:
 
 	KeyCoating* keys_ = nullptr;
 
-	std::unique_ptr<Field> field_ = nullptr;
-	std::unique_ptr<BlockRender> blockRender_ = nullptr;
-	std::unique_ptr<Player> player_ = nullptr;
+	Field field_ = Field(fieldWidth_, fieldHeight_);
+	BlockRender blockRender_;
+	Player player_;
 
-	std::unique_ptr<Tetrimino> tetrimino_ = nullptr;
+	ScoreManager scoreManager_;
+
+	Tetrimino tetrimino_;
 
 	bool gameOver_ = false;
 	int deletedLine_ = 0;

@@ -189,7 +189,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Tetris\Field\Field.cpp" />
     <ClCompile Include="AppSource\Game\Tetris\Mino\Tetrimino.cpp" />
     <ClCompile Include="AppSource\Game\Tetris\Player\Player.cpp" />
-    <ClCompile Include="AppSource\Game\Tetris\Score\LevelManager.cpp" />
     <ClCompile Include="AppSource\Game\Tetris\Score\ScoreManager.cpp" />
     <ClCompile Include="AppSource\Game\Tetris\Tetris.cpp" />
     <ClCompile Include="AppSource\Scene\CommonData.cpp" />
@@ -281,7 +280,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Game\Tetris\Field\Field.h" />
     <ClInclude Include="AppSource\Game\Tetris\Mino\Tetrimino.h" />
     <ClInclude Include="AppSource\Game\Tetris\Player\Player.h" />
-    <ClInclude Include="AppSource\Game\Tetris\Score\LevelManager.h" />
     <ClInclude Include="AppSource\Game\Tetris\Score\ScoreManager.h" />
     <ClInclude Include="AppSource\Game\Tetris\Tetris.h" />
     <ClInclude Include="AppSource\Scene\CommonData.h" />

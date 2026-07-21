@@ -66,7 +66,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     basePositions[index] += velocities[index] * float16_t(deltaTime);
     
     //波の処理
-    float32_t3 pos = mul(float4(basePositions[index], 1.0f), parentMatrix).xyz;
+    float32_t3 pos = basePositions[index];
     float16_t3 col = baseColors[index];
     for (int i = 0; i < kWaveNum; ++i)
     {
@@ -94,7 +94,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float16_t normalzed = currentTimes[index] / float16_t(lifetime);
     float16_t alpha = float16_t(abs((normalzed * 2) - 1));
     colors[globalIndex] = float16_t4(col, alpha);
-    positions[globalIndex] = pos;
+    positions[globalIndex] = mul(float4(pos, 1.0f), parentMatrix).xyz;
     
     currentTimes[index] += float16_t(deltaTime);
     if ((currentTimes[index] >= float16_t(lifetime)))

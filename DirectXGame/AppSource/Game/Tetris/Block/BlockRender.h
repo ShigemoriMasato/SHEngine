@@ -47,7 +47,6 @@ private:
 	std::unique_ptr<SHEngine::Renderer> blockRenderer_;
 	SHEngine::GPUBuffer* vsBuffer_;
 	SHEngine::GPUBuffer* colorMapBuffer_;
-	SHEngine::GPUBuffer* psBuffer_;
 	std::vector<Transform> blockTransforms_{};
 
 
@@ -56,13 +55,8 @@ private:
 		Matrix4x4 wvp = Matrix4x4::Identity();
 		uint32_t colorID;
 	};
-	struct PSData {
-		Vector3 cameraPos;
-		float strength = 0.5f;
-	};
 	int vertexDataIndex_ = -1;
 	std::vector<VSData> vsData_{};
-	PSData psData_{};
 
 	//表示するフィールドサイズ
 	uint32_t fieldWidth_ = 0;

@@ -17,7 +17,7 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine:
 	pool_.particleNum->CopyBuffer(&kMaxParticleNum, sizeof(uint32_t));
 
 	//描画用バッファ
-	vpMatrixBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4) * 2, 1); // viewProjectionMatrix
+	vpMatrixBuffer_ = container_->Create(BufferType::CBV, sizeof(CameraData), 1); // viewProjectionMatrix
 	sizeBuffer_ = container_->Create(BufferType::CBV, sizeof(float), 1); // size
 
 	initialize_->SetShader("Particle/Pool/Initialize.CS.hlsl");
@@ -41,16 +41,17 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine:
 	renderer_->SetDepthStencil(SHEngine::PSO::DepthStencilID::Default);
 	pool_.maxParticleNum = kMaxParticleNum;
 
-	drawCount_ = kMaxParticleNum / 2;
+	drawCount_ = kMaxParticleNum / 4;
 }
 
-void ParticlePool::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime, CCC* compute) {
+void ParticlePool::Update(Camera* camera, float deltaTime, CCC* compute) {
 	//drawCountに応じてレンダラーのDispatchGroupを設定する。
 	static constexpr int kExecuteNum = 64 * 32;
 	renderer_->SetDispatchGroup(drawCount_ / kExecuteNum + 1, 1, 1);
 
-	camera_.vpMatrix = vpMatrix;
-	camera_.billboardMatrix = billboardMatrix;
+	camera_.vpMatrix = camera->GetVPMatrix();
+	camera_.billboardMatrix = camera->GetBillboardMatrix();
+	camera_.cameraPos = camera->GetPosition();
 	vpMatrixBuffer_->CopyBuffer(&camera_, sizeof(camera_));
 	sizeBuffer_->CopyBuffer(&size_, sizeof(size_));
 	pool_.deltaTime->CopyBuffer(&deltaTime, sizeof(float));

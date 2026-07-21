@@ -47,3 +47,14 @@ void Field::DeleteFillLine() {
 	}
 	reqLine_.clear();
 }
+
+bool Field::IsAllClear() const {
+	for (const auto& row : field_) {
+		for (const auto& cell : row) {
+			if (cell != 0) {
+				return false;
+			}
+		}
+	}
+	return true;
+}

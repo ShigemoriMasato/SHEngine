@@ -2,8 +2,8 @@ RWStructuredBuffer<int> freeList : register(u0);
 RWStructuredBuffer<int> freeListIndex : register(u1);
 RWStructuredBuffer<float32_t3> positions : register(u2);
 RWStructuredBuffer<float16_t4> colors : register(u3);
-RWStructuredBuffer<float16_t3> velocities : register(u4);
-RWStructuredBuffer<float> currentTime : register(u5);
+RWStructuredBuffer<float> currentTime : register(u4);
+RWStructuredBuffer<float32_t3> basePositions : register(u5);
 
 struct Polygon {
     float32_t3 a;
@@ -26,15 +26,11 @@ cbuffer WorldMatrix : register(b2){
     float32_t4x4 worldMatrix;
 }
 
-cbuffer Speed : register(b3){
-    float32_t speed;
-}
-
-cbuffer ChanceListSize : register(b4) {
+cbuffer ChanceListSize : register(b3) {
     uint chanceListSize;
 }
 
-cbuffer RandSeed : register(b5) {
+cbuffer RandSeed : register(b4) {
     uint randSeed;
 }
 
@@ -98,10 +94,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
     }
 
     float3 p = polygon.a + u * (polygon.b - polygon.a) + v * (polygon.c - polygon.a);
-
-    velocities[index] = float16_t3(normalize(float3(randf(seed) * 2.0f - 1.0f, randf(seed) * 2.0f - 1.0f, randf(seed) * 2.0f - 1.0f)) * speed);
+    
     currentTime[index] = 0.0f;
 
-    positions[globalIndex] = mul(float4(p, 1.0f), worldMatrix).xyz;
+    float3 pos = mul(float4(p, 1.0f), worldMatrix).xyz;
+    basePositions[index] = pos;
+    positions[globalIndex] = pos;
     colors[globalIndex] = float16_t4(color.rgb, 1.0f);
 }

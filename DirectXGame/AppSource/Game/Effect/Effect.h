@@ -10,7 +10,7 @@ public:
 
 	void AddEmitter(IEmitter* emitter);
 
-	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime);
+	void Update(Camera* camera, float deltaTime);
 	void Draw();
 
 private:

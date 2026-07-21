@@ -17,6 +17,7 @@ cbuffer Camera : register(b1)
 {
     float4x4 vpMatrix;
     float4x4 billboardMatrix;
+    float3 cameraPosition;
 };
 cbuffer MaxNum : register(b2)
 {
@@ -68,16 +69,19 @@ out indices uint3 triangles[128]
         return;
     }
     
-    float4x4 scale = float4x4(size, 0, 0, 0,
-                                0, size, 0, 0,
-                                0, 0, size, 0,
+    float dist = length(positions[threadID] - cameraPosition);
+    float adjustmentSize = size * (1.0f + dist * 0.03f);
+    
+    float4x4 scale = float4x4(adjustmentSize, 0, 0, 0,
+                                0, adjustmentSize, 0, 0,
+                                0, 0, adjustmentSize, 0,
                                 0, 0, 0, 1);
     float4x4 translate = float4x4(1, 0, 0, 0,
                                 0, 1, 0, 0,
                                 0, 0, 1, 0,
                                 positions[threadID].x, positions[threadID].y, positions[threadID].z, 1);
-    float4x4 world = mul(mul(scale, billboardMatrix), translate);
-    float4x4 wvpMatrix = mul(world, vpMatrix);
+    
+    float4x4 wvpMatrix = mul(mul(mul(scale, billboardMatrix), translate), vpMatrix);
     vertices[vertexOffset + 0].position = mul(float4(-0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
     vertices[vertexOffset + 1].position = mul(float4(0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
     vertices[vertexOffset + 2].position = mul(float4(-0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);

@@ -17,6 +17,8 @@ public:
 	void LineCheck();
 	void DeleteFillLine();
 
+	bool IsAllClear() const;
+
 	std::vector<int> FillLineIndex() const { return reqLine_; }
 
 private:

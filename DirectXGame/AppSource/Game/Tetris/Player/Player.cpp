@@ -31,9 +31,13 @@ void Player::Initialize(Field* field, Tetrimino* tetrimino) {
 	spawnPosition_ = std::make_pair(int(field->GetField()[0].size() / 2 - 1), static_cast<int>(field->GetField().size() - 7));
 }
 
-void Player::Update(float deltaTime, std::unordered_map<Key, bool> key) {
+bool Player::Update(float deltaTime, std::unordered_map<Key, bool> key) {
+	//Tスピン判定をリセット
+	isTSpin_ = false;
+
 	dropTimer_ += deltaTime;
 	auto fieldData = field_->GetField();
+	bool isDroped = false;
 
 	PlayerControl(deltaTime, key);
 
@@ -65,7 +69,10 @@ void Player::Update(float deltaTime, std::unordered_map<Key, bool> key) {
 		notAllowDown_ = false;
 		holded_ = false;
 		maxDropTime_ = normalDropTime_;
+		isDroped = true;
 	}
+
+	return isDroped;
 }
 
 bool Player::SpawnMino(Tetrimino::Type tetriminoType) {
@@ -99,6 +106,10 @@ bool Player::SpawnMino(Tetrimino::Type tetriminoType) {
 	direction_ = dUp;
 	hasMoveMino_ = true;
 	return true;
+}
+
+bool Player::GetIsTSpin() const {
+	return isTSpin_;
 }
 
 void Player::PlayerControl(float deltaTime, std::unordered_map<Key, bool> key) {
@@ -250,7 +261,10 @@ void Player::ExecuteSRS(Rotate rotate) {
 
 	auto field = field_->GetField();
 	bool moved = false;
-	for (const auto& [dx, dy] : srs) {
+	int rotateIndex = 0;
+	for (rotateIndex = 0; rotateIndex < srs.size(); ++rotateIndex) {
+		int dx = srs[rotateIndex].first;
+		int dy = srs[rotateIndex].second;
 		if (canMove(moveMino_, field, dx, dy)) {
 			moveMino_.position.first += dx;
 			moveMino_.position.second += dy;
@@ -261,12 +275,18 @@ void Player::ExecuteSRS(Rotate rotate) {
 	}
 
 	//移動できなかったら元に戻す
-	if (!moved) {
-		moveMino_ = prevMino;
-	} else {
-		if(!canMove(moveMino_, field, 0, -1)) {
+	if (moved) {
+		if (!canMove(moveMino_, field, 0, -1)) {
+			//回転完了
 			downTimer_ = 0.0f;
+			
+			//TMinoが補正を受けた状態で回転した場合、TSpin判定をtrueにする
+			if (moveMino_.minoType == Tetrimino::Type::T && rotateIndex > 0) {
+				isTSpin_ = true;
+			}
 		}
+	} else {
+		moveMino_ = prevMino;
 	}
 
 	direction_ = Direction(dir);

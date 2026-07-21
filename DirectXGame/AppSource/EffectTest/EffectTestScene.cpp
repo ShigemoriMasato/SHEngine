@@ -63,7 +63,7 @@ std::unique_ptr<IScene> EffectTestScene::Update() {
 
 	static auto model = modelManager_->LoadModel(filePath);
 
-	effect_->Update(camera_.GetVPMatrix(), camera_.GetBillboardMatrix(), engine_->GetDeltaTime());
+	effect_->Update(&camera_, engine_->GetDeltaTime());
 
 	computeContext_->EndTimeStamp();
 

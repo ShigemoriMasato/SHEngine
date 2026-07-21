@@ -8,7 +8,7 @@ void Effect::Initialize(SHEngine::Engine* engine) {
 
 	particlePool_ = std::make_unique<ParticlePool>();
 	// メモリを確保する
-	particlePool_->Initialize(int(100000000), compute_, textureManager_);
+	particlePool_->Initialize(int(50000000), compute_, textureManager_);
 
 	compute_->MiddleExecute();
 }
@@ -20,14 +20,14 @@ void Effect::AddEmitter(IEmitter* emitter) {
 	emitters_.push_back(emitter);
 }
 
-void Effect::Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime) {
+void Effect::Update(Camera* camera, float deltaTime) {
 	static Logger logger = GetLogger("Command");
 
 	for (auto& emitter : emitters_) {
 		emitter->Update(compute_, deltaTime);
 	}
 
-	particlePool_->Update(vpMatrix, billboardMatrix, deltaTime, compute_);
+	particlePool_->Update(camera, deltaTime, compute_);
 }
 
 void Effect::Draw() {

@@ -2,6 +2,7 @@
 #include <Compute/ComputeObject.h>
 #include <Render/MeshRenderer.h>
 #include <Render/Screen/Display.h>
+#include <Camera/Camera.h>
 
 struct Pool {
 	SHEngine::GPUBuffer* freeList;
@@ -20,7 +21,7 @@ public:
 	void Initialize(const int kMaxParticleNum, CCC* compute, SHEngine::TextureManager* textureManager);
 
 	//全てのWorldMatrixにcamera行列をかけて、GPUに転送する
-	void Update(const Matrix4x4& vpMatrix, const Matrix4x4& billboardMatrix, float deltaTime, CCC* compute);
+	void Update(Camera* camera, float deltaTime, CCC* compute);
 
 	//パーティクルの描画
 	void Draw(DCC* dcc, CCC* ccc);
@@ -45,9 +46,10 @@ private:
 	std::unique_ptr<SHEngine::MeshRenderer> renderer_;
 
 	float size_ = 0.01f;
-	struct Camera {
+	struct CameraData {
 		Matrix4x4 vpMatrix;
 		Matrix4x4 billboardMatrix;
+		Vector3 cameraPos;
 	}camera_;
 
 	int drawCount_;

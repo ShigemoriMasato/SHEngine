@@ -119,8 +119,6 @@ void WaveEmitter::CopyConfig(float deltaTime) {
 
 void WaveEmitter::Config::DrawImGui() {
 #ifdef USE_IMGUI
-	ImGui::Begin("WaveEmitter::Config");
-
 	ImGui::DragFloat("Speed", &speed, 0.01f);
 	ImGui::DragFloat("LifeTime", &lifeTime, 0.1f, 5.0f);
 	ImGui::DragInt("EmitNum", &emitNum, 1, 0, 100000);
@@ -130,9 +128,6 @@ void WaveEmitter::Config::DrawImGui() {
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
 	ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
 	ImGui::DragFloat3("Position", &position.x, 0.1f);
-
-	ImGui::End();
-
 #endif
 }
 
@@ -166,8 +161,6 @@ bool WaveEmitter::WaveData::DrawImGui() {
 	bool isAdd = false;
 
 #ifdef USE_IMGUI
-	ImGui::Begin("WaveEmitter::WaveData");
-	
 	ImGui::ColorEdit3("TestWave Color", &color.x);
 	ImGui::DragFloat3("TestWave Position", &position.x, 0.1f);
 	ImGui::DragFloat("TestWave Speed", &speed, 0.01f);
@@ -180,8 +173,6 @@ bool WaveEmitter::WaveData::DrawImGui() {
 	if (ImGui::Button("Add")) {
 		isAdd = true;
 	}
-
-	ImGui::End();
 #endif
 
 	return isAdd;
