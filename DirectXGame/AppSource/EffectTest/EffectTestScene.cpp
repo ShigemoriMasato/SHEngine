@@ -20,14 +20,15 @@ void EffectTestScene::Initialize() {
 	auto model = modelManager_->LoadModel(filePath);
 	//vertexEmitter_->AddModel(model->meshes.front().position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), computeContext_);
 
-	polygonEmitter_ = std::make_unique<PolygonEmitter>(65535 * 128 - 1);
+	constexpr static int particleNum = 200000;
+	polygonEmitter_ = std::make_unique<PolygonEmitter>(particleNum * 4);
 	effect_->AddEmitter(polygonEmitter_.get());
 
-	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(0.0f, 3.0f, 0.0f)), Vector4(0.1f, 0.2f, 0.1f, 1.0f), 2000000);
+	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(0.0f, 3.0f, 0.0f)), Vector4(0.1f, 0.2f, 0.1f, 1.0f), particleNum);
 	model = modelManager_->GetModelData(SHEngine::TestModel::Desc);
-	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(5.0f, 0.0f, 0.0f)), Vector4(0.2f, 0.1f, 0.1f, 1.0f), 2000000);
+	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(5.0f, 0.0f, 0.0f)), Vector4(0.2f, 0.1f, 0.1f, 1.0f), particleNum);
 	model = modelManager_->LoadModel("Bunny");
-	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(-3.0f, 0.0f, 0.0f)), Vector4(0.1f, 0.1f, 0.2f, 1.0f), 2000000);
+	polygonEmitter_->AddPolygon(model->meshes, Matrix::MakeTranslationMatrix(Vector3(-3.0f, 0.0f, 0.0f)), Vector4(0.1f, 0.1f, 0.2f, 1.0f), particleNum);
 
 	waveEmitter_ = std::make_unique<WaveEmitter>(65535 * 128 - 1);
 	effect_->AddEmitter(waveEmitter_.get());
@@ -42,19 +43,6 @@ void EffectTestScene::Initialize() {
 
 	timeViewer_ = std::make_unique<TimeViewer>();
 	timeViewer_->Initialize(engine_);
-
-
-	unorderedTest_ = std::make_unique<SHEngine::Screen::Display>();
-	unorderedTest_->Initialize(1280, 720, "Unordered Test");
-	unorderedTest_->AddRenderTarget(textureManager_, 0x000000ff, SHEngine::Format::R8G8B8A8_UNORM, true);
-
-	auto unorderedTestTexture = unorderedTest_->GetTextureData();
-	auto utBuffer = container_->Create(unorderedTestTexture);
-
-	unorderedTestCom_ = std::make_unique<SHEngine::ComputeObject>();
-	unorderedTestCom_->SetShader("Test/UnorderedTest.CS.hlsl");
-	unorderedTestCom_->SetThreadGroupSize(1280 * 720 / 128 + 1, 1, 1);
-	unorderedTestCom_->SetGPUBuffer(BufferType::UAV, utBuffer);
 }
 
 std::unique_ptr<IScene> EffectTestScene::Update() {
@@ -78,10 +66,6 @@ std::unique_ptr<IScene> EffectTestScene::Update() {
 	effect_->Update(camera_.GetVPMatrix(), camera_.GetBillboardMatrix(), engine_->GetDeltaTime());
 
 	computeContext_->EndTimeStamp();
-
-	unorderedTest_->ToUnordered(directContext_, true);
-	unorderedTestCom_->Execute(directContext_);
-	unorderedTest_->ToTexture(directContext_);
 
 	return std::unique_ptr<IScene>();
 }

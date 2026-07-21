@@ -35,7 +35,7 @@ void InitializeScene::Initialize() {
 	commonData_->display = std::make_unique<SHEngine::Screen::Display>();
 	commonData_->display->Initialize(1280, 720, "MainWindow");
 	commonData_->display->CreateDepthTexture(textureManager_);
-	commonData_->display->AddRenderTarget(textureManager_, 0xff);
+	commonData_->display->AddRenderTarget(textureManager_, 0xff0000ff);
 	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 
 	engine_->ImGuiActivate(commonData_->window->GetWindowsAPI());

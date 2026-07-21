@@ -45,9 +45,6 @@ private:
 
 	std::unique_ptr<Grid> grid_ = nullptr;
 
-	std::unique_ptr<SHEngine::Screen::Display> unorderedTest_ = nullptr;
-	std::unique_ptr<SHEngine::ComputeObject> unorderedTestCom_ = nullptr;
-
 	bool drawGrid_ = false;
 
 	const std::string savefile_ = "EffectTestScene.bin";
