@@ -18,8 +18,6 @@ protected:
 	uint32_t GetRandU();
 	float GetRandF();
 
-	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
-
 private:
 
 	static inline std::mt19937 randomEngine_{ std::random_device{}() };

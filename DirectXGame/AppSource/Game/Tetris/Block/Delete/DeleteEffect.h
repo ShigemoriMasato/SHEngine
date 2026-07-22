@@ -24,9 +24,10 @@ private:
 
 	const int kLineCount_ = 10; //1ラインのブロック数
 
-	const float kEffectTime_ = 1.2f; //演出時間
+	const float kEffectTime_ = 1.0f; //演出時間
 	const float kInitSpeed_ = 20.0f; //初速
 	const float kReqTime_ = 0.7f; //削除要求を出すまでの時間
+	const float kMarginTime_ = 0.1f; //削除要求を出すまでの時間のマージン
 
 private:
 

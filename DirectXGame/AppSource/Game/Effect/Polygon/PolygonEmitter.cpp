@@ -28,7 +28,7 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	color_ = pool.color;
 
 	initialize_ = std::make_unique<SHEngine::ComputeObject>();
-	initialize_->SetShader("Particle/Polygon/Initialize.CS.hlsl");
+	initialize_->SetShader("Particle/EmitterInit.CS.hlsl");
 	initialize_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, pool.freeList, pool.freeListIndex, indexList_ });
 	initialize_->SetGPUBuffer(BufferType::CBV, maxParticleNum_);
 	initialize_->SetExecuteNum(kMaxParticleNum_ / 1024 + 1);

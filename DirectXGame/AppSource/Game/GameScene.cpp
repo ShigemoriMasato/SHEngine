@@ -132,7 +132,12 @@ void GameScene::Initialize() {
 
 	polygonEmitter_ = std::make_unique<PolygonEmitter>();
 	effect_.AddEmitter(polygonEmitter_.get());
-	
+
+	ellipseEmitter_ = std::make_unique<EllipseEmitter>();
+	effect_.AddEmitter(ellipseEmitter_.get());
+
+	computeContext_->MiddleExecute();
+
 
 	auto model = modelManager_->GetModelData(SHEngine::TestModel::Cube);	//Cube
 	auto ddsTexture = textureManager_->GetTextureData(textureManager_->LoadTexture("rostock_laage_airport_4k.dds"));
@@ -164,8 +169,6 @@ void GameScene::Initialize() {
 	auto config2 = polygonEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
 	polygonConfigs_.push_back(config2);
 
-	Load();
-
 	ignoreBallManager_.Initialize();
 
 	ignoreBalls_.resize(2);
@@ -177,6 +180,8 @@ void GameScene::Initialize() {
 		};
 	ignoreBallManager_.SetMove(ballFunc1);
 	ignoreBallManager_.SetMove(ballFunc2);
+
+	Load();
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
@@ -295,6 +300,12 @@ void GameScene::Draw() {
 	}
 	ImGui::End();
 
+	ImGui::Begin("EllipseEmitter");
+	if (ellipseConfig_.DrawImGui()) {
+		ellipseEmitter_->Emit(ellipseConfig_);
+	}
+	ImGui::End();
+
 	{
 		ImGui::Begin("WaveData");
 		static int waveIndex = 0;
@@ -367,6 +378,7 @@ void GameScene::Save() {
 		bin.Register(&ignoreBall.position);
 		bin.Register(&ignoreBall.radius);
 	}
+	ellipseConfig_.Save(bin);
 
 	static const std::string fileName = "GameScene.bin";
 	bin.Write(fileName);
@@ -393,4 +405,5 @@ void GameScene::Load() {
 		ignoreBalls_[i].position = bin.Reverse<Vector3>();
 		ignoreBalls_[i].radius = bin.Reverse<float>();
 	}
+	ellipseConfig_.Load(bin);
 }

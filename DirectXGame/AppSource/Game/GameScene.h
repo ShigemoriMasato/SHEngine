@@ -9,6 +9,7 @@
 #include <Game/Effect/Effect.h>
 #include <Game/Effect/Wave/WaveEmitter.h>
 #include <Game/Effect/Polygon/PolygonEmitter.h>
+#include <Game/Effect/Ellipse/EllipseEmitter.h>
 
 #include <Game/ParticleTool/IgnoreBallManager.h>
 
@@ -61,6 +62,9 @@ private:
 
 	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
 	std::vector<PolygonEmitter::Config> polygonConfigs_ = {};
+
+	std::unique_ptr<EllipseEmitter> ellipseEmitter_ = nullptr;
+	EllipseEmitter::Config ellipseConfig_ = {};
 
 	IgnoreBallManager ignoreBallManager_ = {};
 

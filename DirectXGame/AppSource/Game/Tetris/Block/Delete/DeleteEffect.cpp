@@ -42,13 +42,10 @@ void DeleteEffect::Update(float deltaTime) {
 }
 
 void DeleteEffect::UpdateEffect(float deltaTime) {
-	currentSpeed_ = lerp(kInitSpeed_, 0.0f, timer_ / kReqTime_);
-	float t = timer_ / kReqTime_;
+	float t = timer_ / (kReqTime_ - kMarginTime_);
+	t = std::clamp(t, 0.0f, 1.0f);
+	currentSpeed_ = lerp(kInitSpeed_, 0.0f, t);
 	float scale = EaseOutBackReverse(t, 3.0f) * -1.f + 1.f;
-
-	ImGui::Begin("DeleteEffect");
-	ImGui::Text("Scale: %.2f", scale);
-	ImGui::End();
 
 	for (int i = 0; i < int(transform_.size()); ++i) {
 		transform_[i].scale = Vector3(scale, scale, scale);

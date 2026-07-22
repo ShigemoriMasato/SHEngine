@@ -28,6 +28,7 @@ private:
 		uint32_t vertexNum = 0;								//頂点数。Dispatchに使用
 	};
 
+	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> addModel_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> editVertex_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> editColor_ = nullptr;
