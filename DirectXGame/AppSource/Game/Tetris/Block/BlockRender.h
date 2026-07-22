@@ -39,24 +39,31 @@ private:
 		Vector4 color;
 		Vector4 outlineColor;
 	};
+	struct VSData {
+		Matrix4x4 world = Matrix4x4::Identity();
+		Matrix4x4 wvp = Matrix4x4::Identity();
+	};
+	struct MaterialData {
+		Vector3 color = { 1.0f, 1.0f, 1.0f };
+		float intensity = 0.0f;
+		uint32_t colorID;
+	};
 	std::vector<ColorMap> colorMap_{};
-	Camera* camera_ = nullptr;
+	std::vector<VSData> vsData_{};
+	std::vector<MaterialData> materialData_{};
+
+	SHEngine::GPUBuffer* vsBuffer_;
+	SHEngine::GPUBuffer* colorMapBuffer_;
+	SHEngine::GPUBuffer* materialBuffer_;
 
 	//Field->Wall->Hold->Next
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 	std::unique_ptr<SHEngine::Renderer> blockRenderer_;
-	SHEngine::GPUBuffer* vsBuffer_;
-	SHEngine::GPUBuffer* colorMapBuffer_;
+
+	Camera* camera_ = nullptr;
 	std::vector<Transform> blockTransforms_{};
 
-
-	struct VSData {
-		Matrix4x4 world = Matrix4x4::Identity();
-		Matrix4x4 wvp = Matrix4x4::Identity();
-		uint32_t colorID;
-	};
 	int vertexDataIndex_ = -1;
-	std::vector<VSData> vsData_{};
 
 	//表示するフィールドサイズ
 	uint32_t fieldWidth_ = 0;

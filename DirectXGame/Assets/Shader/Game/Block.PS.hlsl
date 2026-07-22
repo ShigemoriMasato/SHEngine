@@ -11,7 +11,15 @@ struct ColorMap
     float4 outlineColor;
 };
 
+struct Material
+{
+    float3 color;
+    float intensity;
+    uint colorID;
+};
+
 StructuredBuffer<ColorMap> colorMap : register(t0);
+StructuredBuffer<Material> material : register(t1);
 
 PSOutput main(PSInput input)
 {
@@ -19,7 +27,10 @@ PSOutput main(PSInput input)
     
     float outlineWidth = 0.05f;
     
-    output.color = colorMap[input.colorID].color;
+    Material mat = material[input.instanceID];
+    
+    output.color = colorMap[mat.colorID].color;
+    
     
     float2 texcoord = input.texCoord;
     texcoord = fmod(texcoord, 1.0f);
@@ -27,8 +38,13 @@ PSOutput main(PSInput input)
     if (input.texCoord.x < outlineWidth || input.texCoord.x > 1.0f - outlineWidth ||
        input.texCoord.y < outlineWidth || input.texCoord.y > 1.0f - outlineWidth)
     {
-        output.color = colorMap[input.colorID].outlineColor;
+        output.color = colorMap[mat.colorID].outlineColor;
     }
+    
+    float2 centere = float2(0.5f, 0.5f);
+    float dist = distance(input.texCoord, centere);
+    float adjustedIntensity = material[input.instanceID].intensity * (1.0f - (dist / 2.0f));
+    output.color.rgb += material[input.instanceID].color * adjustedIntensity;
     
     if (output.color.a < 0.01f)
     {

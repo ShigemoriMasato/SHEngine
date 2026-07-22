@@ -18,9 +18,15 @@ void SHEngine::ComputeObject::StaticInitialize(PSO::CSPSOManager* psoManager, D3
 
 void ComputeObject::Initialize() {
 	gpuBuffers_.clear();
-	SetThreadGroupSize(1, 1, 1);
+	SetExecuteNum(1);
 	SetUseTexture(false);
 	SetSamplerID(0);
+}
+
+void SHEngine::ComputeObject::SetExecuteNum(int executeNum) {
+	threadGroupSize_.x = std::min(65535, executeNum);
+	threadGroupSize_.y = std::clamp(executeNum / 65535, 1, 65535);
+	threadGroupSize_.z = 1;// 使うときになったら実装する
 }
 
 void SHEngine::ComputeObject::SetGPUBuffer(BufferType bufferType, GPUBuffer* buffer) {

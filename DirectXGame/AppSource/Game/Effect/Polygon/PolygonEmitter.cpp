@@ -31,7 +31,7 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	initialize_->SetShader("Particle/Polygon/Initialize.CS.hlsl");
 	initialize_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, pool.freeList, pool.freeListIndex, indexList_ });
 	initialize_->SetGPUBuffer(BufferType::CBV, maxParticleNum_);
-	initialize_->SetThreadGroupSize(kMaxParticleNum_ / 1024 + 1);
+	initialize_->SetExecuteNum(kMaxParticleNum_ / 1024 + 1);
 	CCC* ccc = engine->GetComputeCommandContext();
 	initialize_->Execute(ccc);
 
@@ -40,7 +40,7 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	update_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, currentTime_, position_, color_ });
 	update_->SetGPUBuffers(BufferType::SRV, { indexList_, ignoreBall_, basePosition_ });
 	update_->SetGPUBuffers(BufferType::CBV, { maxParticleNum_, lifeTime_, pool.deltaTime, ignoreBallNum_ });
-	update_->SetThreadGroupSize(kMaxParticleNum_ / 128 + 1);
+	update_->SetExecuteNum(kMaxParticleNum_ / 128 + 1);
 
 	emit_ = std::make_unique<SHEngine::ComputeObject>();
 	emit_->SetShader("Particle/Polygon/Emit.CS.hlsl");
@@ -58,7 +58,7 @@ void PolygonEmitter::Update(CCC* compute, float deltaTime) {
 		emit_->SetGPUBuffers(BufferType::CBV, { set.emitNum, set.color, set.worldMatrix, set.chanceListNum, seed_ });
 		uint32_t emitNum = uint32_t(std::round(float(set.emitNumValue) * deltaTime));
 		set.emitNum->CopyBuffer(&emitNum, sizeof(uint32_t));
-		emit_->SetThreadGroupSize(std::min(65535, (int)emitNum/ 128 + 1));
+		emit_->SetExecuteNum(std::min(65535, (int)emitNum/ 128 + 1));
 		emit_->Execute(compute);
 	}
 
@@ -130,10 +130,9 @@ void PolygonEmitter::SetCommonConfig(float lifeTime) {
 	lifeTime_->CopyBuffer(&lifeTime, sizeof(float));
 }
 
-void PolygonEmitter::SetIgnoreBalls(const std::vector<IgnoreBall>& ignoreBalls) {
-	uint32_t ignoreBallNum = static_cast<uint32_t>(std::min(ignoreBalls.size(), (size_t)kMaxIgnoreBallNum_));
-	ignoreBallNum_->CopyBuffer(&ignoreBallNum, sizeof(uint32_t));
-	ignoreBall_->CopyBuffer(ignoreBalls.data(), sizeof(IgnoreBall) * ignoreBallNum);
+void PolygonEmitter::SetIgnoreBalls(const std::array<IgnoreBall, 16>& ignoreBalls) {
+	ignoreBallNum_->CopyBuffer(&kMaxIgnoreBallNum_, sizeof(uint32_t));
+	ignoreBall_->CopyBuffer(ignoreBalls.data(), sizeof(IgnoreBall) * kMaxIgnoreBallNum_);
 }
 
 PolygonList PolygonEmitter::CreatePolygonList(const std::vector<Mesh>& meshes) {

@@ -1,7 +1,7 @@
 RWStructuredBuffer<uint> freeList : register(u0);
 RWStructuredBuffer<uint> freeListIndex : register(u1);
 RWStructuredBuffer<float> currentTime : register(u2);
-RWStructuredBuffer<float32_t3> position : register(u3);
+RWStructuredBuffer<float3> position : register(u3);
 RWStructuredBuffer<float16_t4> color : register(u4);
 
 StructuredBuffer<int> indexList : register(t0);
@@ -13,7 +13,7 @@ struct IgnoreBall
 };
 
 StructuredBuffer<IgnoreBall> ignoreBallList : register(t1);
-StructuredBuffer<float32_t3> basePositions : register(t2);
+StructuredBuffer<float3> basePositions : register(t2);
 
 cbuffer MaxParticle : register(b0) {
     uint maxParticleNum;
@@ -38,22 +38,29 @@ void main(uint3 DTid : SV_DispatchThreadID) {
     if (index >= maxParticleNum) return;
 
     currentTime[index] += deltaTime;
-
     int globalIndex = indexList[index];
+    float3 pos = position[globalIndex];
 
     //Positionが初期値のままなら何もしない
     static const float minValue = 1.175494351E-38;
-    if(position[globalIndex].x == minValue) return;
+    if(pos.x == minValue) return;
     
-    float baseDist = length(position[globalIndex] - basePositions[globalIndex]);
-    float innnerSpeed = 1.0f / baseDist;
-
-    float3 velocity = float3(0,0,0);
+    float baseDist = distance(pos, basePositions[index]);
+    float3 baseDir = float3(0,0,0);
+    float innnerSpeed = 0.0f;
+    if (baseDist > 0.01f)
+    {
+        baseDir = normalize(basePositions[index] - pos);
+        innnerSpeed = baseDist;
+    }
+    
+    float3 velocity = baseDir * innnerSpeed;
     for (uint i = 0; i < ignoreBallNum; i++)
     {
-        float dist = length(position[globalIndex] - ignoreBallList[i].position);
-        float outerSpeed = 1.0f / (dist / ignoreBallList[i].radius);
-        float3 dir = normalize(position[globalIndex] - ignoreBallList[i].position);
+        float dist = length(ignoreBallList[i].position - pos);
+        float intensity = dist / ignoreBallList[i].radius;
+        float outerSpeed = 1.0f / (intensity * intensity);
+        float3 dir = normalize(pos - ignoreBallList[i].position);
         velocity += dir * outerSpeed;
     }
     
@@ -65,6 +72,6 @@ void main(uint3 DTid : SV_DispatchThreadID) {
         uint freeIndex;
         InterlockedAdd(freeListIndex[0], 1, freeIndex);
         freeList[freeIndex + 1] = index;
-        position[globalIndex] = float32_t3(minValue, minValue, minValue);
+        position[globalIndex] = float3(minValue, minValue, minValue);
     }
 }

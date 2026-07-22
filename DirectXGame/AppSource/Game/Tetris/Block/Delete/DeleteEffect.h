@@ -1,29 +1,44 @@
 #pragma once
 #include <Utility/DataStructures.h>
+#include <vector>
+#include <random>
 
 class DeleteEffect {
 public:
 
-	void Initialize();
+	void Initialize(int deleteLineNum);
 	void Update(float deltaTime);
 
-	Transform GetTransform() const { return transform_; }
+	const std::vector<Transform>& GetTransforms() const { return transform_; }
 
+	//描画側に削除を要求するかどうか
 	bool ReqDelete() const { return reqDelete_; }
+	//演出が終了したかどうか
 	bool FinishEffect() const { return finishEffect_; }
 
 private:
 
-	const float kEffectingTime_ = 0.5f;
-	const float kWaitTime_ = 0.2f;
-
-	const float kInitRotate_ = 30.0f;
+	void UpdateEffect(float deltaTime);
 
 private:
 
-	Transform transform_{};
+	const int kLineCount_ = 10; //1ラインのブロック数
+
+	const float kEffectTime_ = 1.2f; //演出時間
+	const float kInitSpeed_ = 20.0f; //初速
+	const float kReqTime_ = 0.7f; //削除要求を出すまでの時間
+
+private:
+
+	std::vector<Transform> transform_{};
+	std::vector<Vector3> directions_{};
+	std::vector<Vector3> rotateDirections_{};
+	float currentSpeed_;
+
+	std::mt19937 randomEngine_{ std::random_device{}() };
+	std::uniform_real_distribution<float> randomDist_{ -1.0f, 1.0f };
+
 	float timer_ = 0.0f;
-	float waitTimer_ = 0.0f;
 
 	bool reqDelete_ = false;
 	bool finishEffect_ = false;

@@ -37,7 +37,7 @@ int VertexEmitter::AddModel(const std::vector<Vector3>& vertices, const Vector4&
 	addModel_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, data->indexList, positions_, colors_ });
 	addModel_->SetGPUBuffer(BufferType::SRV, data->vertexList);
 	addModel_->SetGPUBuffers(BufferType::CBV, { data->vertexNumBuffer, data->color });
-	addModel_->SetThreadGroupSize(uint32_t(vertices.size()) / 128 + 1);
+	addModel_->SetExecuteNum(uint32_t(vertices.size()) / 128 + 1);
 	addModel_->Execute(ccc);
 	return 0;
 }
@@ -49,7 +49,7 @@ void VertexEmitter::ReleaseModel(int index, CCC* ccc) {
 	release_->Initialize();
 	release_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, data->indexList, positions_, colors_ });
 	release_->SetGPUBuffer(BufferType::CBV, data->vertexNumBuffer);
-	release_->SetThreadGroupSize(data->vertexNum / 128 + 1);
+	release_->SetExecuteNum(data->vertexNum / 128 + 1);
 	release_->Execute(ccc);
 
 	//メモリを解放する
@@ -70,7 +70,7 @@ void VertexEmitter::EditColor(int index, const Vector4& color, CCC* ccc) {
 	editColor_->SetGPUBuffer(BufferType::UAV, colors_);
 	editColor_->SetGPUBuffer(BufferType::SRV, data->indexList);
 	editColor_->SetGPUBuffers(BufferType::CBV, { data->vertexNumBuffer, data->color });
-	editColor_->SetThreadGroupSize(data->vertexNum / 128 + 1);
+	editColor_->SetExecuteNum(data->vertexNum / 128 + 1);
 	editColor_->Execute(ccc);
 }
 
@@ -84,7 +84,7 @@ void VertexEmitter::EditPosition(int index, const std::vector<Vector3>& vertices
 	editVertex_->SetGPUBuffer(BufferType::UAV, positions_);
 	editVertex_->SetGPUBuffers(BufferType::SRV, { data->indexList, data->vertexList });
 	editVertex_->SetGPUBuffers(BufferType::CBV, { data->vertexNumBuffer });
-	editVertex_->SetThreadGroupSize(data->vertexNum / 128 + 1);
+	editVertex_->SetExecuteNum(data->vertexNum / 128 + 1);
 	editVertex_->Execute(ccc);
 }
 

@@ -442,6 +442,7 @@ DirectXGame.vcxproj.filters
 DirectXGame/externals/header/
 # DirectXTexnのシェーダーコンパイル後の生成ファイル
 *.inc
-# Blender関係を除外
+# 制作アプリ関係を除外
 *.blender
 *.blender1
+*.aseprite

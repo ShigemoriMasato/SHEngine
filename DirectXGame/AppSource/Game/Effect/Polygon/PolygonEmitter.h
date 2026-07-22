@@ -31,8 +31,8 @@ public:
 	};
 
 	struct IgnoreBall {
-		Vector3 position;
-		float radius;
+		Vector3 position = {0, 0, 0};
+		float radius = 0.0f;
 	};
 
 public:
@@ -49,7 +49,7 @@ public:
 
 	void SetCommonConfig(float lifeTime);
 
-	void SetIgnoreBalls(const std::vector<IgnoreBall>& ignoreBalls);
+	void SetIgnoreBalls(const std::array<IgnoreBall, 16>& ignoreBalls);
 
 private:
 

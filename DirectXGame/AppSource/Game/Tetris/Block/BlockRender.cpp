@@ -32,17 +32,20 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 
 	vsBuffer_ = container_->Create(BufferType::SRV, sizeof(VSData), blockNum);
 	colorMapBuffer_ = container_->Create(BufferType::SRV, sizeof(ColorMap), 32);
+	materialBuffer_ = container_->Create(BufferType::SRV, sizeof(MaterialData), blockNum);
 
 	blockRenderer_ = std::make_unique<SHEngine::Renderer>(VertexType::Default, cubeMesh);
 	blockRenderer_->SetVS("Game/Block.VS.hlsl");
 	blockRenderer_->SetPS("Game/Block.PS.hlsl");
 	blockRenderer_->SetGPUBuffer(vsBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
 	blockRenderer_->SetGPUBuffer(colorMapBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	blockRenderer_->SetGPUBuffer(materialBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
 
 	blockRenderer_->instanceNum_ = blockNum;
 
 	//CPU準備
 	vsData_.resize(blockNum);
+	materialData_.resize(blockNum);
 
 	//Binary
 	binaryManager_ = std::make_unique<BinaryManager>();
@@ -54,7 +57,7 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 	//Field
 	for (int i = 0; i < int(fieldHeight_); ++i) {
 		for (int j = 0; j < int((fieldWidth_)); ++j) {
-			vsData_[index].colorID = 0;
+			materialData_[index].colorID = 0;
 			blockTransforms_[index].position = Vector3(float(j - int(fieldWidth_) / 2), float(i - int(fieldHeight_) / 2), 0.0f);
 			++index;
 		}
@@ -64,17 +67,17 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 	constexpr uint32_t wallIndex = 8; //灰色
 	for (int i = 0; i < int(fieldHeight_); ++i) {
 		//左
-		vsData_[index].colorID = wallIndex;
+		materialData_[index].colorID = wallIndex;
 		blockTransforms_[index].position = Vector3(float(-int(fieldWidth_) / 2 - 1), float(i - int(fieldHeight_) / 2), 0.0f);
 		++index;
 		//右
-		vsData_[index].colorID = wallIndex;
+		materialData_[index].colorID = wallIndex;
 		blockTransforms_[index].position = Vector3(float(fieldWidth_ / 2), float(i - int(fieldHeight_) / 2), 0.0f);
 		++index;
 	}
 	for (int i = 0; i < int(fieldWidth_) + 2; ++i) {
 		//下
-		vsData_[index].colorID = wallIndex;
+		materialData_[index].colorID = wallIndex;
 		blockTransforms_[index].position = Vector3(float(i - int(fieldWidth_) / 2 - 1), float(-int(fieldHeight_) / 2 - 1), 0.0f);
 		++index;
 	}
@@ -88,18 +91,28 @@ void BlockRender::Update(float deltaTime) {
 	if (isDeleting_) {
 		deleteEffect_->Update(deltaTime);
 
-		Transform effectTransform = deleteEffect_->GetTransform();
+		auto effectTransform = deleteEffect_->GetTransforms();
 
 		for (int line : deletingLines_) {
 			for (uint32_t x = 0; x < fieldWidth_; ++x) {
 				uint32_t index = static_cast<uint32_t>(line) * fieldWidth_ + x;
-				blockTransforms_[index].scale = effectTransform.scale;
-				blockTransforms_[index].rotate = effectTransform.rotate;
+				blockTransforms_[index].scale = effectTransform[x].scale;
+				blockTransforms_[index].rotate = effectTransform[x].rotate;
+				materialData_[index].intensity = 1.f;
 			}
 		}
 
 		if (deleteEffect_->ReqDelete()) {
 			SetBlock(deletedField_, MovableMino{});
+
+			for (int line : deletingLines_) {
+				for (uint32_t x = 0; x < fieldWidth_; ++x) {
+					uint32_t index = static_cast<uint32_t>(line) * fieldWidth_ + x;
+					blockTransforms_[index].scale = Vector3(1.0f, 1.0f, 1.0f);
+					blockTransforms_[index].rotate = Vector3(0.0f, 0.0f, 0.0f);
+					materialData_[index].intensity = 0.0f;
+				}
+			}
 		}
 		if (deleteEffect_->FinishEffect()) {
 			isDeleting_ = false;
@@ -112,7 +125,7 @@ void BlockRender::Update(float deltaTime) {
 		data.wvp = data.world * camera_->GetVPMatrix();
 	}
 	vsBuffer_->CopyBuffer(vsData_.data(), sizeof(VSData) * vsData_.size());
-
+	materialBuffer_->CopyBuffer(materialData_.data(), sizeof(MaterialData) * materialData_.size());
 	colorMapBuffer_->CopyBuffer(colorMap_.data(), sizeof(ColorMap) * colorMap_.size());
 }
 
@@ -128,7 +141,7 @@ void BlockRender::SetStageData(std::vector<std::vector<int>> fieldData, const Mo
 
 	for (int i = 0; i < int(fieldHeight_); ++i) {
 		for (int j = 0; j < int(fieldWidth_); ++j) {
-			vsData_[i * fieldWidth_ + j].colorID = fieldData[i][j];
+			materialData_[i * fieldWidth_ + j].colorID = fieldData[i][j];
 		}
 	}
 
@@ -138,7 +151,7 @@ void BlockRender::SetStageData(std::vector<std::vector<int>> fieldData, const Mo
 		if (x < 0 || x >= int(fieldWidth_) || y < 0 || y >= int(fieldHeight_)) {
 			continue;
 		}
-		vsData_[y * fieldWidth_ + x].colorID = mino.minoType;
+		materialData_[y * fieldWidth_ + x].colorID = mino.minoType;
 	}
 }
 
@@ -147,11 +160,11 @@ void BlockRender::SetHoldMino(std::vector<std::pair<int, int>> blockPos, int col
 	uint32_t startIndex = fieldWidth_ * fieldHeight_ + (fieldHeight_ * 2) + (fieldWidth_ + 2);
 	for (i = 0; i < int(blockPos.size()); ++i) {
 		blockTransforms_[startIndex + i].position = holdBasePosition_ + Vector3(float(blockPos[i].first), float(blockPos[i].second), 0.0f);
-		vsData_[startIndex + i].colorID = colorID;
+		materialData_[startIndex + i].colorID = colorID;
 	}
 
 	for (i; i < 4; ++i) {
-		vsData_[startIndex + i].colorID = 0;
+		materialData_[startIndex + i].colorID = 0;
 	}
 }
 
@@ -172,7 +185,7 @@ void BlockRender::SetNextMino(std::vector<std::pair<int, int>> blockPos, int col
 		}
 
 		blockTransforms_[startIndex + i].position = nextBasePosition_ + nextGap_ * float(minoCount) + Vector3(float(blockPos[i].first), float(blockPos[i].second), 0.0f);
-		vsData_[startIndex + i].colorID = colorID;
+		materialData_[startIndex + i].colorID = colorID;
 	}
 }
 
@@ -181,7 +194,7 @@ void BlockRender::SetBlock(int x, int y, int configIndex) {
 	assert(colorMap_.size() > configIndex);
 	configIndex = std::min(int(colorMap_.size() - 1), configIndex);
 
-	vsData_[index].colorID = configIndex;
+	materialData_[index].colorID = configIndex;
 }
 
 void BlockRender::SetBlock(std::vector<std::vector<int>> allConfigIndices, MovableMino movableMino) {
@@ -231,7 +244,7 @@ void BlockRender::BeginDeleteEffect(std::vector<int> fillLines, std::vector<std:
 	deletedField_ = deletedField;
 	deletingLines_ = fillLines;
 	isDeleting_ = true;
-	deleteEffect_->Initialize();
+	deleteEffect_->Initialize((int)fillLines.size());
 }
 
 void BlockRender::Draw(DCC* cmdObj) {

@@ -117,8 +117,8 @@ GameScene::GameScene() {
 	gameCamera_ = std::make_unique<GameCamera>();
 
 	gameCamera_->Initialize();
-	worldCamera_ = debugCamera_.get();
 	worldCamera_ = gameCamera_->GetCamera();
+	worldCamera_ = debugCamera_.get();
 }
 
 void GameScene::Initialize() {
@@ -127,7 +127,7 @@ void GameScene::Initialize() {
 
 	effect_.Initialize(engine_);
 
-	waveEmitter_ = std::make_unique<WaveEmitter>();
+	waveEmitter_ = std::make_unique<WaveEmitter>(6000000);
 	effect_.AddEmitter(waveEmitter_.get());
 
 	polygonEmitter_ = std::make_unique<PolygonEmitter>();
@@ -165,16 +165,32 @@ void GameScene::Initialize() {
 	polygonConfigs_.push_back(config2);
 
 	Load();
+
+	ignoreBallManager_.Initialize();
+
+	ignoreBalls_.resize(2);
+	auto ballFunc1 = [this](float deltaTime, bool& destroyMe) -> PolygonEmitter::IgnoreBall {
+		return ignoreBalls_[0];
+		};
+	auto ballFunc2 = [this](float deltaTime, bool& destroyMe) -> PolygonEmitter::IgnoreBall {
+		return ignoreBalls_[1];
+		};
+	ignoreBallManager_.SetMove(ballFunc1);
+	ignoreBallManager_.SetMove(ballFunc2);
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
+	keyCoating_->Update(deltaTime);
+	auto key = keyCoating_->GetKeyStates();
 
 	waveEmitter_->SetConfig(waveEmitterConfig_);
 	for (const auto& config : polygonConfigs_) {
 		polygonEmitter_->SetConfig(config);
 	}
-	polygonEmitter_->SetIgnoreBalls(ignoreBalls_);
+
+	ignoreBallManager_.Update(deltaTime);
+	polygonEmitter_->SetIgnoreBalls(ignoreBallManager_.GetIgnoreBalls());
 
 	computeContext_->BeginTimeStamp("Particle Update");
 	effect_.Update(worldCamera_, deltaTime);
@@ -182,7 +198,6 @@ std::unique_ptr<IScene> GameScene::Update() {
 
 	input_->Update();
 	commonData_->keyManager->Update();
-	keyCoating_->Update(deltaTime);
 
 	debugCamera_->Update();
 	gameCamera_->Update(deltaTime);
@@ -191,13 +206,13 @@ std::unique_ptr<IScene> GameScene::Update() {
 
 	//線を消したときのやつ
 	int deleteNum = tetris_.IsLineDeleted();
-	if (deleteNum) {
+	if (deleteNum || key[Key::Debug2]) {
 		waveEmitter_->AddWave(waves_[deleteNum]);
 		if (deleteNum > 2) {
 			gameCamera_->Shake(0.3f * deleteNum, 0.5f);
 		}
+		ignoreBallManager_.SetPresetFunc(IgnoreBallPreset::Impact);
 	}
-	auto key = keyCoating_->GetKeyStates();
 
 	if (key.at(Key::Debug1)) {
 		return std::make_unique<GameScene>();
@@ -262,11 +277,22 @@ void GameScene::Draw() {
 #ifdef USE_IMGUI
 	display->DrawImGui();
 	gameCamera_->DrawImGui();
+	ignoreBallManager_.DrawImGui();
 	//tetris_.DrawImGui();
 	//timeViewer_->DrawImGui();
 
 	ImGui::Begin("WaveEmitterConfig");
 	waveEmitterConfig_.DrawImGui();
+	ImGui::End();
+
+	ImGui::Begin("IgnoreBall");
+	for (int i = 0; i < ignoreBalls_.size(); ++i) {
+		ImGui::PushID(i);
+		ImGui::DragFloat3("Position", &ignoreBalls_[i].position.x, 0.01f);
+		ImGui::DragFloat("Radius", &ignoreBalls_[i].radius, 0.01f);
+		ImGui::PopID();
+		ImGui::Separator();
+	}
 	ImGui::End();
 
 	{
@@ -310,14 +336,6 @@ void GameScene::Draw() {
 	}
 
 	{
-		ImGui::Begin("IgnoreBall");
-		ignoreBalls_.resize(1);
-		ImGui::DragFloat3("position", &ignoreBalls_[0].position.x, 0.05f);
-		ImGui::DragFloat("radius", &ignoreBalls_[0].radius, 0.01f);
-		ImGui::End();
-	}
-
-	{
 		ImGui::Begin("PolygonEmitterCommon");
 		static float lifeTime = 1.0f;
 		ImGui::DragFloat("LifeTime", &lifeTime, 0.01f);
@@ -343,6 +361,12 @@ void GameScene::Save() {
 	for (auto& polygonConfig : polygonConfigs_) {
 		polygonConfig.Save(bin);
 	}
+	uint32_t ignoreBallSize = static_cast<uint32_t>(ignoreBalls_.size());
+	bin.Register(&ignoreBallSize);
+	for (auto& ignoreBall : ignoreBalls_) {
+		bin.Register(&ignoreBall.position);
+		bin.Register(&ignoreBall.radius);
+	}
 
 	static const std::string fileName = "GameScene.bin";
 	bin.Write(fileName);
@@ -362,5 +386,11 @@ void GameScene::Load() {
 	uint32_t polygonConfigSize = bin.Reverse<uint32_t>();
 	for (uint32_t i = 0; i < polygonConfigSize; ++i) {
 		polygonConfigs_[i].Load(bin);
+	}
+	uint32_t ignoreBallSize = bin.Reverse<uint32_t>();
+	ignoreBalls_.resize(ignoreBallSize);
+	for (uint32_t i = 0; i < ignoreBallSize; ++i) {
+		ignoreBalls_[i].position = bin.Reverse<Vector3>();
+		ignoreBalls_[i].radius = bin.Reverse<float>();
 	}
 }

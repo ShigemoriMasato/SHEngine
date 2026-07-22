@@ -10,6 +10,8 @@
 #include <Game/Effect/Wave/WaveEmitter.h>
 #include <Game/Effect/Polygon/PolygonEmitter.h>
 
+#include <Game/ParticleTool/IgnoreBallManager.h>
+
 enum class WaveType {
 	Test,
 	One,
@@ -59,5 +61,8 @@ private:
 
 	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
 	std::vector<PolygonEmitter::Config> polygonConfigs_ = {};
+
+	IgnoreBallManager ignoreBallManager_ = {};
+
 	std::vector<PolygonEmitter::IgnoreBall> ignoreBalls_ = {};
 };

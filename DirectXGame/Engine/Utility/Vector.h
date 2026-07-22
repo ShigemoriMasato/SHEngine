@@ -30,7 +30,7 @@ struct Vector3 final {
 	float x;
 	float y;
 	float z;
-	Vector3(float x_ = 0.0f, float y_ = 0.0f, float z_ = 0.0f) :x(x_), y(y_), z(z_) {}
+	constexpr Vector3(float x_ = 0.0f, float y_ = 0.0f, float z_ = 0.0f) :x(x_), y(y_), z(z_) {}
 
 	float Length() const {
 		return sqrtf(x * x + y * y + z * z);

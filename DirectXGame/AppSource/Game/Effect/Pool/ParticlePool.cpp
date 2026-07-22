@@ -23,7 +23,7 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine:
 	initialize_->SetShader("Particle/Pool/Initialize.CS.hlsl");
 	initialize_->SetGPUBuffers(BufferType::UAV, { pool_.freeList, pool_.freeListIndex, pool_.position });
 	initialize_->SetGPUBuffer(BufferType::CBV, pool_.particleNum);
-	initialize_->SetThreadGroupSize(kMaxParticleNum / kThreadGroupSize_ + 1);
+	initialize_->SetExecuteNum(kMaxParticleNum / kThreadGroupSize_ + 1);
 
 	initialize_->Execute(compute);
 
@@ -41,7 +41,7 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine:
 	renderer_->SetDepthStencil(SHEngine::PSO::DepthStencilID::Default);
 	pool_.maxParticleNum = kMaxParticleNum;
 
-	drawCount_ = kMaxParticleNum / 4;
+	drawCount_ = kMaxParticleNum / 2;
 }
 
 void ParticlePool::Update(Camera* camera, float deltaTime, CCC* compute) {

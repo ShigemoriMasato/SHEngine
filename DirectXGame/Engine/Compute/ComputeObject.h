@@ -18,7 +18,7 @@ namespace SHEngine {
 		// @brief Shader名を登録
 		void SetShader(std::string computeShaderName) { computeShaderName_ = computeShaderName; }
 		// @brief スレッドグループのサイズを登録
-		void SetThreadGroupSize(int x, int y = 1, int z = 1) { threadGroupSize_ = { x, y, z }; }
+		void SetExecuteNum(int executeNum);
 		// @brief CBV/SRV/UAVを登録
 		void SetGPUBuffer(BufferType bufferType, GPUBuffer* buffer);
 		// @brief 複数のCBV/SRV/UAVを登録

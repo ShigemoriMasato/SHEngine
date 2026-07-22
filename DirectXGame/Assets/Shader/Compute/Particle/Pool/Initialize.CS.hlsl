@@ -8,7 +8,7 @@ cbuffer ParticleNum : register(b0)
 };
 
 [numthreads(1024, 1, 1)]
-void main(uint3 DTid : SV_DispatchThreadID)
+void main(uint3 DTid : SV_DispatchThreadID, uint3 GroupId : SV_GroupID)
 {
     uint index = DTid.x;
     if (index >= maxNum)

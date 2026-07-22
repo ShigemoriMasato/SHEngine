@@ -39,7 +39,7 @@ void WaveEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	initialize_->SetGPUBuffers(BufferType::UAV, { freeList, freeListIndex, pool.freeList, pool.freeListIndex, indexList, basePositions });
 	initialize_->SetGPUBuffers(BufferType::CBV, { maxParticleNum });
 	CCC* ccc = engine->GetComputeCommandContext();
-	initialize_->SetThreadGroupSize(kMaxParticleNum_ / 1024 + 1);
+	initialize_->SetExecuteNum(kMaxParticleNum_ / 1024 + 1);
 	initialize_->Execute(ccc);
 
 	emit_ = std::make_unique<SHEngine::ComputeObject>();
@@ -54,7 +54,7 @@ void WaveEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 	update_->SetGPUBuffers(BufferType::UAV, { freeList, freeListIndex, pool.position, pool.color, velocity, currentTime, basePositions, baseColors });
 	update_->SetGPUBuffers(BufferType::SRV, { waveBuffer_, indexList });
 	update_->SetGPUBuffers(BufferType::CBV, { maxParticleNum, pool.deltaTime, lifeTime_, updateData_ });
-	update_->SetThreadGroupSize(kMaxParticleNum_ / 128 + 1);
+	update_->SetExecuteNum(kMaxParticleNum_ / 128 + 1);
 
 	waves_.resize(16);
 }
@@ -66,7 +66,7 @@ void WaveEmitter::Update(CCC* ccc, float deltaTime) {
 	}
 	CopyConfig(deltaTime);
 
-	emit_->SetThreadGroupSize(config_.emitNum / 128 + 1);
+	emit_->SetExecuteNum(config_.emitNum / 128 + 1);
 	emit_->Execute(ccc);
 	update_->Execute(ccc);
 }

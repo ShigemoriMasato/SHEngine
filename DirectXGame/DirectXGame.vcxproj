@@ -265,6 +265,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Render\Buffer\ReadBackBuffer.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Polygon\PolygonEmitter.cpp" />
     <ClCompile Include="Engine\Tool\AnimationModel\SkinningModel.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\Point\PointEmitter.cpp" />
     <ClInclude Include="Engine\Render\DrawData.h" />
     <ClInclude Include="Engine\Tool\AnimationModel\AnimationModel.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
@@ -317,6 +318,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Assets\Fonts\FontLoader.cpp" />
     <ClCompile Include="Engine\Core\ImGuiWrapper.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Base\IEmitter.cpp" />
+    <ClCompile Include="AppSource\Game\ParticleTool\IgnoreBallManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Utility\src\Operator.cpp" />
     <ClCompile Include="Engine\Utility\src\MatrixFactory.cpp" />
@@ -345,6 +347,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\Buffer\ReadBackBuffer.h" />
     <ClInclude Include="AppSource\Game\Effect\Polygon\PolygonEmitter.h" />
     <ClInclude Include="Engine\Tool\AnimationModel\SkinningModel.h" />
+    <ClInclude Include="AppSource\Game\ParticleTool\IgnoreBallManager.h" />
+    <ClInclude Include="AppSource\Game\Effect\Point\PointEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />
@@ -390,17 +394,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Assets\Texture\TextureManager.h" />
     <ClInclude Include="Engine\Assets\Model\ModelLoader.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets" Condition="Exists('..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
