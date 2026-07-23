@@ -2,8 +2,8 @@
 
 cbuffer FadeParameters : register(b1)
 {
-    float3 FadeColor; // フェードカラー
-    float FadeAmount; // フェードの進行度 (0.0 = no fade, 1.0 = full fade)
+    float4 fadeColor; // フェードカラー
+    float t; // フェードの進行度 (0.0 = no fade, 1.0 = full fade)
 }
 
 cbuffer TextureIndex : register(b0)
@@ -17,10 +17,10 @@ SamplerState gSampler : register(s0);
 PixelShaderOutput main(PixelShaderInput input) {
     PixelShaderOutput output;
     // テクスチャから色を取得
-    float4 color = gTexture[textureIndex].Sample(gSampler, input.texcoord);
-    float alpha = color.a;
+    float4 origin = gTexture[textureIndex].Sample(gSampler, input.texcoord);
     
-    output.color = lerp(color, float4(FadeColor, alpha), FadeAmount);
+    float factT = t * fadeColor.a; // フェードの進行度にアルファ値を掛ける
+    output.color = lerp(origin.rgb, fadeColor.rgb, factT);
     
     return output;
 }

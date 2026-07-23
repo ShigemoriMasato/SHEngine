@@ -79,6 +79,7 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, bool copyO
 		createPostEffectObject(PostEffectJob::Outline, "Outline");
 		createPostEffectObject(PostEffectJob::RadialBlur, "RadialBlur");
 		createPostEffectObject(PostEffectJob::Dissolve, "Dissolve");
+		createPostEffectObject(PostEffectJob::Fade, "Fade");
 
 		//PostEffect用Displayの初期化
 		intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();

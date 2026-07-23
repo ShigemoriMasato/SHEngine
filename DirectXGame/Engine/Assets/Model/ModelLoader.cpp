@@ -170,6 +170,12 @@ std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::stri
 		if (ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) {
 			std::string path = texturePath.C_Str();
 			material.textureIndex = textureManager->LoadTexture(directoryPath + "/" + path);
+
+			if (material.textureIndex == textureManager->GetErrorTextureHandle()) {
+				// Assets/Texture/から探す
+				material.textureIndex = textureManager->LoadTexture(path);
+			}
+
 		} else {
 			material.textureIndex = textureManager->GetErrorTextureHandle();
 		}

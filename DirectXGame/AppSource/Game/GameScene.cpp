@@ -117,8 +117,8 @@ GameScene::GameScene() {
 	gameCamera_ = std::make_unique<GameCamera>();
 
 	gameCamera_->Initialize();
-	worldCamera_ = gameCamera_->GetCamera();
 	worldCamera_ = debugCamera_.get();
+	worldCamera_ = gameCamera_->GetCamera();
 }
 
 void GameScene::Initialize() {

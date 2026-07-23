@@ -13,6 +13,7 @@ enum class PostEffectJob : uint32_t {
 	Outline = 1 << 6,
 	RadialBlur = 1 << 7,
 	Dissolve = 1 << 8,
+	Fade = 1 << 9,
 };
 
 uint32_t operator|(PostEffectJob a, PostEffectJob b);

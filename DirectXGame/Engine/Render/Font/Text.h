@@ -14,11 +14,15 @@ namespace SHEngine {
 		void Initialize(const Mesh& plane, const std::string& fontPath, int fontSize = 64, std::string debugName = "");
 
 		void SetText(const std::wstring& text);
+		void SetText(const std::string& text);
 		void SetSize(float size);
 		void SetTransform(const Transform& transform);
 		void SetColor(const Vector4& color);
+		void IsUI(bool isUI) { renderer_->SetDepthStencil(isUI ? PSO::DepthStencilID::UI : PSO::DepthStencilID::Default); }
 		void Update(Matrix4x4 vpMat);
 		void Draw(DCC* direct);
+
+		float GetLength() const;
 
 	private:
 

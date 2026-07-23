@@ -82,7 +82,7 @@ private://Binary保存
 	void Load();
 
 	std::unique_ptr<BinaryManager> binaryManager_ = nullptr;
-	static inline const std::string fileName_ = "TetrisBlockRenderData.sg";
+	static inline const std::string fileName_ = "TetrisBlockRenderData.bin";
 	
 	Vector3 holdBasePosition_ = Vector3(-11.0f, 6.0f, 0.0f);
 	Vector3 nextBasePosition_ = Vector3(11.0f, 6.0f, 0.0f);

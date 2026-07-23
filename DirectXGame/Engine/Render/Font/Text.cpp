@@ -1,4 +1,5 @@
 #include "Text.h"
+#include <Utility/ConvertString.h>
 
 using namespace Matrix;
 
@@ -39,6 +40,10 @@ void SHEngine::Text::SetText(const std::wstring& text) {
 	charPositions_.clear();
 }
 
+void SHEngine::Text::SetText(const std::string& text) {
+	SetText(ConvertString(text));
+}
+
 void SHEngine::Text::SetSize(float size) {
 	charSizeMat_ = MakeScaleMatrix({ size, size, 1.0f });
 }
@@ -58,4 +63,12 @@ void SHEngine::Text::Update(Matrix4x4 vpMat) {
 
 void SHEngine::Text::Draw(DCC* direct) {
 	renderer_->Draw(direct);
+}
+
+float SHEngine::Text::GetLength() const {
+	float length = 0.0f;
+	for (const auto& charPos : charPositions_) {
+		length += charPos.advanceX;
+	}
+	return length;
 }

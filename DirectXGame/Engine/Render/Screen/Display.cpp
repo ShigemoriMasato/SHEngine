@@ -150,6 +150,14 @@ void SHEngine::Screen::Display::DrawImGui() {
 		ImVec2 imageSize = ImVec2(width_ * ratio, height_ * ratio);
 
 		ImGui::Image(ImTextureRef(textureData_[i]->GetSRVHandle().ptr), imageSize);
+
+		if (i == 0) {
+			ImVec2 windowPos = ImGui::GetItemRectMin();
+			imguiWidth_ = imageSize.x;
+			imguiHeight_ = imageSize.y;
+			this->imguiPos_ = { windowPos.x, windowPos.y };
+		}
+
 		ImGui::End();
 	}
 

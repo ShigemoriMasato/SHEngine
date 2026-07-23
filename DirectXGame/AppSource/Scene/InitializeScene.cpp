@@ -42,8 +42,6 @@ void InitializeScene::Initialize() {
 
 	textureManager_->LoadAllTextures();
 
-	fontLoader_->Load("YDWbananaslipplus.otf", 64);
-
 	//KeyManager
 #pragma region 長いので折りたたみ
 	commonData_->keyManager = std::make_unique<KeyManager>();
@@ -128,9 +126,9 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
+	return std::make_unique<TestScene>();
 	return std::make_unique<GameScene>();
 	return std::make_unique<EffectTestScene>();
-	return std::make_unique<TestScene>();
 
 	return nullptr;
 }

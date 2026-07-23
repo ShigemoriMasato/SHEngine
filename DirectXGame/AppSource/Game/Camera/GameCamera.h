@@ -27,7 +27,7 @@ private:
 	std::unique_ptr<Camera> camera_{};
 
 	std::unique_ptr<BinaryManager> binaryManager_ = nullptr;
-	std::string saveFile_ = "GameCamera.sg";
+	std::string saveFile_ = "GameCamera.bin";
 
 	Vector3 position_{};
 	Vector3 rotation_{};

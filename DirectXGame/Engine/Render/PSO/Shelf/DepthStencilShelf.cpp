@@ -50,6 +50,12 @@ DepthStencilShelf::DepthStencilShelf() {
 
 	depthStencilDescs_[int(DepthStencilID::Transparent)] = transparentDesc;
 
+	D3D12_DEPTH_STENCIL_DESC uiDesc{};
+	uiDesc.DepthEnable = false;	//深度バッファを使わない
+
+	uiDesc.StencilEnable = FALSE; // ステンシルテストを使わないなら FALSE
+
+	depthStencilDescs_[int(DepthStencilID::UI)] = uiDesc;
 }
 
 DepthStencilShelf::~DepthStencilShelf() {
