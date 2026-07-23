@@ -8,6 +8,7 @@
 struct CommonData {
 	std::unique_ptr<SHEngine::Screen::SwapChain> window;	// メインウィンドウとスワップチェーンのセット
 	std::unique_ptr<SHEngine::Screen::Display> display = nullptr;	// メインディスプレイ
+	std::unique_ptr<SHEngine::Screen::Display> subDisplay = nullptr;	// サブディスプレイ
 
 	std::unique_ptr<KeyManager> keyManager = nullptr;	// キーマネージャーの共通データ
 	int postEffectDrawDataIndex = -1;

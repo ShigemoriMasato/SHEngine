@@ -22,7 +22,7 @@ void TimeViewer::Add(std::string name, double time) {
 	//なければ新しく作る
 	auto& text = texts_[name];
 	text = std::make_unique<SHEngine::Text>();
-	text->Initialize(planeMesh_, "Assets/Fonts/YDWbananaslipplus.otf", 64, name);
+	text->Initialize(planeMesh_, "Assets/Fonts/ZenOldMincho-Medium.ttf", 64, name);
 	text->SetText(std::format(L"{}: {:.2f} ms", ConvertString(name), time * 1000.0));
 }
 

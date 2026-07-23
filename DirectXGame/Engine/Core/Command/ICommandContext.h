@@ -14,7 +14,7 @@ namespace SHEngine {
 		void BeginFrame();
 
 		/// @brief コマンドを実行して、CmdObjを切り替え。GPUが処理を終えるのを待つためのフェンスを返す
-		Command::WaitFence MiddleExecute();
+		virtual Command::WaitFence MiddleExecute();
 
 		/// @brief コマンドを実行する
 		void EndFrame();

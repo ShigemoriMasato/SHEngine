@@ -52,6 +52,7 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, bool copyO
 	renderer_->SetVertexBuffer(SHEngine::VertexType::Texcoord, vertexUV_.get());
 	renderer_->SetVS("PostEffect/PostEffect.VS.hlsl");
 	renderer_->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
+	renderer_->SetDepthStencil(SHEngine::PSO::DepthStencilID::UI);
 	renderer_->SetUseTexture(true);
 
 	//最後のコピー用に一つ

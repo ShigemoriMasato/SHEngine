@@ -37,6 +37,7 @@ namespace SHEngine {
 
 		void StopGPU() {
 			directCmdContext_->StopGPU();
+			computeCmdContext_->StopGPU();
 		}
 
 		// ImGuiの有効化

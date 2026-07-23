@@ -8,7 +8,7 @@ public:
 
 	struct Config {
 		Vector2 scale = { 1.0f, 1.0f };
-		Vector2 positoin = { 0.0f, 0.0f };
+		Vector2 position = { 0.0f, 0.0f };
 		Vector4 color = { 1.0f, 1.0f, 1.0f };
 		Vector2 putDirection = { -1.0f, 0.0f };
 

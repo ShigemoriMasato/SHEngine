@@ -4,7 +4,7 @@
 #include <Render/PostEffect.h>
 
 enum class FinSceneUI {
-	None,
+	None = -1,
 	Retry,
 	Title,
 
@@ -14,7 +14,9 @@ enum class FinSceneUI {
 class FinScene {
 public:
 
-	FinScene(SHEngine::Engine* engine);
+	FinScene(SHEngine::Engine* engine, SHEngine::Screen::Display* display);
+
+	void PowerOff() { Initialize({}, "", {}); isInitialized_ = false; }
 
 	void Initialize(Vector4 fadeColor, std::string title, Vector4 titleColor);
 	FinSceneUI Update(float deltaTime, Vector2 mousePos);
@@ -46,7 +48,7 @@ private:
 private:
 
 	//
-	static inline std::unique_ptr<SHEngine::Screen::Display> display_ = nullptr;
+	SHEngine::Screen::Display* display_ = nullptr;
 	Camera orthoCamera_ = {};
 
 	SHEngine::Text titleText_ = {};
@@ -54,6 +56,9 @@ private:
 	PostEffect backGround_ = {};
 	PostEffectConfig backGroundConfig_ = {};
 	Fade fade_ = {};
+
+	PostEffect lastCopy_ = {};
+	PostEffectConfig lastCopyConfig_ = {};
 
 	FinSceneUI currentBox_ = FinSceneUI::None;
 	Vector2 prevMousePos_ = {};
@@ -68,6 +73,7 @@ private:
 	Vector2 scale_ = { 1.0f, 1.0f };
 
 	std::vector<Vector4> colorMap_;
+	bool isInitialized_ = false;
 
 
 	std::vector<std::string> textMap_ = { "Retry", "Title" };

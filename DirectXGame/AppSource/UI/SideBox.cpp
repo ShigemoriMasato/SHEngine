@@ -55,7 +55,7 @@ bool SideBox::Update(float deltaTime, Camera* orthoCamera, Vector2 mousePos) {
 
 	t_ = std::clamp(t_, 0.0f, 1.0f);
 
-	Vector2 putedPosition = lerp(config_.positoin, config_.positoin + config_.putDirection * config_.scale * putRatio_, t_);
+	Vector2 putedPosition = lerp(config_.position, config_.position + config_.putDirection * config_.scale * putRatio_, t_);
 	Vector2 textPosition = putedPosition + textPositionOffset_;
 
 	Transform textTransform = {};
@@ -109,7 +109,7 @@ void SideBox::LoadCommon() {
 }
 
 bool SideBox::IsMouseInBox(Vector2 mousePos) const {
-	Vector2 position = lerp(config_.positoin, config_.positoin + config_.putDirection * config_.scale * putRatio_, t_);
+	Vector2 position = lerp(config_.position, config_.position + config_.putDirection * config_.scale * putRatio_, t_);
 	float minX = position.x - config_.scale.x * 0.5f;
 	float maxX = position.x + config_.scale.x * 0.5f;
 	float minY = position.y + config_.scale.y * 0.5f;
@@ -125,7 +125,7 @@ bool SideBox::IsMouseInBox(Vector2 mousePos) const {
 void SideBox::Config::DrawImGui() {
 #ifdef USE_IMGUI
 	ImGui::DragFloat2("Scale", &scale.x, 0.1f);
-	ImGui::DragFloat2("Position", &positoin.x, 0.1f);
+	ImGui::DragFloat2("Position", &position.x, 0.1f);
 	ImGui::ColorEdit4("Color", &color.x);
 	ImGui::DragFloat2("PutDirection", &putDirection.x, 0.1f);
 #endif
@@ -133,14 +133,14 @@ void SideBox::Config::DrawImGui() {
 
 void SideBox::Config::Save(BinaryManager& bin) const {
 	bin.Register(&scale);
-	bin.Register(&positoin);
+	bin.Register(&position);
 	bin.Register(&color);
 	bin.Register(&putDirection);
 }
 
 void SideBox::Config::Load(BinaryManager& bin) {
 	scale = bin.Reverse<Vector2>();
-	positoin = bin.Reverse<Vector2>();
+	position = bin.Reverse<Vector2>();
 	color = bin.Reverse<Vector4>();
 	putDirection = bin.Reverse<Vector2>();
 }

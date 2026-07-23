@@ -125,6 +125,8 @@ void GameScene::Initialize() {
 	keyCoating_ = std::make_unique<KeyCoating>(commonData_->keyManager.get());
 	debugCamera_->Initialize(input_);
 
+	finScene_ = std::make_unique<FinScene>(engine_, commonData_->subDisplay.get());
+
 	effect_.Initialize(engine_);
 
 	waveEmitter_ = std::make_unique<WaveEmitter>(6000000);
@@ -223,9 +225,13 @@ std::unique_ptr<IScene> GameScene::Update() {
 		return std::make_unique<GameScene>();
 	}
 
-	if (tetris_.IsGameOver() && (key.at(Key::HardDrop) || key.at(Key::Hold))) {
-		return std::make_unique<TitleScene>();
+	if ((tetris_.IsGameOver() && !prevIsGameOver_) || key.at(Key::Debug3)) {
+		prevIsGameOver_ = true;
+		finScene_->Initialize({0, 0, 0, 0.5f}, "Game Over", {1, 0, 0, 1});
 	}
+
+	Vector2 mousePos = commonData_->display->GetCursorPos(input_->GetCursorPos());
+	finScene_->Update(deltaTime, mousePos);
 
 	return nullptr;
 }
@@ -254,6 +260,12 @@ void GameScene::Draw() {
 	timeViewer_->Add("FPS", engine_->GetDeltaTime());
 
 	timeViewer_->Draw(directContext_);
+
+	display->ToTexture(directContext_);
+
+	finScene_->DrawReady(directContext_);
+	directContext_->SetRenderTarget(display, false);
+	finScene_->Draw(directContext_);
 
 	display->ToTexture(directContext_);
 

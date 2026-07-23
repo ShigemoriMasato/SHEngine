@@ -5,6 +5,7 @@
 #include <Render/PostEffect.h>
 #include <Game/Camera/GameCamera.h>
 #include <Tool/TimeViewer/TimeViewer.h>
+#include <Game/Fin/FinScene.h>
 
 #include <Game/Effect/Effect.h>
 #include <Game/Effect/Wave/WaveEmitter.h>
@@ -46,6 +47,7 @@ private:
 	std::unique_ptr<KeyCoating> keyCoating_;
 	Tetris tetris_;
 	Effect effect_;
+	std::unique_ptr<FinScene> finScene_;
 
 	PostEffectConfig postEffectConfig_{};
 	PostEffect postEffect_;
@@ -69,4 +71,6 @@ private:
 	IgnoreBallManager ignoreBallManager_ = {};
 
 	std::vector<PolygonEmitter::IgnoreBall> ignoreBalls_ = {};
+
+	bool prevIsGameOver_ = false;
 };

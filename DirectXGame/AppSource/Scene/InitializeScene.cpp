@@ -38,9 +38,18 @@ void InitializeScene::Initialize() {
 	commonData_->display->AddRenderTarget(textureManager_, 0x0000ff);
 	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 
+	commonData_->subDisplay = std::make_unique<SHEngine::Screen::Display>();
+	commonData_->subDisplay->Initialize(1280, 720, "SubWindow");
+	commonData_->subDisplay->CreateDepthTexture(textureManager_);
+	commonData_->subDisplay->AddRenderTarget(textureManager_, 0xff);
+
 	engine_->ImGuiActivate(commonData_->window->GetWindowsAPI());
 
 	textureManager_->LoadAllTextures();
+
+	fontLoader_->Load("851Gkktt_005.ttf");
+	fontLoader_->Load("ZenOldMincho-Medium.ttf");
+
 
 	//KeyManager
 #pragma region 長いので折りたたみ
@@ -126,8 +135,8 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
-	return std::make_unique<TestScene>();
 	return std::make_unique<GameScene>();
+	return std::make_unique<TestScene>();
 	return std::make_unique<EffectTestScene>();
 
 	return nullptr;

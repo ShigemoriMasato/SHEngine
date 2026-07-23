@@ -21,7 +21,6 @@ void Terminal::Run() {
 	}
 
 	engine_->StopGPU();
-	engine_->StopGPU();
 }
 
 bool Terminal::IsLoop() const {

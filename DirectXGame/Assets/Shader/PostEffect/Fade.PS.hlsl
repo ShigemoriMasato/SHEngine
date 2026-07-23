@@ -20,7 +20,8 @@ PixelShaderOutput main(PixelShaderInput input) {
     float4 origin = gTexture[textureIndex].Sample(gSampler, input.texcoord);
     
     float factT = t * fadeColor.a; // フェードの進行度にアルファ値を掛ける
-    output.color = lerp(origin.rgb, fadeColor.rgb, factT);
+    output.color.rgb = lerp(origin.rgb, fadeColor.rgb, factT);
+    output.color.a = 1.0f;
     
     return output;
 }
