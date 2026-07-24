@@ -21,6 +21,8 @@ namespace SHEngine::PSO {
 
 		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> GetSamplers() const;
 
+		void CompileAllShader();
+
 	private:
 
 		/// @brief シェーダー管理

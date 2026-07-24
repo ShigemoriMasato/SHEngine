@@ -6,7 +6,7 @@
 class Effect {
 public:
 
-	void Initialize(SHEngine::Engine* engine);
+	void Initialize(SHEngine::Engine* engine, int particleCount = 50000000);
 
 	void AddEmitter(IEmitter* emitter);
 

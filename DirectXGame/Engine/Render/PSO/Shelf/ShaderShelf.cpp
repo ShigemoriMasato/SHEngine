@@ -27,7 +27,7 @@ void ShaderShelf::CompileAllShader() {
 
 	//shaderNameBufferを削除するためのスコープ
 	{
-		std::vector<std::string> shaderNameBuffer = SearchFiles(basePath_, ".hlsl");
+		std::vector<std::string> shaderNameBuffer = SearchFilePathsAddChild(basePath_, ".hlsl");
 		for (const auto& name : shaderNameBuffer) {
 			shaderNames.push_back(name);
 		}
@@ -52,6 +52,10 @@ void ShaderShelf::CompileAllShader() {
 		//MeshShader
 		else if (sn.find("MS") != std::string::npos) {
 			RegisterShaderByteCode(sn, ShaderType::MESH_SHADER);
+		}
+		//AmplificationShader
+		else if (sn.find("AS") != std::string::npos) {
+			RegisterShaderByteCode(sn, ShaderType::AMPLIFICATION_SHADER);
 		}
 		//これ以降も同じように追加する
 

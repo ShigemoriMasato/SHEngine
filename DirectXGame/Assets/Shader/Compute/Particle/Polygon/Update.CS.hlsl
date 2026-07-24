@@ -14,6 +14,7 @@ struct IgnoreBall
 
 StructuredBuffer<IgnoreBall> ignoreBallList : register(t1);
 StructuredBuffer<float3> basePositions : register(t2);
+StructuredBuffer<float3> velocities : register(t3);
 
 cbuffer MaxParticle : register(b0) {
     uint maxParticleNum;
@@ -54,7 +55,7 @@ void main(uint3 DTid : SV_DispatchThreadID) {
         innnerSpeed = baseDist;
     }
     
-    float3 velocity = baseDir * innnerSpeed;
+    float3 velocity = baseDir * innnerSpeed + velocities[index];
     for (uint i = 0; i < ignoreBallNum; i++)
     {
         float dist = length(ignoreBallList[i].position - pos);

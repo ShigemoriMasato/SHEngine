@@ -28,7 +28,7 @@ void SideBox::Initialize(std::string sentence) {
 	text_ = std::make_unique<SHEngine::Text>();
 	text_->Initialize(planeMesh_, "851Gkktt_005.ttf", 64, "SelectBoxText");
 	text_->SetText(sentence);
-	text_->IsUI(true);
+	text_->SetIsUI(true);
 
 	container_ = std::make_unique<SHEngine::BufferContainer>(2);
 	matrixBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4));
@@ -41,6 +41,7 @@ void SideBox::Initialize(std::string sentence) {
 	backGround_->SetGPUBuffer(colorBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
 	backGround_->SetGPUBuffer(backGroundTexture_.get(), ShaderType::PIXEL_SHADER, BufferType::SRV);
 	backGround_->SetDepthStencil(SHEngine::PSO::DepthStencilID::UI);
+	backGround_->SetBlendState(SHEngine::PSO::BlendStateID::Force);
 }
 
 
@@ -75,7 +76,8 @@ bool SideBox::Update(float deltaTime, Camera* orthoCamera, Vector2 mousePos) {
 
 	bool mouseInBoxTrigger = isMouseInBox && !prevMouseInBox_;
 	prevMouseInBox_ = isMouseInBox;
-	return mouseInBoxTrigger;
+
+	return isMouseInBox;
 }
 
 void SideBox::Draw(DCC* dcc) {
@@ -118,7 +120,7 @@ bool SideBox::IsMouseInBox(Vector2 mousePos) const {
 	bool inX = mousePos.x >= minX && mousePos.x <= maxX;
 	bool inY = mousePos.y >= minY && mousePos.y <= maxY;
 
-	return inX && inY;
+	return (inX && inY) || isSelected_;
 }
 
 

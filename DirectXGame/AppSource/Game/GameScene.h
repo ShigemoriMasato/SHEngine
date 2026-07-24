@@ -45,9 +45,9 @@ private:
 	std::unique_ptr<GameCamera> gameCamera_ = nullptr;
 
 	std::unique_ptr<KeyCoating> keyCoating_;
-	Tetris tetris_;
-	Effect effect_;
-	std::unique_ptr<FinScene> finScene_;
+	Tetris tetris_{};
+	Effect effect_{};
+	std::unique_ptr<FinScene> finScene_{};
 
 	PostEffectConfig postEffectConfig_{};
 	PostEffect postEffect_;

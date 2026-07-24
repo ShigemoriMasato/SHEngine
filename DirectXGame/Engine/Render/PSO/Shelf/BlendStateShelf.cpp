@@ -74,6 +74,18 @@ BlendStateShelf::BlendStateShelf() {
 	D3D12_RENDER_TARGET_BLEND_DESC noneBlend{};
 	noneBlend.BlendEnable = false;
 	blendStates_[int(BlendStateID::None)] = noneBlend;
+
+	//ForceBlend
+	D3D12_RENDER_TARGET_BLEND_DESC forceBlend{};
+	forceBlend.BlendEnable = true;
+	forceBlend.SrcBlend = D3D12_BLEND_ONE;
+	forceBlend.BlendOp = D3D12_BLEND_OP_ADD;
+	forceBlend.DestBlend = D3D12_BLEND_ZERO;
+	forceBlend.SrcBlendAlpha = D3D12_BLEND_ONE;
+	forceBlend.DestBlendAlpha = D3D12_BLEND_ZERO;
+	forceBlend.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	forceBlend.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendStates_[int(BlendStateID::Force)] = forceBlend;
 }
 
 BlendStateShelf::~BlendStateShelf() {

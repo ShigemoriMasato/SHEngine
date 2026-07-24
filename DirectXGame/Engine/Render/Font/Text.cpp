@@ -56,6 +56,11 @@ void SHEngine::Text::SetColor(const Vector4& color) {
 	colorBuffer_->CopyBuffer(&color, sizeof(Vector4));
 }
 
+void SHEngine::Text::SetIsUI(bool isUI) {
+	renderer_->SetDepthStencil(isUI ? PSO::DepthStencilID::UI : PSO::DepthStencilID::Default);
+	renderer_->SetBlendState(isUI ? PSO::BlendStateID::Force : PSO::BlendStateID::Normal);
+}
+
 void SHEngine::Text::Update(Matrix4x4 vpMat) {
 	Matrix4x4 mat[2] = { worldMat_, vpMat };
 	matrixBuffer_->CopyBuffer(mat, sizeof(Matrix4x4) * 2);

@@ -1,15 +1,15 @@
 #include "PostEffect.hlsli"
 
-cbuffer FadeParameters : register(b1)
-{
-    float4 fadeColor; // フェードカラー
-    float t; // フェードの進行度 (0.0 = no fade, 1.0 = full fade)
-}
-
 cbuffer TextureIndex : register(b0)
 {
     int textureIndex; // 使用するテクスチャのインデックス
 };
+
+cbuffer Data : register(b1)
+{
+    float4 fadeColor; // フェードカラー
+    float t; // フェードの進行度 (0.0 = no fade, 1.0 = full fade)
+}
 
 Texture2D<float4> gTexture[] : register(t8);
 SamplerState gSampler : register(s0);

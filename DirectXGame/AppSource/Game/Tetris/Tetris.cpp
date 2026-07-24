@@ -72,12 +72,6 @@ void Tetris::Update(float deltaTime) {
 	}
 
 	blockRender_.Update(deltaTime);
-
-	ImGui::Begin("Score");
-	ImGui::Text("Score: %d", scoreManager_.GetScore());
-	ImGui::Text("Len: %d", scoreManager_.GetLen());
-	ImGui::Text("Level: %d", scoreManager_.GetLevel());
-	ImGui::End();
 }
 
 void Tetris::Draw(DCC* cmdObj) {

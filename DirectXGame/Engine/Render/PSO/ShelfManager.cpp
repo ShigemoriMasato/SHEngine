@@ -56,3 +56,7 @@ D3D_PRIMITIVE_TOPOLOGY SHEngine::PSO::ShelfManager::GetD3Topology(Topology id) c
 std::map<SHEngine::PSO::SamplerID, D3D12_STATIC_SAMPLER_DESC> SHEngine::PSO::ShelfManager::GetSamplers() const { 
 	return rootSignatureShelf_->GetSamplers(); 
 }
+
+void SHEngine::PSO::ShelfManager::CompileAllShader() {
+	shaderShelf_->CompileAllShader();
+}

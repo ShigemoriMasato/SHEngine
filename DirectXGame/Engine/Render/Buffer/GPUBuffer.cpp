@@ -153,6 +153,7 @@ void SHEngine::GPUBuffer::CopyBuffer(const void* data, size_t dataSize) {
 	}
 
 	// 所有を持つバイト配列にコピーして保持する（呼び出し元の寿命に依存しない）
+	nextData_.clear();
 	nextData_.assign(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data) + dataSize);
 }
 

@@ -105,9 +105,11 @@ void IgnoreBallManager::SetPresetFunc(IgnoreBallPreset preset) {
 }
 
 void IgnoreBallManager::DrawImGui() {
+#ifdef USE_IMGUI
 	ImGui::Begin("IgnoreBallManager");
 	for (int i = 0; i < kMaxIgnoreBallNum_; ++i) {
 		ImGui::Text("IgnoreBall %d: Position(%.2f, %.2f, %.2f), Radius: %.2f", i, ignoreBalls_[i].position.x, ignoreBalls_[i].position.y, ignoreBalls_[i].position.z, ignoreBalls_[i].radius);
 	}
 	ImGui::End();
+#endif
 }

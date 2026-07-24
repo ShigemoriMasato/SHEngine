@@ -75,6 +75,10 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	AudioManager::GetInstance()->Initialize();
 	PostEffect::StaticInitialize();
 
+#ifdef SH_RELEASE
+	shelfManager_->CompileAllShader();
+#endif
+
 	fpsObserver_ = std::make_unique<FPSObserver>();
 
 	hInstance_ = hInstance;

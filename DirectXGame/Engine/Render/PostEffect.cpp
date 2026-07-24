@@ -168,3 +168,122 @@ void PostEffect::Draw(const PostEffectConfig& config) {
 
 	output->ToPresent(config.dcc);
 }
+
+void PostEffect::DebugImGui(PostEffectConfig& config, SHEngine::TextureManager* tm, SHEngine::Screen::IDisplay* edgeTexture) {
+#ifdef USE_IMGUI
+	ImGui::Begin("PostEffect");
+	static bool grayScale = false;
+	static bool vignette = false;
+	static bool boxBlur = false;
+	static bool gaussBlur = false;
+	static bool edgeDetection = false;
+	static bool outline = false;
+	static bool radialBlur = false;
+	static bool dissolve = false;
+	static bool fade = false;
+	ImGui::Checkbox("GrayScale", &grayScale);
+	if (grayScale) {
+		static Grayscale config;
+		ImGui::PushID("GrayScale");
+		ImGui::DragFloat("intensity", &config.intensity, 0.01f);
+		ImGui::PopID();
+		CopyBuffer(PostEffectJob::GrayScale, config);
+	}
+	ImGui::Checkbox("Vignette", &vignette);
+	if (vignette) {
+		static Vignette config;
+		ImGui::PushID("Vignette");
+		ImGui::ColorEdit4("Color", &config.color.x);
+		ImGui::DragFloat("Strength", &config.intensity, 0.01f);
+		ImGui::DragFloat("lerpWidth", &config.radius, 0.01f);
+		ImGui::DragFloat("softness", &config.softness, 0.01f);
+		ImGui::PopID();
+		CopyBuffer(PostEffectJob::Vignette, config);
+	}
+	ImGui::Checkbox("BoxBlur", &boxBlur);
+	if (boxBlur) {
+		static Blur config;
+		ImGui::PushID("BoxBlur");
+		ImGui::SliderInt("KernelSize", reinterpret_cast<int*>(&config.kernelSize), 1, 30);
+		ImGui::PopID();
+		CopyBuffer(PostEffectJob::BoxBlur, config);
+	}
+	ImGui::Checkbox("GaussBlur", &gaussBlur);
+	if (gaussBlur) {
+		static GaussBlur config;
+		ImGui::PushID("GaussBlur");
+		ImGui::SliderInt("KernelSize", reinterpret_cast<int*>(&config.kernelSize), 1, 15);
+		ImGui::DragFloat("Sigma", &config.sigma, 0.01f);
+		ImGui::PopID();
+		CopyBuffer(PostEffectJob::GaussBlur, config);
+	}
+	ImGui::Checkbox("EdgeDetection", &edgeDetection);
+	if (edgeDetection) {
+		//データは必要ないため無記入
+	}
+	if (edgeTexture) {
+		ImGui::Checkbox("Outline", &outline);
+		if (outline) {
+			static Outline config;
+			config.edgeTextureIndex = edgeTexture->GetTextureData()->GetHandle();
+			ImGui::PushID("Outline");
+			ImGui::ColorEdit4("Color", &config.color.x);
+			ImGui::DragFloat("Strength", &config.strength, 0.01f);
+			ImGui::PopID();
+			CopyBuffer(PostEffectJob::Outline, config);
+		}
+	}
+	ImGui::Checkbox("RadialBlur", &radialBlur);
+	if (radialBlur) {
+		static RadialBlur config;
+		ImGui::PushID("RadialBlur");
+		ImGui::DragFloat2("Center", &config.center.x, 0.01f);
+		ImGui::DragFloat("Strength", &config.strength, 0.01f);
+		ImGui::DragInt("SampleCount", &config.sampleCount, 1, 1, 10);
+		ImGui::PopID();
+		CopyBuffer(PostEffectJob::RadialBlur, config);
+	}
+	if (tm) {
+		ImGui::Checkbox("Dissolve", &dissolve);
+		if (dissolve) {
+			static std::vector<int> noise = {
+				tm->LoadTexture("Noise0.png"),
+				tm->LoadTexture("Noise1.png")
+			};
+			static Dissolve config;
+			static int noiseIndex = 0;
+			ImGui::PushID("Dissolve");
+			ImGui::SliderInt("NoiseTexture", &noiseIndex, 0, int(noise.size()) - 1);
+			ImGui::SliderFloat("Threshold", &config.threshold, 0.0f, 1.0f);
+			ImGui::DragFloat("EdgeThreshold", &config.edgeThreshold, 0.01f, 0.0f, 1.0f);
+			ImGui::ColorEdit3("EdgeColor", &config.edgeColor.x);
+			ImGui::PopID();
+			config.noiseTextureIndex = noise[noiseIndex];
+			config.transitionTextureIndex = 1;	//トランジションテクスチャのインデックスは1で固定
+			CopyBuffer(PostEffectJob::Dissolve, config);
+		}
+	}
+	ImGui::Checkbox("Fade", &fade);
+	if (fade) {
+		static Fade config;
+		ImGui::PushID("Fade");
+		ImGui::ColorEdit4("Color", &config.color.x);
+		ImGui::DragFloat("intensity", &config.t, 0.01f);
+		ImGui::PopID();
+		CopyBuffer(PostEffectJob::Fade, config);
+	}
+	ImGui::End();
+
+
+	config.jobs_ =
+		uint32_t(grayScale) << 1 |
+		uint32_t(vignette) << 2 |
+		uint32_t(boxBlur) << 3 |
+		uint32_t(gaussBlur) << 4 |
+		uint32_t(edgeDetection) << 5 |
+		uint32_t(outline) << 6 |
+		uint32_t(radialBlur) << 7 |
+		uint32_t(dissolve) << 8 |
+		uint32_t(fade) << 9;
+#endif
+}

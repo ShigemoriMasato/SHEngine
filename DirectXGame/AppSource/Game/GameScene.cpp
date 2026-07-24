@@ -6,107 +6,7 @@
 using namespace SHEngine;
 
 namespace {
-	void PostEffectImGui(PostEffect* postEffect, PostEffectConfig& config, TextureManager* tm, Screen::IDisplay* edgeTexture) {
-		ImGui::Begin("PostEffect");
-		static bool grayScale = false;
-		static bool vignette = false;
-		static bool boxBlur = false;
-		static bool gaussBlur = false;
-		static bool edgeDetection = false;
-		static bool outline = false;
-		static bool radialBlur = false;
-		static bool dissolve = false;
-		ImGui::Checkbox("GrayScale", &grayScale);
-		if (grayScale) {
-			static Grayscale config;
-			ImGui::PushID("GrayScale");
-			ImGui::DragFloat("intensity", &config.intensity, 0.01f);
-			ImGui::PopID();
-			postEffect->CopyBuffer(PostEffectJob::GrayScale, config);
-		}
-		ImGui::Checkbox("Vignette", &vignette);
-		if (vignette) {
-			static Vignette config;
-			ImGui::PushID("Vignette");
-			ImGui::ColorEdit4("Color", &config.color.x);
-			ImGui::DragFloat("Strength", &config.intensity, 0.01f);
-			ImGui::DragFloat("lerpWidth", &config.radius, 0.01f);
-			ImGui::DragFloat("softness", &config.softness, 0.01f);
-			ImGui::PopID();
-			postEffect->CopyBuffer(PostEffectJob::Vignette, config);
-		}
-		ImGui::Checkbox("BoxBlur", &boxBlur);
-		if (boxBlur) {
-			static Blur config;
-			ImGui::PushID("BoxBlur");
-			ImGui::SliderInt("KernelSize", reinterpret_cast<int*>(&config.kernelSize), 1, 30);
-			ImGui::PopID();
-			postEffect->CopyBuffer(PostEffectJob::BoxBlur, config);
-		}
-		ImGui::Checkbox("GaussBlur", &gaussBlur);
-		if (gaussBlur) {
-			static GaussBlur config;
-			ImGui::PushID("GaussBlur");
-			ImGui::SliderInt("KernelSize", reinterpret_cast<int*>(&config.kernelSize), 1, 15);
-			ImGui::DragFloat("Sigma", &config.sigma, 0.01f);
-			ImGui::PopID();
-			postEffect->CopyBuffer(PostEffectJob::GaussBlur, config);
-		}
-		ImGui::Checkbox("EdgeDetection", &edgeDetection);
-		if (edgeDetection) {
-			//データは必要ないため無記入
-		}
-		ImGui::Checkbox("Outline", &outline);
-		if (outline) {
-			static Outline config;
-			config.edgeTextureIndex = edgeTexture->GetTextureData()->GetHandle();
-			ImGui::PushID("Outline");
-			ImGui::ColorEdit4("Color", &config.color.x);
-			ImGui::DragFloat("Strength", &config.strength, 0.01f);
-			ImGui::PopID();
-			postEffect->CopyBuffer(PostEffectJob::Outline, config);
-		}
-		ImGui::Checkbox("RadialBlur", &radialBlur);
-		if (radialBlur) {
-			static RadialBlur config;
-			ImGui::PushID("RadialBlur");
-			ImGui::DragFloat2("Center", &config.center.x, 0.01f);
-			ImGui::DragFloat("Strength", &config.strength, 0.01f);
-			ImGui::DragInt("SampleCount", &config.sampleCount, 1, 1, 10);
-			ImGui::PopID();
-			postEffect->CopyBuffer(PostEffectJob::RadialBlur, config);
-		}
-		ImGui::Checkbox("Dissolve", &dissolve);
-		if (dissolve) {
-			static std::vector<int> noise = {
-				tm->LoadTexture("Noise0.png"),
-				tm->LoadTexture("Noise1.png")
-			};
-			static Dissolve config;
-			static int noiseIndex = 0;
-			ImGui::PushID("Dissolve");
-			ImGui::SliderInt("NoiseTexture", &noiseIndex, 0, int(noise.size()) - 1);
-			ImGui::SliderFloat("Threshold", &config.threshold, 0.0f, 1.0f);
-			ImGui::DragFloat("EdgeThreshold", &config.edgeThreshold, 0.01f, 0.0f, 1.0f);
-			ImGui::ColorEdit3("EdgeColor", &config.edgeColor.x);
-			ImGui::PopID();
-			config.noiseTextureIndex = noise[noiseIndex];
-			config.transitionTextureIndex = 1;	//トランジションテクスチャのインデックスは1で固定
-			postEffect->CopyBuffer(PostEffectJob::Dissolve, config);
-		}
-		ImGui::End();
-
-
-		config.jobs_ =
-			uint32_t(grayScale) << 1 |
-			uint32_t(vignette) << 2 |
-			uint32_t(boxBlur) << 3 |
-			uint32_t(gaussBlur) << 4 |
-			uint32_t(edgeDetection) << 5 |
-			uint32_t(outline) << 6 |
-			uint32_t(radialBlur) << 7 |
-			uint32_t(dissolve) << 8;
-	}
+	
 }
 
 GameScene::GameScene() {
@@ -125,7 +25,8 @@ void GameScene::Initialize() {
 	keyCoating_ = std::make_unique<KeyCoating>(commonData_->keyManager.get());
 	debugCamera_->Initialize(input_);
 
-	finScene_ = std::make_unique<FinScene>(engine_, commonData_->subDisplay.get());
+	finScene_ = std::make_unique<FinScene>(engine_);
+	finScene_->PowerOff();
 
 	effect_.Initialize(engine_);
 
@@ -227,11 +128,21 @@ std::unique_ptr<IScene> GameScene::Update() {
 
 	if ((tetris_.IsGameOver() && !prevIsGameOver_) || key.at(Key::Debug3)) {
 		prevIsGameOver_ = true;
-		finScene_->Initialize({0, 0, 0, 0.5f}, "Game Over", {1, 0, 0, 1});
+		finScene_->Initialize({0, 0, 0, 0.9f}, "Game Over", {1, 0, 0, 1});
 	}
 
 	Vector2 mousePos = commonData_->display->GetCursorPos(input_->GetCursorPos());
-	finScene_->Update(deltaTime, mousePos);
+	auto ans = finScene_->Update(deltaTime, mousePos, key);
+
+	//ゲームオーバー時のUIでの選択肢によって次のシーンを発行する
+	if (key[Key::Correct]) {
+		switch (ans) {
+		case FinSceneUI::Retry:
+			return std::make_unique<GameScene>();
+		case FinSceneUI::Title:
+			return std::make_unique<TitleScene>();
+		}
+	}
 
 	return nullptr;
 }
@@ -261,10 +172,6 @@ void GameScene::Draw() {
 
 	timeViewer_->Draw(directContext_);
 
-	display->ToTexture(directContext_);
-
-	finScene_->DrawReady(directContext_);
-	directContext_->SetRenderTarget(display, false);
 	finScene_->Draw(directContext_);
 
 	display->ToTexture(directContext_);
@@ -293,10 +200,11 @@ void GameScene::Draw() {
 	//ここ以外で記述する場合、ifdefを忘れないようにすること
 #ifdef USE_IMGUI
 	display->DrawImGui();
-	gameCamera_->DrawImGui();
-	ignoreBallManager_.DrawImGui();
+	//gameCamera_->DrawImGui();
+	//ignoreBallManager_.DrawImGui();
 	//tetris_.DrawImGui();
 	//timeViewer_->DrawImGui();
+	finScene_->DrawImGui();
 
 	ImGui::Begin("WaveEmitterConfig");
 	waveEmitterConfig_.DrawImGui();
@@ -392,6 +300,8 @@ void GameScene::Save() {
 	}
 	ellipseConfig_.Save(bin);
 
+	finScene_->Save(bin);
+
 	static const std::string fileName = "GameScene.bin";
 	bin.Write(fileName);
 }
@@ -418,4 +328,6 @@ void GameScene::Load() {
 		ignoreBalls_[i].radius = bin.Reverse<float>();
 	}
 	ellipseConfig_.Load(bin);
+
+	finScene_->Load(bin);
 }

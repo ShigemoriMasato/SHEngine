@@ -2,6 +2,7 @@
 #include <Scene/IScene.h>
 #include <UI/SideBox.h>
 #include <Render/PostEffect.h>
+#include <Common/KeyConfig/KeyManager.h>
 
 enum class FinSceneUI {
 	None = -1,
@@ -14,15 +15,12 @@ enum class FinSceneUI {
 class FinScene {
 public:
 
-	FinScene(SHEngine::Engine* engine, SHEngine::Screen::Display* display);
+	FinScene(SHEngine::Engine* engine);
 
 	void PowerOff() { Initialize({}, "", {}); isInitialized_ = false; }
 
 	void Initialize(Vector4 fadeColor, std::string title, Vector4 titleColor);
-	FinSceneUI Update(float deltaTime, Vector2 mousePos);
-	//内部ディスプレイへ描画
-	void DrawReady(DCC* dcc);
-	//内部ディスプレイを現在のRenderTargetへ描画
+	FinSceneUI Update(float deltaTime, Vector2 mousePos, std::unordered_map<Key, bool> keys);
 	void Draw(DCC* dcc);
 
 	void DrawImGui();
@@ -34,21 +32,16 @@ private:
 
 	void FadeProcess();
 	void UISetup(float deltaTime);
-	void UIUpdate(float deltaTime);
+	void UIUpdate(float deltaTime, Vector2 mousePos, std::unordered_map<Key, bool> keys);
 
 private:
 
 	SHEngine::Engine* engine_ = nullptr;
 
-	float fadeTime_ = 1.0f;
-	float setupTime_ = 0.5f;
-
 	float timer_ = 0.0f;
 
 private:
 
-	//
-	SHEngine::Screen::Display* display_ = nullptr;
 	Camera orthoCamera_ = {};
 
 	SHEngine::Text titleText_ = {};
@@ -57,13 +50,13 @@ private:
 	PostEffectConfig backGroundConfig_ = {};
 	Fade fade_ = {};
 
-	PostEffect lastCopy_ = {};
-	PostEffectConfig lastCopyConfig_ = {};
-
 	FinSceneUI currentBox_ = FinSceneUI::None;
 	Vector2 prevMousePos_ = {};
 
 private:
+
+	float fadeTime_ = 1.0f;
+	float setupTime_ = 0.5f;
 
 	Vector2 titlePos_ = {};
 	Vector2 titleScale_ = {};

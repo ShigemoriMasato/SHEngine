@@ -24,6 +24,7 @@ struct Vignette {
 struct Fade {
 	Vector4 color = { 0.0f, 0.0f, 0.0f, 1.0f };		// フェードカラー
 	float t = 1.0f; 								// フェードの進行度（0.0 - 1.0）
+	Vector3 pad;
 };
 
 struct EdgeDetection {

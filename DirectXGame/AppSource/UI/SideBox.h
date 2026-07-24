@@ -22,7 +22,9 @@ public:
 	static void DrawImGui();
 
 	void Initialize(std::string sentence);
+	void IsSelected(bool isSelected) { isSelected_ = isSelected; }
 	bool Update(float deltaTime, Camera* orthoCamera, Vector2 mousePos);
+	bool IsSelected() const { return isUpdateSelected_; }
 	void Draw(DCC* dcc);
 
 	void SetConfig(const Config& config);
@@ -59,6 +61,9 @@ private:
 
 	float t_ = 0.0f;	//座標変化用
 	bool prevMouseInBox_ = false;
+	bool isSelected_ = false;
+
+	bool isUpdateSelected_ = false;
 
 	Config config_ = {};
 };

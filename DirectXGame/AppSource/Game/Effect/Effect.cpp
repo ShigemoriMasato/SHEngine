@@ -1,6 +1,6 @@
 #include "Effect.h"
 
-void Effect::Initialize(SHEngine::Engine* engine) {
+void Effect::Initialize(SHEngine::Engine* engine, int particleCount) {
 	engine_ = engine;
 	textureManager_ = engine_->GetTextureManager();
 	compute_ = engine_->GetComputeCommandContext();
@@ -8,7 +8,7 @@ void Effect::Initialize(SHEngine::Engine* engine) {
 
 	particlePool_ = std::make_unique<ParticlePool>();
 	// メモリを確保する
-	particlePool_->Initialize(int(50000000), compute_, textureManager_);
+	particlePool_->Initialize(particleCount, compute_, textureManager_);
 
 	compute_->MiddleExecute();
 }

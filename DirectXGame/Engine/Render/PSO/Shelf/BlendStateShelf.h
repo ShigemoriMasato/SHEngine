@@ -16,6 +16,7 @@ namespace SHEngine::PSO {
 		Multiply,   ///< 乗算ブレンド
 		Screen,     ///< スクリーンブレンド
 		None,       ///< ブレンドなし
+		Force,		///< 強制書き込み
 
 		Count       ///< ブレンドモードの総数
 	};

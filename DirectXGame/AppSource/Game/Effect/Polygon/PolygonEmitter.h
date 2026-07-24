@@ -19,10 +19,11 @@ public:
 
 	struct Config {
 		Config(uint32_t inID) : id(inID) {}
-		const uint32_t id;
+		uint32_t id;
 		Transform transform;
 		Vector4 color = {1,1,1,1};
 		uint32_t emitNum = 1;
+		float speed = 1.0f;
 
 		void DrawImGui();
 
@@ -70,6 +71,7 @@ private:
 		SHEngine::GPUBuffer* worldMatrix;
 		SHEngine::GPUBuffer* color;
 		SHEngine::GPUBuffer* emitNum;
+		SHEngine::GPUBuffer* speed;
 		uint32_t emitNumValue;
 	};
 
@@ -83,6 +85,7 @@ private:
 	SHEngine::GPUBuffer* indexList_ = nullptr;
 	SHEngine::GPUBuffer* currentTime_ = nullptr;
 	SHEngine::GPUBuffer* basePosition_ = nullptr;
+	SHEngine::GPUBuffer* velocity_ = nullptr;
 
 	SHEngine::GPUBuffer* lifeTime_ = nullptr;
 	SHEngine::GPUBuffer* seed_ = nullptr;

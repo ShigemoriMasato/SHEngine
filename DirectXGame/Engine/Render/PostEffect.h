@@ -42,6 +42,8 @@ public:
 	void CopyBuffer(PostEffectJob job, const T& data);
 	void Draw(const PostEffectConfig& config);
 
+	void DebugImGui(PostEffectConfig& config, SHEngine::TextureManager* tm, SHEngine::Screen::IDisplay* edgeTexture);
+
 private:
 
 	std::unique_ptr<SHEngine::Screen::Display> intermediateDisplay_ = nullptr;
