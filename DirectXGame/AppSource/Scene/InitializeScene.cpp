@@ -47,7 +47,7 @@ void InitializeScene::Initialize() {
 
 	textureManager_->LoadAllTextures();
 
-	fontLoader_->Load("851Gkktt_005.ttf");
+	fontLoader_->Load("851Gkktt_005.ttf", 128);
 	fontLoader_->Load("ZenOldMincho-Medium.ttf");
 
 
@@ -128,9 +128,11 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::Restart, DIK_ESCAPE, KeyState::Trigger);
 	keyManager->SetButton(Key::Restart, XBoxController::kSelect, KeyState::Trigger);
 
+#ifndef SH_RELEASE
 	keyManager->SetKey(Key::Debug1, DIK_F1, KeyState::Trigger);
 	keyManager->SetKey(Key::Debug2, DIK_F2, KeyState::Trigger);
 	keyManager->SetKey(Key::Debug3, DIK_F3, KeyState::Trigger);
+#endif
 #pragma endregion
 }
 
@@ -140,7 +142,6 @@ std::unique_ptr<IScene> InitializeScene::Update() {
 	return std::make_unique<GameScene>();
 	return std::make_unique<TestScene>();
 	return std::make_unique<EffectTestScene>();
-
 	return nullptr;
 }
 

@@ -21,7 +21,7 @@ void FinScene::Initialize(Vector4 fadeColor, std::string title, Vector4 titleCol
 	const auto planeMesh = engine_->GetModelManager()->GetModelData(SHEngine::TestModel::Plane)->meshes.front();
 	const std::string useFont = "851Gkktt_005.ttf";
 
-	titleText_.Initialize(planeMesh, useFont, 64, "Title");
+	titleText_.Initialize(planeMesh, useFont, 128, "Title");
 	titleText_.SetText(title);
 	titleText_.SetColor(titleColor);
 	titleText_.SetIsUI(true);
@@ -82,6 +82,8 @@ void FinScene::Draw(DCC* dcc) {
 	for (auto& sideBox : sideBoxes_) {
 		sideBox.Draw(dcc);
 	}
+
+	SideBox::DrawImGui();
 }
 
 void FinScene::DrawImGui() {

@@ -26,7 +26,7 @@ void SideBox::DrawImGui() {
 
 void SideBox::Initialize(std::string sentence) {
 	text_ = std::make_unique<SHEngine::Text>();
-	text_->Initialize(planeMesh_, "851Gkktt_005.ttf", 64, "SelectBoxText");
+	text_->Initialize(planeMesh_, "851Gkktt_005.ttf", 128, "SelectBoxText");
 	text_->SetText(sentence);
 	text_->SetIsUI(true);
 
