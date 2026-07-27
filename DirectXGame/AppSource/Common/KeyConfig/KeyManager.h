@@ -35,6 +35,14 @@ enum class Key {
 	Debug2,
 	Debug3,
 
+	// Editor用 -===========
+	Z,
+	Y,
+	Delete,
+	S,
+	R,
+	T,
+
 	Count
 };
 

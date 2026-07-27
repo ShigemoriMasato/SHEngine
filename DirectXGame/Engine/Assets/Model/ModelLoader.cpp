@@ -56,6 +56,7 @@ std::vector<Mesh> ModelLoader::LoadMeshes(const aiScene* scene) {
 		newMesh.color = LoadColors(ai_mesh);
 		newMesh.vertexInfluences = LoadVertexInfluences(ai_mesh);
 		newMesh.indices = LoadIndices(ai_mesh);
+		newMesh.primitives = LoadPrimitives(ai_mesh);
 		meshes.push_back(newMesh);
 	}
 	return meshes;
@@ -76,10 +77,10 @@ std::vector<Vector3> ModelLoader::LoadPositions(const aiMesh* ai_mesh) {
 }
 
 std::vector<Vector3> ModelLoader::LoadNormals(const aiMesh* ai_mesh) {
-	std::vector<Vector3> normals;
+	uint32_t vertexCount = ai_mesh->mNumVertices;
+	std::vector<Vector3> normals(vertexCount, {});
 
-	normals.resize(ai_mesh->mNumVertices);
-	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+	for (uint32_t v = 0; v < vertexCount; ++v) {
 		//法線
 		normals[v].x = ai_mesh->mNormals[v].x;
 		normals[v].y = ai_mesh->mNormals[v].y;
@@ -90,13 +91,13 @@ std::vector<Vector3> ModelLoader::LoadNormals(const aiMesh* ai_mesh) {
 }
 
 std::vector<Vector2> ModelLoader::LoadTexcoords(const aiMesh* ai_mesh) {
-	std::vector<Vector2> texcoords;
+	uint32_t vertexCount = ai_mesh->mNumVertices;
+	std::vector<Vector2> texcoords(vertexCount, {});
 	if (ai_mesh->GetNumUVChannels() == 0) {
 		return texcoords;
 	}
 
-	texcoords.resize(ai_mesh->mNumVertices);
-	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+	for (uint32_t v = 0; v < vertexCount; ++v) {
 		//UV
 		texcoords[v].x = ai_mesh->mTextureCoords[0][v].x;
 		texcoords[v].y = ai_mesh->mTextureCoords[0][v].y;
@@ -106,13 +107,13 @@ std::vector<Vector2> ModelLoader::LoadTexcoords(const aiMesh* ai_mesh) {
 }
 
 std::vector<Vector4> ModelLoader::LoadColors(const aiMesh* ai_mesh) {
-	std::vector<Vector4> colors;
+	uint32_t vertexCount = ai_mesh->mNumVertices;
+	std::vector<Vector4> colors(vertexCount, {});
 	if (ai_mesh->GetNumColorChannels() == 0) {
 		return colors;
 	}
 
-	colors.resize(ai_mesh->mNumVertices);
-	for (uint32_t v = 0; v < ai_mesh->mNumVertices; ++v) {
+	for (uint32_t v = 0; v < vertexCount; ++v) {
 		//色情報
 		colors[v].x = ai_mesh->mColors[0][v].r;
 		colors[v].y = ai_mesh->mColors[0][v].g;
@@ -125,7 +126,7 @@ std::vector<Vector4> ModelLoader::LoadColors(const aiMesh* ai_mesh) {
 
 std::vector<VertexInfluence> ModelLoader::LoadVertexInfluences(const aiMesh* ai_mesh) {
 	std::vector<VertexInfluence> vertexInfluences;
-	vertexInfluences.resize(ai_mesh->mNumVertices);
+	vertexInfluences.resize(ai_mesh->mNumVertices, {});
 
 	for (uint32_t boneIndex = 0; boneIndex < ai_mesh->mNumBones; ++boneIndex) {
 		aiBone* bone = ai_mesh->mBones[boneIndex];
@@ -156,6 +157,21 @@ std::vector<uint32_t> ModelLoader::LoadIndices(const aiMesh* ai_mesh) {
 		}
 	}
 	return indices;
+}
+
+std::vector<Primitive> ModelLoader::LoadPrimitives(const aiMesh* ai_mesh) {
+	std::vector<Primitive> primitives;
+
+	primitives.resize(ai_mesh->mNumFaces);
+	for (uint32_t f = 0; f < ai_mesh->mNumFaces; ++f) {
+		Primitive primitive{};
+		primitive.indexCount = ai_mesh->mFaces[f].mNumIndices;
+		primitive.indexOffset = f * 3;
+		primitive.materialIndex = ai_mesh->mMaterialIndex;
+		primitives[f] = primitive;
+	}
+
+	return primitives;
 }
 
 std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::string directoryPath, TextureManager* textureManager) {

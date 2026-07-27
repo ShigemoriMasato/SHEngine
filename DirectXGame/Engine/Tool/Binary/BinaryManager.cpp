@@ -9,7 +9,13 @@ void BinaryManager::Write(const std::string& fileName) {
 	std::ofstream file(basePath + fileName, std::ios::binary);
 
 	if (!file) {
-		throw std::runtime_error("Failed to open file for writing: " + fileName);
+		fs::create_directories(basePath); // ディレクトリが存在しない場合は作成
+		file.open(basePath + fileName, std::ios::binary); // 再度ファイルを開く
+
+		if (!file) {
+			// 作成に失敗している状態。
+			throw std::runtime_error("Failed to open file for writing: " + basePath + fileName);
+		}
 	}
 
 	file.write(reinterpret_cast<const char*>(&version_), sizeof(version_)); // バージョンを書き込む

@@ -37,12 +37,11 @@ void Decorate::ObjManager::Update(Camera* camera) {
 
 		//Rendererがないときは作成する
 		if (!renderer) {
-			auto ddm = engine_->GetDrawDataManager();
 			auto mm = engine_->GetModelManager();
-			auto modelData = mm->GetModelData(mm->LoadModel(path));
-			auto drawData = ddm->GetDrawData(modelData.drawDataIndex);
-			int textureIndex = modelData.materials[modelData.materialIndex.front()].textureIndex;
-			renderer = std::make_unique<ObjRenderer>(drawData, textureIndex);
+			auto modelData = mm->LoadModel(path);
+
+			renderer = std::make_unique<ModelDrawer>();
+			renderer->Initialize(modelData, path, ModelDrawer::Type::Deco);
 		}
 
 		std::vector<Matrix4x4> transforms;
@@ -53,7 +52,8 @@ void Decorate::ObjManager::Update(Camera* camera) {
 			transforms.push_back(transform.Matrix());
 			ids.push_back(id);
 		}
-		renderer->SetObjInfo(transforms, ids);
+		renderer->SetTransform(transforms);
+		renderer->SetIDs(ids);
 	}
 }
 

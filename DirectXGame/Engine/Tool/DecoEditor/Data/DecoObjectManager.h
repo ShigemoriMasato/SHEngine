@@ -1,7 +1,7 @@
 #pragma once
 #include <SHEngine.h>
-#include "DecoObjectRender.h"
 #include "DecoDataManager.h"
+#include <Tool/ModelDrawer/ModelDrawer.h>
 
 namespace Decorate {
 
@@ -29,7 +29,7 @@ namespace Decorate {
 			std::vector<Matrix4x4> transforms;
 		};
 		std::vector<RenderInfo> renderInfos_;
-		std::unordered_map<std::string, std::unique_ptr<ObjRenderer>> renderers_;
+		std::unordered_map<std::string, std::unique_ptr<ModelDrawer>> renderers_;
 	};
 
 }

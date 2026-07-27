@@ -36,7 +36,7 @@ void InitializeScene::Initialize() {
 	commonData_->display->Initialize(1280, 720, "MainWindow");
 	commonData_->display->CreateDepthTexture(textureManager_);
 	commonData_->display->AddRenderTarget(textureManager_, 0x0000ff);
-	commonData_->display->AddRenderTarget(textureManager_, 0);
+	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 
 	commonData_->subDisplay = std::make_unique<SHEngine::Screen::Display>();
 	commonData_->subDisplay->Initialize(1280, 720, "SubWindow");
@@ -128,6 +128,13 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::Restart, DIK_ESCAPE, KeyState::Trigger);
 	keyManager->SetButton(Key::Restart, XBoxController::kSelect, KeyState::Trigger);
 
+	keyManager->SetKey(Key::Z, DIK_Z, KeyState::Trigger);
+	keyManager->SetKey(Key::Y, DIK_Y, KeyState::Trigger);
+	keyManager->SetKey(Key::Delete, DIK_DELETE, KeyState::Trigger);
+	keyManager->SetKey(Key::S, DIK_S, KeyState::Trigger);
+	keyManager->SetKey(Key::R, DIK_R, KeyState::Trigger);
+	keyManager->SetKey(Key::T, DIK_T, KeyState::Trigger);
+
 #ifndef SH_RELEASE
 	keyManager->SetKey(Key::Debug1, DIK_F1, KeyState::Trigger);
 	keyManager->SetKey(Key::Debug2, DIK_F2, KeyState::Trigger);
@@ -138,9 +145,9 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
+	return std::make_unique<TestScene>();
 	return std::make_unique<TitleScene>();
 	return std::make_unique<GameScene>();
-	return std::make_unique<TestScene>();
 	return std::make_unique<EffectTestScene>();
 	return nullptr;
 }

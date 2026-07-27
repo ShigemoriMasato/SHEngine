@@ -15,6 +15,7 @@ namespace ModelLoader {
 	std::vector<Vector4> LoadColors(const aiMesh* ai_mesh);
 	std::vector<VertexInfluence> LoadVertexInfluences(const aiMesh* ai_mesh);
 	std::vector<uint32_t> LoadIndices(const aiMesh* ai_mesh);
+	std::vector<Primitive> LoadPrimitives(const aiMesh* ai_mesh);
 
 	std::vector<Material> LoadMaterials(const aiScene* scene, std::string directoryPath, SHEngine::TextureManager* textureManager);
 	std::vector<uint32_t> LoadMaterialIndices(const aiMesh* ai_mesh);

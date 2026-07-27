@@ -16,13 +16,15 @@ void TestScene::Initialize() {
 
 	// ===================== 超えられない壁 =================================
 
-	selectBox_.StaticInitialize(engine_);
-	selectBox_.Initialize("Retry");
+	decoEditor_ = std::make_unique<DecoEditor>(engine_, commonData_->display.get());
+
 	Load();
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
 	debugCamera_->Update();
+	commonData_->keyManager->Update();
+	auto key = commonData_->keyManager->GetKeyStates();
 	float deltaTime = engine_->GetDeltaTime();
 
 	grid_->Update(debugCamera_->GetCenter(), debugCamera_->GetVPMatrix());
@@ -30,8 +32,18 @@ std::unique_ptr<IScene> TestScene::Update() {
 	// ===================== 超えられない壁 =================================
 
 	Vector2 mousePos = commonData_->display->GetCursorPos(input_->GetCursorPos());
-	selectBox_.SetConfig(selectBoxConfig_);
-	selectBox_.Update(deltaTime, &orthoCamera_, mousePos);
+
+	decoEditor_->Update(debugCamera_.get(), directContext_);
+
+
+	if (input_->GetKeyState(DIK_LCONTROL)) {
+		if(key[Key::Z]) {
+			decoEditor_->Undo();
+		}
+		if (key[Key::Y]) {
+			decoEditor_->Redo();
+		}
+	}
 
 	return nullptr;
 }
@@ -46,7 +58,7 @@ void TestScene::Draw() {
 	// ↓↓↓ オブジェクト描画 ==============================================
 
 
-	selectBox_.Draw(directContext_);
+	decoEditor_->Draw(directContext_);
 
 
 	// ↑↑↑ オブジェクト描画 ==============================================
@@ -57,21 +69,13 @@ void TestScene::Draw() {
 
 #ifdef USE_IMGUI
 
-	selectBox_.DrawImGui();
-
-	ImGui::Begin("Config");
-	selectBoxConfig_.DrawImGui();
-	ImGui::End();
-
-
 	ImGui::Begin("FPS");
 	float deltaTime = engine_->GetDeltaTime();
 	ImGui::Text("FPS: %f", 1.f / deltaTime);
 	ImGui::End();
 
 #endif
-
-	commonData_->display->DrawImGui();
+	
 	engine_->DrawImGui();
 	window->ToPresent(directContext_);
 }
@@ -79,8 +83,6 @@ void TestScene::Draw() {
 void TestScene::Save() {
 	BinaryManager bin;
 	const std::string fileName = "TestScene_Config.bin";
-
-	selectBoxConfig_.Save(bin);
 
 	bin.Write(fileName);
 }
@@ -93,5 +95,4 @@ void TestScene::Load() {
 		return;
 	}
 
-	selectBoxConfig_.Load(bin);
 }

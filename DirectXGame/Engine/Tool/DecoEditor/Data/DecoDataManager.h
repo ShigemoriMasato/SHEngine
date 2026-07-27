@@ -25,6 +25,7 @@ namespace Decorate {
 		void EraseObject(uint32_t id);
 
 		uint32_t GetCurrentID() const { return currentID_; }
+		std::string GetCurrentPath() const { return currentPath_; }
 		const std::unordered_map<std::string, std::map<int, Transform>>& GetObjectInfos(std::string path) const;
 
 		void Undo();

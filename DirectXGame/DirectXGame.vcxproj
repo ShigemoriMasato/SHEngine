@@ -227,6 +227,11 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoDataManager.cpp" />
+    <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoObjectController.cpp" />
+    <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoObjectManager.cpp" />
+    <ClCompile Include="Engine\Tool\DecoEditor\Data\DecoPathManager.cpp" />
+    <ClCompile Include="Engine\Tool\DecoEditor\DecoEditor.cpp" />
     <ClCompile Include="Engine\Tool\Grid\Grid.cpp" />
     <ClCompile Include="Engine\Tool\Json\JsonManager.cpp" />
     <ClCompile Include="Engine\Utility\src\DirectUtilFuncs.cpp" />
@@ -267,6 +272,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Effect\Polygon\PolygonEmitter.cpp" />
     <ClCompile Include="Engine\Tool\AnimationModel\SkinningModel.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Point\PointEmitter.cpp" />
+    <ClCompile Include="Engine\Tool\ModelDrawer\ModelDrawer.cpp" />
     <ClInclude Include="AppSource\Game\Effect\Ellipse\EllipseEmitter.h" />
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
     <ClInclude Include="Engine\Render\DrawData.h" />
@@ -313,6 +319,11 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Tool\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Assets\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Tool\Binary\Value.h" />
+    <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoDataManager.h" />
+    <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoObjectController.h" />
+    <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoObjectManager.h" />
+    <ClInclude Include="Engine\Tool\DecoEditor\Data\DecoPathManager.h" />
+    <ClInclude Include="Engine\Tool\DecoEditor\DecoEditor.h" />
     <ClInclude Include="Engine\Tool\Grid\Grid.h" />
     <ClInclude Include="Engine\Tool\Json\JsonManager.h" />
     <ClInclude Include="Engine\Tool\Logger\CustomLogSetting.h" />
@@ -355,6 +366,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Game\Effect\Point\PointEmitter.h" />
     <ClInclude Include="AppSource\UI\SideBox.h" />
     <ClInclude Include="AppSource\Game\Fin\FinScene.h" />
+    <ClInclude Include="Engine\Tool\ModelDrawer\ModelDrawer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

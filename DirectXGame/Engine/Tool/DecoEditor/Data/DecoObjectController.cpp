@@ -23,7 +23,7 @@ Decorate::ObjController::ObjController(SHEngine::Screen::Display* display, SHEng
 	idGetter_ = std::make_unique<SHEngine::ComputeObject>();
 	idGetter_->Initialize();
 	idGetter_->SetShader("Deco/GetID.CS.hlsl");
-	idGetter_->SetThreadGroupSize(1, 1, 1);
+	idGetter_->SetExecuteNum(1);
 	idGetter_->SetGPUBuffer(BufferType::CBV, cursorBuffer_);
 	idGetter_->SetGPUBuffer(BufferType::CBV, textureIndexBuffer);
 	idGetter_->SetGPUBuffer(BufferType::UAV, ansBuffer_);
@@ -94,6 +94,7 @@ void Decorate::ObjController::GetIDFromGPU(DCC* dcc) {
 void Decorate::ObjController::EditObject(Camera* camera) {
 	//currentID_が0のときは何もしない
 	if (dataManager_->GetCurrentID() == 0) return;
+	if (dataManager_->GetCurrentPath().empty()) return;
 
 	const Transform& transform = dataManager_->GetCurrentTransform();
 

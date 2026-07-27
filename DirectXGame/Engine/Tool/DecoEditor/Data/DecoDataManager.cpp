@@ -71,9 +71,12 @@ void Decorate::DataManager::AddObject(std::string path, Vector3 position) {
 }
 
 void Decorate::DataManager::EraseObject(uint32_t id) {
-	AddHistory(HistoryType::Erase);
 	Data data{};
 	data.path = GetPathFromID(id);
+	if (data.path.empty()) {
+		return;
+	}
+	AddHistory(HistoryType::Erase);
 	data.id = id;
 	data.transform = transform_.at(data.path).at(data.id);
 
@@ -237,7 +240,9 @@ void Decorate::DataManager::Save() {
 }
 
 void Decorate::DataManager::Load() {
-	transform_.clear();
+	for(auto& [path, infos] : transform_) {
+		infos.clear();
+	}
 	nextID_ = 1;
 
 	BinaryManager binManager;

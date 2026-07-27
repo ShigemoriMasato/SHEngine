@@ -4,6 +4,7 @@
 #include <Tool/Grid/Grid.h>
 #include <Render/MeshRenderer.h>
 #include <UI/SideBox.h>
+#include <Tool/DecoEditor/DecoEditor.h>
 
 class TestScene : public IScene {
 public:
@@ -23,8 +24,5 @@ private:
 	Camera orthoCamera_;
 	std::unique_ptr<Grid> grid_;
 
-	std::unique_ptr<SHEngine::MeshRenderer> meshRenderer_;
-
-	SideBox selectBox_;
-	SideBox::Config selectBoxConfig_ = {};
+	std::unique_ptr<DecoEditor> decoEditor_;
 };
