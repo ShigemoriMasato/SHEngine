@@ -38,7 +38,7 @@ void EffectTestScene::Initialize() {
 	postEffect_->Initialize(textureManager_, true);
 	peConfig_.origin = commonData_->display.get();
 	peConfig_.output = commonData_->window.get();
-	peConfig_.jobs_ = uint32_t(PostEffectJob::None);
+	peConfig_.jobs = uint32_t(PostEffectJob::None);
 	peConfig_.dcc = directContext_;
 
 	timeViewer_ = std::make_unique<TimeViewer>();

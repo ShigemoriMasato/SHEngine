@@ -27,7 +27,7 @@ struct PostEffectConfig {
 	SHEngine::Screen::IDisplay* origin = nullptr;
 	SHEngine::Screen::IDisplay* output = nullptr;	//nullptrの場合はoriginに描画する
 
-	uint32_t jobs_ = 0;
+	uint32_t jobs = 0;
 
 };
 

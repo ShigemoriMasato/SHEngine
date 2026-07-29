@@ -30,7 +30,9 @@ VSOutput main(VSInput input,
 uint instanceID : SV_InstanceID)
 {
     VSOutput output;
-    output.position = mul(float4(input.position, 1.0f), mul(world[instanceID], vp));
+    float4x4 worldMatrix = mul(parents[nodeIndex], world[instanceID]);
+    
+    output.position = mul(float4(input.position, 1.0f), mul(worldMatrix, vp));
     output.texCoord = input.texCoord;
     output.normal = input.normal;
     output.instanceID = instanceID;

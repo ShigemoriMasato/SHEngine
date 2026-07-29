@@ -84,6 +84,8 @@ void Decorate::DataManager::EraseObject(uint32_t id) {
 	historyEraseIndex_++;
 
 	transform_.at(data.path).erase(data.id);
+
+	currentID_ = 0;
 }
 
 const std::unordered_map<std::string, std::map<int, Transform>>& Decorate::DataManager::GetObjectInfos(std::string path) const {
@@ -316,15 +318,4 @@ std::string Decorate::DataManager::GetPathFromID(uint32_t id) const {
 		}
 	}
 	return std::string();
-}
-
-
-
-void Decorate::DataManager::UpdateHistory() {
-	
-}
-
-void Decorate::DataManager::AcceptHistory() {
-	//データ内容が変化していない場合は履歴に追加しない
-	
 }

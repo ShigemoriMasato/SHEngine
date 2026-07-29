@@ -1,4 +1,26 @@
 #include "ModelDrawer.h"
+#include <Utility/Easing.h>
+
+namespace {
+	template <typename T>
+	T EaseAnimationKey(const AnimationCurve<T>& curve, float time) {
+		for (uint32_t i = 0; i < uint32_t(curve.keyframes.size()); ++i) {
+			if (time < curve.keyframes[i].time) {
+				if (i == 0) {
+					assert(false && "アニメーションの時間が0より小さいです。");
+				}
+				auto prevKey = curve.keyframes[i - 1];
+				auto nextKey = curve.keyframes[i];
+				float t = (time - prevKey.time) / (nextKey.time - prevKey.time);
+
+				T value = lerp(prevKey.value, nextKey.value, t);
+				return value;
+			}
+		}
+		assert(false && "アニメーションの時間が範囲外です。");
+		return T();
+	}
+}
 
 void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, Type type) {
 	const auto& meshes = modelData->meshes;
@@ -18,7 +40,7 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 		idBuffer_ = container_.Create(BufferType::SRV, sizeof(uint32_t), kMaxInstanceNum);
 	}
 
-	auto materialBuffer = container_.Create(BufferType::SRV, sizeof(MaterialData), materialNum, BufferNum::Single);
+	materialBuffer_ = container_.Create(BufferType::SRV, sizeof(MaterialData), materialNum, BufferNum::Single);
 
 	std::vector<MaterialData> materialData;
 	materialData.resize(modelData->materials.size());
@@ -29,7 +51,7 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 		materialData[i].textureIndex = modelData->materials[i].textureIndex;
 		materialData[i].normalTexture = modelData->materials[i].normalTexture;
 	}
-	materialBuffer->CopyBuffer(materialData.data(), sizeof(MaterialData) * materialData.size());
+	materialBuffer_->CopyBuffer(materialData.data(), sizeof(MaterialData) * materialData.size());
 
 	for (uint32_t i = 0; i < nodeNum; ++i) {
 		if (modelData->nodes[i].meshIndex == -1) continue;
@@ -52,7 +74,7 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 		renderer->SetPS("Engine/ModelDrawer.PS.hlsl");
 		renderer->SetGPUBuffers({ transformBuffer_, parentMatrixBuffer_ }, ShaderType::VERTEX_SHADER, BufferType::SRV);
 		renderer->SetGPUBuffers({ cameraBuffer_, nodeIndexBuffer }, ShaderType::VERTEX_SHADER, BufferType::CBV);
-		renderer->SetGPUBuffers({ materialBuffer, materialIndexBuffer }, ShaderType::PIXEL_SHADER, BufferType::SRV);
+		renderer->SetGPUBuffers({ materialBuffer_, materialIndexBuffer }, ShaderType::PIXEL_SHADER, BufferType::SRV);
 		renderer->SetUseTexture(true);
 
 		if (type == Type::Deco) {
@@ -61,25 +83,55 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 		}
 	}
 
-	//これを可変にするかどうかはいつかの自分に任せる
-	std::vector<Matrix4x4> parentMatrices(nodeNum, Matrix4x4::Identity());
+	transformMatrices_.resize(nodeNum, Matrix4x4::Identity());
+	localTransforms_.resize(nodeNum);
 	for (uint32_t i = 0; i < nodeNum; ++i) {
 		const auto& node = modelData->nodes[i];
-		Matrix4x4 parent = node.parent != -1 ? parentMatrices[node.parent] : Matrix4x4::Identity();
-		parentMatrices[i] = parent * node.localMatrix;
+		localTransforms_[i].name = node.name;
+		localTransforms_[i].transform.position = node.localTransform.position;
+		localTransforms_[i].transform.rotate= node.localTransform.rotate;
+		localTransforms_[i].transform.scale = node.localTransform.scale;
 	}
-	parentMatrixBuffer_->CopyBuffer(parentMatrices.data(), sizeof(Matrix4x4) * parentMatrices.size());
 }
 
-void ModelDrawer::Update(const Camera* camera) {
+void ModelDrawer::Update(const Camera* camera, float deltaTime) {
 	Matrix4x4 tmp = camera->GetVPMatrix();
 	cameraBuffer_->CopyBuffer(&tmp, sizeof(Matrix4x4));
+
+	animationTimer_ = std::fmod(animationTimer_ + deltaTime, animation_.duration);
+	
+	if (!animation_.nodeAnimations.empty()) {
+		for (auto& easyNode : localTransforms_) {
+			const auto& it = animation_.nodeAnimations.find(easyNode.name);
+			if (it == animation_.nodeAnimations.end()) continue;
+			const auto& nodeAnimation = it->second;
+
+			easyNode.transform.position = EaseAnimationKey(nodeAnimation.position, animationTimer_);
+			easyNode.transform.rotate = EaseAnimationKey(nodeAnimation.rotate, animationTimer_);
+			easyNode.transform.scale = EaseAnimationKey(nodeAnimation.scale, animationTimer_);
+		}
+	}
+
+	for (uint32_t i = 0; i < (uint32_t)localTransforms_.size(); ++i) {
+		transformMatrices_[i] = localTransforms_[i].transform.Matrix();
+	}
+
+	parentMatrixBuffer_->CopyBuffer(transformMatrices_.data(), sizeof(Matrix4x4) * transformMatrices_.size());
 }
 
 void ModelDrawer::Draw(DCC* dcc) {
 	for (const auto& renderer : renderers_) {
 		renderer->Draw(dcc);
 	}
+}
+
+void ModelDrawer::SetMaterial(const std::vector<MaterialData>& materials) {
+	size_t materialSize = materials.size() * sizeof(MaterialData);
+	if(materialSize > materialBuffer_->GetSizeInBytes()) {
+		assert(false && "Material数が最大値を超えています。");
+	}
+
+	materialBuffer_->CopyBuffer(materials.data(), materialSize);
 }
 
 void ModelDrawer::SetTransform(const std::vector<Matrix4x4>& transform) {
@@ -95,6 +147,11 @@ void ModelDrawer::SetTransform(const std::vector<Matrix4x4>& transform) {
 	for (auto& renderer : renderers_) {
 		renderer->instanceNum_ = transformNum;
 	}
+}
+
+void ModelDrawer::SetAnimation(const Animation& animation) {
+	animation_ = animation;
+	animationTimer_ = 0.0f;
 }
 
 void ModelDrawer::SetIDs(const std::vector<uint32_t>& ids) {

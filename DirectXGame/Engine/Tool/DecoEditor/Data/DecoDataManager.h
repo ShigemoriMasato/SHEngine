@@ -79,9 +79,6 @@ namespace Decorate {
 
 		bool editingTransform_ = false;
 
-		void UpdateHistory();
-		void AcceptHistory();
-
 		const uint32_t maxHistorySize_ = 128;
 
 		std::unordered_map<std::string, std::map<int, Transform>> transform_;

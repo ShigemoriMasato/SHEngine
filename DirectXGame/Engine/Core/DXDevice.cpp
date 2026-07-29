@@ -144,7 +144,7 @@ void DXDevice::Initialize() {
 }
 
 IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderType shaderType) {
-	std::wstring profile = compileProfiles_[shaderType];
+	std::wstring& profile = compileProfiles_[shaderType];
 	std::wstring wFilePath = ConvertString(filePath);
     logger_->info("Begin CompileShader, path: {}", filePath);
 
@@ -159,25 +159,25 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
     shaderSourceBuffer.Size = shaderSource->GetBufferSize();
     shaderSourceBuffer.Encoding = DXC_CP_UTF8;//utf8の文字コードであることを通知
 
-#ifdef SH_RELEASE
+#ifdef SH_DEBUG
     LPCWSTR arguments[] = {
         wFilePath.c_str(),	            //コンパイル対象のhlslファイル名
-        L"-E", L"main",                 //エントリーポイントの指定。基本的にmain以外にはしない
+        L"-E", L"main",                 //エントリーポイント
         L"-T", profile.c_str(),         //ShaderProfileの設定
-        L"-Qstrip_debug",               //デバッグ情報を削除する
-        L"-Qstrip_reflect",             //リフレクション情報を削除する
-		L"-O3",                         //最適化レベル3
+        L"-Zi",                         //デバッグ情報を生成する
+        L"-Qembed_debug",               //デバッグ用の情報をDXILに埋め込む
+        L"-Od",                         //最適化を行わない
         L"-Zpr",                        //メモリレイアウトは行優先
         L"-enable-16bit-types"          //16bit型を有効化する
     };
 #else
     LPCWSTR arguments[] = {
         wFilePath.c_str(),	            //コンパイル対象のhlslファイル名
-        L"-E", L"main",                 //エントリーポイントの指定。基本的にmain以外にはしない
+        L"-E", L"main",                 //エントリーポイント
         L"-T", profile.c_str(),         //ShaderProfileの設定
-        L"-Zi",                         //デバッグ情報を生成する
-        L"-Qembed_debug",               //デバッグ用の情報をDXILに埋め込む
-        L"-Od",                         //最適化を行わない
+        L"-Qstrip_debug",               //デバッグ情報を削除する
+        L"-Qstrip_reflect",             //リフレクション情報を削除する
+        L"-O3",                         //最適化レベル3
         L"-Zpr",                        //メモリレイアウトは行優先
         L"-enable-16bit-types"          //16bit型を有効化する
     };

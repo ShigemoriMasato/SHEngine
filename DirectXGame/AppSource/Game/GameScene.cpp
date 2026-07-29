@@ -49,7 +49,7 @@ void GameScene::Initialize() {
 	//PostEffectの初期化
 	postEffect_.Initialize(textureManager_);		//描画だけするやつなのでコピーオンリー
 	postEffectConfig_.origin = commonData_->display.get();
-	postEffectConfig_.jobs_ = uint32_t(PostEffectJob::None);
+	postEffectConfig_.jobs = uint32_t(PostEffectJob::None);
 
 	intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
 	intermediateDisplay_->Initialize(1280, 720, "EdgeDetection");
@@ -59,7 +59,7 @@ void GameScene::Initialize() {
 	edgeDetection_->Initialize(textureManager_);
 	forEdgeDetection_.origin = commonData_->display.get();
 	forEdgeDetection_.output = intermediateDisplay_.get();
-	forEdgeDetection_.jobs_ = uint32_t(PostEffectJob::EdgeDetection);
+	forEdgeDetection_.jobs = uint32_t(PostEffectJob::EdgeDetection);
 
 	timeViewer_ = std::make_unique<TimeViewer>();
 	timeViewer_->Initialize(engine_);

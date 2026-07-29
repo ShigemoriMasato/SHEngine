@@ -50,7 +50,9 @@ namespace SHEngine {
 			return resources_[currentIndex_ % resources_.size()].res.Get();
 		}
 
+		//全体のサイズ
 		size_t GetSizeInBytes() const { return sizeInBytes_; }
+		//1要素のサイズ
 		size_t GetStrideInBytes() const { return strideInBytes_; }
 		uint32_t GetNum() const { return num_; }
 

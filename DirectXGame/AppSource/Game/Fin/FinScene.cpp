@@ -11,7 +11,7 @@ FinScene::FinScene(SHEngine::Engine* engine) {
 	backGround_.Initialize(engine->GetTextureManager());
 
 	backGroundConfig_.dcc = engine->GetDirectCommandContext();
-	backGroundConfig_.jobs_ = static_cast<uint32_t>(PostEffectJob::Fade);
+	backGroundConfig_.jobs = static_cast<uint32_t>(PostEffectJob::Fade);
 
 	orthoCamera_.SetProjectionMatrix(OrthographicDesc());
 	orthoCamera_.MakeMatrix();

@@ -112,7 +112,6 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::Correct, DIK_RETURN, KeyState::Trigger);
 	keyManager->SetKey(Key::Correct, DIK_SPACE, KeyState::Trigger);
 	keyManager->SetKey(Key::Correct, DIK_Z, KeyState::Trigger);
-	keyManager->SetMouse(Key::Correct, 0, KeyState::Trigger);
 	keyManager->SetButton(Key::Correct, XBoxController::kA, KeyState::Trigger);
 
 	keyManager->SetKey(Key::Reverse, DIK_X, KeyState::Trigger);
@@ -135,10 +134,23 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::R, DIK_R, KeyState::Trigger);
 	keyManager->SetKey(Key::T, DIK_T, KeyState::Trigger);
 
+	keyManager->SetKey(Key::One, DIK_1, KeyState::Trigger);
+	keyManager->SetKey(Key::Two, DIK_2, KeyState::Trigger);
+	keyManager->SetKey(Key::Three, DIK_3, KeyState::Trigger);
+	keyManager->SetKey(Key::Four, DIK_4, KeyState::Trigger);
+	keyManager->SetKey(Key::Five, DIK_5, KeyState::Trigger);
+	keyManager->SetKey(Key::Six, DIK_6, KeyState::Trigger);
+	keyManager->SetKey(Key::Seven, DIK_7, KeyState::Trigger);
+	keyManager->SetKey(Key::Eight, DIK_8, KeyState::Trigger);
+	keyManager->SetKey(Key::Nine, DIK_9, KeyState::Trigger);
+	keyManager->SetKey(Key::Zero, DIK_0, KeyState::Trigger);
+
 #ifndef SH_RELEASE
 	keyManager->SetKey(Key::Debug1, DIK_F1, KeyState::Trigger);
 	keyManager->SetKey(Key::Debug2, DIK_F2, KeyState::Trigger);
 	keyManager->SetKey(Key::Debug3, DIK_F3, KeyState::Trigger);
+#else
+	keyManager->SetMouse(Key::Correct, 0, KeyState::Trigger);
 #endif
 #pragma endregion
 }

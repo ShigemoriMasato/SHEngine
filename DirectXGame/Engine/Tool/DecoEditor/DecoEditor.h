@@ -16,6 +16,7 @@ public:
 
 	void Undo() { decoDataManager_->Undo(); }
 	void Redo() { decoDataManager_->Redo(); }
+	void DeleteSelectedObj() { decoDataManager_->EraseObject(decoDataManager_->GetCurrentID()); }
 
 private:
 

@@ -96,7 +96,7 @@ void PostEffect::Initialize(SHEngine::TextureManager* textureManager, bool copyO
 }
 
 void PostEffect::Draw(const PostEffectConfig& config) {
-	uint32_t jobs = config.jobs_;
+	uint32_t jobs = config.jobs;
 	SHEngine::Screen::IDisplay* origin = config.origin;
 	SHEngine::Screen::IDisplay* output = intermediateDisplay_.get();
 	auto dcc = config.dcc;
@@ -275,7 +275,7 @@ void PostEffect::DebugImGui(PostEffectConfig& config, SHEngine::TextureManager* 
 	ImGui::End();
 
 
-	config.jobs_ =
+	config.jobs =
 		uint32_t(grayScale) << 1 |
 		uint32_t(vignette) << 2 |
 		uint32_t(boxBlur) << 3 |

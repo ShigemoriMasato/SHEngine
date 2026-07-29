@@ -17,7 +17,7 @@ void TitleScene::Initialize() {
 	postEffect_.Initialize(textureManager_);
 	peConfig_.origin = commonData_->display.get();
 	peConfig_.dcc = directContext_;
-	peConfig_.jobs_ = uint32_t(PostEffectJob::Fade);
+	peConfig_.jobs = uint32_t(PostEffectJob::Fade);
 	fade_.color = { 0.0f, 0.0f, 0.0f, 1.0f };
 	fade_.t = 0.0f;
 

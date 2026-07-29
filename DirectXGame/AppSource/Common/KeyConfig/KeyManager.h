@@ -43,6 +43,17 @@ enum class Key {
 	R,
 	T,
 
+	One,
+	Two,
+	Three,
+	Four,
+	Five,
+	Six,
+	Seven,
+	Eight,
+	Nine,
+	Zero,
+
 	Count
 };
 
