@@ -273,6 +273,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Tool\AnimationModel\SkinningModel.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Point\PointEmitter.cpp" />
     <ClCompile Include="Engine\Tool\ModelDrawer\ModelDrawer.cpp" />
+    <ClCompile Include="Engine\Tool\ModelDrawer\SkinningProcessor.cpp" />
     <ClInclude Include="AppSource\Game\Effect\Ellipse\EllipseEmitter.h" />
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
     <ClInclude Include="Engine\Render\DrawData.h" />
@@ -367,6 +368,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\UI\SideBox.h" />
     <ClInclude Include="AppSource\Game\Fin\FinScene.h" />
     <ClInclude Include="Engine\Tool\ModelDrawer\ModelDrawer.h" />
+    <ClInclude Include="Engine\Tool\ModelDrawer\SkinningProcessor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

@@ -26,6 +26,8 @@ public:
 
 	void SetMaterial(const std::vector<MaterialData>& materials);
 
+	void SetVertexBuffer(std::vector<SHEngine::GPUBuffer*> position, std::vector<SHEngine::GPUBuffer*> normal);
+
 	void SetTransform(const std::vector<Matrix4x4>& transform);
 	void SetAnimation(const Animation& animation);
 	//Deco専用関数

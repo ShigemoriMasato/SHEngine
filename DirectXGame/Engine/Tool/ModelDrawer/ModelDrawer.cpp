@@ -134,6 +134,13 @@ void ModelDrawer::SetMaterial(const std::vector<MaterialData>& materials) {
 	materialBuffer_->CopyBuffer(materials.data(), materialSize);
 }
 
+void ModelDrawer::SetVertexBuffer(std::vector<SHEngine::GPUBuffer*> position, std::vector<SHEngine::GPUBuffer*> normal) {
+	for (uint32_t i = 0; i < renderers_.size(); ++i) {
+		renderers_[i]->SetVertexBuffer(SHEngine::VertexType::Position, position[i]);
+		renderers_[i]->SetVertexBuffer(SHEngine::VertexType::Normal, normal[i]);
+	}
+}
+
 void ModelDrawer::SetTransform(const std::vector<Matrix4x4>& transform) {
 	uint32_t transformNum = static_cast<uint32_t>(transform.size());
 
