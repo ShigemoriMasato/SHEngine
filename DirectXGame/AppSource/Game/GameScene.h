@@ -52,6 +52,9 @@ private:
 	PostEffectConfig postEffectConfig_{};
 	PostEffect postEffect_;
 
+	PostEffectConfig edgeConfig_{};
+	PostEffect edgeEffect_{};
+
 	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
 
 	std::unique_ptr<SHEngine::Screen::Display> intermediateDisplay_ = nullptr;
@@ -71,6 +74,8 @@ private:
 	IgnoreBallManager ignoreBallManager_ = {};
 
 	std::vector<PolygonEmitter::IgnoreBall> ignoreBalls_ = {};
+
+	Grayscale grayScale_;
 
 	bool prevIsGameOver_ = false;
 };

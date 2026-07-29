@@ -84,6 +84,17 @@ void GameScene::Initialize() {
 	ignoreBallManager_.SetMove(ballFunc1);
 	ignoreBallManager_.SetMove(ballFunc2);
 
+	grayScale_.intensity = 1.0f;
+	postEffect_.CopyBuffer(PostEffectJob::GrayScale, grayScale_);
+	postEffectConfig_.jobs |= uint32_t(PostEffectJob::GrayScale);
+
+	Outline outline;
+	outline.edgeTextureIndex = intermediateDisplay_->GetTextureData()->GetHandle();
+	outline.color = { 1.0f,0.1f,0.1f,1.0f };
+	outline.strength = 0.7f;
+	postEffect_.CopyBuffer(PostEffectJob::Outline, outline);
+	postEffectConfig_.jobs |= uint32_t(PostEffectJob::Outline);
+
 	Load();
 }
 
