@@ -88,7 +88,7 @@ public:
 
 	void SetKey(Key action, uint8_t DIK, KeyState state = KeyState::Release);
 	void SetButton(Key action, XBoxController button, KeyState state);
-	void SetStick(Key action, bool isLightStick, StickDirection direction, float toggleValue, KeyState state);
+	void SetStick(Key action, bool isLeftStick, StickDirection direction, float toggleValue, KeyState state);
 	//0.左クリック 1.右クリック 2.ホイールクリック
 	void SetMouse(Key action, int mouseButton, KeyState state);
 

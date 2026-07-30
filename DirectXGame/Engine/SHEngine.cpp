@@ -125,6 +125,19 @@ void SHEngine::Engine::ImGuiActivate(Screen::WindowsAPI* window) {
 	imGuiWrapper_->NewFrame();
 }
 
+void SHEngine::Engine::EditImGuiIni(std::string fileName) {
+#ifdef USE_IMGUI
+
+	if (!imGuiWrapper_) {
+		return;
+	}
+
+	auto& io = ImGui::GetIO();
+	io.IniFilename = ("Assets/ImGui/" + fileName + ".ini").c_str();
+
+#endif
+}
+
 void SHEngine::Engine::DrawImGui() {
 	if (imGuiWrapper_) {
 		imGuiWrapper_->Render(directCmdContext_->GetCommandList());

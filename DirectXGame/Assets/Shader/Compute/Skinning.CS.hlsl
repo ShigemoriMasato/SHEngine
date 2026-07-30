@@ -28,13 +28,13 @@ StructuredBuffer<float3> positions : register(t2);
 StructuredBuffer<float3> normals : register(t3);
 RWStructuredBuffer<float3> outputPos : register(u0);
 RWStructuredBuffer<float3> outputNorm : register(u1);
-ConstantBuffer<SkinningInformation> skinninfInfo : register(b0);
+ConstantBuffer<SkinningInformation> skinningInfo : register(b0);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint vertexIndex = DTid.x;
-    if (vertexIndex >= skinninfInfo.numVertices)
+    if (vertexIndex >= skinningInfo.numVertices)
     {
         return;
     }

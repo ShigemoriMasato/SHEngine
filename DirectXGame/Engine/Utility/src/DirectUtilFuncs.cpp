@@ -106,7 +106,7 @@ ID3D12Resource* SHEngine::Func::CreateReadBackResource(ID3D12Device* device, siz
 void SHEngine::Func::InsertBarrier(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES stateAfter, D3D12_RESOURCE_STATES& stateBefore, ID3D12Resource* pResource,
 	D3D12_RESOURCE_BARRIER_TYPE type, D3D12_RESOURCE_BARRIER_FLAGS flags) {
 
-	if (stateAfter == stateBefore && stateAfter != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+	if (stateAfter == stateBefore) {
 		// 既に同じ状態ならバリアは不要
 		return;
 	}

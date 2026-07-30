@@ -12,6 +12,7 @@ void SceneManager::Update() {
 	if (nextScene_) {
 		//engine_->StopGPU();
 		engine_->GetTextureManager()->ClearIntermediateResource();
+		engine_->EditImGuiIni("imgui");
 		nextScene_->Ready(engine_, commonData_.get());
 		nextScene_->Initialize();
 		currentScene_ = std::move(nextScene_);

@@ -43,6 +43,9 @@ namespace SHEngine {
 		// ImGuiの有効化
 		void ImGuiActivate(Screen::WindowsAPI* window);
 
+		// ImGuiのconfigを記したファイルの変更
+		void EditImGuiIni(std::string fileName);
+
 		// ImGuiの描画
 		void DrawImGui();
 

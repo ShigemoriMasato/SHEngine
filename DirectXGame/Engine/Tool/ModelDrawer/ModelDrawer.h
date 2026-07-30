@@ -52,7 +52,7 @@ private:
 	Transform transform_;
 
 	SHEngine::BufferContainer container_;
-	std::vector<std::unique_ptr<SHEngine::Renderer>> renderers_;
+	std::vector<std::unique_ptr<SHEngine::Renderer>> renderers_{};
 
 	SHEngine::GPUBuffer* idBuffer_ = nullptr;
 	SHEngine::GPUBuffer* transformBuffer_ = nullptr;

@@ -62,22 +62,22 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::Right, DIK_D, KeyState::Hold);
 	keyManager->SetKey(Key::Right, DIK_RIGHTARROW, KeyState::Hold);
 	keyManager->SetButton(Key::Right, XBoxController::kRight, KeyState::Hold);
-	keyManager->SetStick(Key::Right, false, StickDirection::Right, 0.5f, KeyState::Hold);
+	keyManager->SetStick(Key::Right, true, StickDirection::Right, 0.5f, KeyState::Hold);
 
 	keyManager->SetKey(Key::Left, DIK_A, KeyState::Hold);
 	keyManager->SetKey(Key::Left, DIK_LEFTARROW, KeyState::Hold);
 	keyManager->SetButton(Key::Left, XBoxController::kLeft, KeyState::Hold);
-	keyManager->SetStick(Key::Left, false, StickDirection::Left, 0.5f, KeyState::Hold);
+	keyManager->SetStick(Key::Left, true, StickDirection::Left, 0.5f, KeyState::Hold);
 
 	keyManager->SetKey(Key::Up, DIK_W, KeyState::Hold);
 	keyManager->SetKey(Key::Up, DIK_UPARROW, KeyState::Hold);
 	keyManager->SetButton(Key::Up, XBoxController::kUp, KeyState::Hold);
-	keyManager->SetStick(Key::Up, false, StickDirection::Up, 0.5f, KeyState::Hold);
+	keyManager->SetStick(Key::Up, true, StickDirection::Up, 0.5f, KeyState::Hold);
 
 	keyManager->SetKey(Key::Down, DIK_S, KeyState::Hold);
 	keyManager->SetKey(Key::Down, DIK_DOWNARROW, KeyState::Hold);
 	keyManager->SetButton(Key::Down, XBoxController::kDown, KeyState::Hold);
-	keyManager->SetStick(Key::Down, false, StickDirection::Down, 0.5f, KeyState::Hold);
+	keyManager->SetStick(Key::Down, true, StickDirection::Down, 0.5f, KeyState::Hold);
 
 	//================================================================================
 

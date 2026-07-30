@@ -9,6 +9,12 @@
 #include <Render/Font/Text.h>
 #include <Tool/ModelDrawer/SkinningProcessor.h>
 
+#include <Game/Effect/Effect.h>
+#include <Game/Effect/Wave/WaveEmitter.h>
+#include <Game/Effect/Polygon/PolygonEmitter.h>
+
+#include <Game/ParticleTool/IgnoreBallManager.h>
+
 class TestScene : public IScene {
 public:
 
@@ -27,7 +33,25 @@ private:
 	Camera orthoCamera_;
 	std::unique_ptr<Grid> grid_;
 
+	Effect effect_{};
+
+	std::unique_ptr<WaveEmitter> waveEmitter_ = nullptr;
+	WaveEmitter::Config waveEmitterConfig_ = {};
+	WaveEmitter::WaveData waves_ = {};
+
+	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
+	std::vector<PolygonEmitter::Config> polygonConfigs_ = {};
 
 	ModelDrawer modelDrawer_;
 	SkinningProcessor skinningProcessor_;
+
+	IgnoreBallManager ignoreBallManager_ = {};
+	std::vector<PolygonEmitter::IgnoreBall> ignoreBalls_ = {};
+
+	Transform modelTransform_ = {};
+
+	PostEffect copy_;
+	PostEffectConfig copyConfig_ = {};
+
+	std::vector<std::unique_ptr<ModelDrawer>> modelDrawers_ = {};
 };

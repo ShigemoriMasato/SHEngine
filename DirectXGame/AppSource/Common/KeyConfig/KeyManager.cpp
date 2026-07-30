@@ -140,22 +140,31 @@ void KeyManager::Update() {
 			//Stickの傾き具合	[Pre, Now]
 			std::pair<float, float> stickState;
 
+			Vector2 prevStick, nowStick;
+			if(info.direction == Direction::Left) {
+				prevStick = stickHistory_[stickHistory_.size() - 2].first;
+				nowStick = stickHistory_.back().first;
+			} else {
+				prevStick = stickHistory_[stickHistory_.size() - 2].second;
+				nowStick = stickHistory_.back().second;
+			}
+
 			switch (info.stickDirection) {
 			case StickDirection::Right:
-				stickState.first = stickHistory_[stickHistory_.size() - 2].second.x;
-				stickState.second = stickHistory_.back().second.x;
+				stickState.first = nowStick.x;
+				stickState.second = nowStick.x;
 				break;
 			case StickDirection::Left:
-				stickState.first = -stickHistory_[stickHistory_.size() - 2].second.x;
-				stickState.second = -stickHistory_.back().second.x;
+				stickState.first = -prevStick.x;
+				stickState.second = -nowStick.x;
 				break;
 			case StickDirection::Up:
-				stickState.first = stickHistory_[stickHistory_.size() - 2].second.y;
-				stickState.second = stickHistory_.back().second.y;
+				stickState.first = prevStick.y;
+				stickState.second = nowStick.y;
 				break;
 			case StickDirection::Down:
-				stickState.first = -stickHistory_[stickHistory_.size() - 2].second.y;
-				stickState.second = -stickHistory_.back().second.y;
+				stickState.first = -prevStick.y;
+				stickState.second = -nowStick.y;
 				break;
 			}
 
@@ -239,8 +248,8 @@ void KeyManager::SetButton(Key action, XBoxController button, KeyState state) {
 	buttonMap_[action].emplace_back(button, state);
 }
 
-void KeyManager::SetStick(Key action, bool isRightStick, StickDirection direction, float toggleValue, KeyState state) {
-	Direction dir = isRightStick ? Direction::Left : Direction::Right;
+void KeyManager::SetStick(Key action, bool isLeftStick, StickDirection direction, float toggleValue, KeyState state) {
+	Direction dir = isLeftStick ? Direction::Left : Direction::Right;
 	StickInfo stickInfo = { dir, direction, toggleValue, state };
 	stickMap_[action].emplace_back(stickInfo);
 }
