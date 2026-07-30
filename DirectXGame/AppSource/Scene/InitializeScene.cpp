@@ -157,8 +157,8 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
-	return std::make_unique<TitleScene>();
 	return std::make_unique<TestScene>();
+	return std::make_unique<TitleScene>();
 	return std::make_unique<GameScene>();
 	return std::make_unique<EffectTestScene>();
 	return nullptr;

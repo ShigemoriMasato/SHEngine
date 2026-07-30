@@ -23,6 +23,10 @@ void ModelLoader::CreateNodes(const aiNode* node, std::vector<Node>& nodes, uint
 
 	newNode.parent = parentIndex;
 
+	if (parentIndex != -1) {
+		nodes[parentIndex].children.push_back(nodeIndex);
+	}
+
 	//メッシュ情報登録
 	if (node->mNumMeshes > 0) {
 		//メッシュは1ノードに1つしかない前提
@@ -236,47 +240,75 @@ std::vector<uint32_t> ModelLoader::LoadMaterialIndices(const aiMesh* ai_mesh) {
 
 Skeleton ModelLoader::CreateSkeleton(std::vector<Node>& nodes, const aiScene* scene) {
 	Skeleton skeleton{};
-	std::unordered_map<std::string, int> boneNameToIndex;
+	std::unordered_set<std::string> boneNames;
 
-	if (!scene->HasSkeletons()) {
-		return skeleton;
+	for (uint32_t i = 0; i < scene->mNumMeshes; ++i) {
+		const aiMesh* ai_mesh = scene->mMeshes[i];
+		for (uint32_t boneIndex = 0; boneIndex < ai_mesh->mNumBones; ++boneIndex) {
+			aiBone* ai_bone = ai_mesh->mBones[boneIndex];
+			std::string boneName = ai_bone->mName.C_Str();
+			boneNames.insert(boneName);
+		}
 	}
+	skeleton.joints.reserve(boneNames.size());
+	CreateJoint(nodes, 0, {}, skeleton, boneNames, Matrix4x4::Identity());
 
-	for (int i = 0; i < nodes.size(); ++i) {
-		const Node& node = nodes[i];
-		if (node.meshIndex != -1) {
-			aiMesh* mesh = scene->mMeshes[node.meshIndex];
-			for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
-				aiBone* bone = mesh->mBones[boneIndex];
-				std::string boneName = bone->mName.C_Str();
-
-				const auto& it = boneNameToIndex.find(boneName);
-				if (it == boneNameToIndex.end()) {
-					boneNameToIndex[boneName] = static_cast<int>(skeleton.joints.size());
-					skeleton.joints.push_back(Joint{});
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+		const aiMesh* ai_mesh = scene->mMeshes[meshIndex];
+		for (uint32_t boneIndex = 0; boneIndex < ai_mesh->mNumBones; ++boneIndex) {
+			aiBone* ai_bone = ai_mesh->mBones[boneIndex];
+			std::string boneName = ai_bone->mName.C_Str();
+			int jointIndex = -1;
+			for (uint32_t j = 0; j < skeleton.joints.size(); ++j) {
+				if (skeleton.joints[j].name == boneName) {
+					jointIndex = j;
+					break;
 				}
-
-				auto& joint = skeleton.joints[boneNameToIndex[boneName]];
-				joint.name = boneName;
-
-				aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
-				aiVector3D scale, translate;
-				aiQuaternion rotate;
-				bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
-
-				Matrix4x4 bindPoseMatrix =
-					Matrix::MakeScaleMatrix({ scale.x, scale.y, scale.z }) *
-					Quaternion(rotate.x, rotate.y, rotate.z, rotate.w).ToMatrix() *
-					Matrix::MakeTranslationMatrix({ translate.x, translate.y, translate.z });
-
-				joint.inverseBindMatrix = bindPoseMatrix.Inverse();
-
-				joint.nodeIndex = i;
 			}
+
+			aiMatrix4x4 bindPoseMatrixAssimp = ai_bone->mOffsetMatrix.Inverse();
+			aiVector3D scale, position;
+			aiQuaternion rotate;
+			bindPoseMatrixAssimp.Decompose(scale, rotate, position);
+			Matrix4x4 bindPoseMatrix = Matrix::MakeScaleMatrix({ scale.x, scale.y, scale.z }) *
+				Quaternion{ rotate.x, rotate.y, rotate.z, rotate.w }.ToMatrix() *
+				Matrix::MakeTranslationMatrix({ position.x, position.y, position.z });
+			skeleton.joints[jointIndex].inverseBindMatrix = bindPoseMatrix.Inverse();
 		}
 	}
 
 	return skeleton;
+}
+
+int32_t ModelLoader::CreateJoint(std::vector<Node>& nodes, int current, const std::optional<int32_t>& parent, Skeleton& skeleton, std::unordered_set<std::string>& boneNames, Matrix4x4 parentAccumulated) {
+	Node& node = nodes[current];
+	Matrix4x4 currentAccumulated = parentAccumulated * node.localMatrix;
+
+	auto& joints = skeleton.joints;
+	if (!boneNames.contains(node.name)) {
+		for (const int& childIndex : node.children) {
+			skeleton.rootMatrix = node.localMatrix * skeleton.rootMatrix;
+			CreateJoint(nodes, childIndex, parent, skeleton, boneNames, currentAccumulated);
+		}
+		return -1;
+	}
+
+	int index = static_cast<int>(joints.size());
+	Joint& joint = joints.emplace_back();
+	joint.name = node.name;
+	joint.nodeIndex = current;
+	node.skinIndex = index;
+
+	if (!parent.has_value()) {
+		skeleton.rootNode = current;
+		skeleton.rootMatrix = parentAccumulated;
+	}
+
+	for (const int& child : node.children) {
+		CreateJoint(nodes, child, current, skeleton, boneNames, currentAccumulated);
+	}
+
+	return index;
 }
 
 std::unordered_map<std::string, Animation> ModelLoader::LoadAnimations(const aiScene* scene) {

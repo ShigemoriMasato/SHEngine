@@ -43,13 +43,15 @@ void SHEngine::DrawData::SetIndexBuffer(GPUBuffer* buffer) {
 	indexBuffer_ = buffer;
 }
 
-std::vector<D3D12_VERTEX_BUFFER_VIEW> SHEngine::DrawData::GetVertexBufferView() {
+std::vector<D3D12_VERTEX_BUFFER_VIEW> SHEngine::DrawData::GetVertexBufferView(ID3D12GraphicsCommandList* cmdList) {
 	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbvs{};
 	vbvs.reserve(vertexBuffer_.size());
 	for (auto& buffer : vertexBuffer_) {
 		if (buffer) {
-			buffer->Flush(nullptr);
+			buffer->TransitionBarrier(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			buffer->Flush(cmdList);
 			auto& vbv = vbvs.emplace_back();
+			//CBVとしてではないが、VirtualGPUAddressを取得するためにCBVのハンドルを使う
 			vbv.BufferLocation = buffer->GetGPUDescriptorHandle(BufferType::CBV).ptr;
 			vbv.SizeInBytes = static_cast<UINT>(buffer->GetSizeInBytes());
 			vbv.StrideInBytes = static_cast<UINT>(buffer->GetStrideInBytes());
@@ -58,13 +60,18 @@ std::vector<D3D12_VERTEX_BUFFER_VIEW> SHEngine::DrawData::GetVertexBufferView() 
 	return vbvs;
 }
 
-D3D12_INDEX_BUFFER_VIEW SHEngine::DrawData::GetIndexBufferView() {
+D3D12_INDEX_BUFFER_VIEW SHEngine::DrawData::GetIndexBufferView(ID3D12GraphicsCommandList* cmdList) {
 	D3D12_INDEX_BUFFER_VIEW ibv{};
 	if (indexBuffer_) {
-		indexBuffer_->Flush(nullptr);
+		indexBuffer_->TransitionBarrier(D3D12_RESOURCE_STATE_INDEX_BUFFER);
+		indexBuffer_->Flush(cmdList);
 		ibv.BufferLocation = indexBuffer_->GetGPUDescriptorHandle(BufferType::CBV).ptr;
 		ibv.SizeInBytes = static_cast<UINT>(indexBuffer_->GetSizeInBytes());
 		ibv.Format = DXGI_FORMAT_R32_UINT;
 	}
 	return ibv;
+}
+
+SHEngine::GPUBuffer* SHEngine::DrawData::GetVertexBuffer(VertexType type) const {
+	return vertexBuffer_[uint32_t(type)];
 }

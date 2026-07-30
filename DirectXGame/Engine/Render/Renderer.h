@@ -57,6 +57,8 @@ namespace SHEngine {
 		// @brief 指定された設定を基に描画コマンドを発行する。
 		void Draw(DirectCommandContext* dcc);
 
+		GPUBuffer* GetVertexBuffer(VertexType type) const;
+
 		// インスタンスの数
 		uint32_t instanceNum_ = 1;
 

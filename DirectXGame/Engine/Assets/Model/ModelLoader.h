@@ -22,5 +22,7 @@ namespace ModelLoader {
 
 	Skeleton CreateSkeleton(std::vector<Node>& nodes, const aiScene* scene);
 
+	int32_t CreateJoint(std::vector<Node>& nodes, int current, const std::optional<int32_t>& parent, Skeleton& skeleton, std::unordered_set<std::string>& boneNames, Matrix4x4 parentAccumulated);
+
 	std::unordered_map<std::string, Animation>  LoadAnimations(const aiScene* scene);
 }

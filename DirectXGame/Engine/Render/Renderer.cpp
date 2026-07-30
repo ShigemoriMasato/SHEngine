@@ -69,6 +69,9 @@ SHEngine::Renderer::Renderer(VertexType type) {
 }
 
 void SHEngine::Renderer::SetVertexBuffer(VertexType type, GPUBuffer* gpuBuffer) {
+	if (!gpuBuffer) {
+		return;
+	}
 	vertexBuffers_[uint32_t(type)] = gpuBuffer;
 	drawData_.AddVertexBuffer(type, gpuBuffer);
 	vertexType_ = static_cast<VertexType>(static_cast<uint32_t>(vertexType_) | static_cast<uint32_t>(type));
@@ -136,8 +139,8 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 		psoConfig_.depthStencilID = PSO::DepthStencilID::None;
 	}
 
-	auto vbvs = drawData_.GetVertexBufferView();
-	auto ibv = drawData_.GetIndexBufferView();
+	auto vbvs = drawData_.GetVertexBufferView(cmdList);
+	auto ibv = drawData_.GetIndexBufferView(cmdList);
 
 	psoEditor_->SetPSO(cmdList, psoConfig_);
 
@@ -173,4 +176,8 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 		uavBuffer->TransitionBarrier(D3D12_RESOURCE_STATE_COMMON);
 		uavBuffer->Flush(cmdList);
 	}
+}
+
+SHEngine::GPUBuffer* SHEngine::Renderer::GetVertexBuffer(VertexType type) const {
+	return drawData_.GetVertexBuffer(type);
 }

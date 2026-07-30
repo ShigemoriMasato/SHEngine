@@ -138,6 +138,9 @@ SHEngine::GPUBuffer::GPUBuffer(TextureData* textureData) {
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetGPUDescriptorHandle(BufferType type) const {
+	if (type == BufferType::CBV) {
+		return { resources_[currentIndex_ % resources_.size()].res->GetGPUVirtualAddress() };
+	}
 	auto it = descriptorHandles_.find(type);
 	assert(it != descriptorHandles_.end());
 	uint32_t bufferIndex = currentIndex_ % resources_.size();

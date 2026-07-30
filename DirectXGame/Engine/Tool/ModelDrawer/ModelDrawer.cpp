@@ -6,11 +6,16 @@ namespace {
 	T EaseAnimationKey(const AnimationCurve<T>& curve, float time) {
 		for (uint32_t i = 0; i < uint32_t(curve.keyframes.size()); ++i) {
 			if (time < curve.keyframes[i].time) {
-				if (i == 0) {
-					assert(false && "アニメーションの時間が0より小さいです。");
+				int prevIndex = i - 1;
+				int nextIndex = i;
+
+				if (prevIndex < 0) {
+					prevIndex = int(curve.keyframes.size() - 1);
 				}
-				auto prevKey = curve.keyframes[i - 1];
-				auto nextKey = curve.keyframes[i];
+
+				auto prevKey = curve.keyframes[prevIndex];
+				auto nextKey = curve.keyframes[nextIndex];
+				
 				float t = (time - prevKey.time) / (nextKey.time - prevKey.time);
 
 				T value = lerp(prevKey.value, nextKey.value, t);

@@ -18,9 +18,14 @@ public:
 		int normalTexture = -1;
 	};
 
+	struct EasyNode {
+		std::string name;
+		QuaternionTransform transform;
+	};
+
 	ModelDrawer() = default;
 
-	void Initialize(const ModelData* modelData, std::string debugName, Type type = Type::Normal);
+	void Initialize(const ModelData* modelData, std::string debugName = "NoName", Type type = Type::Normal);
 	void Update(const Camera* camera, float deltaTime = 0.0f);
 	void Draw(DCC* dcc);
 
@@ -32,6 +37,11 @@ public:
 	void SetAnimation(const Animation& animation);
 	//Deco専用関数
 	void SetIDs(const std::vector<uint32_t>& ids);
+
+	SHEngine::Renderer* GetRenderer(uint32_t index) const { return renderers_[index].get(); }
+
+	//Skinning用
+	const EasyNode* GetEasyNode() const { return localTransforms_.data(); }
 
 	//Light実装予定
 
@@ -52,10 +62,6 @@ private:
 
 	std::vector<Matrix4x4> transformMatrices_;
 
-	struct EasyNode {
-		std::string name;
-		QuaternionTransform transform;
-	};
 	std::vector<EasyNode> localTransforms_;
 	Animation animation_;
 	float animationTimer_ = 0.0f;

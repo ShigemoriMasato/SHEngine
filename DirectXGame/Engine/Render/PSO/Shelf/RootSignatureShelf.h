@@ -16,7 +16,7 @@ enum class BufferType : uint8_t {
 	SRV_UAV = 0b110,
 	//CBV_SRV_UAV = 0b111,	使えないやつ
 
-	ReadBack = 0b10000,
+	ReadBack = 0b1000,
 };
 
 uint8_t operator&(uint8_t a, BufferType b);
