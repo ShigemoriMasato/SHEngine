@@ -9,7 +9,7 @@ void SHEngine::Screen::SwapChain::Initialize(TextureManager* textureManager, Dir
     HWND hwnd = window->GetHwnd();
     auto [width, height] = window->GetWindowSize();
 
-	int bufferCount = device_->GetBufferCount();
+	int bufferCount = std::max(2, device_->GetBufferCount());
 
     //スワップチェーンを生成する
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};

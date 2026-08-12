@@ -176,6 +176,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppSource\Game\Effect\Ellipse\EllipseEmitter.cpp" />
+    <ClCompile Include="AppSource\Game\ParticleTool\DeleteLineMeshEffect.cpp" />
     <ClCompile Include="Engine\Render\DrawData.cpp" />
     <ClCompile Include="Engine\Tool\AnimationModel\AnimationModel.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
@@ -276,6 +277,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Tool\ModelDrawer\SkinningProcessor.cpp" />
     <ClInclude Include="AppSource\Game\Effect\Ellipse\EllipseEmitter.h" />
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
+    <ClInclude Include="AppSource\Game\ParticleTool\DeleteLineMeshEffect.h" />
     <ClInclude Include="Engine\Render\DrawData.h" />
     <ClInclude Include="Engine\Tool\AnimationModel\AnimationModel.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
@@ -335,6 +337,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Effect\Base\IEmitter.cpp" />
     <ClCompile Include="AppSource\Game\ParticleTool\IgnoreBallManager.cpp" />
     <ClCompile Include="AppSource\Game\Fin\FinScene.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\IgnorePol\IgnoreBallPolygonEmitter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Utility\src\Operator.cpp" />
     <ClCompile Include="Engine\Utility\src\MatrixFactory.cpp" />
@@ -369,6 +372,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Game\Fin\FinScene.h" />
     <ClInclude Include="Engine\Tool\ModelDrawer\ModelDrawer.h" />
     <ClInclude Include="Engine\Tool\ModelDrawer\SkinningProcessor.h" />
+    <ClInclude Include="AppSource\Game\Effect\IgnorePol\IgnoreBallPolygonEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

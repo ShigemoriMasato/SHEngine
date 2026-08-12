@@ -28,6 +28,11 @@ public:
 
 	bool GetIsEffecting() const { return isDeleting_; }
 
+	std::vector<Transform> DeleteLinesTransform() const;
+
+	Vector3 BoxSize() const { return Vector3(1.0f, 1.0f, 1.0f); };
+	Vector3 GetLowerLeftPos() const { return lowerLeftPos_; }
+
 private:
 
 	void SetBlock(int x, int y, int configIndex);
@@ -44,7 +49,7 @@ private:
 		Matrix4x4 wvp = Matrix4x4::Identity();
 	};
 	struct MaterialData {
-		Vector3 color = { 1.0f, 1.0f, 1.0f };
+		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		float intensity = 0.0f;
 		uint32_t colorID;
 	};
@@ -68,6 +73,8 @@ private:
 	//表示するフィールドサイズ
 	uint32_t fieldWidth_ = 0;
 	uint32_t fieldHeight_ = 0;
+
+	Vector3 lowerLeftPos_;
 
 private://DeleteEffect
 

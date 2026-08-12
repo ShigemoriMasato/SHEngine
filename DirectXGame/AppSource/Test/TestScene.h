@@ -45,9 +45,6 @@ private:
 	ModelDrawer modelDrawer_;
 	SkinningProcessor skinningProcessor_;
 
-	IgnoreBallManager ignoreBallManager_ = {};
-	std::vector<PolygonEmitter::IgnoreBall> ignoreBalls_ = {};
-
 	Transform modelTransform_ = {};
 
 	PostEffect copy_;

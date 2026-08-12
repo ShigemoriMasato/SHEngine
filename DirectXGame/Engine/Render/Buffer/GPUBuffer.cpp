@@ -7,6 +7,8 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint
 	strideInBytes_ = strideInBytes;
 	num_ = num;
 
+	bufferType_ = uint8_t(bufferType);
+
 	auto HasBuffer = [&](BufferType t) noexcept -> bool {
 		return (bufferType_ & static_cast<uint8_t>(t)) != 0u;
 		};

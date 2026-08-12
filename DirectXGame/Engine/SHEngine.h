@@ -81,6 +81,8 @@ namespace SHEngine {
 		std::unique_ptr<Input> input_;
 		std::unique_ptr<FPSObserver> fpsObserver_;
 
+		std::string imguiIniFilePath_ = "Assets/ImGui/imgui.ini";
+
 	private: // その他系
 		HINSTANCE hInstance_;
 		MSG msg_{};

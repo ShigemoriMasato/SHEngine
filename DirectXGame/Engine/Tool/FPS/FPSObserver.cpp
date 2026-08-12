@@ -61,6 +61,8 @@ void FPSObserver::TimeAdjustment(FPSType type) {
     double frameTime = static_cast<double>(timeEnd.QuadPart - timeStart.QuadPart) /
         static_cast<double>(timeFreq.QuadPart);
 
+	cpuTime_ = static_cast<float>(frameTime);
+
     if (isFix_[int(type)]) {
 
         // 目標フレーム時間まで待機

@@ -50,20 +50,6 @@ void TestScene::Initialize() {
 	}
 
 	{
-		ignoreBallManager_.Initialize();
-
-		ignoreBalls_.resize(2);
-		auto ballFunc1 = [this](float deltaTime, bool& destroyMe) -> PolygonEmitter::IgnoreBall {
-			return ignoreBalls_[0];
-			};
-		auto ballFunc2 = [this](float deltaTime, bool& destroyMe) -> PolygonEmitter::IgnoreBall {
-			return ignoreBalls_[1];
-			};
-		ignoreBallManager_.SetMove(ballFunc1);
-		ignoreBallManager_.SetMove(ballFunc2);
-	}
-
-	{
 		std::vector<std::string> testModels = { "TestModel/MultiMaterial", "TestModel/MultiMesh" };
 
 		for (uint32_t i = 0; i < int(testModels.size()); ++i) {
@@ -119,9 +105,6 @@ std::unique_ptr<IScene> TestScene::Update() {
 	for (const auto& config : polygonConfigs_) {
 		polygonEmitter_->SetConfig(config);
 	}
-
-	ignoreBallManager_.Update(deltaTime);
-	polygonEmitter_->SetIgnoreBalls(ignoreBallManager_.GetIgnoreBalls());
 
 	effect_.Update(debugCamera_.get(), deltaTime);
 

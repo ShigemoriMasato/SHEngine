@@ -17,8 +17,8 @@ GameScene::GameScene() {
 	gameCamera_ = std::make_unique<GameCamera>();
 
 	gameCamera_->Initialize();
-	worldCamera_ = debugCamera_.get();
 	worldCamera_ = gameCamera_->GetCamera();
+	worldCamera_ = debugCamera_.get();
 }
 
 void GameScene::Initialize() {
@@ -38,6 +38,9 @@ void GameScene::Initialize() {
 
 	ellipseEmitter_ = std::make_unique<EllipseEmitter>();
 	effect_.AddEmitter(ellipseEmitter_.get());
+
+	ignoreBallEmitter_ = std::make_unique<IgnoreBallPolygonEmitter>();
+	effect_.AddEmitter(ignoreBallEmitter_.get());
 
 	computeContext_->MiddleExecute();
 
@@ -67,22 +70,15 @@ void GameScene::Initialize() {
 	waveEmitterConfig_.textureID = textureManager_->LoadTexture("MagicCircle.png");
 
 	model = modelManager_->LoadModel("Pyramid");
-	auto config = polygonEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
+	auto config = ignoreBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
 	polygonConfigs_.push_back(config);
-	auto config2 = polygonEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
+	auto config2 = ignoreBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
 	polygonConfigs_.push_back(config2);
 
 	ignoreBallManager_.Initialize();
 
-	ignoreBalls_.resize(2);
-	auto ballFunc1 = [this](float deltaTime, bool& destroyMe) -> PolygonEmitter::IgnoreBall {
-		return ignoreBalls_[0];
-		};
-	auto ballFunc2 = [this](float deltaTime, bool& destroyMe) -> PolygonEmitter::IgnoreBall {
-		return ignoreBalls_[1];
-		};
-	ignoreBallManager_.SetMove(ballFunc1);
-	ignoreBallManager_.SetMove(ballFunc2);
+	model = modelManager_->GetModelData(SHEngine::TestModel::Plane);
+	deleteLineMeshEffect_.Initialize(&tetris_, polygonEmitter_.get(), model->meshes.front());
 
 	Load();
 }
@@ -91,14 +87,17 @@ std::unique_ptr<IScene> GameScene::Update() {
 	float deltaTime = engine_->GetFPSObserver()->GetDeltatime();
 	keyCoating_->Update(deltaTime);
 	auto key = keyCoating_->GetKeyStates();
+	Vector2 mousePos = commonData_->display->GetCursorPos(input_->GetCursorPos());
 
 	waveEmitter_->SetConfig(waveEmitterConfig_);
 	for (const auto& config : polygonConfigs_) {
-		polygonEmitter_->SetConfig(config);
+		ignoreBallEmitter_->SetConfig(config);
 	}
 
+	deleteLineMeshEffect_.Update(deltaTime);
+
 	ignoreBallManager_.Update(deltaTime);
-	polygonEmitter_->SetIgnoreBalls(ignoreBallManager_.GetIgnoreBalls());
+	ignoreBallEmitter_->SetIgnoreBalls(ignoreBallManager_.GetIgnoreBalls());
 
 	computeContext_->BeginTimeStamp("Particle Update");
 	effect_.Update(worldCamera_, deltaTime);
@@ -131,8 +130,8 @@ std::unique_ptr<IScene> GameScene::Update() {
 		finScene_->Initialize({0, 0, 0, 0.9f}, "Game Over", {1, 0, 0, 1});
 	}
 
-	Vector2 mousePos = commonData_->display->GetCursorPos(input_->GetCursorPos());
-	auto ans = finScene_->Update(deltaTime, mousePos, key);
+	FinSceneUI ans = FinSceneUI::None;
+	//ans = finScene_->Update(deltaTime, mousePos, key);
 
 	//ゲームオーバー時のUIでの選択肢によって次のシーンを発行する
 	if (key[Key::Correct]) {
@@ -168,7 +167,8 @@ void GameScene::Draw() {
 
 	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
 	timeViewer_->Add("Particle Draw", engine_->GetDirectCommandContext()->GetTimeStampResult("Particle Draw"));
-	timeViewer_->Add("FPS", engine_->GetDeltaTime());
+	timeViewer_->Add("CPUTime", (double)engine_->GetFPSObserver()->GetCPUTime());
+	timeViewer_->Add("DeltaTime", engine_->GetDeltaTime());
 
 	timeViewer_->Draw(directContext_);
 
@@ -204,20 +204,11 @@ void GameScene::Draw() {
 	//ignoreBallManager_.DrawImGui();
 	//tetris_.DrawImGui();
 	//timeViewer_->DrawImGui();
-	finScene_->DrawImGui();
+	//finScene_->DrawImGui();
+	deleteLineMeshEffect_.DrawImGui();
 
 	ImGui::Begin("WaveEmitterConfig");
 	waveEmitterConfig_.DrawImGui();
-	ImGui::End();
-
-	ImGui::Begin("IgnoreBall");
-	for (int i = 0; i < ignoreBalls_.size(); ++i) {
-		ImGui::PushID(i);
-		ImGui::DragFloat3("Position", &ignoreBalls_[i].position.x, 0.01f);
-		ImGui::DragFloat("Radius", &ignoreBalls_[i].radius, 0.01f);
-		ImGui::PopID();
-		ImGui::Separator();
-	}
 	ImGui::End();
 
 	ImGui::Begin("EllipseEmitter");
@@ -292,15 +283,11 @@ void GameScene::Save() {
 	for (auto& polygonConfig : polygonConfigs_) {
 		polygonConfig.Save(bin);
 	}
-	uint32_t ignoreBallSize = static_cast<uint32_t>(ignoreBalls_.size());
-	bin.Register(&ignoreBallSize);
-	for (auto& ignoreBall : ignoreBalls_) {
-		bin.Register(&ignoreBall.position);
-		bin.Register(&ignoreBall.radius);
-	}
 	ellipseConfig_.Save(bin);
 
 	finScene_->Save(bin);
+
+	deleteLineMeshEffect_.Save(bin);
 
 	static const std::string fileName = "GameScene.bin";
 	bin.Write(fileName);
@@ -322,12 +309,13 @@ void GameScene::Load() {
 		polygonConfigs_[i].Load(bin);
 	}
 	uint32_t ignoreBallSize = bin.Reverse<uint32_t>();
-	ignoreBalls_.resize(ignoreBallSize);
 	for (uint32_t i = 0; i < ignoreBallSize; ++i) {
-		ignoreBalls_[i].position = bin.Reverse<Vector3>();
-		ignoreBalls_[i].radius = bin.Reverse<float>();
+		auto ignoreBall = IgnoreBallPolygonEmitter::IgnoreBall();
+		ignoreBall.position = bin.Reverse<Vector3>();
+		ignoreBall.radius = bin.Reverse<float>();
 	}
 	ellipseConfig_.Load(bin);
 
 	finScene_->Load(bin);
+	deleteLineMeshEffect_.Load(bin);
 }

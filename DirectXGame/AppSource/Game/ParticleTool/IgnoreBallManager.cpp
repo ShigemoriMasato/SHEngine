@@ -15,7 +15,7 @@ void IgnoreBallManager::Initialize() {
 
 	presetFuncs_[static_cast<size_t>(IgnoreBallPreset::None)] = [](float deltaTime, bool& destroyMe) {
 		destroyMe = false;
-		PolygonEmitter::IgnoreBall ball;
+		IgnoreBallPolygonEmitter::IgnoreBall ball;
 		ball.position = kInitialPosition;
 		ball.radius = kRadius;
 		return ball;
@@ -23,7 +23,7 @@ void IgnoreBallManager::Initialize() {
 
 	presetFuncs_[static_cast<size_t>(IgnoreBallPreset::Round)] = [](float deltaTime, bool& destroyMe) {
 		destroyMe = false;
-		PolygonEmitter::IgnoreBall ball;
+		IgnoreBallPolygonEmitter::IgnoreBall ball;
 		static float angle = 0.0f;
 		angle = std::fmod(angle + deltaTime, 2.0f * std::numbers::pi_v<float>);
 		const float roundRadius = 28.0f;
@@ -34,7 +34,7 @@ void IgnoreBallManager::Initialize() {
 
 	presetFuncs_[static_cast<size_t>(IgnoreBallPreset::Scale)] = [](float deltaTime, bool& destroyMe) {
 		destroyMe = false;
-		PolygonEmitter::IgnoreBall ball;
+		IgnoreBallPolygonEmitter::IgnoreBall ball;
 		static float timer = 0.0f;
 		const float cycleTime = 4.0f;
 		timer = std::fmod(timer + deltaTime, cycleTime);
@@ -63,7 +63,7 @@ void IgnoreBallManager::Initialize() {
 			timer = 0.0f;
 		}
 
-		PolygonEmitter::IgnoreBall ball;
+		IgnoreBallPolygonEmitter::IgnoreBall ball;
 		ball.position = kInitialPosition;
 		ball.radius = lerp(1000.0f, 0.0f, t, EaseType::EaseInQuad);
 
@@ -84,7 +84,7 @@ void IgnoreBallManager::Update(float deltaTime) {
 	}
 }
 
-uint32_t IgnoreBallManager::SetMove(std::function<PolygonEmitter::IgnoreBall(float deltaTime, bool& destroyMe)> moveFunc) {
+uint32_t IgnoreBallManager::SetMove(std::function<IgnoreBallPolygonEmitter::IgnoreBall(float deltaTime, bool& destroyMe)> moveFunc) {
 	for (uint32_t i = 0; i < kMaxIgnoreBallNum_; ++i) {
 		if (!moveFuncs_[i]) {
 			moveFuncs_[i] = moveFunc;

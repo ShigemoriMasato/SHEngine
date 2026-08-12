@@ -21,6 +21,12 @@ public:
 	bool IsGameOver() const { return gameOver_; }
 	int IsLineDeleted() const { return deletedLine_; }
 
+	std::vector<Transform> DeleteLinesTransform() const;
+	std::vector<int> FillLineIndex() const { return fillLines_; }
+	Vector3 BoxSize() const { return blockRender_.BoxSize(); }
+	Vector3 GetLowerLeftPos() const { return blockRender_.GetLowerLeftPos(); }
+	Vector2 GetFieldSize() const { return { float(fieldWidth_), float(fieldHeight_) }; }
+
 private://定数
 
 	const int fieldWidth_ = 10;
@@ -47,5 +53,6 @@ private:
 	bool gameOver_ = false;
 	int deletedLine_ = 0;
 
+	std::vector<int> fillLines_ = {};
 };
 

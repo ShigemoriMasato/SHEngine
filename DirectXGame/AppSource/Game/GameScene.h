@@ -13,6 +13,7 @@
 #include <Game/Effect/Ellipse/EllipseEmitter.h>
 
 #include <Game/ParticleTool/IgnoreBallManager.h>
+#include <Game/ParticleTool/DeleteLineMeshEffect.h>
 
 enum class WaveType {
 	Test,
@@ -61,6 +62,12 @@ private:
 	std::unique_ptr<PostEffect> edgeDetection_ = nullptr;
 	PostEffectConfig forEdgeDetection_{};
 
+	Grayscale grayScale_;
+
+	bool prevIsGameOver_ = false;
+
+	// ==========================
+
 	std::unique_ptr<WaveEmitter> waveEmitter_ = nullptr;
 	WaveEmitter::Config waveEmitterConfig_ = {};
 	std::array<WaveEmitter::WaveData, size_t(WaveType::Count)> waves_ = {};
@@ -71,11 +78,9 @@ private:
 	std::unique_ptr<EllipseEmitter> ellipseEmitter_ = nullptr;
 	EllipseEmitter::Config ellipseConfig_ = {};
 
+	std::unique_ptr<IgnoreBallPolygonEmitter> ignoreBallEmitter_ = nullptr;
+
 	IgnoreBallManager ignoreBallManager_ = {};
 
-	std::vector<PolygonEmitter::IgnoreBall> ignoreBalls_ = {};
-
-	Grayscale grayScale_;
-
-	bool prevIsGameOver_ = false;
+	DeleteLineMeshEffect deleteLineMeshEffect_;
 };

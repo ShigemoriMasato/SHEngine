@@ -1,7 +1,6 @@
 #include "DXDevice.h"
 #include <Utility/ConvertString.h>
 #include <format>
-#include <Utility/ConvertString.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")

@@ -97,10 +97,10 @@ bool Engine::IsLoop() {
 }
 
 void Engine::BeginFrame() {
+	fpsObserver_->TimeAdjustment();
 	directCmdContext_->BeginFrame();
 	computeCmdContext_->BeginFrame();
 	input_->Update();
-	fpsObserver_->TimeAdjustment();
 	psoEditor_->FrameInitialize();
 	AudioManager::GetInstance()->Update();
 	BufferContainer::EraseListUpdate();
@@ -133,7 +133,8 @@ void SHEngine::Engine::EditImGuiIni(std::string fileName) {
 	}
 
 	auto& io = ImGui::GetIO();
-	io.IniFilename = ("Assets/ImGui/" + fileName + ".ini").c_str();
+	imguiIniFilePath_ = ("Assets/ImGui/" + fileName + ".ini");
+	io.IniFilename = imguiIniFilePath_.c_str();
 
 #endif
 }

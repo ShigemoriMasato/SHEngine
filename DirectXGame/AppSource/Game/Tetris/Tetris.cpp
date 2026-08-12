@@ -59,11 +59,11 @@ void Tetris::Update(float deltaTime) {
 		}
 		blockRender_.SetNextMino(nextPos, int(Tetrimino::Type::Next));
 
-		auto fillLines = field_.FillLineIndex();
-		if (!fillLines.empty()) {
+		fillLines_ = field_.FillLineIndex();
+		if (!fillLines_.empty()) {
 			field_.DeleteFillLine();
-			blockRender_.BeginDeleteEffect(fillLines, field_.GetField());
-			deletedLine_ = int(fillLines.size());
+			blockRender_.BeginDeleteEffect(fillLines_, field_.GetField());
+			deletedLine_ = int(fillLines_.size());
 			scoreManager_.DeleteLine(deletedLine_, player_.GetIsTSpin(), field_.IsAllClear());
 		} else if (isDroped) {
 			scoreManager_.ResetLen();
@@ -80,4 +80,8 @@ void Tetris::Draw(DCC* cmdObj) {
 
 void Tetris::DrawImGui() {
 	blockRender_.DrawImGui();
+}
+
+std::vector<Transform> Tetris::DeleteLinesTransform() const {
+	return blockRender_.DeleteLinesTransform();
 }

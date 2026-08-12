@@ -42,6 +42,7 @@ void ParticlePool::Initialize(const int kMaxParticleNum, CCC* compute, SHEngine:
 	pool_.maxParticleNum = kMaxParticleNum;
 
 	drawCount_ = kMaxParticleNum / 2;
+	drawCount_ = 1;
 }
 
 void ParticlePool::Update(Camera* camera, float deltaTime, CCC* compute) {

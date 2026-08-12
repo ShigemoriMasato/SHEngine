@@ -1,47 +1,11 @@
 #include "PolygonEmitter.h"
 
 void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
-	if (kMaxParticleNum_ >= 65535 * 128) {
-		throw std::runtime_error("PolygonEmitter: maxParticleNum is too large. It must be less than 65535 * 128.");
-	}
-
-	container_ = std::make_unique<SHEngine::BufferContainer>();
-
-	maxParticleNum_ = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single);		//定数はSingle
-	maxParticleNum_->CopyBuffer(&kMaxParticleNum_, sizeof(uint32_t));
-
-	freeList_ = container_->Create(BufferType::UAV, sizeof(int), kMaxParticleNum_, BufferNum::Single);
-	freeListIndex_ = container_->Create(BufferType::UAV, sizeof(int), 1, BufferNum::Single);
-	indexList_ = container_->Create(BufferType::SRV_UAV, sizeof(int), kMaxParticleNum_, BufferNum::Single);
-	currentTime_ = container_->Create(BufferType::SRV_UAV, sizeof(float), kMaxParticleNum_, BufferNum::Single);
-	basePosition_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum_, BufferNum::Single);
-	velocity_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum_, BufferNum::Single);
-
-	lifeTime_ = container_->Create(BufferType::CBV, sizeof(float));
-	seed_ = container_->Create(BufferType::CBV, sizeof(uint32_t));
-	ignoreBallNum_ = container_->Create(BufferType::CBV, sizeof(int));
-	ignoreBall_ = container_->Create(BufferType::SRV, sizeof(IgnoreBall), kMaxIgnoreBallNum_);
-
-	float initLifeTime = 2.0f;
-	lifeTime_->CopyBuffer(&initLifeTime, sizeof(float));
-
-	position_ = pool.position;
-	color_ = pool.color;
-
-	initialize_ = std::make_unique<SHEngine::ComputeObject>();
-	initialize_->SetShader("Particle/EmitterInit.CS.hlsl");
-	initialize_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, pool.freeList, pool.freeListIndex, indexList_ });
-	initialize_->SetGPUBuffer(BufferType::CBV, maxParticleNum_);
-	initialize_->SetExecuteNum(kMaxParticleNum_ / 1024 + 1);
-	CCC* ccc = engine->GetComputeCommandContext();
-	initialize_->Execute(ccc);
+	CommonInitialize(engine, pool);
 
 	update_ = std::make_unique<SHEngine::ComputeObject>();
-	update_->SetShader("Particle/Polygon/Update.CS.hlsl");
-	update_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, currentTime_, position_, color_ });
-	update_->SetGPUBuffers(BufferType::SRV, { indexList_, ignoreBall_, basePosition_, velocity_ });
-	update_->SetGPUBuffers(BufferType::CBV, { maxParticleNum_, lifeTime_, pool.deltaTime, ignoreBallNum_ });
-	update_->SetExecuteNum(kMaxParticleNum_ / 128 + 1);
+
+	SetUpdate();
 
 	emit_ = std::make_unique<SHEngine::ComputeObject>();
 	emit_->SetShader("Particle/Polygon/Emit.CS.hlsl");
@@ -49,19 +13,7 @@ void PolygonEmitter::Initialize(SHEngine::Engine* engine, const Pool& pool) {
 
 
 void PolygonEmitter::Update(CCC* compute, float deltaTime) {
-	uint32_t seed = GetRandU();
-	seed_->CopyBuffer(&seed, sizeof(uint32_t));
-
-	for (const auto& [id, set] : polygonSets_) {
-		emit_->Initialize();
-		emit_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, position_, color_, currentTime_, basePosition_, velocity_ });
-		emit_->SetGPUBuffers(BufferType::SRV, { set.polygonList, set.chanceList, indexList_ });
-		emit_->SetGPUBuffers(BufferType::CBV, { set.emitNum, set.color, set.worldMatrix, set.chanceListNum, seed_, set.speed });
-		uint32_t emitNum = uint32_t(std::round(float(set.emitNumValue) * deltaTime));
-		set.emitNum->CopyBuffer(&emitNum, sizeof(uint32_t));
-		emit_->SetExecuteNum(std::min(65535, (int)emitNum/ 128 + 1));
-		emit_->Execute(compute);
-	}
+	CommonUpdate(compute, deltaTime);
 
 	update_->Execute(compute);
 }
@@ -133,9 +85,71 @@ void PolygonEmitter::SetCommonConfig(float lifeTime) {
 	lifeTime_->CopyBuffer(&lifeTime, sizeof(float));
 }
 
-void PolygonEmitter::SetIgnoreBalls(const std::array<IgnoreBall, 16>& ignoreBalls) {
-	ignoreBallNum_->CopyBuffer(&kMaxIgnoreBallNum_, sizeof(uint32_t));
-	ignoreBall_->CopyBuffer(ignoreBalls.data(), sizeof(IgnoreBall) * kMaxIgnoreBallNum_);
+void PolygonEmitter::CommonInitialize(SHEngine::Engine* engine, const Pool& pool) {
+	if (kMaxParticleNum_ >= 65535 * 128) {
+		throw std::runtime_error("PolygonEmitter: maxParticleNum is too large. It must be less than 65535 * 128.");
+	}
+
+	container_ = std::make_unique<SHEngine::BufferContainer>();
+
+	maxParticleNum_ = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single);		//定数はSingle
+	maxParticleNum_->CopyBuffer(&kMaxParticleNum_, sizeof(uint32_t));
+
+	freeList_ = container_->Create(BufferType::UAV, sizeof(int), kMaxParticleNum_, BufferNum::Single);
+	freeListIndex_ = container_->Create(BufferType::UAV, sizeof(int), 1, BufferNum::Single);
+	indexList_ = container_->Create(BufferType::SRV_UAV, sizeof(int), kMaxParticleNum_, BufferNum::Single);
+	currentTime_ = container_->Create(BufferType::SRV_UAV, sizeof(float), kMaxParticleNum_, BufferNum::Single);
+	basePosition_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum_, BufferNum::Single);
+	velocity_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3), kMaxParticleNum_, BufferNum::Single);
+
+	lifeTime_ = container_->Create(BufferType::CBV, sizeof(float));
+	seed_ = container_->Create(BufferType::CBV, sizeof(uint32_t));
+
+	deltaTime_ = pool.deltaTime;
+
+	float initLifeTime = 2.0f;
+	lifeTime_->CopyBuffer(&initLifeTime, sizeof(float));
+
+	position_ = pool.position;
+	color_ = pool.color;
+
+	initialize_ = std::make_unique<SHEngine::ComputeObject>();
+	initialize_->SetShader("Particle/EmitterInit.CS.hlsl");
+	initialize_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, pool.freeList, pool.freeListIndex, indexList_ });
+	initialize_->SetGPUBuffer(BufferType::CBV, maxParticleNum_);
+	initialize_->SetExecuteNum(kMaxParticleNum_ / 1024 + 1);
+	CCC* ccc = engine->GetComputeCommandContext();
+	initialize_->Execute(ccc);
+}
+
+void PolygonEmitter::CommonUpdate(CCC* compute, float deltaTime) {
+	uint32_t seed = GetRandU();
+	seed_->CopyBuffer(&seed, sizeof(uint32_t));
+
+	for (const auto& [id, set] : polygonSets_) {
+		emit_->Initialize();
+		emit_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, position_, color_, currentTime_, basePosition_, velocity_ });
+		emit_->SetGPUBuffers(BufferType::SRV, { set.polygonList, set.chanceList, indexList_ });
+		emit_->SetGPUBuffers(BufferType::CBV, { set.emitNum, set.color, set.worldMatrix, set.chanceListNum, seed_, set.speed });
+		uint32_t emitNum = uint32_t(std::round(float(set.emitNumValue) * deltaTime));
+		set.emitNum->CopyBuffer(&emitNum, sizeof(uint32_t));
+		emit_->SetExecuteNum(std::min(65535, (int)emitNum / 128 + 1));
+		emit_->Execute(compute);
+	}
+}
+
+void PolygonEmitter::SetUpdate(std::vector<SHEngine::GPUBuffer*> uav, std::vector<SHEngine::GPUBuffer*> srv, std::vector<SHEngine::GPUBuffer*> cbv, std::string shader) {
+	update_->Initialize();
+	std::string shaderName = shader.empty() ? "Update.CS.hlsl" : shader;
+	update_->SetShader("Particle/Polygon/" + shaderName);
+	update_->SetGPUBuffers(BufferType::UAV, { freeList_, freeListIndex_, currentTime_, position_, color_ });
+	update_->SetGPUBuffers(BufferType::SRV, { indexList_, basePosition_, velocity_ });
+	update_->SetGPUBuffers(BufferType::CBV, { maxParticleNum_, lifeTime_, deltaTime_ });
+	update_->SetExecuteNum(kMaxParticleNum_ / 128 + 1);
+
+	update_->SetGPUBuffers(BufferType::UAV, uav);
+	update_->SetGPUBuffers(BufferType::SRV, srv);
+	update_->SetGPUBuffers(BufferType::CBV, cbv);
 }
 
 PolygonList PolygonEmitter::CreatePolygonList(const std::vector<Mesh>& meshes) {

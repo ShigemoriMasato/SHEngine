@@ -25,7 +25,7 @@ void ICommandContext::PrivateInitialize(DXDevice* device, Command::Type type, in
 
 	cmdObjects_.reserve(initCmdObjNum);
 	for (int i = 0; i < initCmdObjNum; i++) {
-		cmdObjects_.push_back(std::make_unique<Command::Object>(device, type, 3));
+		cmdObjects_.push_back(std::make_unique<Command::Object>(device, type, device->GetBufferCount()));
 	}
 
 	lastWaitFence_.resize(device->GetBufferCount());
@@ -51,7 +51,7 @@ Command::WaitFence SHEngine::ICommandContext::MiddleExecute() {
 	// コマンドオブジェクトを次のものに切り替える
 	currentCmdObjIndex_++;
 	if (currentCmdObjIndex_ >= cmdObjects_.size()) {
-		cmdObjects_.emplace_back(std::make_unique<Command::Object>(device_, type_, 3));
+		cmdObjects_.emplace_back(std::make_unique<Command::Object>(device_, type_, device_->GetBufferCount()));
 	}
 	cmdObjects_[currentCmdObjIndex_]->ResetCommandList();
 

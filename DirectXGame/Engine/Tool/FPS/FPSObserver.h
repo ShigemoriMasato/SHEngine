@@ -56,6 +56,8 @@ public:
      */
     float GetDeltatime(FPSType type = FPSType::CPU) { return deltatime_[int(type)]; }
 
+	float GetCPUTime() { return cpuTime_; }
+
     /**
      * @brief フレーム間の時間調整を行う
      * 
@@ -82,6 +84,9 @@ private:
     std::vector<LARGE_INTEGER> timeEnd_{};
     /// @brief 計測周波数
     std::vector<LARGE_INTEGER> timeFreq_{};
+
+    //待機時間を含まないCPUの処理時間
+    float cpuTime_ = 0.0f;
 
     /**
      * @brief 高精度な時間待機を行う

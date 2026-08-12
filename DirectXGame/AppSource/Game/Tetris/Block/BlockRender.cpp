@@ -59,6 +59,11 @@ void BlockRender::Initialize(uint32_t fieldWidth, uint32_t fieldHeight, Camera* 
 		for (int j = 0; j < int((fieldWidth_)); ++j) {
 			materialData_[index].colorID = 0;
 			blockTransforms_[index].position = Vector3(float(j - int(fieldWidth_) / 2), float(i - int(fieldHeight_) / 2), 0.0f);
+
+			if (i == 0 && j == 0) {
+				lowerLeftPos_ = blockTransforms_[index].position;
+			}
+
 			++index;
 		}
 	}
@@ -99,6 +104,7 @@ void BlockRender::Update(float deltaTime) {
 				blockTransforms_[index].scale = effectTransform[x].scale;
 				blockTransforms_[index].rotate = effectTransform[x].rotate;
 				materialData_[index].intensity = 1.f;
+				materialData_[index].color.w = 2.0f - effectTransform[x].scale.x;
 			}
 		}
 
@@ -111,6 +117,7 @@ void BlockRender::Update(float deltaTime) {
 					blockTransforms_[index].scale = Vector3(1.0f, 1.0f, 1.0f);
 					blockTransforms_[index].rotate = Vector3(0.0f, 0.0f, 0.0f);
 					materialData_[index].intensity = 0.0f;
+					materialData_[index].color.w = 1.0f;
 				}
 			}
 		}
@@ -200,14 +207,6 @@ void BlockRender::SetBlock(int x, int y, int configIndex) {
 void BlockRender::SetBlock(std::vector<std::vector<int>> allConfigIndices, MovableMino movableMino) {
 #ifdef SH_DEBUG
 	logger_->debug("BlockRender::SetBlock() called");
-	std::string debugStr = "Pre Stage Data:\n";
-	for (const auto& row : allConfigIndices) {
-		for (const auto& val : row) {
-			debugStr += std::to_string(val) + " ";
-		}
-		debugStr += "\n";
-	}
-	logger_->debug(debugStr);
 #endif
 
 	if (allConfigIndices.size() < static_cast<size_t>(fieldHeight_) ||
@@ -227,17 +226,6 @@ void BlockRender::SetBlock(std::vector<std::vector<int>> allConfigIndices, Movab
 			SetBlock(x, y, configIndex);
 		}
 	}
-
-#ifdef SH_DEBUG
-	debugStr = "Now Stage Data:\n";
-	for (const auto& row : allConfigIndices) {
-		for (const auto& val : row) {
-			debugStr += std::to_string(val) + " ";
-		}
-		debugStr += "\n";
-	}
-	logger_->debug(debugStr);
-#endif
 }
 
 void BlockRender::BeginDeleteEffect(std::vector<int> fillLines, std::vector<std::vector<int>> deletedField) {
@@ -284,6 +272,10 @@ void BlockRender::DrawImGui() {
 	}
 	ImGui::End();
 #endif
+}
+
+std::vector<Transform> BlockRender::DeleteLinesTransform() const {
+	return deleteEffect_->GetTransforms();
 }
 
 

@@ -13,7 +13,7 @@ struct ColorMap
 
 struct Material
 {
-    float3 color;
+    float4 color;
     float intensity;
     uint colorID;
 };
@@ -44,7 +44,8 @@ PSOutput main(PSInput input)
     float2 centere = float2(0.5f, 0.5f);
     float dist = distance(input.texCoord, centere);
     float adjustedIntensity = material[input.instanceID].intensity * (1.0f - (dist / 2.0f));
-    output.color.rgb += material[input.instanceID].color * adjustedIntensity;
+    output.color.rgb += material[input.instanceID].color.rgb * adjustedIntensity;
+    output.color.a *= material[input.instanceID].color.a;
     
     if (output.color.a < 0.01f)
     {

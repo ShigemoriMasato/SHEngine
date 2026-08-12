@@ -2,12 +2,6 @@
 #include <Utility/Easing.h>
 #include <imgui/imgui.h>
 
-namespace {
-	float EaseOutBackReverse(float t, float s) {
-		return t * t * ((s + 1.0f) * t - s);
-	}
-}
-
 void DeleteEffect::Initialize(int deleteLineNum) {
 	timer_ = 0.0f;
 	reqDelete_ = false;
@@ -42,10 +36,7 @@ void DeleteEffect::Update(float deltaTime) {
 }
 
 void DeleteEffect::UpdateEffect(float deltaTime) {
-	float t = timer_ / (kReqTime_ - kMarginTime_);
-	t = std::clamp(t, 0.0f, 1.0f);
-	currentSpeed_ = lerp(kInitSpeed_, 0.0f, t);
-	float scale = EaseOutBackReverse(t, 3.0f) * -1.f + 1.f;
+	float scale = timer_ / (kEffectTime_ / 1.f) + 1.0f;
 
 	for (int i = 0; i < int(transform_.size()); ++i) {
 		transform_[i].scale = Vector3(scale, scale, scale);

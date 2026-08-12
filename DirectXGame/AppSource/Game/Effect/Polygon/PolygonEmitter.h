@@ -18,7 +18,7 @@ class PolygonEmitter : public IEmitter {
 public:
 
 	struct Config {
-		Config(uint32_t inID) : id(inID) {}
+		Config(uint32_t inID = 0xffffffff) : id(inID) {}
 		uint32_t id;
 		Transform transform;
 		Vector4 color = {1,1,1,1};
@@ -29,28 +29,38 @@ public:
 
 		void Save(BinaryManager& bin) const;
 		void Load(BinaryManager& bin);
-	};
 
-	struct IgnoreBall {
-		Vector3 position = {0, 0, 0};
-		float radius = 0.0f;
+		//idはコピーしないようにする
+		void operator()(const Config& other) {
+			transform = other.transform;
+			color = other.color;
+			emitNum = other.emitNum;
+			speed = other.speed;
+		}
 	};
 
 public:
 
 	PolygonEmitter(uint32_t maxParticleNum = 1000000) : kMaxParticleNum_(maxParticleNum) {};
 
-	void Initialize(SHEngine::Engine* engine, const Pool& pool) override;
-	void Update(CCC* compute, float deltaTime) override;
+	virtual void Initialize(SHEngine::Engine* engine, const Pool& pool) override;
+	virtual void Update(CCC* compute, float deltaTime) override;
 
-	Config AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix = Matrix4x4::Identity(), Vector4 color = {1,1,1,1}, uint32_t emitNum = 1);
+	Config AddPolygon(const std::vector<Mesh>& meshes, Matrix4x4 worldMatrix = Matrix4x4::Identity(), Vector4 color = {1,1,1,1}, uint32_t emitNum = 0);
 
 	void SetConfig(const Config& config);
 	void EditPolygon(uint32_t index, const PolygonList& polygonList, bool isCreateChanceList);
 
 	void SetCommonConfig(float lifeTime);
 
-	void SetIgnoreBalls(const std::array<IgnoreBall, 16>& ignoreBalls);
+protected:
+
+	void CommonInitialize(SHEngine::Engine* engine, const Pool& pool);
+	void CommonUpdate(CCC* compute, float deltaTime);
+
+	void SetUpdate(std::vector<SHEngine::GPUBuffer*> uav = {}, std::vector<SHEngine::GPUBuffer*> srv = {}, std::vector<SHEngine::GPUBuffer*> cbv = {}, std::string shader = "");
+
+	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
 
 private:
 
@@ -58,7 +68,6 @@ private:
 
 	std::vector<int> CreateChanceList(const PolygonList& polygonList);
 
-	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> initialize_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> update_ = nullptr;
 	std::unique_ptr<SHEngine::ComputeObject> emit_ = nullptr;
@@ -79,6 +88,7 @@ private:
 	uint32_t nextID_ = 0;
 
 	SHEngine::GPUBuffer* maxParticleNum_ = nullptr;
+	SHEngine::GPUBuffer* deltaTime_ = nullptr;
 
 	SHEngine::GPUBuffer* freeList_ = nullptr;
 	SHEngine::GPUBuffer* freeListIndex_ = nullptr;
@@ -89,12 +99,9 @@ private:
 
 	SHEngine::GPUBuffer* lifeTime_ = nullptr;
 	SHEngine::GPUBuffer* seed_ = nullptr;
-	SHEngine::GPUBuffer* ignoreBallNum_ = nullptr;
-	SHEngine::GPUBuffer* ignoreBall_ = nullptr;
 
 	SHEngine::GPUBuffer* position_ = nullptr;
 	SHEngine::GPUBuffer* color_ = nullptr;
 
 	const uint32_t kMaxParticleNum_;
-	const uint32_t kMaxIgnoreBallNum_ = 16;
 };
