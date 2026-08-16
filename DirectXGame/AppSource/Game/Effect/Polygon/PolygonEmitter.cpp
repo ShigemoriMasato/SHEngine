@@ -48,7 +48,7 @@ PolygonEmitter::Config PolygonEmitter::AddPolygon(const std::vector<Mesh>& meshe
 	return config;
 }
 
-void PolygonEmitter::SetConfig(const Config& config) {
+void PolygonEmitter::SetConfig(Config& config) {
 	const auto& it = polygonSets_.find(config.id);
 	if (it == polygonSets_.end()) {
 		assert(false && "PolygonEmitter: SetConfig failed. index not found.");
@@ -90,7 +90,7 @@ void PolygonEmitter::CommonInitialize(SHEngine::Engine* engine, const Pool& pool
 		throw std::runtime_error("PolygonEmitter: maxParticleNum is too large. It must be less than 65535 * 128.");
 	}
 
-	container_ = std::make_unique<SHEngine::BufferContainer>();
+	container_ = std::make_unique<SHEngine::BufferContainer>(64);
 
 	maxParticleNum_ = container_->Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single);		//定数はSingle
 	maxParticleNum_->CopyBuffer(&kMaxParticleNum_, sizeof(uint32_t));
@@ -181,8 +181,9 @@ std::vector<int> PolygonEmitter::CreateChanceList(const PolygonList& polygonList
 	std::vector<int> chanceList;
 	chanceList.reserve(polygonList.polygons.size() * 5);
 
-	//Particleの生成がせまい場所に偏る用であればこの値をどうにかする
-	const float kChanceScale = 1.0f / (polygonList.totalArea / (float)polygonList.polygons.size() / 10.f);
+	//Particleの生成がせまい場所に偏るようであればこの値を大きくする。初期化が重いのであれば低くする
+	const float chanceConstant = 10.0f;
+	const float kChanceScale = (float)polygonList.polygons.size() * chanceConstant / polygonList.totalArea;
 	for (int i = 0; i < polygonList.areas.size(); ++i) {
 		const auto& area = polygonList.areas[i];
 		uint32_t chance = std::max(1u, static_cast<uint32_t>(area * kChanceScale));

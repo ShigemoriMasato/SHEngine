@@ -38,6 +38,12 @@ public:
 	//Deco専用関数
 	void SetIDs(const std::vector<uint32_t>& ids);
 
+	void IsWireFrame(bool isWireFrame) {
+		for (auto& renderer : renderers_) {
+			renderer->SetRasterizer(SHEngine::PSO::RasterizerID::Wireframe);
+		}
+	}
+
 	SHEngine::Renderer* GetRenderer(uint32_t index) const { return renderers_[index].get(); }
 
 	//Skinning用

@@ -32,6 +32,8 @@ namespace SHEngine::Screen {
 		HWND GetHwnd() const { return hwnd_; }
 		std::pair<int, int> GetWindowSize() const { return { width_, height_ }; }
 
+		bool IsDestoroy() const { return isDestoroy_; }
+
 	private:
 
 		HWND hwnd_ = nullptr;	///< ウィンドウハンドル
@@ -44,5 +46,7 @@ namespace SHEngine::Screen {
 		int height_ = 0;		///< ウィンドウの高さ
 
 		bool isPushCloseButton_ = false;	///< ウィンドウのクローズボタンが押されたかどうか
+
+		bool isDestoroy_ = false;	///< ウィンドウが破棄されたかどうか
 	};
 }

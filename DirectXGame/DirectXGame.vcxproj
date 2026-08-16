@@ -197,7 +197,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Title\TitleScene.cpp" />
     <ClCompile Include="AppSource\Title\WaterWave\WaterWave.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Effect.cpp" />
-    <ClCompile Include="AppSource\EffectTest\EffectTestScene.cpp" />
     <ClCompile Include="Engine\Render\Screen\IDisplay.cpp" />
     <ClCompile Include="Engine\Compute\ComputeCommandContext.cpp" />
     <ClCompile Include="Engine\Core\Command\ICommandContext.cpp" />
@@ -299,7 +298,6 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Title\TitleScene.h" />
     <ClInclude Include="AppSource\Title\WaterWave\WaterWave.h" />
     <ClInclude Include="AppSource\Game\Effect\Effect.h" />
-    <ClInclude Include="AppSource\EffectTest\EffectTestScene.h" />
     <ClInclude Include="Engine\Compute\ComputeCommandContext.h" />
     <ClInclude Include="Engine\Core\Command\ICommandContext.h" />
     <ClInclude Include="Engine\Render\Command\DirectCommandContext.h" />
@@ -335,9 +333,10 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Assets\Fonts\FontLoader.cpp" />
     <ClCompile Include="Engine\Core\ImGuiWrapper.cpp" />
     <ClCompile Include="AppSource\Game\Effect\Base\IEmitter.cpp" />
-    <ClCompile Include="AppSource\Game\ParticleTool\IgnoreBallManager.cpp" />
+    <ClCompile Include="AppSource\Game\ParticleTool\RejectBallManager.cpp" />
     <ClCompile Include="AppSource\Game\Fin\FinScene.cpp" />
-    <ClCompile Include="AppSource\Game\Effect\IgnorePol\IgnoreBallPolygonEmitter.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\RejectPol\RejectBallPolygonEmitter.cpp" />
+    <ClCompile Include="AppSource\Game\Effect\FallPol\FallPolygonEmitter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Utility\src\Operator.cpp" />
     <ClCompile Include="Engine\Utility\src\MatrixFactory.cpp" />
@@ -366,13 +365,14 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Render\Buffer\ReadBackBuffer.h" />
     <ClInclude Include="AppSource\Game\Effect\Polygon\PolygonEmitter.h" />
     <ClInclude Include="Engine\Tool\AnimationModel\SkinningModel.h" />
-    <ClInclude Include="AppSource\Game\ParticleTool\IgnoreBallManager.h" />
+    <ClInclude Include="AppSource\Game\ParticleTool\RejectBallManager.h" />
     <ClInclude Include="AppSource\Game\Effect\Point\PointEmitter.h" />
     <ClInclude Include="AppSource\UI\SideBox.h" />
     <ClInclude Include="AppSource\Game\Fin\FinScene.h" />
     <ClInclude Include="Engine\Tool\ModelDrawer\ModelDrawer.h" />
     <ClInclude Include="Engine\Tool\ModelDrawer\SkinningProcessor.h" />
-    <ClInclude Include="AppSource\Game\Effect\IgnorePol\IgnoreBallPolygonEmitter.h" />
+    <ClInclude Include="AppSource\Game\Effect\RejectPol\RejectBallPolygonEmitter.h" />
+    <ClInclude Include="AppSource\Game\Effect\FallPol\FallPolygonEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

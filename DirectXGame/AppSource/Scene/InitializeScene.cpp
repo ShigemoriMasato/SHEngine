@@ -3,7 +3,6 @@
 #include <Game/GameScene.h>
 #include <Title/TitleScene.h>
 #include <Test/TestScene.h>
-#include <EffectTest/EffectTestScene.h>
 
 #ifdef USE_IMGUI
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -157,10 +156,9 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
+	return std::make_unique<TitleScene>();
 	return std::make_unique<GameScene>();
 	return std::make_unique<TestScene>();
-	return std::make_unique<TitleScene>();
-	return std::make_unique<EffectTestScene>();
 	return nullptr;
 }
 

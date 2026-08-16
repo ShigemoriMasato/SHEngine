@@ -6,7 +6,7 @@ RWStructuredBuffer<float16_t4> color : register(u4);
 
 StructuredBuffer<int> indexList : register(t0);
 
-struct IgnoreBall
+struct RejectBall
 {
     float32_t3 position;
     float32_t radius;
@@ -14,7 +14,7 @@ struct IgnoreBall
 
 StructuredBuffer<float3> basePositions : register(t1);
 StructuredBuffer<float3> velocities : register(t2);
-StructuredBuffer<IgnoreBall> ignoreBallList : register(t3);
+StructuredBuffer<RejectBall> rejectBallList : register(t3);
 
 cbuffer MaxParticle : register(b0) {
     uint maxParticleNum;
@@ -28,9 +28,9 @@ cbuffer deltaTime : register(b2) {
     float deltaTime;
 }
 
-cbuffer IgnoreBallNum : register(b3)
+cbuffer RejectBallNum : register(b3)
 {
-    uint ignoreBallNum;
+    uint rejectBallNum;
 }
 
 [numthreads(128, 1, 1)]
@@ -56,12 +56,12 @@ void main(uint3 DTid : SV_DispatchThreadID) {
     }
     
     float3 velocity = baseDir * innnerSpeed + velocities[index];
-    for (uint i = 0; i < ignoreBallNum; i++)
+    for (uint i = 0; i < rejectBallNum; i++)
     {
-        float dist = length(ignoreBallList[i].position - pos);
-        float intensity = dist / ignoreBallList[i].radius;
+        float dist = length(rejectBallList[i].position - pos);
+        float intensity = dist / rejectBallList[i].radius;
         float outerSpeed = 1.0f / (intensity * intensity);
-        float3 dir = normalize(pos - ignoreBallList[i].position);
+        float3 dir = normalize(pos - rejectBallList[i].position);
         velocity += dir * outerSpeed;
     }
     

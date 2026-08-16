@@ -136,7 +136,6 @@ void WaveEmitter::Config::Save(BinaryManager& binaryManager) {
 	binaryManager.Register(&speed);
 	binaryManager.Register(&fieldSize);
 	binaryManager.Register(&emitNum);
-	binaryManager.Register(&textureID);
 	binaryManager.Register(&colorIntensity);
 	binaryManager.Register(&lifeTime);
 	binaryManager.Register(&scale);
@@ -149,7 +148,6 @@ void WaveEmitter::Config::Load(BinaryManager& binaryManager) {
 	speed = binaryManager.Reverse<float>();
 	fieldSize = binaryManager.Reverse<Vector3>();
 	emitNum = binaryManager.Reverse<int>();
-	textureID = binaryManager.Reverse<uint32_t>();
 	colorIntensity = binaryManager.Reverse<float>();
 	lifeTime = binaryManager.Reverse<float>();
 	scale = binaryManager.Reverse<Vector3>();

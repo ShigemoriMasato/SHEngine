@@ -76,6 +76,7 @@ LRESULT CALLBACK SHEngine::Screen::WindowsAPI::WindowProc(HWND hwnd, UINT msg, W
 		if (msg == WM_DESTROY) {
 			it->second->logger_->info("Window is pushed Close Button.");
 			it->second->isPushCloseButton_ = true;
+			it->second->isDestoroy_ = true;
 			PostQuitMessage(0);
 		}
 

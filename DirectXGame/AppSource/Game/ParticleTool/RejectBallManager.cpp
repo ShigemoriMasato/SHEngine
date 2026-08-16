@@ -1,29 +1,29 @@
-#include "IgnoreBallManager.h"
+#include "RejectBallManager.h"
 #include <numbers>
 #include <Utility/Easing.h>
 
-void IgnoreBallManager::Initialize() {
-	for (uint32_t i = 0; i < kMaxIgnoreBallNum_; ++i) {
-		ignoreBalls_[i] = {};
+void RejectBallManager::Initialize() {
+	for (uint32_t i = 0; i < kMaxRejectBallNum_; ++i) {
+		rejectBalls_[i] = {};
 		moveFuncs_[i] = nullptr;
 	}
 
 	static constexpr Vector3 kInitialPosition = { 0.0f, 0.0f, 20.0f };
 	static constexpr float kRadius = 64.0f;
 
-	presetFuncs_.resize(static_cast<size_t>(IgnoreBallPreset::Count));
+	presetFuncs_.resize(static_cast<size_t>(RejectBallPreset::Count));
 
-	presetFuncs_[static_cast<size_t>(IgnoreBallPreset::None)] = [](float deltaTime, bool& destroyMe) {
+	presetFuncs_[static_cast<size_t>(RejectBallPreset::None)] = [](float deltaTime, bool& destroyMe) {
 		destroyMe = false;
-		IgnoreBallPolygonEmitter::IgnoreBall ball;
+		RejectBallPolygonEmitter::RejectBall ball;
 		ball.position = kInitialPosition;
 		ball.radius = kRadius;
 		return ball;
 		};
 
-	presetFuncs_[static_cast<size_t>(IgnoreBallPreset::Round)] = [](float deltaTime, bool& destroyMe) {
+	presetFuncs_[static_cast<size_t>(RejectBallPreset::Round)] = [](float deltaTime, bool& destroyMe) {
 		destroyMe = false;
-		IgnoreBallPolygonEmitter::IgnoreBall ball;
+		RejectBallPolygonEmitter::RejectBall ball;
 		static float angle = 0.0f;
 		angle = std::fmod(angle + deltaTime, 2.0f * std::numbers::pi_v<float>);
 		const float roundRadius = 28.0f;
@@ -32,9 +32,9 @@ void IgnoreBallManager::Initialize() {
 		return ball;
 		};
 
-	presetFuncs_[static_cast<size_t>(IgnoreBallPreset::Scale)] = [](float deltaTime, bool& destroyMe) {
+	presetFuncs_[static_cast<size_t>(RejectBallPreset::Scale)] = [](float deltaTime, bool& destroyMe) {
 		destroyMe = false;
-		IgnoreBallPolygonEmitter::IgnoreBall ball;
+		RejectBallPolygonEmitter::RejectBall ball;
 		static float timer = 0.0f;
 		const float cycleTime = 4.0f;
 		timer = std::fmod(timer + deltaTime, cycleTime);
@@ -49,7 +49,7 @@ void IgnoreBallManager::Initialize() {
 		return ball;
 		};
 
-	presetFuncs_[static_cast<size_t>(IgnoreBallPreset::Impact)] = [timer = 0.0f](float deltaTime, bool& destroyMe) mutable {
+	presetFuncs_[static_cast<size_t>(RejectBallPreset::Impact)] = [timer = 0.0f](float deltaTime, bool& destroyMe) mutable {
 		destroyMe = false;
 
 		const float kImpactTime = 0.5f;
@@ -63,7 +63,7 @@ void IgnoreBallManager::Initialize() {
 			timer = 0.0f;
 		}
 
-		IgnoreBallPolygonEmitter::IgnoreBall ball;
+		RejectBallPolygonEmitter::RejectBall ball;
 		ball.position = kInitialPosition;
 		ball.radius = lerp(1000.0f, 0.0f, t, EaseType::EaseInQuad);
 
@@ -71,21 +71,21 @@ void IgnoreBallManager::Initialize() {
 		};
 }
 
-void IgnoreBallManager::Update(float deltaTime) {
-	for (uint32_t i = 0; i < kMaxIgnoreBallNum_; ++i) {
+void RejectBallManager::Update(float deltaTime) {
+	for (uint32_t i = 0; i < kMaxRejectBallNum_; ++i) {
 		if (moveFuncs_[i]) {
 			bool destroyMe = false;
-			ignoreBalls_[i] = moveFuncs_[i](deltaTime, destroyMe);
+			rejectBalls_[i] = moveFuncs_[i](deltaTime, destroyMe);
 			if (destroyMe) {
 				moveFuncs_[i] = nullptr;
-				ignoreBalls_[i] = {};
+				rejectBalls_[i] = {};
 			}
 		}
 	}
 }
 
-uint32_t IgnoreBallManager::SetMove(std::function<IgnoreBallPolygonEmitter::IgnoreBall(float deltaTime, bool& destroyMe)> moveFunc) {
-	for (uint32_t i = 0; i < kMaxIgnoreBallNum_; ++i) {
+uint32_t RejectBallManager::SetMove(std::function<RejectBallPolygonEmitter::RejectBall(float deltaTime, bool& destroyMe)> moveFunc) {
+	for (uint32_t i = 0; i < kMaxRejectBallNum_; ++i) {
 		if (!moveFuncs_[i]) {
 			moveFuncs_[i] = moveFunc;
 			return i;
@@ -94,21 +94,21 @@ uint32_t IgnoreBallManager::SetMove(std::function<IgnoreBallPolygonEmitter::Igno
 	return UINT32_MAX; // No available slot
 }
 
-void IgnoreBallManager::RemoveMove(uint32_t index) {
-	if (index < kMaxIgnoreBallNum_) {
+void RejectBallManager::RemoveMove(uint32_t index) {
+	if (index < kMaxRejectBallNum_) {
 		moveFuncs_[index] = nullptr;
 	}
 }
 
-void IgnoreBallManager::SetPresetFunc(IgnoreBallPreset preset) {
+void RejectBallManager::SetPresetFunc(RejectBallPreset preset) {
 	SetMove(presetFuncs_[static_cast<size_t>(preset)]);
 }
 
-void IgnoreBallManager::DrawImGui() {
+void RejectBallManager::DrawImGui() {
 #ifdef USE_IMGUI
-	ImGui::Begin("IgnoreBallManager");
-	for (int i = 0; i < kMaxIgnoreBallNum_; ++i) {
-		ImGui::Text("IgnoreBall %d: Position(%.2f, %.2f, %.2f), Radius: %.2f", i, ignoreBalls_[i].position.x, ignoreBalls_[i].position.y, ignoreBalls_[i].position.z, ignoreBalls_[i].radius);
+	ImGui::Begin("RejectBallManager");
+	for (int i = 0; i < kMaxRejectBallNum_; ++i) {
+		ImGui::Text("RejectBall %d: Position(%.2f, %.2f, %.2f), Radius: %.2f", i, rejectBalls_[i].position.x, rejectBalls_[i].position.y, rejectBalls_[i].position.z, rejectBalls_[i].radius);
 	}
 	ImGui::End();
 #endif

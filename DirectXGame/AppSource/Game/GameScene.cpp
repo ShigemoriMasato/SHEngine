@@ -17,8 +17,8 @@ GameScene::GameScene() {
 	gameCamera_ = std::make_unique<GameCamera>();
 
 	gameCamera_->Initialize();
-	worldCamera_ = gameCamera_->GetCamera();
 	worldCamera_ = debugCamera_.get();
+	worldCamera_ = gameCamera_->GetCamera();
 }
 
 void GameScene::Initialize() {
@@ -33,21 +33,20 @@ void GameScene::Initialize() {
 	waveEmitter_ = std::make_unique<WaveEmitter>(6000000);
 	effect_.AddEmitter(waveEmitter_.get());
 
-	polygonEmitter_ = std::make_unique<PolygonEmitter>();
+	polygonEmitter_ = std::make_unique<PolygonEmitter>(4000000);
 	effect_.AddEmitter(polygonEmitter_.get());
 
 	ellipseEmitter_ = std::make_unique<EllipseEmitter>();
 	effect_.AddEmitter(ellipseEmitter_.get());
 
-	ignoreBallEmitter_ = std::make_unique<IgnoreBallPolygonEmitter>();
-	effect_.AddEmitter(ignoreBallEmitter_.get());
+	rejectBallEmitter_ = std::make_unique<RejectBallPolygonEmitter>();
+	effect_.AddEmitter(rejectBallEmitter_.get());
 
 	computeContext_->MiddleExecute();
 
 
 	auto model = modelManager_->GetModelData(SHEngine::TestModel::Cube);	//Cube
-	auto ddsTexture = textureManager_->GetTextureData(textureManager_->LoadTexture("rostock_laage_airport_4k.dds"));
-	tetris_.Initialize(keyCoating_.get(), worldCamera_, model->meshes.front(), ddsTexture);
+	tetris_.Initialize(keyCoating_.get(), worldCamera_, model->meshes.front(), nullptr);
 
 	//PostEffectの初期化
 	postEffect_.Initialize(textureManager_);		//描画だけするやつなのでコピーオンリー
@@ -70,12 +69,12 @@ void GameScene::Initialize() {
 	waveEmitterConfig_.textureID = textureManager_->LoadTexture("MagicCircle.png");
 
 	model = modelManager_->LoadModel("Pyramid");
-	auto config = ignoreBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
+	auto config = rejectBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
 	polygonConfigs_.push_back(config);
-	auto config2 = ignoreBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
+	auto config2 = rejectBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
 	polygonConfigs_.push_back(config2);
 
-	ignoreBallManager_.Initialize();
+	rejectBallManager_.Initialize();
 
 	model = modelManager_->GetModelData(SHEngine::TestModel::Plane);
 	deleteLineMeshEffect_.Initialize(&tetris_, polygonEmitter_.get(), model->meshes.front());
@@ -90,14 +89,14 @@ std::unique_ptr<IScene> GameScene::Update() {
 	Vector2 mousePos = commonData_->display->GetCursorPos(input_->GetCursorPos());
 
 	waveEmitter_->SetConfig(waveEmitterConfig_);
-	for (const auto& config : polygonConfigs_) {
-		ignoreBallEmitter_->SetConfig(config);
+	for (auto& config : polygonConfigs_) {
+		rejectBallEmitter_->SetConfig(config);
 	}
 
 	deleteLineMeshEffect_.Update(deltaTime);
 
-	ignoreBallManager_.Update(deltaTime);
-	ignoreBallEmitter_->SetIgnoreBalls(ignoreBallManager_.GetIgnoreBalls());
+	rejectBallManager_.Update(deltaTime);
+	rejectBallEmitter_->SetRejectBalls(rejectBallManager_.GetRejectBalls());
 
 	computeContext_->BeginTimeStamp("Particle Update");
 	effect_.Update(worldCamera_, deltaTime);
@@ -118,7 +117,7 @@ std::unique_ptr<IScene> GameScene::Update() {
 		if (deleteNum > 2) {
 			gameCamera_->Shake(0.3f * deleteNum, 0.5f);
 		}
-		ignoreBallManager_.SetPresetFunc(IgnoreBallPreset::Impact);
+		rejectBallManager_.SetPresetFunc(RejectBallPreset::Impact);
 	}
 
 	if (key.at(Key::Debug1)) {
@@ -165,9 +164,8 @@ void GameScene::Draw() {
 	//Effectで一度実行されるので、もう一度Setしなおす
 	directContext_->SetRenderTarget(display, false);
 
-	timeViewer_->Add("Particle Update", engine_->GetComputeCommandContext()->GetTimeStampResult("Particle Update"));
-	timeViewer_->Add("Particle Draw", engine_->GetDirectCommandContext()->GetTimeStampResult("Particle Draw"));
-	timeViewer_->Add("CPUTime", (double)engine_->GetFPSObserver()->GetCPUTime());
+	timeViewer_->Add("Particle Update", computeContext_->GetTimeStampResult("Particle Update"));
+	timeViewer_->Add("Particle Draw", directContext_->GetTimeStampResult("Particle Draw"));
 	timeViewer_->Add("DeltaTime", engine_->GetDeltaTime());
 
 	timeViewer_->Draw(directContext_);
@@ -201,7 +199,7 @@ void GameScene::Draw() {
 #ifdef USE_IMGUI
 	display->DrawImGui();
 	//gameCamera_->DrawImGui();
-	//ignoreBallManager_.DrawImGui();
+	//rejectBallManager_.DrawImGui();
 	//tetris_.DrawImGui();
 	//timeViewer_->DrawImGui();
 	//finScene_->DrawImGui();
@@ -308,11 +306,11 @@ void GameScene::Load() {
 	for (uint32_t i = 0; i < polygonConfigSize; ++i) {
 		polygonConfigs_[i].Load(bin);
 	}
-	uint32_t ignoreBallSize = bin.Reverse<uint32_t>();
-	for (uint32_t i = 0; i < ignoreBallSize; ++i) {
-		auto ignoreBall = IgnoreBallPolygonEmitter::IgnoreBall();
-		ignoreBall.position = bin.Reverse<Vector3>();
-		ignoreBall.radius = bin.Reverse<float>();
+	uint32_t rejectBallSize = bin.Reverse<uint32_t>();
+	for (uint32_t i = 0; i < rejectBallSize; ++i) {
+		auto rejectBall = RejectBallPolygonEmitter::RejectBall();
+		rejectBall.position = bin.Reverse<Vector3>();
+		rejectBall.radius = bin.Reverse<float>();
 	}
 	ellipseConfig_.Load(bin);
 

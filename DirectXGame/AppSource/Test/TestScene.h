@@ -2,18 +2,13 @@
 #include <Scene/IScene.h>
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
-#include <Render/MeshRenderer.h>
-#include <UI/SideBox.h>
-#include <Tool/DecoEditor/DecoEditor.h>
-#include <Render/PostEffect.h>
-#include <Render/Font/Text.h>
-#include <Tool/ModelDrawer/SkinningProcessor.h>
 
 #include <Game/Effect/Effect.h>
-#include <Game/Effect/Wave/WaveEmitter.h>
-#include <Game/Effect/Polygon/PolygonEmitter.h>
+#include <Game/Effect/FallPol/FallPolygonEmitter.h>
+#include <Game/Effect/RejectPol/RejectBallPolygonEmitter.h>
+#include <Game/Effect/FallPol/FallPolygonEmitter.h>
 
-#include <Game/ParticleTool/IgnoreBallManager.h>
+#include <Tool/ModelDrawer/ModelDrawer.h>
 
 class TestScene : public IScene {
 public:
@@ -35,20 +30,21 @@ private:
 
 	Effect effect_{};
 
-	std::unique_ptr<WaveEmitter> waveEmitter_ = nullptr;
-	WaveEmitter::Config waveEmitterConfig_ = {};
-	WaveEmitter::WaveData waves_ = {};
+	FallPolygonEmitter fallEmitter_{};
+	RejectBallPolygonEmitter rejectBallEmitter_ = RejectBallPolygonEmitter();
 
-	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
-	std::vector<PolygonEmitter::Config> polygonConfigs_ = {};
+	PolygonEmitter::Config fallConfig_{};
+	FallPolygonEmitter::Sphere fallSphere_{};
+	RejectBallPolygonEmitter::Config rejectBallConfig_{};
+	RejectBallPolygonEmitter::RejectBall rejectBall_{};
 
-	ModelDrawer modelDrawer_;
-	SkinningProcessor skinningProcessor_;
 
-	Transform modelTransform_ = {};
+	float lifeTime_ = 10.0f;
+	Vector3 gravity_ = { 0.0f, -9.8f, 0.0f };
 
-	PostEffect copy_;
-	PostEffectConfig copyConfig_ = {};
+	bool emit_ = false;
 
-	std::vector<std::unique_ptr<ModelDrawer>> modelDrawers_ = {};
+	const ModelData* model_ = nullptr;
+
+	ModelDrawer modelDrawer_{};
 };

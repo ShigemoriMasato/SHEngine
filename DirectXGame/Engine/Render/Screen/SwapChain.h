@@ -58,6 +58,8 @@ namespace SHEngine::Screen {
 
 		WindowsAPI* GetWindowsAPI() const { return window_.get(); }
 
+		bool IsDestoroy() const { return window_->IsDestoroy(); }
+
 	private:
 
 		Logger logger_;

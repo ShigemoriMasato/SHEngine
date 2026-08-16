@@ -39,6 +39,8 @@ void SceneManager::Draw() {
 }
 
 bool SceneManager::IsLoop() const {
-	//CommonDataとかからループを抜ける条件を判断する
+	if (commonData_->window && commonData_->window->IsDestoroy()) {
+		return false;
+	}
 	return true;
 }

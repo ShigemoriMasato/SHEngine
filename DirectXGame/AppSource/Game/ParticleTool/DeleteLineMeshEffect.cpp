@@ -24,16 +24,16 @@ void DeleteLineMeshEffect::Update(float deltaTime) {
 		Vector2 mid = Vector2(lowerLeftPos.x + fieldSize.x / 2.0f, lowerLeftPos.y);
 		Vector2 pos = Vector2(lowerLeftPos.x + fieldSize.x / 2.0f, lowerLeftPos.y + line + 0.5f);
 
-		configs_[i](emitConfig_);
+		configs_[i].Copy(emitConfig_);
 
 		configs_[i].transform.position = Vector3(pos.x, pos.y, lowerLeftPos.z);
 	}
 	for (i; i < int(configs_.size()); ++i) {
-		configs_[i](zeroConfig_);
+		configs_[i].Copy(zeroConfig_);
 	}
 
 	if (debugDeleteLine_) {
-		configs_[0](emitConfig_);
+		configs_[0].Copy(emitConfig_);
 		configs_[0].transform.position = { 0.0f, 0.0f, 0.0f };
 		debugDeleteLine_ = false;
 	}

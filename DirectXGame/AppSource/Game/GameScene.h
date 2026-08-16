@@ -12,7 +12,7 @@
 #include <Game/Effect/Polygon/PolygonEmitter.h>
 #include <Game/Effect/Ellipse/EllipseEmitter.h>
 
-#include <Game/ParticleTool/IgnoreBallManager.h>
+#include <Game/ParticleTool/RejectBallManager.h>
 #include <Game/ParticleTool/DeleteLineMeshEffect.h>
 
 enum class WaveType {
@@ -78,9 +78,9 @@ private:
 	std::unique_ptr<EllipseEmitter> ellipseEmitter_ = nullptr;
 	EllipseEmitter::Config ellipseConfig_ = {};
 
-	std::unique_ptr<IgnoreBallPolygonEmitter> ignoreBallEmitter_ = nullptr;
+	std::unique_ptr<RejectBallPolygonEmitter> rejectBallEmitter_ = nullptr;
 
-	IgnoreBallManager ignoreBallManager_ = {};
+	RejectBallManager rejectBallManager_ = {};
 
 	DeleteLineMeshEffect deleteLineMeshEffect_;
 };
