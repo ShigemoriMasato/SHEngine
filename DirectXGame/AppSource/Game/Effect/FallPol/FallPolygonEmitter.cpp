@@ -35,6 +35,13 @@ void FallPolygonEmitter::Update(CCC* compute, float deltaTime) {
 
 }
 
+void FallPolygonEmitter::AddPolygon(const MeshList& meshList, SHEngine::ModelManager* modelManager) {
+	for (const auto& meshInfo : meshList.meshes) {
+		auto modelData = modelManager->LoadModel(meshInfo.modelPath);
+		PolygonEmitter::AddPolygon(modelData->meshes, meshInfo.transform.Matrix(), meshInfo.color, meshInfo.emitNum);
+	}
+}
+
 void FallPolygonEmitter::SetConfig(Config& config) {
 	config.emitNum *= 60;
 	PolygonEmitter::SetConfig(config);
@@ -43,4 +50,26 @@ void FallPolygonEmitter::SetConfig(Config& config) {
 
 void FallPolygonEmitter::Fall(Sphere sphere) {
 	sphereList_.push_back(sphere);
+}
+
+void FallPolygonEmitter::MeshList::Save(BinaryManager& bin) const {
+	uint32_t meshNum = static_cast<uint32_t>(meshes.size());
+	bin.Register(&meshNum);
+	for (const auto& mesh : meshes) {
+		bin.Register(&mesh.modelPath);
+		bin.Register(&mesh.transform);
+		bin.Register(&mesh.color);
+		bin.Register(&mesh.emitNum);
+	}
+}
+
+void FallPolygonEmitter::MeshList::Load(BinaryManager& bin) {
+	uint32_t meshNum = bin.Reverse<uint32_t>();
+	meshes.resize(meshNum);
+	for (auto& mesh : meshes) {
+		mesh.modelPath = bin.Reverse<std::string>();
+		mesh.transform = bin.Reverse<Transform>();
+		mesh.color = bin.Reverse<Vector4>();
+		mesh.emitNum = bin.Reverse<uint32_t>();
+	}
 }

@@ -68,6 +68,8 @@ void DebugCamera::Update(bool enableInput) {
 	//座標の適用
 	//===================
 	MakeMatrix();
+
+	vpBuffer_->CopyBuffer(&vpMatrix_, sizeof(Matrix4x4));
 }
 
 Vector3 DebugCamera::GetCenter() const {

@@ -1,5 +1,7 @@
 #pragma once
 #include <Utility/SearchFile.h>
+#include <Assets/Texture/TextureManager.h>
+#include "DecoDataManager.h"
 
 namespace Decorate {
 
@@ -12,7 +14,7 @@ namespace Decorate {
 	class PathManager {
 	public:
 
-		PathManager();
+		PathManager(SHEngine::TextureManager* textureManager, DataManager* dataManager);
 
 		DecoPath GetDecoPath(const std::string& name);
 		
@@ -26,9 +28,14 @@ namespace Decorate {
 
 		void Update();
 
-		void DrawDecoPath(const DecoPath& node);
+		SHEngine::TextureManager* textureManager_;
+		DataManager* dataManager_;
 
 		DecoPath root_;
 
+		std::vector<std::string> currentPath_;
+
+		int folder_ = 0;
+		int model_ = 0;
 	};
 }

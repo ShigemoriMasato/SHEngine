@@ -19,12 +19,12 @@ void BinaryManager::Write(const std::string& fileName) {
 	}
 
 	file.write(reinterpret_cast<const char*>(&version_), sizeof(version_)); // バージョンを書き込む
-	file.write(binaryBuffer_.data(), binaryBuffer_.size());
+	file.write(outputBuffer_.data(), outputBuffer_.size());
 
 	file.close();
 
 	// 書き込み後はバッファをクリア
-	binaryBuffer_.clear();
+	outputBuffer_.clear();
 }
 
 bool BinaryManager::Boot(const std::string& fileName) {
@@ -46,7 +46,14 @@ bool BinaryManager::Boot(const std::string& fileName) {
 		inputBuffer_.clear();
 		return false;
 	}
-	inputBuffer_.erase(0, sizeof(fileVersion)); // バージョンを読み取った後、バッファから削除
+
+	inputBuffer_.erase(0, sizeof(fileVersion)); // バージョンを読み取った後、バッファから削除 
+	readIndex_ = 0; // 読み取りインデックスをリセット
 
 	return true;
+}
+
+void BinaryManager::BootRawData(const std::string& rawData) {
+	inputBuffer_ = rawData;
+	readIndex_ = 0; // 読み取りインデックスをリセット
 }

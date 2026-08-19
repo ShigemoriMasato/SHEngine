@@ -5,7 +5,7 @@ void Grid::Initialize() {
 
 	auto positionBuffer = container_->Create(BufferType::CBV, sizeof(Vector3), 2, BufferNum::Single);
 	configBuffer_ = container_->Create(BufferType::SRV, sizeof(LineConfig), lineNum_ * 2);
-	vpBuffer_ = container_->Create(BufferType::CBV, sizeof(Matrix4x4));
+	vpBuffer_ = nullptr;
 
 	Mesh dummyMesh;
 	dummyMesh.position.resize(2);
@@ -13,8 +13,6 @@ void Grid::Initialize() {
 	renderer_ = std::make_unique<SHEngine::Renderer>(SHEngine::VertexType::Position, dummyMesh);
 	renderer_->SetVS("Engine/Grid.VS.hlsl");
 	renderer_->SetPS("Engine/Grid.PS.hlsl");
-	renderer_->SetGPUBuffer(configBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
-	renderer_->SetGPUBuffer(vpBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->SetTopology(SHEngine::PSO::Topology::Line);
 	renderer_->instanceNum_ = lineNum_ * 2;
 
@@ -24,7 +22,7 @@ void Grid::Initialize() {
 	configs_.reserve(lineNum_ * 2);
 }
 
-void Grid::Update(Vector3 middle, const Matrix4x4& vpMatrix) {
+void Grid::Update(Vector3 middle) {
 	Vector3 middleGrided = {
 		std::round(middle.x / interval_) * interval_,
 		0.0f,
@@ -56,9 +54,19 @@ void Grid::Update(Vector3 middle, const Matrix4x4& vpMatrix) {
 	configs_.insert(configs_.end(), horizontal_.begin(), horizontal_.end());
 
 	configBuffer_->CopyBuffer(configs_.data(), sizeof(LineConfig) * configs_.size());
-	vpBuffer_->CopyBuffer(&vpMatrix, sizeof(Matrix4x4));
+}
+
+void Grid::SetCamera(Camera* camera) {
+	vpBuffer_ = camera->GetVPBuffer();
 }
 
 void Grid::Draw(DCC* dcc) {
+	if (!vpBuffer_) {
+		return;
+	}
+
+	renderer_->ResetGPUBuffers();
+	renderer_->SetGPUBuffer(configBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
+	renderer_->SetGPUBuffer(vpBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
 	renderer_->Draw(dcc);
 }

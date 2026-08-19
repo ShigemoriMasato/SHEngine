@@ -2,13 +2,22 @@
 
 TestScene::~TestScene() {
 	Save();
+
+	BinaryManager bin;
+	uint32_t fileNum = static_cast<uint32_t>(fileList_.size());
+	bin.Register(&fileNum);
+	for (uint32_t i = 0; i < fileNum; ++i) {
+		bin.Register(&fileList_[i]);
+	}
+	bin.Write("TestScene_Config.bin");
 }
 
 void TestScene::Initialize() {
-	engine_->EditImGuiIni("TestScene");
-
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize(input_);
+
+	gameCamera_ = std::make_unique<Camera>();
+	gameCamera_->SetProjectionMatrix(PerspectiveFovDesc());
 
 	orthoCamera_.SetProjectionMatrix(OrthographicDesc());
 	orthoCamera_.MakeMatrix();
@@ -16,41 +25,79 @@ void TestScene::Initialize() {
 	grid_ = std::make_unique<Grid>();
 	grid_->Initialize();
 
+	gameDisplay_ = std::make_unique<SHEngine::Screen::Display>();
+	gameDisplay_->Initialize(1280, 720, "GameDisplay");
+	gameDisplay_->AddRenderTarget(textureManager_, 0xff);
+	gameDisplay_->CreateDepthTexture(textureManager_);
+
 	// ===================== 超えられない壁 =================================
 
-	effect_.Initialize(engine_);
+	cameraEditor_.Initialize(gameCamera_.get());
+	decoEditor_ = std::make_unique<DecoEditor>(engine_, commonData_->display.get());
 
-	effect_.AddEmitter(&fallEmitter_);
-	effect_.AddEmitter(&rejectBallEmitter_);
+	Load();
 
-	model_ = modelManager_->LoadModel("Pyramid");
-	fallConfig_ = fallEmitter_.AddPolygon(model_->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 0);
-	rejectBallConfig_ = rejectBallEmitter_.AddPolygon(model_->meshes, Matrix4x4::Identity(), Vector4(1, 0, 0, 1), 0);
+	{
+		BinaryManager bin;
+		uint32_t fileNum = 0;
+		if (bin.Boot("TestScene_Config.bin")) {
+			fileNum = bin.Reverse<uint32_t>();
+			fileList_.resize(fileNum);
+			for (uint32_t i = 0; i < fileNum; ++i) {
+				fileList_[i] = bin.Reverse<std::string>();
+			}
+		}
+	}
 
-	auto sphere = modelManager_->GetModelData(SHEngine::TestModel::Sphere);
-	modelDrawer_.Initialize(sphere);
-	modelDrawer_.IsWireFrame(true);
+	cameraEditor_.SetData(cameraCurveData_);
+	decoEditor_->SetData(decoObjData_);
+
+	auto model = modelManager_->GetModelData(SHEngine::TestModel::Camera);
+	cameraRenderer_.Initialize(model);
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
-	debugCamera_->Update();
+	debugCamera_->Update(commonData_->display->IsForcus());
+
 	commonData_->keyManager->Update();
 	auto key = commonData_->keyManager->GetKeyStates();
 	float deltaTime = engine_->GetDeltaTime();
 
-	grid_->Update(debugCamera_->GetCenter(), debugCamera_->GetVPMatrix());
+	grid_->Update(debugCamera_->GetCenter());
 
 	// ===================== 超えられない壁 =================================
 
-	if (emit_) {
-		fallEmitter_.SetConfig(fallConfig_);
+	commonData_->display->DrawImGui();
+	ImGuizmo::OriginalSetRect(commonData_->display.get());
+
+	cameraEditor_.Update(input_, debugCamera_.get(), deltaTime);
+
+	decoEditor_->Update(debugCamera_.get(), directContext_);
+
+	cameraCurveData_ = cameraEditor_.GetData();
+	decoObjData_ = decoEditor_->GetData();
+
+	cameraRenderer_.SetTransform({ gameCamera_->GetViewMatrix().Inverse() });
+	cameraRenderer_.Update(debugCamera_.get(), deltaTime);
+
+#ifdef USE_IMGUI
+
+	std::string currentFilePath;
+	uint32_t currentID;
+	decoEditor_->GetCurrentObj(currentFilePath, currentID);
+
+	if (currentID == 0) {
+		return nullptr;
 	}
-	rejectBallEmitter_.SetConfig(rejectBallConfig_);
-	rejectBallEmitter_.SetRejectBalls({ rejectBall_ });
 
-	effect_.Update(debugCamera_.get(), deltaTime);
+	auto& conf = decoObjDataBuffer_[currentFilePath][currentID];
 
-	modelDrawer_.Update(debugCamera_.get(), deltaTime);
+	ImGui::Begin("EmitterConfig");
+	ImGui::ColorEdit4("Color", &conf.first.x);
+	ImGui::DragInt("EmitNum", (int*)&conf.second, 1000, 0, 1000000);
+	ImGui::End();
+
+#endif
 
 	return nullptr;
 }
@@ -58,86 +105,48 @@ std::unique_ptr<IScene> TestScene::Update() {
 void TestScene::Draw() {
 	auto window = commonData_->window.get();
 	auto display = commonData_->display.get();
-	directContext_->SetRenderTarget(display);
-	grid_->Draw(directContext_);
 
-	effect_.Draw();
+	directContext_->SetRenderTarget(display);
+	grid_->SetCamera(debugCamera_.get());
+	grid_->Draw(directContext_);
 
 	directContext_->SetRenderTarget(display, false);
 
 	// ↓↓↓ オブジェクト描画 ==============================================
 
-	modelDrawer_.Draw(directContext_);
+	cameraRenderer_.Draw(directContext_);
+
+	decoEditor_->Draw(directContext_);
 
 	// ↑↑↑ オブジェクト描画 ==============================================
 
-#ifdef USE_IMGUI
-
-	ImGui::Begin("FallConfig");
-	fallConfig_.DrawImGui();
-
-	if (ImGui::Button("100k")) {
-		fallConfig_.emitNum = 100000;
-		emit_ = true;
-	}
-
-	ImGui::Separator();
-
-	ImGui::DragFloat3("Gravity", &gravity_.x, 0.01f);
-	ImGui::DragFloat("LifeTime", &lifeTime_, 0.01f, 0.0f);
-
-	fallEmitter_.SetGravity(gravity_);
-	fallEmitter_.SetLifeTime(lifeTime_);
-
-	ImGui::End();
-
-	ImGui::Begin("Sphere");
-	ImGui::DragFloat3("Position", &fallSphere_.pos.x, 0.01f);
-	ImGui::DragFloat("Radius", &fallSphere_.radius, 0.01f, 0.0f);
-	if (ImGui::Button("Fall")) {
-		fallEmitter_.Fall(fallSphere_);
-	}
-	ImGui::End();
-
-	Vector3 scale = { fallSphere_.radius, fallSphere_.radius, fallSphere_.radius };
-	modelDrawer_.SetTransform({ Matrix::MakeScaleMatrix(scale) * Matrix::MakeTranslationMatrix(fallSphere_.pos) });
-
-	ImGui::Begin("RejectBallConfig");
-	rejectBallConfig_.DrawImGui();
-	ImGui::DragFloat3("Position", &rejectBall_.position.x, 0.01f);
-	ImGui::DragFloat("Radius", &rejectBall_.radius, 0.01f, 0.0f);
-	ImGui::End();
-
-#endif
-
 	display->ToTexture(directContext_);
 
-#ifdef SH_RELEASE
+	directContext_->SetRenderTarget(gameDisplay_.get());
+	grid_->SetCamera(gameCamera_.get());
+	grid_->Draw(directContext_);
 
-	directContext_->SetRenderTarget(window, false);
+	decoEditor_->SetDrawCamera(gameCamera_.get());
+	decoEditor_->NormalDraw(directContext_);
 
-#else
+	gameDisplay_->ToTexture(directContext_);
+
+	gameDisplay_->DrawImGui();
+	SelectFile();
 
 	directContext_->SetRenderTarget(window);
-
-#endif
-
-#ifdef USE_IMGUI
-
-#endif
-	
-	display->DrawImGui();
 	engine_->DrawImGui();
 	window->ToPresent(directContext_);
 }
 
 void TestScene::Save() {
 	BinaryManager bin;
-	const std::string fileName = "TestScene_Config.bin";
+	const std::string fileName = basePath_ + currentFileName_ + extension_;
 
 	// ↓↓↓ 保存するデータ ==============================================
 
-
+	cameraCurveData_.Save(bin);
+	CreateMeshList().Save(bin);
 
 	// ↑↑↑ 保存するデータ ==============================================
 
@@ -146,10 +155,97 @@ void TestScene::Save() {
 
 void TestScene::Load() {
 	BinaryManager bin;
-	const std::string fileName = "TestScene_Config.bin";
+	const std::string fileName = basePath_ + currentFileName_ + extension_;
 
 	if (!bin.Boot(fileName)) {
 		return;
 	}
 
+	cameraCurveData_.Load(bin);
+	FallPolygonEmitter::MeshList meshList;
+	meshList.Load(bin);
+
+	DecomposeMeshList(meshList);
+
+	cameraEditor_.SetData(cameraCurveData_);
+	decoEditor_->SetData(decoObjData_);
+}
+
+void TestScene::SelectFile() {
+#ifdef USE_IMGUI
+
+	ImGui::Begin("Select File");
+
+	const SHEngine::TextureData* fileTexture = textureManager_->GetTextureData("Assets/.EngineResource/Texture/File.png");
+	const auto windowSize = ImGui::GetContentRegionAvail();
+	const float buttonSize = 64.f;
+	const float itemSpacing = 8.0f;
+	const float tileWidth = buttonSize + ImGui::GetStyle().FramePadding.x * 2.0f;
+	const int columnCount = std::max(1, static_cast<int>((windowSize.x + itemSpacing) / (tileWidth + itemSpacing)));
+	int itemIndex = 0;
+
+	ImGui::InputText("File Name", currentFileName_, sizeof(currentFileName_));
+
+	if (ImGui::Button("+")) {
+		const auto& it = std::find(fileList_.begin(), fileList_.end(), currentFileName_);
+		if (it == fileList_.end()) {
+			fileList_.push_back(currentFileName_);
+		}
+
+		Save();
+	}
+
+	for (const auto& fileName : fileList_) {
+		if (itemIndex % columnCount != 0) {
+			ImGui::SameLine();
+		}
+
+		if (ImGui::ImageButton(fileName.c_str(), (ImTextureRef)fileTexture->GetSRVHandle().ptr, ImVec2(buttonSize, buttonSize))) {
+			std::memcpy(currentFileName_, fileName.c_str(), sizeof(currentFileName_));
+			Load();
+		}
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1), fileName.c_str());
+	}
+
+	ImGui::End();
+
+#endif
+}
+
+FallPolygonEmitter::MeshList TestScene::CreateMeshList() {
+	FallPolygonEmitter::MeshList meshList;
+	for (const auto& [name, objMap] : decoObjData_) {
+		auto& conf = decoObjDataBuffer_[name];
+		for (const auto& [id, transform] : objMap) {
+			auto& info = meshList.meshes.emplace_back();
+
+			info.modelPath = name;
+			info.transform = transform;
+			info.color = conf[id].first;
+			info.emitNum = conf[id].second;
+		}
+	}
+	return meshList;
+}
+
+void TestScene::DecomposeMeshList(const FallPolygonEmitter::MeshList& meshList) {
+	for (auto& [name, objMap] : decoObjData_) {
+		objMap.clear();
+	}
+	decoObjData_.clear();
+	for (auto& [name, conf] : decoObjDataBuffer_) {
+		conf.clear();
+	}
+	decoObjDataBuffer_.clear();
+
+	int id = 0;
+
+	for (const auto& info : meshList.meshes) {
+		id++;
+		auto& objMap = decoObjData_[info.modelPath];
+		auto& conf = decoObjDataBuffer_[info.modelPath];
+		objMap[id] = info.transform;
+		conf[id] = { info.color, info.emitNum };
+	}
 }

@@ -143,6 +143,11 @@ void Input::Update() {
 	}
 }
 
+void SHEngine::Input::AllClear() {
+	ControllerClear();
+	MouseKeyboardClear();
+}
+
 BYTE* Input::GetKeyState() {
 	if (!isInitialized_) {
 		return nullptr;

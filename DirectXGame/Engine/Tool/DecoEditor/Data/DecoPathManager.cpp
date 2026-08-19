@@ -6,40 +6,45 @@ using namespace Decorate;
 namespace fs = std::filesystem;
 
 DecoPath* FindOrCreateChild(std::vector<DecoPath>& children, const std::string& name) {
-    auto it = std::find_if(children.begin(), children.end(), 
-        [&](const DecoPath& node) {
-            return node.name == name;
-        });
+	auto it = std::find_if(children.begin(), children.end(),
+		[&](const DecoPath& node) {
+			return node.name == name;
+		});
 
-    if (it != children.end()) {
-        return &(*it);
-    }
+	if (it != children.end()) {
+		return &(*it);
+	}
 
-    children.push_back({ name, {} });
-    return &children.back();
+	children.push_back({ name, {} });
+	return &children.back();
 }
 
 DecoPath CreateDirectoryTree(const fs::path& rootPath) {
-    DecoPath root;
-    root.name = "Root";
+	DecoPath root;
+	root.name = "Root";
 
-    auto paths = SearchDirectoryPathsAddChild(rootPath);
+	auto paths = SearchDirectoryPathsAddChild(rootPath);
 
-    for (const auto& pathStr : paths) {
-        fs::path path(pathStr);
-        DecoPath* current = &root;
+	for (const auto& pathStr : paths) {
+		fs::path path(pathStr);
+		DecoPath* current = &root;
 
-        for (const auto& part : path) {
-            current = FindOrCreateChild(current->children, part.string());
-        }
-        current->fullPath = pathStr;
-    }
+		for (const auto& part : path) {
+			current = FindOrCreateChild(current->children, part.string());
+		}
+		current->fullPath = pathStr;
+	}
 
-    return root;
+	return root;
 }
 
-Decorate::PathManager::PathManager() {
+Decorate::PathManager::PathManager(SHEngine::TextureManager* textureManager, DataManager* dataManager) {
 	Update();
+	textureManager_ = textureManager;
+	dataManager_ = dataManager;
+
+	folder_ = textureManager_->LoadTexture("Assets/.EngineResource/Texture/Folder.png");
+	model_ = textureManager_->LoadTexture("Assets/.EngineResource/Texture/Model.png");
 }
 
 Decorate::DecoPath Decorate::PathManager::GetDecoPath(const std::string& name) {
@@ -56,39 +61,68 @@ void Decorate::PathManager::Update() {
 
 
 void Decorate::PathManager::DrawImGui() {
-	DrawDecoPath(root_);
-}
-
-void Decorate::PathManager::DrawDecoPath(const DecoPath& node) {
 #ifdef USE_IMGUI
 
-    if (node.children.empty()) {
+	Decorate::DecoPath* currentNode = &root_;
 
-        ImGui::Selectable(node.name.c_str());
+	std::string currentPath = "Model/";
 
-        if (ImGui::BeginDragDropSource()) {
-            ImGui::SetDragDropPayload("DECO_DROP", node.fullPath.c_str(), node.fullPath.size() + 1);
+	for (uint32_t i = 0; i < (uint32_t)currentPath_.size(); ++i) {
+		const auto& it = std::find_if(currentNode->children.begin(), currentNode->children.end(),
+			[&](const DecoPath& node) {
+				return node.name == currentPath_[i];
+			});
 
-            ImGui::Text("%s", node.name.c_str());
+		if (it != currentNode->children.end()) {
+			currentNode = &(*it);
+			currentPath += currentPath_[i] + "/";
+		} else {
+			currentPath_.erase(currentPath_.begin() + i, currentPath_.end());
+		}
+	}
 
-            ImGui::EndDragDropSource();
-        }
+	ImGui::Begin("Explorer");
 
-    } else {
+	const auto windowSize = ImGui::GetContentRegionAvail();
 
-		if (node.name == "Root") {
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+	ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1), currentPath.c_str());
+	const float buttonSize = 96.f;
+	const float itemSpacing = 8.0f;
+	const float tileWidth = buttonSize + ImGui::GetStyle().FramePadding.x * 2.0f;
+	const int columnCount = std::max(1, static_cast<int>((windowSize.x + itemSpacing) / (tileWidth + itemSpacing)));
+	int itemIndex = 0;
+
+	for (const auto& child : currentNode->children) {
+		bool isModel = child.children.empty();
+
+		SHEngine::TextureData* iconTexture = isModel ? textureManager_->GetTextureData(model_) : textureManager_->GetTextureData(folder_);
+
+		if (itemIndex % columnCount != 0) {
+			ImGui::SameLine(0.0f, itemSpacing);
 		}
 
-        if (ImGui::TreeNode(node.name.c_str())) {
+		ImGui::BeginGroup();
+		ImGui::ImageButton(child.name.c_str(), iconTexture->GetSRVHandle().ptr, ImVec2(buttonSize, buttonSize));
+		const bool doubleClicked = ImGui::IsItemHovered() &&
+			ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 
-            for (const auto& child : node.children) {
-                DrawDecoPath(child);
-            }
+		const float textWidth = ImGui::CalcTextSize(child.name.c_str()).x;
+		const float textOffset = std::max(0.0f, (tileWidth - textWidth) * 0.5f);
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textOffset);
+		ImGui::TextUnformatted(child.name.c_str());
+		ImGui::EndGroup();
 
-            ImGui::TreePop();
-        }
-    }
+		if (doubleClicked) {
+			if (isModel) {
+				dataManager_->AddObject(child.fullPath, Vector3(0, 0, 0));
+			} else {
+				currentPath_.push_back(child.name);
+			}
+		}
+		++itemIndex;
+	}
+
+	ImGui::End();
 
 #endif
 }

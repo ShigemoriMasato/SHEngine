@@ -3,9 +3,8 @@
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
 
-#include <Game/Effect/Effect.h>
-#include <Game/Effect/FallPol/FallPolygonEmitter.h>
-#include <Game/Effect/RejectPol/RejectBallPolygonEmitter.h>
+#include <Camera/Editor/CameraEditor.h>
+#include <Tool/DecoEditor/DecoEditor.h>
 #include <Game/Effect/FallPol/FallPolygonEmitter.h>
 
 #include <Tool/ModelDrawer/ModelDrawer.h>
@@ -24,27 +23,34 @@ private:
 	void Save();
 	void Load();
 
+	void SelectFile();
+
+	FallPolygonEmitter::MeshList CreateMeshList();
+	void DecomposeMeshList(const FallPolygonEmitter::MeshList& meshList);
+
 	std::unique_ptr<DebugCamera> debugCamera_;
+	std::unique_ptr<Camera> gameCamera_;
 	Camera orthoCamera_;
 	std::unique_ptr<Grid> grid_;
 
-	Effect effect_{};
+	CameraEditor cameraEditor_;
+	std::unique_ptr<DecoEditor> decoEditor_;
 
-	FallPolygonEmitter fallEmitter_{};
-	RejectBallPolygonEmitter rejectBallEmitter_ = RejectBallPolygonEmitter();
+	CameraCurveData cameraCurveData_;
+	DecoObjData decoObjData_;
+	std::unordered_map<std::string, std::map<int, std::pair<Vector4, uint32_t>>> decoObjDataBuffer_;
 
-	PolygonEmitter::Config fallConfig_{};
-	FallPolygonEmitter::Sphere fallSphere_{};
-	RejectBallPolygonEmitter::Config rejectBallConfig_{};
-	RejectBallPolygonEmitter::RejectBall rejectBall_{};
+	std::unique_ptr<SHEngine::Screen::Display> gameDisplay_;
 
+	ModelDrawer cameraRenderer_{};
 
-	float lifeTime_ = 10.0f;
-	Vector3 gravity_ = { 0.0f, -9.8f, 0.0f };
+private:
 
-	bool emit_ = false;
+	char currentFileName_[256] = "";
+	const std::string basePath_ = "Game/StageConfig/";
+	const std::string extension_ = ".bin";
 
-	const ModelData* model_ = nullptr;
+	std::vector<std::string> fileList_ = {};
 
-	ModelDrawer modelDrawer_{};
+	
 };

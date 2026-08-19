@@ -156,6 +156,10 @@ void SHEngine::Screen::Display::DrawImGui() {
 			imguiWidth_ = imageSize.x;
 			imguiHeight_ = imageSize.y;
 			this->imguiPos_ = { windowPos.x, windowPos.y };
+			isForcus_ = ImGui::IsWindowFocused();
+
+			auto drawList = ImGui::GetWindowDrawList();
+			ImGuizmo::SetDrawlist(drawList);
 		}
 
 		ImGui::End();
@@ -188,6 +192,8 @@ const ImGuiPayload* SHEngine::Screen::Display::DrawImGuiWithDD(std::string key) 
 		ImGui::Image(ImTextureRef(textureData_[i]->GetSRVHandle().ptr), imageSize);
 
 		if (i == 0) {
+
+			isForcus_ = ImGui::IsWindowFocused();
 
 			imguiWidth_ = imageSize.x;
 			imguiHeight_ = imageSize.y;
@@ -250,6 +256,14 @@ bool SHEngine::Screen::Display::IsHovering() {
 #endif // USE_IMGUI
 
 	return isHovering;
+}
+
+bool SHEngine::Screen::Display::IsForcus() {
+#ifdef USE_IMGUI
+	return isForcus_;
+#endif
+
+	return true;
 }
 
 void SHEngine::Screen::Display::CreateRenderTarget(SHEngine::TextureManager* textureManager, uint32_t index) {

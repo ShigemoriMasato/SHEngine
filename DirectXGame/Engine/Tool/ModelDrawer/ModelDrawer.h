@@ -28,6 +28,7 @@ public:
 	void Initialize(const ModelData* modelData, std::string debugName = "NoName", Type type = Type::Normal);
 	void Update(const Camera* camera, float deltaTime = 0.0f);
 	void Draw(DCC* dcc);
+	void NormalDraw(DCC* dcc);
 
 	void SetMaterial(const std::vector<MaterialData>& materials);
 
@@ -59,7 +60,8 @@ private:
 
 	SHEngine::BufferContainer container_;
 	std::vector<std::unique_ptr<SHEngine::Renderer>> renderers_{};
-
+	std::vector<SHEngine::GPUBuffer*> materialIndexBuffer_ = {};
+	std::vector<SHEngine::GPUBuffer*> nodeIndexBuffer_ = {};
 	SHEngine::GPUBuffer* idBuffer_ = nullptr;
 	SHEngine::GPUBuffer* transformBuffer_ = nullptr;
 	SHEngine::GPUBuffer* cameraBuffer_ = nullptr;

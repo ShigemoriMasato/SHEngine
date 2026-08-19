@@ -38,7 +38,6 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 	renderers_.reserve(meshNum);
 
 	transformBuffer_ = container_.Create(BufferType::SRV, sizeof(Matrix4x4), kMaxInstanceNum);
-	cameraBuffer_ = container_.Create(BufferType::CBV, sizeof(Matrix4x4));
 	parentMatrixBuffer_ = container_.Create(BufferType::SRV, sizeof(Matrix4x4), nodeNum);
 
 	if (type == Type::Deco) {
@@ -58,14 +57,16 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 	}
 	materialBuffer_->CopyBuffer(materialData.data(), sizeof(MaterialData) * materialData.size());
 
+	materialIndexBuffer_.reserve(nodeNum);
+	nodeIndexBuffer_.reserve(nodeNum);
 	for (uint32_t i = 0; i < nodeNum; ++i) {
 		if (modelData->nodes[i].meshIndex == -1) continue;
 
 		const auto& mesh = modelData->meshes[modelData->nodes[i].meshIndex];
 		uint32_t materialIndexNum = static_cast<uint32_t>(mesh.primitives.size());
 
-		auto materialIndexBuffer = container_.Create(BufferType::SRV, sizeof(uint32_t), materialIndexNum, BufferNum::Single);
-		auto nodeIndexBuffer = container_.Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single);
+		auto materialIndexBuffer = materialIndexBuffer_.emplace_back(container_.Create(BufferType::SRV, sizeof(uint32_t), materialIndexNum, BufferNum::Single));
+		auto nodeIndexBuffer = nodeIndexBuffer_.emplace_back(container_.Create(BufferType::CBV, sizeof(uint32_t), 1, BufferNum::Single));
 
 		std::vector<uint32_t> materialIndices(materialIndexNum, 0);
 		for (uint32_t j = 0; j < materialIndexNum; ++j) {
@@ -77,13 +78,9 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 		auto& renderer = renderers_.emplace_back(std::make_unique<SHEngine::Renderer>(SHEngine::VertexType::Default, mesh));
 		renderer->SetVS("Engine/ModelDrawer.VS.hlsl");
 		renderer->SetPS("Engine/ModelDrawer.PS.hlsl");
-		renderer->SetGPUBuffers({ transformBuffer_, parentMatrixBuffer_ }, ShaderType::VERTEX_SHADER, BufferType::SRV);
-		renderer->SetGPUBuffers({ cameraBuffer_, nodeIndexBuffer }, ShaderType::VERTEX_SHADER, BufferType::CBV);
-		renderer->SetGPUBuffers({ materialBuffer_, materialIndexBuffer }, ShaderType::PIXEL_SHADER, BufferType::SRV);
 		renderer->SetUseTexture(true);
 
 		if (type == Type::Deco) {
-			renderer->SetGPUBuffer(idBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
 			renderer->SetPS("Engine/DecoEditor.PS.hlsl");
 		}
 	}
@@ -101,7 +98,6 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 
 void ModelDrawer::Update(const Camera* camera, float deltaTime) {
 	Matrix4x4 tmp = camera->GetVPMatrix();
-	cameraBuffer_->CopyBuffer(&tmp, sizeof(Matrix4x4));
 
 	animationTimer_ = std::fmod(animationTimer_ + deltaTime, animation_.duration);
 	
@@ -122,11 +118,42 @@ void ModelDrawer::Update(const Camera* camera, float deltaTime) {
 	}
 
 	parentMatrixBuffer_->CopyBuffer(transformMatrices_.data(), sizeof(Matrix4x4) * transformMatrices_.size());
+
+	cameraBuffer_ = camera->GetVPBuffer();
 }
 
 void ModelDrawer::Draw(DCC* dcc) {
-	for (const auto& renderer : renderers_) {
-		renderer->Draw(dcc);
+	if (!cameraBuffer_) {
+		return;
+	}
+
+	for (uint32_t i = 0; i < (uint32_t)renderers_.size(); ++i) {
+		renderers_[i]->ResetGPUBuffers();
+		renderers_[i]->SetGPUBuffers({ transformBuffer_, parentMatrixBuffer_ }, ShaderType::VERTEX_SHADER, BufferType::SRV);
+		renderers_[i]->SetGPUBuffers({ cameraBuffer_, nodeIndexBuffer_[i] }, ShaderType::VERTEX_SHADER, BufferType::CBV);
+		renderers_[i]->SetGPUBuffers({ materialBuffer_, materialIndexBuffer_[i] }, ShaderType::PIXEL_SHADER, BufferType::SRV);
+		if (idBuffer_) {
+			renderers_[i]->SetPS("Engine/DecoEditor.PS.hlsl");
+			renderers_[i]->SetGPUBuffer(idBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
+		}
+		renderers_[i]->SetUseTexture(true);
+		renderers_[i]->Draw(dcc);
+	}
+}
+
+void ModelDrawer::NormalDraw(DCC* dcc) {
+	if (!cameraBuffer_) {
+		return;
+	}
+
+	for (uint32_t i = 0; i < (uint32_t)renderers_.size(); ++i) {
+		renderers_[i]->ResetGPUBuffers();
+		renderers_[i]->SetPS("Engine/ModelDrawer.PS.hlsl");
+		renderers_[i]->SetGPUBuffers({ transformBuffer_, parentMatrixBuffer_ }, ShaderType::VERTEX_SHADER, BufferType::SRV);
+		renderers_[i]->SetGPUBuffers({ cameraBuffer_, nodeIndexBuffer_[i] }, ShaderType::VERTEX_SHADER, BufferType::CBV);
+		renderers_[i]->SetGPUBuffers({ materialBuffer_, materialIndexBuffer_[i] }, ShaderType::PIXEL_SHADER, BufferType::SRV);
+		renderers_[i]->SetUseTexture(true);
+		renderers_[i]->Draw(dcc);
 	}
 }
 

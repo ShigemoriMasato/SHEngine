@@ -7,31 +7,16 @@ Decorate::ObjManager::ObjManager(SHEngine::Screen::Display* display, SHEngine::E
 }
 
 void Decorate::ObjManager::Update(Camera* camera) {
-#ifdef USE_IMGUI
-	const ImGuiPayload* payload = display_->DrawImGuiWithDD("DECO_DROP");
-
-	if (payload && payload->IsDelivery()) {
-		currentPath_ = static_cast<const char*>(payload->Data);
-	} else {
-		currentPath_ = "";
-	}
-
-#endif
-
 	//Dragされたので、DecoObjectを追加する
 	if (!currentPath_.empty()) {
-		constexpr static float cameraDistance = 20.0f;
-		Vector3 position = camera->GetPosition() + camera->GetDirection() * cameraDistance;
-		Vector3 dummy = position;
-		dummy.x -= 1.0f;
-		dataManager_->AddObject(currentPath_, position);
+		dataManager_->AddObject(currentPath_, Vector3(0, 0, 0));
 	}
 
 	for (auto& [path, renderer] : renderers_) {
 		renderer->Update(camera);
 	}
 
-	auto& objectInfos = dataManager_->GetObjectInfos(currentPath_);
+	auto& objectInfos = dataManager_->GetObjectInfos();
 	for (const auto& [path, info] : objectInfos) {
 		auto& renderer = renderers_[path];
 
@@ -60,5 +45,17 @@ void Decorate::ObjManager::Update(Camera* camera) {
 void Decorate::ObjManager::Draw(DCC* dcc) {
 	for (const auto& [path, renderer] : renderers_) {
 		renderer->Draw(dcc);
+	}
+}
+
+void Decorate::ObjManager::NormalDraw(DCC* dcc) {
+	for (const auto& [path, renderer] : renderers_) {
+		renderer->NormalDraw(dcc);
+	}
+}
+
+void Decorate::ObjManager::SetCamera(Camera* camera) {
+	for (auto& renderer : renderers_) {
+		renderer.second->Update(camera);
 	}
 }

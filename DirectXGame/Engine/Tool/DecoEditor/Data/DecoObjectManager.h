@@ -14,6 +14,9 @@ namespace Decorate {
 		void Update(Camera* camera);
 
 		void Draw(DCC* dcc);
+		void NormalDraw(DCC* dcc);
+
+		void SetCamera(Camera* camera);
 
 	private:
 

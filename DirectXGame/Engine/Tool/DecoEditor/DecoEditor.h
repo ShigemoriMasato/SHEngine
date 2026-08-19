@@ -13,10 +13,17 @@ public:
 
 	void Update(Camera* camera, DCC* dcc);
 	void Draw(DCC* dcc);
+	void NormalDraw(DCC* dcc);
 
 	void Undo() { decoDataManager_->Undo(); }
 	void Redo() { decoDataManager_->Redo(); }
 	void DeleteSelectedObj() { decoDataManager_->EraseObject(decoDataManager_->GetCurrentID()); }
+
+	void SetData(const DecoObjData& data);
+	void SetDrawCamera(Camera* camera);
+
+	void GetCurrentObj(std::string& path, uint32_t& id);
+	const DecoObjData& GetData() const;
 
 private:
 

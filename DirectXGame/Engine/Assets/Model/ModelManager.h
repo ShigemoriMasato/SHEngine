@@ -18,6 +18,8 @@ namespace SHEngine {
 		Sphere,
 		SimpleSkin,
 		Desc,
+		Camera,
+
 	};
 
 	/**

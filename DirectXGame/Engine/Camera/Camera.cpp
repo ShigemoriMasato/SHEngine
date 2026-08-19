@@ -37,6 +37,10 @@ namespace {
 	}
 }
 
+Camera::Camera() {
+	vpBuffer_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Matrix4x4));
+}
+
 void Camera::SetProjectionMatrix(PerspectiveFovDesc desc) {
 	projectionMatrix_ = MakePerspectiveFovMatrix(desc.fovY, desc.aspectRatio, desc.nearClip, desc.farClip);
 }
@@ -45,11 +49,27 @@ void Camera::SetProjectionMatrix(OrthographicDesc desc) {
 	projectionMatrix_ = MakeOrthographicMatrix(desc.left, desc.top, desc.right, desc.bottom, desc.nearClip, desc.farClip);
 }
 
+void Camera::UpdateCurve(float deltaTime) {
+	if (curveData_.totalTime <= 0.0f) {
+		return;
+	}
+	timer_ = std::fmod(timer_ + deltaTime, curveData_.totalTime);
+	
+	position_.x = curveData_.posXCurve.Evaluate(timer_);
+	position_.y = curveData_.posYCurve.Evaluate(timer_);
+	position_.z = curveData_.posZCurve.Evaluate(timer_);
+
+	rotation_.x = curveData_.rotXCurve.Evaluate(timer_);
+	rotation_.y = curveData_.rotYCurve.Evaluate(timer_);
+	rotation_.z = curveData_.rotZCurve.Evaluate(timer_);
+}
+
 void Camera::MakeMatrix() {
 	if (!isSetMatrix) {
 		transformMatrix_ = MakeTranslationMatrix(-position_) * MakeRotationMatrix(rotation_) * MakeScaleMatrix(scale_);
 	}
 	vpMatrix_ = transformMatrix_ * projectionMatrix_;
+	vpBuffer_->CopyBuffer(&vpMatrix_, sizeof(Matrix4x4));
 }
 
 void Camera::DrawImGui() {
@@ -85,4 +105,8 @@ Vector3 Camera::GetDirection() const {
 	Vector3 direction = { 0.0f, 0.0f, 1.0f };
 	direction = MakeRotationMatrix(rotation_) * direction;
 	return direction.Normalize();
+}
+
+void Camera::Inport(const CameraCurveData& data) {
+	curveData_ = data;
 }

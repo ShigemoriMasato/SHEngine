@@ -1,11 +1,18 @@
 #pragma once
 #include <Utility/DataStructures.h>
+#include <Tool/Binary/BinaryManager.h>
+#include <Camera/Camera.h>
 #include <vector>
 #include <string>
 #include <unordered_map>
 #include <map>
 
+using DecoObjData = std::unordered_map<std::string, std::map<int, Transform>>;
+
 namespace Decorate {
+
+	void Save(DecoObjData& data, BinaryManager& binManager);
+	void Load(DecoObjData& data, BinaryManager& binManager);
 
 	struct EditData {
 		int id;
@@ -26,15 +33,15 @@ namespace Decorate {
 
 		uint32_t GetCurrentID() const { return currentID_; }
 		std::string GetCurrentPath() const { return currentPath_; }
-		const std::unordered_map<std::string, std::map<int, Transform>>& GetObjectInfos(std::string path) const;
+		const DecoObjData& GetObjectInfos() const;
+		void SetObjectInfos(const DecoObjData& data);
+
+		void SetCamera(Camera* camera) { camera_ = camera; }
 
 		void Undo();
 		void Redo();
 
 		void DrawImGui();
-
-		void Save();
-		void Load();
 
 	private:
 
@@ -89,6 +96,8 @@ namespace Decorate {
 
 		std::string selectedPath_;
 		const std::string basePath = "Deco/";
+
+		Camera* camera_ = nullptr;
 
 		const std::string configName = "DecoDataConfig.bin";
 	};

@@ -1,5 +1,6 @@
 #include "DecoObjectController.h"
 #include <Utility/DirectUtilFuncs.h>
+#include <numbers>
 
 Decorate::ObjController::ObjController(SHEngine::Screen::Display* display, SHEngine::Engine* engine, DataManager* dataManager) {
 	display_ = display;
@@ -61,7 +62,14 @@ void Decorate::ObjController::GetIDFromGPU(DCC* dcc) {
 	{
 		void* mappedData = nullptr;
 		readBack.res->Map(0, nullptr, &mappedData);
+
+		uint32_t tmp = selectedID_;
 		selectedID_ = *static_cast<uint32_t*>(mappedData);
+
+		if (tmp != selectedID_) {
+			static Logger logger = GetLogger("Editor", LoggerFlag::UseDebugString);
+			logger->info("SelectedID: {}", selectedID_);
+		}
 	}
 
 	//結果の取得を命令する
@@ -78,9 +86,6 @@ void Decorate::ObjController::GetIDFromGPU(DCC* dcc) {
 
 	//computeShaderを起動
 	idGetter_->Execute(dcc);
-
-	//ReadBackしてIDを取得
-	uint32_t id = 0;
 
 	//Barrier張替
 	ansBuffer_->TransitionBarrier(D3D12_RESOURCE_STATE_COPY_SOURCE);
@@ -101,6 +106,8 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	//ImGuizmoを使って編集する
 #ifdef USE_IMGUI
 
+	static bool isImGuizmoActive_ = false;
+
 	ImGuizmo::Enable(true);
 
 	static ImGuizmo::OPERATION op = ImGuizmo::OPERATION::TRANSLATE;
@@ -119,9 +126,9 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	float translation[3], rotation[3], scale[3];
 	ImGuizmo::DecomposeMatrixToComponents(world, translation, rotation, scale);
 
-	rotation[0] *= 3.14159265358979323846f / 180.0f;
-	rotation[1] *= 3.14159265358979323846f / 180.0f;
-	rotation[2] *= 3.14159265358979323846f / 180.0f;
+	rotation[0] *= std::numbers::pi_v<float> / 180.0f;
+	rotation[1] *= std::numbers::pi_v<float> / 180.0f;
+	rotation[2] *= std::numbers::pi_v<float> / 180.0f;
 
 	Transform newTransform = transform;
 
@@ -165,7 +172,7 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 	ImGui::Text("Rotate:   %.2f, %.2f, %.2f", transform.rotate.x, transform.rotate.y, transform.rotate.z);
 	ImGui::Text("Position: %.2f, %.2f, %.2f", transform.position.x, transform.position.y, transform.position.z);
 
-	if (ImGui::Button("Erase")) {
+	if (ImGui::Button("Erase") || ImGui::IsKeyPressed(ImGuiKey_Delete)) {
 		dataManager_->EraseObject(dataManager_->GetCurrentID());
 	}
 

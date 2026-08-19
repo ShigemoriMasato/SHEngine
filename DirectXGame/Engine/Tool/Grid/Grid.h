@@ -5,7 +5,8 @@ class Grid {
 public:
 
 	void Initialize();
-	void Update(Vector3 middle, const Matrix4x4& vpMatrix);
+	void Update(Vector3 middle);
+	void SetCamera(Camera* camera);
 	void Draw(DCC* dcc);
 
 private:

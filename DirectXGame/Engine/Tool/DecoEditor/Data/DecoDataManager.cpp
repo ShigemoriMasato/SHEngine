@@ -59,11 +59,15 @@ void Decorate::DataManager::EditTransform(const Transform& transform, bool corre
 }
 
 void Decorate::DataManager::AddObject(std::string path, Vector3 position) {
+	constexpr static float cameraDistance = 20.0f;
+	Vector3 pos = position;
+	pos += camera_->GetPosition() + camera_->GetDirection() * cameraDistance;
+
 	AddHistory(HistoryType::Add);
 	Data data{};
 	data.path = path;
 	data.id = nextID_++;
-	data.transform.position = position;
+	data.transform.position = pos;
 
 	transform_[data.path][data.id] = data.transform;
 	historyAdd_.push_back(data);
@@ -88,8 +92,35 @@ void Decorate::DataManager::EraseObject(uint32_t id) {
 	currentID_ = 0;
 }
 
-const std::unordered_map<std::string, std::map<int, Transform>>& Decorate::DataManager::GetObjectInfos(std::string path) const {
+const std::unordered_map<std::string, std::map<int, Transform>>& Decorate::DataManager::GetObjectInfos() const {
 	return transform_;
+}
+
+void Decorate::DataManager::SetObjectInfos(const DecoObjData& data) {
+	transform_ = data;
+
+	for (const auto& [path, infos] : transform_) {
+		for (const auto& [id, transform] : infos) {
+			if (id >= int(nextID_)) {
+				nextID_ = id + 1;
+			}
+		}
+	}
+
+	history_.clear();
+	historyAdd_.clear();
+	historyErase_.clear();
+	historyTransform_.clear();
+	historyID_.clear();
+
+	historyIndex_ = -1;
+	historyAddIndex_ = -1;
+	historyEraseIndex_ = -1;
+	historyTransformIndex_ = -1;
+	historyIDIndex_ = -1;
+
+	currentPath_.clear();
+	currentID_ = 0;
 }
 
 void Decorate::DataManager::Undo() {
@@ -185,97 +216,8 @@ void Decorate::DataManager::Redo() {
 void Decorate::DataManager::DrawImGui() {
 #ifdef USE_IMGUI
 
-	ImGui::Begin("SaveFile");
-
-	auto files = SearchFiles("Assets/Binary/" + basePath, ".bin");
-
-	ImGui::Text("Current File: %s", selectedPath_.empty() ? "None" : selectedPath_.c_str());
-
-	ImGui::Separator();
-
-	for (int i = 0; i < static_cast<int>(files.size()); i++) {
-		const std::string& file = files[i];
-		if (ImGui::Selectable(file.c_str(), selectedPath_ == file)) {
-			selectedPath_ = file;
-			Load();
-		}
-	}
-
-	static char newFileName[256] = "";
-	ImGui::InputText("##SaveFileAdd", newFileName, IM_ARRAYSIZE(newFileName));
-	if (ImGui::Button("Save")) {
-		if (strlen(newFileName) > 0) {
-			selectedPath_ = std::string(newFileName) + ".bin";
-			Save();
-			newFileName[0] = '\0';
-		} else {
-			Save();
-		}
-	}
-
-	ImGui::End();
-
 #endif // USE_IMGUI
 
-}
-
-void Decorate::DataManager::Save() {
-	BinaryManager fileNameManager;
-	fileNameManager.Register(&selectedPath_);
-	fileNameManager.Write(configName);
-
-	BinaryManager binManager;
-
-	int pathCount = static_cast<int>(transform_.size());
-	binManager.Register(&pathCount);
-	for (auto& [path, infos] : transform_) {
-		binManager.Register(&path);
-		int objCount = static_cast<int>(infos.size());
-		binManager.Register(&objCount);
-
-		for (auto& [id, transform] : infos) {
-			binManager.Register(&transform);
-		}
-	}
-
-	binManager.Write(basePath + selectedPath_);
-}
-
-void Decorate::DataManager::Load() {
-	for(auto& [path, infos] : transform_) {
-		infos.clear();
-	}
-	nextID_ = 1;
-
-	BinaryManager binManager;
-	if (!binManager.Boot(basePath + selectedPath_)) {
-		return;
-	}
-
-	int pathCount = binManager.Reverse<int>();
-	for (int i = 0; i < pathCount; i++) {
-		std::string path = binManager.Reverse<std::string>();
-		int objCount = binManager.Reverse<int>();
-		for (int j = 0; j < objCount; j++) {
-			Transform transform = binManager.Reverse<Transform>();
-			transform_[path][nextID_++] = transform;
-		}
-	}
-
-	history_.clear();
-	historyAdd_.clear();
-	historyErase_.clear();
-	historyTransform_.clear();
-	historyID_.clear();
-
-	historyIndex_ = -1;
-	historyAddIndex_ = -1;
-	historyEraseIndex_ = -1;
-	historyTransformIndex_ = -1;
-	historyIDIndex_ = -1;
-
-	currentPath_.clear();
-	currentID_ = 0;
 }
 
 void Decorate::DataManager::AddHistory(HistoryType type) {
@@ -318,4 +260,47 @@ std::string Decorate::DataManager::GetPathFromID(uint32_t id) const {
 		}
 	}
 	return std::string();
+}
+
+void Decorate::Save(DecoObjData& data, BinaryManager& binManager) {
+	const static std::string key = "DecoObjData";
+	binManager.Register(&key);
+
+	uint32_t pathCount = static_cast<uint32_t>(data.size());
+	binManager.Register(&pathCount);
+
+	for (const auto& [path, transforms] : data) {
+		binManager.Register(&path);
+
+		uint32_t transformCount = static_cast<uint32_t>(transforms.size());
+		binManager.Register(&transformCount);
+
+		for (const auto& [id, transform] : transforms) {
+			binManager.Register(&transform);
+		}
+	}
+}
+
+void Decorate::Load(DecoObjData& data, BinaryManager& binManager) {
+	const static std::string key = "DecoObjData";
+	std::string readKey = binManager.Reverse<std::string>();
+
+	int nextID = 1;
+
+	if (readKey != key) {
+		binManager.Back();
+		return;
+	}
+
+	uint32_t pathCount = binManager.Reverse<uint32_t>();
+
+	for (uint32_t i = 0; i < pathCount; ++i) {
+		std::string path = binManager.Reverse<std::string>();
+		uint32_t transformCount = binManager.Reverse<uint32_t>();
+
+		for (uint32_t j = 0; j < transformCount; ++j) {
+			Transform transform = binManager.Reverse<Transform>();
+			data[path][nextID++] = transform;
+		}
+	}
 }

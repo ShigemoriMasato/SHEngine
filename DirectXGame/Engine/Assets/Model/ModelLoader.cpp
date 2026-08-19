@@ -197,7 +197,7 @@ std::vector<Material> ModelLoader::LoadMaterials(const aiScene* scene, std::stri
 			}
 
 		} else {
-			material.textureIndex = textureManager->GetErrorTextureHandle();
+			material.textureIndex = textureManager->GetWhite1x1Texture();
 		}
 
 		aiString normalTexturePath;

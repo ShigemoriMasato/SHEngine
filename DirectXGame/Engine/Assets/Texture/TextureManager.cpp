@@ -42,6 +42,11 @@ void TextureManager::Initialize(DXDevice* device) {
 	LoadTexture("Assets/.EngineResource/Texture/white1x1.png");
 	LoadTexture("Assets/.EngineResource/Texture/uvChecker.png");
 	errorTextureHandle_ = LoadTexture("Assets/.EngineResource/Texture/error.png");
+
+	LoadTexture("Assets/.EngineResource/Texture/File.png");
+	LoadTexture("Assets/.EngineResource/Texture/Folder.png");
+	LoadTexture("Assets/.EngineResource/Texture/Model.png");
+	LoadTexture("Assets/.EngineResource/Texture/Texture.png");
 }
 
 void TextureManager::AllTextureClear() {
@@ -76,7 +81,7 @@ TextureData* TextureManager::GetTextureData(std::string filePath) {
 
 	auto it = loadedTexturePaths_.find(factFilePath);
 	if (it != loadedTexturePaths_.end()) {
-		GetTextureData(it->second);
+		return GetTextureData(it->second);
 	}
 	return GetTextureData(errorTextureHandle_);
 }

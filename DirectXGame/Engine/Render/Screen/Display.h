@@ -65,6 +65,7 @@ namespace SHEngine::Screen {
 		// @brief ImGui上でカーソルがDisplayの上にあるかどうか
 		// @return カーソルがDisplayの上にあるときtrue、そうでないときfalse | ImGuiが使われていないときは常にtrueを返す。
 		bool IsHovering();
+		bool IsForcus();
 
 		Vector2 GetPos() override { return imguiPos_; }
 		Vector2 GetSize() override { return { imguiWidth_, imguiHeight_ }; }
@@ -105,6 +106,7 @@ namespace SHEngine::Screen {
 
 		bool isOffScreen_ = true;
 		bool unordered_ = false;
+		bool isForcus_ = false;
 	};
 
 }

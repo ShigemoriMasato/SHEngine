@@ -40,6 +40,7 @@ void ModelManager::Initialize(TextureManager* textureManager) {
 	LoadModel("Assets/.EngineResource/Model/Sphere");
 	LoadModel("Assets/.EngineResource/Model/SimpleSkin");
 	LoadModel("Assets/.EngineResource/Model/DefaultDesc");
+	LoadModel("Assets/.EngineResource/Model/Camera");
 }
 
 const ModelData* ModelManager::LoadModel(std::string filePath) {

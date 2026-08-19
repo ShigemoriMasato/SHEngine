@@ -1,5 +1,7 @@
 #pragma once
 #include <Utility/MatrixFactory.h>
+#include "Editor/Data/CameraEditorData.h"
+#include <Render/Buffer/GPUBuffer.h>
 #include <memory>
 
 //初期値を画面サイズ1280*720と仮定して設定
@@ -69,11 +71,13 @@ struct OrthographicDesc {
 class Camera {
 public:
 
-	Camera() = default;
+	Camera();
 	~Camera() = default;
 	
 	void SetProjectionMatrix(PerspectiveFovDesc desc);
 	void SetProjectionMatrix(OrthographicDesc desc);
+
+	void UpdateCurve(float deltaTime);
 
 	//TransformとProjectionMatrixをかけて、VPMatrixを作成する
 	virtual void MakeMatrix();
@@ -92,7 +96,12 @@ public:
 	Matrix4x4 GetProjectionMatrix() const { return projectionMatrix_; }
 
 	virtual Vector3 GetPosition() const { return position_; }
+	virtual Vector3 GetRotation() const { return rotation_; }
 	Vector3 GetDirection() const;
+
+	void Inport(const CameraCurveData& data);
+
+	SHEngine::GPUBuffer* GetVPBuffer() const { return vpBuffer_.get(); }
 
 protected:
 
@@ -110,5 +119,10 @@ protected:
 
 	/// @brief 投影行列が設定済みかどうか
 	bool isSetMatrix = false;
+
+	CameraCurveData curveData_ = { };
+	float timer_ = 0.0f;
+
+	std::unique_ptr<SHEngine::GPUBuffer> vpBuffer_ = nullptr;
 };
 

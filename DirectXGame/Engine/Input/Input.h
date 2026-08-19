@@ -57,6 +57,9 @@ namespace SHEngine {
 		 */
 		void Update();
 
+		//すべての判定をfalseにする
+		void AllClear();
+
 		/// @brief 現在のキーボード状態を取得
 		/// @return キー状態の配列
 		BYTE* GetKeyState();
