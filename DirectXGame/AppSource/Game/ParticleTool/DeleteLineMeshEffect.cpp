@@ -26,7 +26,7 @@ void DeleteLineMeshEffect::Update(float deltaTime) {
 
 		configs_[i].Copy(emitConfig_);
 
-		configs_[i].transform.position = Vector3(pos.x, pos.y, lowerLeftPos.z);
+		configs_[i].transform.position = Vector3(pos.x, pos.y, lowerLeftPos.z) * parentMatrix_;
 	}
 	for (i; i < int(configs_.size()); ++i) {
 		configs_[i].Copy(zeroConfig_);
@@ -34,7 +34,7 @@ void DeleteLineMeshEffect::Update(float deltaTime) {
 
 	if (debugDeleteLine_) {
 		configs_[0].Copy(emitConfig_);
-		configs_[0].transform.position = { 0.0f, 0.0f, 0.0f };
+		configs_[0].transform.position = Vector3(0.0f, 0.0f, 0.0f) * parentMatrix_;
 		debugDeleteLine_ = false;
 	}
 

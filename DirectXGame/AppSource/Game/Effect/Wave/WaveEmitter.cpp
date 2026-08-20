@@ -121,7 +121,7 @@ void WaveEmitter::Config::DrawImGui() {
 #ifdef USE_IMGUI
 	ImGui::DragFloat("Speed", &speed, 0.01f);
 	ImGui::DragFloat("LifeTime", &lifeTime, 0.1f, 5.0f);
-	ImGui::DragInt("EmitNum", &emitNum, 1, 0, 100000);
+	ImGui::DragInt("EmitNum", &emitNum, 1, 0);
 	ImGui::DragFloat("ColorIntensity", &colorIntensity, 0.01f);
 	ImGui::ColorEdit3("Color", &color.x);
 	ImGui::DragFloat3("FieldSize", &fieldSize.x, 0.1f);

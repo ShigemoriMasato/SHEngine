@@ -12,4 +12,6 @@ struct CommonData {
 
 	std::unique_ptr<KeyManager> keyManager = nullptr;	// キーマネージャーの共通データ
 	int postEffectDrawDataIndex = -1;
+
+	std::string stageName_ = "Stage1";	// 現在のステージ名
 };

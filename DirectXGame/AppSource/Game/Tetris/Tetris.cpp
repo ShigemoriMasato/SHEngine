@@ -23,7 +23,7 @@ void Tetris::Update(float deltaTime) {
 	float deltaTimeScale = 1.0f + (scoreManager_.GetLevel() - 1) * 0.1f;
 	float scaledDeltaTime = deltaTime * deltaTimeScale;
 
-	if (gameOver_) {
+	if (gameOver_ || deltaTime == 0.0f) {
 		blockRender_.Update(deltaTime);
 		return;
 	}

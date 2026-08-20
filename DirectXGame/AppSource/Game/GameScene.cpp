@@ -17,8 +17,9 @@ GameScene::GameScene() {
 	gameCamera_ = std::make_unique<GameCamera>();
 
 	gameCamera_->Initialize();
-	worldCamera_ = debugCamera_.get();
 	worldCamera_ = gameCamera_->GetCamera();
+	worldCamera_ = debugCamera_.get();
+	worldCamera_ = manualCamera_.get();
 }
 
 void GameScene::Initialize() {
@@ -33,14 +34,14 @@ void GameScene::Initialize() {
 	waveEmitter_ = std::make_unique<WaveEmitter>(6000000);
 	effect_.AddEmitter(waveEmitter_.get());
 
-	polygonEmitter_ = std::make_unique<PolygonEmitter>(4000000);
+	polygonEmitter_ = std::make_unique<PolygonEmitter>(6000000);
 	effect_.AddEmitter(polygonEmitter_.get());
 
-	ellipseEmitter_ = std::make_unique<EllipseEmitter>();
-	effect_.AddEmitter(ellipseEmitter_.get());
-
-	rejectBallEmitter_ = std::make_unique<RejectBallPolygonEmitter>();
+	rejectBallEmitter_ = std::make_unique<RejectBallPolygonEmitter>(6000000);
 	effect_.AddEmitter(rejectBallEmitter_.get());
+
+	fallPolygonEmitter_ = std::make_unique<FallPolygonEmitter>(1024);
+	//effect_.AddEmitter(fallPolygonEmitter_.get());
 
 	computeContext_->MiddleExecute();
 
@@ -53,33 +54,21 @@ void GameScene::Initialize() {
 	postEffectConfig_.origin = commonData_->display.get();
 	postEffectConfig_.jobs = uint32_t(PostEffectJob::None);
 
-	intermediateDisplay_ = std::make_unique<SHEngine::Screen::Display>();
-	intermediateDisplay_->Initialize(1280, 720, "EdgeDetection");
-	intermediateDisplay_->AddRenderTarget(textureManager_, 0xff);
-
-	edgeDetection_ = std::make_unique<PostEffect>();
-	edgeDetection_->Initialize(textureManager_);
-	forEdgeDetection_.origin = commonData_->display.get();
-	forEdgeDetection_.output = intermediateDisplay_.get();
-	forEdgeDetection_.jobs = uint32_t(PostEffectJob::EdgeDetection);
-
 	timeViewer_ = std::make_unique<TimeViewer>();
 	timeViewer_->Initialize(engine_);
 
 	waveEmitterConfig_.textureID = textureManager_->LoadTexture("MagicCircle.png");
-
-	model = modelManager_->LoadModel("Pyramid");
-	auto config = rejectBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
-	polygonConfigs_.push_back(config);
-	auto config2 = rejectBallEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), Vector4(1, 1, 1, 1), 100);
-	polygonConfigs_.push_back(config2);
 
 	rejectBallManager_.Initialize();
 
 	model = modelManager_->GetModelData(SHEngine::TestModel::Plane);
 	deleteLineMeshEffect_.Initialize(&tetris_, polygonEmitter_.get(), model->meshes.front());
 
+	model = modelManager_->LoadModel("Pillar");
+	polygonEmitter_->AddPolygon(model->meshes, Matrix4x4::Identity(), { 0.4f, 0.6f, 0.4f, 1.0f }, 800000);
+
 	Load();
+
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
@@ -89,10 +78,8 @@ std::unique_ptr<IScene> GameScene::Update() {
 	Vector2 mousePos = commonData_->display->GetCursorPos(input_->GetCursorPos());
 
 	waveEmitter_->SetConfig(waveEmitterConfig_);
-	for (auto& config : polygonConfigs_) {
-		rejectBallEmitter_->SetConfig(config);
-	}
 
+	deleteLineMeshEffect_.SetParentMatrix(tetrisParent_.Matrix());
 	deleteLineMeshEffect_.Update(deltaTime);
 
 	rejectBallManager_.Update(deltaTime);
@@ -108,6 +95,10 @@ std::unique_ptr<IScene> GameScene::Update() {
 	debugCamera_->Update();
 	gameCamera_->Update(deltaTime);
 
+	if (!manualCamera_->UpdateCurve(deltaTime, false)) {
+		deltaTime = 0.0f;
+	}
+	tetris_.SetParentMatrix(tetrisParent_.Matrix());
 	tetris_.Update(deltaTime);
 
 	//線を消したときのやつ
@@ -130,7 +121,7 @@ std::unique_ptr<IScene> GameScene::Update() {
 	}
 
 	FinSceneUI ans = FinSceneUI::None;
-	//ans = finScene_->Update(deltaTime, mousePos, key);
+	ans = finScene_->Update(deltaTime, mousePos, key);
 
 	//ゲームオーバー時のUIでの選択肢によって次のシーンを発行する
 	if (key[Key::Correct]) {
@@ -174,12 +165,6 @@ void GameScene::Draw() {
 
 	display->ToTexture(directContext_);
 
-	forEdgeDetection_.dcc = directContext_;
-	int edgeDetectionTextureIndex = commonData_->display->GetDepthTexture()->GetHandle();
-	edgeDetection_->CopyBuffer(PostEffectJob::EdgeDetection, edgeDetectionTextureIndex);
-	edgeDetection_->Draw(forEdgeDetection_);
-	intermediateDisplay_->DrawImGui();
-
 	postEffectConfig_.dcc = directContext_;
 
 #ifdef SH_RELEASE
@@ -209,12 +194,6 @@ void GameScene::Draw() {
 	waveEmitterConfig_.DrawImGui();
 	ImGui::End();
 
-	ImGui::Begin("EllipseEmitter");
-	if (ellipseConfig_.DrawImGui()) {
-		ellipseEmitter_->Emit(ellipseConfig_);
-	}
-	ImGui::End();
-
 	{
 		ImGui::Begin("WaveData");
 		static int waveIndex = 0;
@@ -233,25 +212,6 @@ void GameScene::Draw() {
 		if (waves_[waveIndex].DrawImGui()) {
 			waveEmitter_->AddWave(waves_[waveIndex]);
 		}
-		ImGui::End();
-	}
-
-	{
-		ImGui::Begin("PolygonEmitterConfig");
-		static int polygonIndex = 0;
-		ImGui::Text("current: %d", polygonIndex);
-		if (ImGui::Button("-")) {
-			polygonIndex--;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("+")) {
-			polygonIndex++;
-		}
-		polygonIndex = std::clamp(polygonIndex, 0, int(polygonConfigs_.size()) - 1);
-
-		ImGui::Separator();
-
-		polygonConfigs_[polygonIndex].DrawImGui();
 		ImGui::End();
 	}
 
@@ -276,14 +236,9 @@ void GameScene::Save() {
 		wave.Save(bin);
 	}
 	waveEmitterConfig_.Save(bin);
-	uint32_t polygonConfigSize = static_cast<uint32_t>(polygonConfigs_.size());
-	bin.Register(&polygonConfigSize);
-	for (auto& polygonConfig : polygonConfigs_) {
-		polygonConfig.Save(bin);
-	}
-	ellipseConfig_.Save(bin);
 
 	finScene_->Save(bin);
+	bin.Register(&tetrisParent_);
 
 	deleteLineMeshEffect_.Save(bin);
 
@@ -302,18 +257,28 @@ void GameScene::Load() {
 		wave.Load(bin);
 	}
 	waveEmitterConfig_.Load(bin);
-	uint32_t polygonConfigSize = bin.Reverse<uint32_t>();
-	for (uint32_t i = 0; i < polygonConfigSize; ++i) {
-		polygonConfigs_[i].Load(bin);
-	}
-	uint32_t rejectBallSize = bin.Reverse<uint32_t>();
-	for (uint32_t i = 0; i < rejectBallSize; ++i) {
-		auto rejectBall = RejectBallPolygonEmitter::RejectBall();
-		rejectBall.position = bin.Reverse<Vector3>();
-		rejectBall.radius = bin.Reverse<float>();
-	}
-	ellipseConfig_.Load(bin);
-
+	
 	finScene_->Load(bin);
+	tetrisParent_ = bin.Reverse<Transform>();
 	deleteLineMeshEffect_.Load(bin);
+
+	const std::string stageFile = "Game/StageConfig/" + commonData_->stageName_ + ".bin";
+	if (!bin.Boot(stageFile)) {
+		return;
+	}
+
+	CameraCurveData cameraCurveData;
+	FallPolygonEmitter::MeshList fallMeshList;
+
+	cameraCurveData.Load(bin);
+	fallMeshList.Load(bin);
+
+	manualCamera_->Inport(cameraCurveData);
+	//fallPolygonEmitter_->AddPolygon(fallMeshList, modelManager_);
+
+	//今回だけRejectBallのほうに情報を入れる
+	for (const auto& meshInfo : fallMeshList.meshes) {
+		auto model = modelManager_->LoadModel(meshInfo.modelPath);
+		rejectBallEmitter_->AddPolygon(model->meshes, meshInfo.transform.Matrix(), meshInfo.color, meshInfo.emitNum);
+	}
 }

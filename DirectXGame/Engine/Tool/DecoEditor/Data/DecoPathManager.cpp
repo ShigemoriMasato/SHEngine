@@ -92,34 +92,48 @@ void Decorate::PathManager::DrawImGui() {
 	const int columnCount = std::max(1, static_cast<int>((windowSize.x + itemSpacing) / (tileWidth + itemSpacing)));
 	int itemIndex = 0;
 
-	for (const auto& child : currentNode->children) {
-		bool isModel = child.children.empty();
-
-		SHEngine::TextureData* iconTexture = isModel ? textureManager_->GetTextureData(model_) : textureManager_->GetTextureData(folder_);
-
+	auto Button = [&](const SHEngine::TextureData* iconTexture, const std::string& name)->bool {
 		if (itemIndex % columnCount != 0) {
 			ImGui::SameLine(0.0f, itemSpacing);
 		}
 
 		ImGui::BeginGroup();
-		ImGui::ImageButton(child.name.c_str(), iconTexture->GetSRVHandle().ptr, ImVec2(buttonSize, buttonSize));
+		ImGui::ImageButton(name.c_str(), iconTexture->GetSRVHandle().ptr, ImVec2(buttonSize, buttonSize));
 		const bool doubleClicked = ImGui::IsItemHovered() &&
 			ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 
-		const float textWidth = ImGui::CalcTextSize(child.name.c_str()).x;
+		const float textWidth = ImGui::CalcTextSize(name.c_str()).x;
 		const float textOffset = std::max(0.0f, (tileWidth - textWidth) * 0.5f);
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textOffset);
-		ImGui::TextUnformatted(child.name.c_str());
+		ImGui::TextUnformatted(name.c_str());
 		ImGui::EndGroup();
 
-		if (doubleClicked) {
-			if (isModel) {
-				dataManager_->AddObject(child.fullPath, Vector3(0, 0, 0));
-			} else {
-				currentPath_.push_back(child.name);
-			}
-		}
 		++itemIndex;
+
+		return doubleClicked;
+		};
+
+	SHEngine::TextureData* iconTexture = textureManager_->GetTextureData(folder_);
+
+	//Folder
+	for (const auto& child : currentNode->children) {
+		if (child.children.empty()) {
+			continue;
+		}
+
+		if (Button(iconTexture, child.name)) {
+			currentPath_.push_back(child.name);
+		}
+	}
+
+	//Model
+	for (const auto& child : currentNode->children) {
+		if (!child.children.empty()) {
+			continue;
+		}
+		if (Button(textureManager_->GetTextureData(model_), child.name)) {
+			dataManager_->AddObject(child.fullPath, {});
+		}
 	}
 
 	ImGui::End();

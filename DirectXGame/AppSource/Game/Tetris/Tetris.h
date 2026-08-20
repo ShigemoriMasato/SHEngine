@@ -27,6 +27,8 @@ public:
 	Vector3 GetLowerLeftPos() const { return blockRender_.GetLowerLeftPos(); }
 	Vector2 GetFieldSize() const { return { float(fieldWidth_), float(fieldHeight_) }; }
 
+	void SetParentMatrix(Matrix4x4 mat) { blockRender_.SetParentMatrix(mat); }
+
 private://定数
 
 	const int fieldWidth_ = 10;

@@ -12,6 +12,8 @@ public:
 
 	void DrawImGui();
 
+	void SetParentMatrix(Matrix4x4 mat) { parentMatrix_ = mat; }
+
 	void Save(BinaryManager& bin) const;
 	void Load(BinaryManager& bin);
 
@@ -24,6 +26,8 @@ private:
 
 	PolygonEmitter::Config emitConfig_{};
 	PolygonEmitter::Config zeroConfig_{};
+
+	Matrix4x4 parentMatrix_ = Matrix4x4::Identity();
 
 	bool debugDeleteLine_ = false;
 };

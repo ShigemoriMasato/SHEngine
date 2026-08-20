@@ -49,11 +49,23 @@ void Camera::SetProjectionMatrix(OrthographicDesc desc) {
 	projectionMatrix_ = MakeOrthographicMatrix(desc.left, desc.top, desc.right, desc.bottom, desc.nearClip, desc.farClip);
 }
 
-void Camera::UpdateCurve(float deltaTime) {
+bool Camera::UpdateCurve(float deltaTime, bool repeat) {
 	if (curveData_.totalTime <= 0.0f) {
-		return;
+		return false;
 	}
-	timer_ = std::fmod(timer_ + deltaTime, curveData_.totalTime);
+
+	bool ans = false;
+	
+	timer_ += deltaTime;
+	if (timer_ > curveData_.totalTime) {
+		if (repeat) {
+			timer_ -= curveData_.totalTime;
+		} else {
+			timer_ = curveData_.totalTime;
+		}
+
+		ans = true;
+	}
 	
 	position_.x = curveData_.posXCurve.Evaluate(timer_);
 	position_.y = curveData_.posYCurve.Evaluate(timer_);
@@ -62,6 +74,10 @@ void Camera::UpdateCurve(float deltaTime) {
 	rotation_.x = curveData_.rotXCurve.Evaluate(timer_);
 	rotation_.y = curveData_.rotYCurve.Evaluate(timer_);
 	rotation_.z = curveData_.rotZCurve.Evaluate(timer_);
+
+	MakeMatrix();
+
+	return ans;
 }
 
 void Camera::MakeMatrix() {

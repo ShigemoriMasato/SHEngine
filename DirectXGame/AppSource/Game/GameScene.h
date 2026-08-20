@@ -11,6 +11,7 @@
 #include <Game/Effect/Wave/WaveEmitter.h>
 #include <Game/Effect/Polygon/PolygonEmitter.h>
 #include <Game/Effect/Ellipse/EllipseEmitter.h>
+#include <Game/Effect/FallPol/FallPolygonEmitter.h>
 
 #include <Game/ParticleTool/RejectBallManager.h>
 #include <Game/ParticleTool/DeleteLineMeshEffect.h>
@@ -45,6 +46,8 @@ private:
 	std::unique_ptr<Camera> manualCamera_ = nullptr;
 	std::unique_ptr<GameCamera> gameCamera_ = nullptr;
 
+	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
+
 	std::unique_ptr<KeyCoating> keyCoating_;
 	Tetris tetris_{};
 	Effect effect_{};
@@ -53,34 +56,21 @@ private:
 	PostEffectConfig postEffectConfig_{};
 	PostEffect postEffect_;
 
-	PostEffectConfig edgeConfig_{};
-	PostEffect edgeEffect_{};
-
-	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
-
-	std::unique_ptr<SHEngine::Screen::Display> intermediateDisplay_ = nullptr;
-	std::unique_ptr<PostEffect> edgeDetection_ = nullptr;
-	PostEffectConfig forEdgeDetection_{};
-
-	Grayscale grayScale_;
-
 	bool prevIsGameOver_ = false;
 
 	// ==========================
 
 	std::unique_ptr<WaveEmitter> waveEmitter_ = nullptr;
+	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
+	std::unique_ptr<RejectBallPolygonEmitter> rejectBallEmitter_ = nullptr;
+	std::unique_ptr<FallPolygonEmitter> fallPolygonEmitter_ = nullptr;
+
 	WaveEmitter::Config waveEmitterConfig_ = {};
 	std::array<WaveEmitter::WaveData, size_t(WaveType::Count)> waves_ = {};
-
-	std::unique_ptr<PolygonEmitter> polygonEmitter_ = nullptr;
-	std::vector<PolygonEmitter::Config> polygonConfigs_ = {};
-
-	std::unique_ptr<EllipseEmitter> ellipseEmitter_ = nullptr;
-	EllipseEmitter::Config ellipseConfig_ = {};
-
-	std::unique_ptr<RejectBallPolygonEmitter> rejectBallEmitter_ = nullptr;
 
 	RejectBallManager rejectBallManager_ = {};
 
 	DeleteLineMeshEffect deleteLineMeshEffect_;
+
+	Transform tetrisParent_ = {};
 };

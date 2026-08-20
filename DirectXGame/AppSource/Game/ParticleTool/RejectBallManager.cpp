@@ -65,7 +65,7 @@ void RejectBallManager::Initialize() {
 
 		RejectBallPolygonEmitter::RejectBall ball;
 		ball.position = kInitialPosition;
-		ball.radius = lerp(1000.0f, 0.0f, t, EaseType::EaseInQuad);
+		ball.radius = lerp(5000.0f, 0.0f, t, EaseType::EaseInQuad);
 
 		return ball;
 		};

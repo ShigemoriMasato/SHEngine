@@ -128,7 +128,7 @@ void BlockRender::Update(float deltaTime) {
 
 	for (size_t i = 0; i < blockTransforms_.size(); ++i) {
 		VSData& data = vsData_[i];
-		data.world = Matrix::MakeAffineMatrix(blockTransforms_[i].scale, blockTransforms_[i].rotate, blockTransforms_[i].position);
+		data.world = Matrix::MakeAffineMatrix(blockTransforms_[i].scale, blockTransforms_[i].rotate, blockTransforms_[i].position) * parentMatrix_;
 		data.wvp = data.world * camera_->GetVPMatrix();
 	}
 	vsBuffer_->CopyBuffer(vsData_.data(), sizeof(VSData) * vsData_.size());

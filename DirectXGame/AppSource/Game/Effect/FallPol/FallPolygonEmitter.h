@@ -25,6 +25,8 @@ public:
 
 public:
 
+	FallPolygonEmitter(uint32_t maxParticleNum = 1000000) : PolygonEmitter(maxParticleNum) {};
+
 	void Initialize(SHEngine::Engine* engine, const Pool& pool) override;
 	void Update(CCC* compute, float deltaTime) override;
 

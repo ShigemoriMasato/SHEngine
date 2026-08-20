@@ -77,7 +77,7 @@ public:
 	void SetProjectionMatrix(PerspectiveFovDesc desc);
 	void SetProjectionMatrix(OrthographicDesc desc);
 
-	void UpdateCurve(float deltaTime);
+	bool UpdateCurve(float deltaTime, bool repeat = true);
 
 	//TransformとProjectionMatrixをかけて、VPMatrixを作成する
 	virtual void MakeMatrix();

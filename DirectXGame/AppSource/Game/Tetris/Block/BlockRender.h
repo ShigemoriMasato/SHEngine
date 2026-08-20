@@ -21,6 +21,8 @@ public:
 	//4*5まで
 	void SetNextMino(std::vector<std::pair<int, int>> blockPos, int colorID);
 
+	void SetParentMatrix(Matrix4x4 mat) { parentMatrix_ = mat; }
+
 	void BeginDeleteEffect(std::vector<int> fillLines, std::vector<std::vector<int>> deletedField);
 
 	void Draw(DCC* cmdObj);
@@ -60,6 +62,8 @@ private:
 	SHEngine::GPUBuffer* vsBuffer_;
 	SHEngine::GPUBuffer* colorMapBuffer_;
 	SHEngine::GPUBuffer* materialBuffer_;
+
+	Matrix4x4 parentMatrix_ = Matrix4x4::Identity();
 
 	//Field->Wall->Hold->Next
 	std::unique_ptr<SHEngine::BufferContainer> container_;
