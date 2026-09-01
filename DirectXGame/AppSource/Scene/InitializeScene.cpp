@@ -1,7 +1,5 @@
 #include "InitializeScene.h"
 #include <imgui/imgui.h>
-#include <Game/GameScene.h>
-#include <Title/TitleScene.h>
 #include <Test/TestScene.h>
 
 #ifdef USE_IMGUI
@@ -156,8 +154,6 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
-	return std::make_unique<TitleScene>();
-	return std::make_unique<GameScene>();
 	return std::make_unique<TestScene>();
 	return nullptr;
 }

@@ -1,3 +1,5 @@
+#include "../LightFunc.hlsli"
+
 struct PSInput
 {
     float4 position : SV_POSITION;
@@ -39,6 +41,11 @@ float4 EncodeIDToColor(uint id)
 
 PSOutput main(PSInput input)
 {
+    DirectionalLight dirLight;
+    dirLight.direction = normalize(float3(0.3f, 0.3f, 0.3f));
+    dirLight.color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    dirLight.intensity = 1.0f;
+    
     PSOutput output;
     MaterialData material = materials[materialIndices[input.primitiveID]];
     
@@ -51,7 +58,8 @@ PSOutput main(PSInput input)
     
     //その他マテリアル処理はいつかやる
     
-    output.color = baseColor * texColor;
+    
+    output.color = HalfLambert(input.normal, baseColor * texColor, dirLight.color, dirLight.direction, dirLight.intensity);
     output.idColor = EncodeIDToColor(objectID[input.instanceID]);
     
     return output;

@@ -5,7 +5,6 @@
 
 #include <Camera/Editor/CameraEditor.h>
 #include <Tool/DecoEditor/DecoEditor.h>
-#include <Game/Effect/FallPol/FallPolygonEmitter.h>
 
 #include <Tool/ModelDrawer/ModelDrawer.h>
 
@@ -24,9 +23,6 @@ private:
 	void Load();
 
 	void SelectFile();
-
-	FallPolygonEmitter::MeshList CreateMeshList();
-	void DecomposeMeshList(const FallPolygonEmitter::MeshList& meshList);
 
 	std::unique_ptr<DebugCamera> debugCamera_;
 	std::unique_ptr<Camera> gameCamera_;
@@ -47,7 +43,7 @@ private:
 private:
 
 	char currentFileName_[256] = "";
-	const std::string basePath_ = "Game/StageConfig/";
+	const std::string basePath_ = "";
 	const std::string extension_ = ".bin";
 
 	std::vector<std::string> fileList_ = {};
