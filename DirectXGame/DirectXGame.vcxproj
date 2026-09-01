@@ -277,6 +277,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="AppSource\Game\Effect\Point\PointEmitter.cpp" />
     <ClCompile Include="Engine\Tool\ModelDrawer\ModelDrawer.cpp" />
     <ClCompile Include="Engine\Tool\ModelDrawer\SkinningProcessor.cpp" />
+    <ClCompile Include="StageData.cpp" />
     <ClInclude Include="AppSource\Game\Effect\Ellipse\EllipseEmitter.h" />
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
     <ClInclude Include="AppSource\Game\ParticleTool\DeleteLineMeshEffect.h" />
@@ -381,6 +382,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="AppSource\Game\Effect\RejectPol\RejectBallPolygonEmitter.h" />
     <ClInclude Include="AppSource\Game\Effect\FallPol\FallPolygonEmitter.h" />
     <ClInclude Include="AppSource\Game\ParticleTool\FallEmitterEditor.h" />
+    <ClInclude Include="StageData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />

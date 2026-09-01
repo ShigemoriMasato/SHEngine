@@ -1,7 +1,16 @@
 #pragma once
 #include "Pool/ParticlePool.h"
-#include "Wave/WaveEmitter.h"
+#include <Game/Effect/Base/IEmitter.h>
 #include <SHEngine.h>
+
+enum class EmitterType {
+	Wave,
+	Vertex,
+	Polygon,
+	PolygonRB,
+	PolygonFall,
+
+};
 
 class Effect {
 public:
