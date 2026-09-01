@@ -144,6 +144,8 @@ void Decorate::ObjController::EditObject(Camera* camera) {
 		break;
 	}
 
+	newTransform.position.y = 0.0f;
+
 	//ギズモ触ってなくて、ギズモの行列に変更があった時
 	if (!isImGuizmoActive_ && different) {
 		dataManager_->EditTransform(newTransform, false);

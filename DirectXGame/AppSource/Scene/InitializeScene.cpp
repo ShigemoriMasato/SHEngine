@@ -127,6 +127,8 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::Z, DIK_Z, KeyState::Trigger);
 	keyManager->SetKey(Key::Y, DIK_Y, KeyState::Trigger);
 	keyManager->SetKey(Key::Delete, DIK_DELETE, KeyState::Trigger);
+	keyManager->SetKey(Key::Ctrl, DIK_LCONTROL, KeyState::Hold);
+	keyManager->SetKey(Key::Ctrl, DIK_RCONTROL, KeyState::Hold);
 	keyManager->SetKey(Key::S, DIK_S, KeyState::Trigger);
 	keyManager->SetKey(Key::R, DIK_R, KeyState::Trigger);
 	keyManager->SetKey(Key::T, DIK_T, KeyState::Trigger);

@@ -63,6 +63,8 @@ void Decorate::DataManager::AddObject(std::string path, Vector3 position) {
 	Vector3 pos = position;
 	pos += camera_->GetPosition() + camera_->GetDirection() * cameraDistance;
 
+	pos.y = 0.0f;
+
 	AddHistory(HistoryType::Add);
 	Data data{};
 	data.path = path;

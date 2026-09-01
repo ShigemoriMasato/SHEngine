@@ -39,6 +39,7 @@ enum class Key {
 	Z,
 	Y,
 	Delete,
+	Ctrl,
 	S,
 	R,
 	T,

@@ -34,16 +34,13 @@ private:
 
 	CameraCurveData cameraCurveData_;
 	DecoObjData decoObjData_;
-	std::unordered_map<std::string, std::map<int, std::pair<Vector4, uint32_t>>> decoObjDataBuffer_;
-
-	std::unique_ptr<SHEngine::Screen::Display> gameDisplay_;
 
 	ModelDrawer cameraRenderer_{};
 
 private:
 
 	char currentFileName_[256] = "";
-	const std::string basePath_ = "";
+	const std::string basePath_ = "Preset/";
 	const std::string extension_ = ".bin";
 
 	std::vector<std::string> fileList_ = {};

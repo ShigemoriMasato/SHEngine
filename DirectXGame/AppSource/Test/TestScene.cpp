@@ -25,11 +25,6 @@ void TestScene::Initialize() {
 	grid_ = std::make_unique<Grid>();
 	grid_->Initialize();
 
-	gameDisplay_ = std::make_unique<SHEngine::Screen::Display>();
-	gameDisplay_->Initialize(1280, 720, "GameDisplay");
-	gameDisplay_->AddRenderTarget(textureManager_, 0xff);
-	gameDisplay_->CreateDepthTexture(textureManager_);
-
 	// ===================== 超えられない壁 =================================
 
 	cameraEditor_.Initialize(gameCamera_.get());
@@ -72,30 +67,20 @@ std::unique_ptr<IScene> TestScene::Update() {
 
 	decoEditor_->Update(debugCamera_.get(), directContext_);
 
-	cameraCurveData_ = cameraEditor_.GetData();
-	decoObjData_ = decoEditor_->GetData();
-
 	cameraRenderer_.SetTransform({ gameCamera_->GetViewMatrix().Inverse() });
 	cameraRenderer_.Update(debugCamera_.get(), deltaTime);
 
-#ifdef USE_IMGUI
-
-	std::string currentFilePath;
-	uint32_t currentID;
-	decoEditor_->GetCurrentObj(currentFilePath, currentID);
-
-	if (currentID == 0) {
-		return nullptr;
+	if (key[Key::Ctrl] && key[Key::S]) {
+		Save();
 	}
 
-	auto& conf = decoObjDataBuffer_[currentFilePath][currentID];
+	if (key[Key::Ctrl] && key[Key::Z]) {
+		decoEditor_->Undo();
+	}
 
-	ImGui::Begin("EmitterConfig");
-	ImGui::ColorEdit4("Color", &conf.first.x);
-	ImGui::DragInt("EmitNum", (int*)&conf.second, 1000, 0, 1000000);
-	ImGui::End();
-
-#endif
+	if (key[Key::Ctrl] && key[Key::Y]) {
+		decoEditor_->Redo();
+	}
 
 	return nullptr;
 }
@@ -118,16 +103,6 @@ void TestScene::Draw() {
 
 	display->ToTexture(directContext_);
 
-	directContext_->SetRenderTarget(gameDisplay_.get());
-	grid_->SetCamera(gameCamera_.get());
-	grid_->Draw(directContext_);
-
-	decoEditor_->SetDrawCamera(gameCamera_.get());
-	decoEditor_->NormalDraw(directContext_);
-
-	gameDisplay_->ToTexture(directContext_);
-
-	gameDisplay_->DrawImGui();
 	SelectFile();
 
 	directContext_->SetRenderTarget(window);
@@ -140,6 +115,9 @@ void TestScene::Save() {
 	const std::string fileName = basePath_ + currentFileName_ + extension_;
 
 	// ↓↓↓ 保存するデータ ==============================================
+
+	auto data = decoEditor_->GetData();
+	Decorate::Save(data, bin);
 
 	// ↑↑↑ 保存するデータ ==============================================
 
@@ -154,6 +132,9 @@ void TestScene::Load() {
 		return;
 	}
 
+	DecoObjData data;
+	Decorate::Load(data, bin);
+	decoEditor_->SetData(data);
 }
 
 void TestScene::SelectFile() {
@@ -194,6 +175,8 @@ void TestScene::SelectFile() {
 	}
 
 	ImGui::End();
+
+	
 
 #endif
 }
