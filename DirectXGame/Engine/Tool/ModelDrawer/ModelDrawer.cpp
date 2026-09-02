@@ -97,6 +97,10 @@ void ModelDrawer::Initialize(const ModelData* modelData, std::string debugName, 
 }
 
 void ModelDrawer::Update(const Camera* camera, float deltaTime) {
+	if (renderers_.empty()) {
+		return;
+	}
+
 	Matrix4x4 tmp = camera->GetVPMatrix();
 
 	animationTimer_ = std::fmod(animationTimer_ + deltaTime, animation_.duration);
@@ -123,6 +127,10 @@ void ModelDrawer::Update(const Camera* camera, float deltaTime) {
 }
 
 void ModelDrawer::Draw(DCC* dcc) {
+	if (renderers_.empty()) {
+		return;
+	}
+
 	if (!cameraBuffer_) {
 		return;
 	}

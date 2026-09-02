@@ -47,8 +47,19 @@ void TestScene::Initialize() {
 	cameraEditor_.SetData(cameraCurveData_);
 	decoEditor_->SetData(decoObjData_);
 
-	auto model = modelManager_->GetModelData(SHEngine::TestModel::Camera);
-	cameraRenderer_.Initialize(model);
+	models_.resize(16);
+	for (auto& model : models_) {
+		model = std::make_unique<ModelDrawer>();
+	}
+	auto model = modelManager_->GetModelData(SHEngine::TestModel::Field);
+	models_[0]->Initialize(model, "Field");
+	models_[0]->SetTransform({ Matrix4x4::Identity() });
+
+	model = modelManager_->GetModelData(SHEngine::TestModel::Tower);
+	models_[1]->Initialize(model, "Tower");
+	models_[1]->SetTransform({ Matrix4x4::Identity() });
+
+	stageEditor_.Initialize();
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
@@ -67,8 +78,10 @@ std::unique_ptr<IScene> TestScene::Update() {
 
 	decoEditor_->Update(debugCamera_.get(), directContext_);
 
-	cameraRenderer_.SetTransform({ gameCamera_->GetViewMatrix().Inverse() });
-	cameraRenderer_.Update(debugCamera_.get(), deltaTime);
+
+	for (auto& model : models_) {
+		model->Update(debugCamera_.get(), deltaTime);
+	}
 
 	if (key[Key::Ctrl] && key[Key::S]) {
 		Save();
@@ -81,6 +94,9 @@ std::unique_ptr<IScene> TestScene::Update() {
 	if (key[Key::Ctrl] && key[Key::Y]) {
 		decoEditor_->Redo();
 	}
+
+	stageEditor_.SetPresetFileList(fileList_);
+	stageEditor_.Update();
 
 	return nullptr;
 }
@@ -98,6 +114,9 @@ void TestScene::Draw() {
 	// ↓↓↓ オブジェクト描画 ==============================================
 
 	decoEditor_->Draw(directContext_);
+	for (auto& model : models_) {
+		model->Draw(directContext_);
+	}
 
 	// ↑↑↑ オブジェクト描画 ==============================================
 
@@ -111,6 +130,10 @@ void TestScene::Draw() {
 }
 
 void TestScene::Save() {
+	if (currentFileName_[0] == '\0') {
+		return;
+	}
+
 	BinaryManager bin;
 	const std::string fileName = basePath_ + currentFileName_ + extension_;
 

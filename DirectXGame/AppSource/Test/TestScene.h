@@ -8,6 +8,8 @@
 
 #include <Tool/ModelDrawer/ModelDrawer.h>
 
+#include "StageEditor.h"
+
 class TestScene : public IScene {
 public:
 
@@ -35,7 +37,7 @@ private:
 	CameraCurveData cameraCurveData_;
 	DecoObjData decoObjData_;
 
-	ModelDrawer cameraRenderer_{};
+	std::vector<std::unique_ptr<ModelDrawer>> models_{};
 
 private:
 
@@ -45,5 +47,5 @@ private:
 
 	std::vector<std::string> fileList_ = {};
 
-	
+	StageEditor stageEditor_;
 };

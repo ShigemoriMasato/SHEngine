@@ -19,7 +19,8 @@ namespace SHEngine {
 		SimpleSkin,
 		Desc,
 		Camera,
-
+		Field,
+		Tower
 	};
 
 	/**

@@ -257,6 +257,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="Engine\Tool\AnimationModel\SkinningModel.cpp" />
     <ClCompile Include="Engine\Tool\ModelDrawer\ModelDrawer.cpp" />
     <ClCompile Include="Engine\Tool\ModelDrawer\SkinningProcessor.cpp" />
+    <ClCompile Include="AppSource\Test\StageEditor.cpp" />
     <ClInclude Include="AppSource\Test\TestScene.h" />
     <ClInclude Include="Engine\Camera\Editor\CameraEditor.h" />
     <ClInclude Include="Engine\Camera\Editor\Data\CameraEditorData.h" />
@@ -326,6 +327,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="Engine\Tool\AnimationModel\SkinningModel.h" />
     <ClInclude Include="Engine\Tool\ModelDrawer\ModelDrawer.h" />
     <ClInclude Include="Engine\Tool\ModelDrawer\SkinningProcessor.h" />
+    <ClInclude Include="AppSource\Test\StageEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Data\AudioData.h" />
