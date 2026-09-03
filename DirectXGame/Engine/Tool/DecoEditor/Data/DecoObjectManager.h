@@ -17,6 +17,7 @@ namespace Decorate {
 		void NormalDraw(DCC* dcc);
 
 		void SetCamera(Camera* camera);
+		void SetParentMatrix(Matrix4x4 mat) { parentMatrix_ = mat; }
 
 	private:
 
@@ -26,6 +27,8 @@ namespace Decorate {
 
 		SHEngine::Screen::Display* display_ = nullptr;
 		SHEngine::Engine* engine_ = nullptr;
+
+		Matrix4x4 parentMatrix_ = Matrix4x4::Identity();
 
 		struct RenderInfo {
 			std::vector<uint32_t> ids;

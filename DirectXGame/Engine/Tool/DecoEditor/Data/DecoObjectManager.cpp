@@ -17,8 +17,14 @@ void Decorate::ObjManager::Update(Camera* camera) {
 	}
 
 	auto& objectInfos = dataManager_->GetObjectInfos();
+	std::unordered_set<std::string> nonUpdate;
+	for (const auto& [path, renderer] : renderers_) {
+		nonUpdate.insert(path);
+	}
+
 	for (const auto& [path, info] : objectInfos) {
 		auto& renderer = renderers_[path];
+		nonUpdate.erase(path);
 
 		//Rendererがないときは作成する
 		if (!renderer) {
@@ -34,11 +40,16 @@ void Decorate::ObjManager::Update(Camera* camera) {
 		transforms.reserve(info.size());
 		ids.reserve(info.size());
 		for (const auto& [id, transform] : info) {
-			transforms.push_back(transform.Matrix());
+			transforms.push_back(transform.Matrix() * parentMatrix_);
 			ids.push_back(id);
 		}
 		renderer->SetTransform(transforms);
 		renderer->SetIDs(ids);
+	}
+
+	for (const auto& path : nonUpdate) {
+		renderers_[path]->SetTransform({});
+		renderers_[path]->Update(camera);
 	}
 }
 

@@ -99,6 +99,10 @@ const std::unordered_map<std::string, std::map<int, Transform>>& Decorate::DataM
 }
 
 void Decorate::DataManager::SetObjectInfos(const DecoObjData& data) {
+	for (auto& [path, infos] : transform_) {
+		infos.clear();
+	}
+
 	transform_ = data;
 
 	for (const auto& [path, infos] : transform_) {
@@ -264,7 +268,7 @@ std::string Decorate::DataManager::GetPathFromID(uint32_t id) const {
 	return std::string();
 }
 
-void Decorate::Save(DecoObjData& data, BinaryManager& binManager) {
+void Decorate::Save(const DecoObjData& data, BinaryManager& binManager) {
 	const static std::string key = "DecoObjData";
 	binManager.Register(&key);
 

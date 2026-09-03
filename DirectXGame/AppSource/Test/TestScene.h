@@ -25,6 +25,7 @@ private:
 	void Load();
 
 	void SelectFile();
+	void DrawInfo();
 
 	std::unique_ptr<DebugCamera> debugCamera_;
 	std::unique_ptr<Camera> gameCamera_;
@@ -48,4 +49,6 @@ private:
 	std::vector<std::string> fileList_ = {};
 
 	StageEditor stageEditor_;
+
+	float rotation_ = 0.0f;
 };

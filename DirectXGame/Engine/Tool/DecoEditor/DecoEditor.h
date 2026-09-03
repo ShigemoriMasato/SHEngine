@@ -21,6 +21,7 @@ public:
 
 	void SetData(const DecoObjData& data);
 	void SetDrawCamera(Camera* camera);
+	void SetParentMatrix(Matrix4x4 mat) { decoObjectManager_->SetParentMatrix(mat); }
 
 	void GetCurrentObj(std::string& path, uint32_t& id);
 	const DecoObjData& GetData() const;

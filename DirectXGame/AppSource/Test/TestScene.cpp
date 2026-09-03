@@ -1,15 +1,10 @@
 #include "TestScene.h"
+#include <numbers>
+
+#include <Utility/SearchFile.h>
 
 TestScene::~TestScene() {
 	Save();
-
-	BinaryManager bin;
-	uint32_t fileNum = static_cast<uint32_t>(fileList_.size());
-	bin.Register(&fileNum);
-	for (uint32_t i = 0; i < fileNum; ++i) {
-		bin.Register(&fileList_[i]);
-	}
-	bin.Write("TestScene_Config.bin");
 }
 
 void TestScene::Initialize() {
@@ -33,14 +28,11 @@ void TestScene::Initialize() {
 	Load();
 
 	{
-		BinaryManager bin;
-		uint32_t fileNum = 0;
-		if (bin.Boot("TestScene_Config.bin")) {
-			fileNum = bin.Reverse<uint32_t>();
-			fileList_.resize(fileNum);
-			for (uint32_t i = 0; i < fileNum; ++i) {
-				fileList_[i] = bin.Reverse<std::string>();
-			}
+		auto files = SearchFiles("Assets/Binary/" + basePath_, extension_);
+		for (const auto& filePath : files) {
+			std::filesystem::path path(filePath);
+			std::string fileName = path.stem().string();
+			fileList_.push_back(fileName);
 		}
 	}
 
@@ -59,7 +51,7 @@ void TestScene::Initialize() {
 	models_[1]->Initialize(model, "Tower");
 	models_[1]->SetTransform({ Matrix4x4::Identity() });
 
-	stageEditor_.Initialize();
+	stageEditor_.Initialize(textureManager_);
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
@@ -111,6 +103,8 @@ void TestScene::Draw() {
 
 	directContext_->SetRenderTarget(display, false);
 
+	decoEditor_->SetParentMatrix(Matrix::MakeRotationYMatrix(rotation_));
+
 	// ↓↓↓ オブジェクト描画 ==============================================
 
 	decoEditor_->Draw(directContext_);
@@ -123,6 +117,7 @@ void TestScene::Draw() {
 	display->ToTexture(directContext_);
 
 	SelectFile();
+	DrawInfo();
 
 	directContext_->SetRenderTarget(window);
 	engine_->DrawImGui();
@@ -167,7 +162,7 @@ void TestScene::SelectFile() {
 
 	const SHEngine::TextureData* fileTexture = textureManager_->GetTextureData("Assets/.EngineResource/Texture/File.png");
 	const auto windowSize = ImGui::GetContentRegionAvail();
-	const float buttonSize = 64.f;
+	const float buttonSize = 80.f;
 	const float itemSpacing = 8.0f;
 	const float tileWidth = buttonSize + ImGui::GetStyle().FramePadding.x * 2.0f;
 	const int columnCount = std::max(1, static_cast<int>((windowSize.x + itemSpacing) / (tileWidth + itemSpacing)));
@@ -184,22 +179,80 @@ void TestScene::SelectFile() {
 		Save();
 	}
 
+	auto Button = [&](const SHEngine::TextureData* iconTexture, const std::string& name)->bool {
+		if (itemIndex % columnCount != 0) {
+			ImGui::SameLine(0.0f, itemSpacing);
+		}
+
+		ImGui::BeginGroup();
+		ImGui::ImageButton(name.c_str(), iconTexture->GetSRVHandle().ptr, ImVec2(buttonSize, buttonSize));
+		const bool doubleClicked = ImGui::IsItemHovered() &&
+			ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
+
+		const float textWidth = ImGui::CalcTextSize(name.c_str()).x;
+		const float textOffset = std::max(0.0f, (tileWidth - textWidth) * 0.5f);
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textOffset);
+		ImGui::TextUnformatted(name.c_str());
+		ImGui::EndGroup();
+
+		++itemIndex;
+
+		return doubleClicked;
+		};
+
 	for (const auto& fileName : fileList_) {
 		if (itemIndex % columnCount != 0) {
 			ImGui::SameLine();
 		}
 
-		if (ImGui::ImageButton(fileName.c_str(), (ImTextureRef)fileTexture->GetSRVHandle().ptr, ImVec2(buttonSize, buttonSize))) {
+		if (Button(fileTexture, fileName)) {
 			std::memcpy(currentFileName_, fileName.c_str(), sizeof(currentFileName_));
 			Load();
 		}
-		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1), fileName.c_str());
 	}
 
 	ImGui::End();
 
 	
+
+#endif
+}
+
+void TestScene::DrawInfo() {
+	const auto& data = decoEditor_->GetData();
+	std::unordered_map<std::string, int> objectCount;
+
+	for (const auto& [path, transforms] : data) {
+		objectCount[path] = (int)transforms.size();
+	}
+
+#ifdef USE_IMGUI
+
+	ImGui::Begin("Preset Info");
+
+	ImGui::DragFloat("Rotation", &rotation_, 0.01f);
+	rotation_ = std::fmod(rotation_, std::numbers::pi_v<float> * 2.0f);
+	if (ImGui::Button("0")) {
+		rotation_ = 0.0f;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Half")) {
+		rotation_ = std::numbers::pi_v<float> * 0.5f;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Rev")) {
+		rotation_ = std::numbers::pi_v<float>;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("1.5Rev")) {
+		rotation_ = std::numbers::pi_v<float> * 1.5f;
+	}
+
+	for (const auto& [path, count] : objectCount) {
+		ImGui::Text("%s: %d", path.c_str(), count);
+	}
+
+	ImGui::End();
 
 #endif
 }

@@ -11,7 +11,7 @@ using DecoObjData = std::unordered_map<std::string, std::map<int, Transform>>;
 
 namespace Decorate {
 
-	void Save(DecoObjData& data, BinaryManager& binManager);
+	void Save(const DecoObjData& data, BinaryManager& binManager);
 	void Load(DecoObjData& data, BinaryManager& binManager);
 
 	struct EditData {

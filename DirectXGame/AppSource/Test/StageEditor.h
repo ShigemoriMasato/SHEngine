@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <Assets/Texture/TextureManager.h>
 
 class StageEditor {
 public:
@@ -8,26 +9,28 @@ public:
 	struct FaseData {
 		std::string presetName;
 		float time = 0.0f;
+		float rotation = 0.0f;
 	};
 
 	struct StageData {
 		std::string name;
 		std::vector<FaseData> fases;
-		float stageTime = 0.0f;
 		float hpRatio = 1.0f;
+		int minEnemyCount = 1;
 	};
 
 public:
 
-	void Initialize();
+	void Initialize(SHEngine::TextureManager* textureManager);
 	void Update();
 
 	void SetPresetFileList(const std::vector<std::string>& presetFileList) { presetFileList_ = presetFileList; }
 
+	void Save();
+
 private:
 
 	void Load(const std::string& fileName);
-	void Save();
 
 	StageData currentStage_;
 
@@ -36,4 +39,8 @@ private:
 
 	const std::string basePath_ = "StageData/";
 	const std::string extension_ = ".bin";
+
+	const SHEngine::TextureData* fileTexture_ = nullptr;
+
+	char currentFileName_[256] = "";
 };
