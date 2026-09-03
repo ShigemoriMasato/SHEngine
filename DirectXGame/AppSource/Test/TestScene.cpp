@@ -158,7 +158,7 @@ void TestScene::Load() {
 void TestScene::SelectFile() {
 #ifdef USE_IMGUI
 
-	ImGui::Begin("Select File");
+	ImGui::Begin("プリセット");
 
 	const SHEngine::TextureData* fileTexture = textureManager_->GetTextureData("Assets/.EngineResource/Texture/File.png");
 	const auto windowSize = ImGui::GetContentRegionAvail();

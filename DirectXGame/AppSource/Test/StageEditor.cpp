@@ -77,7 +77,7 @@ void StageEditor::Update() {
 
 	ImGui::End();
 
-	ImGui::Begin("Stage Explorer");
+	ImGui::Begin("ステージ");
 
 	ImGui::InputText("File Name", currentFileName_, sizeof(currentFileName_));
 	if (ImGui::Button("+")) {
@@ -123,6 +123,11 @@ void StageEditor::Update() {
 		}
 	}
 
+	ImGui::End();
+
+	ImGui::Begin("Stage Settings");
+	ImGui::DragFloat("HP倍率", &currentStage_.hpRatio, 0.01f, 0.0f);
+	ImGui::DragInt("最小敵数", &currentStage_.minEnemyCount, 1, 1);
 	ImGui::End();
 
 #endif
