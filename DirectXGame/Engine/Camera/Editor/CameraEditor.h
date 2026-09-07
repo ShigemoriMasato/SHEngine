@@ -6,11 +6,15 @@
 class CameraEditor {
 public:
 
-	void Initialize(Camera* camera);
 	void Update(SHEngine::Input* input, Camera* editorCamera, float deltaTime);
 
 	void SetData(const CameraCurveData& data);
 	const CameraCurveData& GetData() const { return data_; }
+
+	Transform GetCurrentTransform();
+
+	//カメラの位置座標の逆行列を設定する
+	void SetMatrixForGuizmo(Matrix4x4 viewMatrix) { viewMatrix_ = viewMatrix; }
 
 private:
 
@@ -24,7 +28,9 @@ private:
 	} mode_ = EditorMode::kStop;
 
 	CameraCurveData data_;
-	Camera* camera_ = nullptr;
+	Transform transform_;
+
+	Matrix4x4 viewMatrix_ = Matrix4x4::Identity();
 
 	float timer_ = 0.0f;
 	float viewTimeMin_ = 0.0f;

@@ -22,7 +22,6 @@ void TestScene::Initialize() {
 
 	// ===================== 超えられない壁 =================================
 
-	cameraEditor_.Initialize(gameCamera_.get());
 	decoEditor_ = std::make_unique<DecoEditor>(engine_, commonData_->display.get());
 
 	Load();
@@ -45,7 +44,7 @@ void TestScene::Initialize() {
 	}
 	auto model = modelManager_->GetModelData(SHEngine::TestModel::Field);
 	models_[0]->Initialize(model, "Field");
-	models_[0]->SetTransform({ Matrix4x4::Identity() });
+	models_[0]->SetTransform({ Matrix::MakeScaleMatrix({1.5f, 1.5f, 1.5f})});
 
 	model = modelManager_->GetModelData(SHEngine::TestModel::Tower);
 	models_[1]->Initialize(model, "Tower");

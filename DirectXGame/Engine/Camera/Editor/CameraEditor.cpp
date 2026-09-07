@@ -28,10 +28,6 @@ namespace {
 #endif
 }
 
-void CameraEditor::Initialize(Camera* camera) {
-	camera_ = camera;
-}
-
 void CameraEditor::SetData(const CameraCurveData& data) {
 	data_ = data;
 	data_.Sort();
@@ -94,8 +90,8 @@ void CameraEditor::Update(SHEngine::Input* input, Camera* editorCamera, float de
 		}
 	}
 
-	if (add && camera_) {
-		data_.AddKey(camera_->GetPosition(), camera_->GetRotation(), timer_);
+	if (add) {
+		data_.AddKey(transform_.position, transform_.rotate, timer_);
 		data_.Sort();
 		fitViewRequested_ = true;
 	}
@@ -118,21 +114,18 @@ void CameraEditor::Update(SHEngine::Input* input, Camera* editorCamera, float de
 }
 
 void CameraEditor::ApplyCameraAt(float time) {
-	if (!camera_) return;
-	camera_->SetPosition({
+	transform_.position = {
 		data_.posXCurve.Evaluate(time), data_.posYCurve.Evaluate(time), data_.posZCurve.Evaluate(time)
-	});
-	camera_->SetRotation({
+	};
+	transform_.rotate = {
 		data_.rotXCurve.Evaluate(time), data_.rotYCurve.Evaluate(time), data_.rotZCurve.Evaluate(time)
-	});
-	camera_->MakeMatrix();
+	};
 }
 
 void CameraEditor::CameraGizmo(Camera* editorCamera) {
 #ifdef USE_IMGUI
 
 	if (!isGizmoActive_) {
-		camera_->MakeMatrix();
 		return;
 	}
 
@@ -150,7 +143,7 @@ void CameraEditor::CameraGizmo(Camera* editorCamera) {
 
 	std::memcpy(view, editorCamera->GetViewMatrix().m, sizeof(float) * 16);
 	std::memcpy(projection, editorCamera->GetProjectionMatrix().m, sizeof(float) * 16);
-	std::memcpy(world, camera_->GetViewMatrix().Inverse().m, sizeof(float) * 16);
+	std::memcpy(world, viewMatrix_.Inverse().m, sizeof(float) * 16);
 
 	bool different = ImGuizmo::Manipulate(view, projection, op, mode, world);
 
@@ -161,22 +154,14 @@ void CameraEditor::CameraGizmo(Camera* editorCamera) {
 	rotation[1] *= std::numbers::pi_v<float> / 180.0f;
 	rotation[2] *= std::numbers::pi_v<float> / 180.0f;
 
-	Transform newTransform;
-	newTransform.rotate = camera_->GetRotation();
-	newTransform.position = camera_->GetPosition();
-
 	switch (op) {
 	case ImGuizmo::TRANSLATE:
-		newTransform.position = { translation[0], translation[1], translation[2] };
+		transform_.position = { translation[0], translation[1], translation[2] };
 		break;
 	case ImGuizmo::ROTATE:
-		newTransform.rotate = { rotation[0], rotation[1], rotation[2] };
+		transform_.rotate = { rotation[0], rotation[1], rotation[2] };
 		break;
 	}
-
-	camera_->SetRotation(newTransform.rotate);
-	camera_->SetPosition(newTransform.position);
-	camera_->MakeMatrix();
 
 #endif
 }
