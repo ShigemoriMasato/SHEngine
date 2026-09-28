@@ -3,7 +3,6 @@
 #include <Render/Screen/SwapChain.h>
 #include <Render/Screen/Display.h>
 #include <Common/KeyConfig/KeyManager.h>
-#include <Common/MainDisplay.h>
 
 struct CommonData {
 	std::unique_ptr<SHEngine::Screen::SwapChain> window;	// メインウィンドウとスワップチェーンのセット

@@ -146,7 +146,6 @@ void TestScene::Save() {
 	// ↓↓↓ 保存するデータ ==============================================
 
 	cameraCurveData_.Save(bin);
-	CreateMeshList().Save(bin);
 
 	// ↑↑↑ 保存するデータ ==============================================
 
@@ -162,10 +161,6 @@ void TestScene::Load() {
 	}
 
 	cameraCurveData_.Load(bin);
-	FallPolygonEmitter::MeshList meshList;
-	meshList.Load(bin);
-
-	DecomposeMeshList(meshList);
 
 	cameraEditor_.SetData(cameraCurveData_);
 	decoEditor_->SetData(decoObjData_);
@@ -211,41 +206,4 @@ void TestScene::SelectFile() {
 	ImGui::End();
 
 #endif
-}
-
-FallPolygonEmitter::MeshList TestScene::CreateMeshList() {
-	FallPolygonEmitter::MeshList meshList;
-	for (const auto& [name, objMap] : decoObjData_) {
-		auto& conf = decoObjDataBuffer_[name];
-		for (const auto& [id, transform] : objMap) {
-			auto& info = meshList.meshes.emplace_back();
-
-			info.modelPath = name;
-			info.transform = transform;
-			info.color = conf[id].first;
-			info.emitNum = conf[id].second;
-		}
-	}
-	return meshList;
-}
-
-void TestScene::DecomposeMeshList(const FallPolygonEmitter::MeshList& meshList) {
-	for (auto& [name, objMap] : decoObjData_) {
-		objMap.clear();
-	}
-	decoObjData_.clear();
-	for (auto& [name, conf] : decoObjDataBuffer_) {
-		conf.clear();
-	}
-	decoObjDataBuffer_.clear();
-
-	int id = 0;
-
-	for (const auto& info : meshList.meshes) {
-		id++;
-		auto& objMap = decoObjData_[info.modelPath];
-		auto& conf = decoObjDataBuffer_[info.modelPath];
-		objMap[id] = info.transform;
-		conf[id] = { info.color, info.emitNum };
-	}
 }

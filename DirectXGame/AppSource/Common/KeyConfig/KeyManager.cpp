@@ -1,6 +1,6 @@
 #include "KeyManager.h"
 
-void KeyManager::Initialize(SHEngine::Input* input, SHEngine::Screen::Display* display) {
+void KeyManager::Initialize(SHEngine::Input* input, SHEngine::Screen::IDisplay* display) {
 	input_ = input;
 	display_ = display;
 	keyHistory_.resize(kMaxHistory_);

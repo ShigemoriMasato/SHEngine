@@ -2,7 +2,7 @@
 #include <Input/Input.h>
 #include <unordered_map>
 #include <Tool/Binary/BinaryManager.h>
-#include <Common/MainDisplay.h>
+#include <Render/Screen/IDisplay.h>
 
 enum class Key {
 	// 移動系 -===========
@@ -80,7 +80,7 @@ public:
 	KeyManager() = default;
 	~KeyManager() = default;
 
-	void Initialize(SHEngine::Input* input, SHEngine::Screen::Display* display);
+	void Initialize(SHEngine::Input* input, SHEngine::Screen::IDisplay* display);
 	void Update();
 
 	std::unordered_map<Key, bool> GetKeyStates() const { return resultKeyFlags_; }
@@ -94,7 +94,7 @@ public:
 
 private:
 
-	SHEngine::Screen::Display* display_ = nullptr;
+	SHEngine::Screen::IDisplay* display_ = nullptr;
 	SHEngine::Input* input_ = nullptr;
 
 	//スティックの種類

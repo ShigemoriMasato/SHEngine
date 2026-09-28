@@ -1,7 +1,5 @@
 #include "InitializeScene.h"
 #include <imgui/imgui.h>
-#include <Game/GameScene.h>
-#include <Title/TitleScene.h>
 #include <Test/TestScene.h>
 
 #ifdef USE_IMGUI
@@ -51,7 +49,6 @@ void InitializeScene::Initialize() {
 
 
 	//KeyManager
-#pragma region 長いので折りたたみ
 	commonData_->keyManager = std::make_unique<KeyManager>();
 
 	auto keyManager = commonData_->keyManager.get();
@@ -80,34 +77,6 @@ void InitializeScene::Initialize() {
 
 	//================================================================================
 
-	keyManager->SetKey(Key::HardDrop, DIK_W, KeyState::Trigger);
-	keyManager->SetKey(Key::HardDrop, DIK_SPACE, KeyState::Trigger);
-	keyManager->SetKey(Key::HardDrop, DIK_UPARROW, KeyState::Trigger);
-	keyManager->SetButton(Key::HardDrop, XBoxController::kUp, KeyState::Trigger);
-	keyManager->SetStick(Key::HardDrop, false, StickDirection::Up, 0.5f, KeyState::Hold);
-
-	keyManager->SetKey(Key::Hold, DIK_LSHIFT, KeyState::Trigger);
-	keyManager->SetKey(Key::Hold, DIK_C, KeyState::Trigger);
-	keyManager->SetKey(Key::Hold, DIK_H, KeyState::Trigger);
-	keyManager->SetKey(Key::Hold, DIK_L, KeyState::Trigger);
-	keyManager->SetKey(Key::Hold, DIK_RSHIFT, KeyState::Trigger);
-	keyManager->SetButton(Key::Hold, XBoxController::kLeftShoulder, KeyState::Trigger);
-	keyManager->SetButton(Key::Hold, XBoxController::kLeftTrigger, KeyState::Trigger);
-	keyManager->SetButton(Key::Hold, XBoxController::kRightShoulder, KeyState::Trigger);
-	keyManager->SetButton(Key::Hold, XBoxController::kLeftTrigger, KeyState::Trigger);
-
-	//================================================================================
-
-	keyManager->SetKey(Key::LRotate, DIK_Z, KeyState::Trigger);
-	keyManager->SetKey(Key::LRotate, DIK_J, KeyState::Trigger);
-	keyManager->SetButton(Key::LRotate, XBoxController::kX, KeyState::Trigger);
-
-	keyManager->SetKey(Key::RRotate, DIK_X, KeyState::Trigger);
-	keyManager->SetKey(Key::RRotate, DIK_K, KeyState::Trigger);
-	keyManager->SetButton(Key::RRotate, XBoxController::kY, KeyState::Trigger);
-
-	//================================================================================
-
 	keyManager->SetKey(Key::Correct, DIK_RETURN, KeyState::Trigger);
 	keyManager->SetKey(Key::Correct, DIK_SPACE, KeyState::Trigger);
 	keyManager->SetKey(Key::Correct, DIK_Z, KeyState::Trigger);
@@ -121,10 +90,6 @@ void InitializeScene::Initialize() {
 	keyManager->SetButton(Key::Pause, XBoxController::kStart, KeyState::Trigger);
 
 	//================================================================================
-
-	keyManager->SetKey(Key::Restart, DIK_R, KeyState::Trigger);
-	keyManager->SetKey(Key::Restart, DIK_ESCAPE, KeyState::Trigger);
-	keyManager->SetButton(Key::Restart, XBoxController::kSelect, KeyState::Trigger);
 
 	keyManager->SetKey(Key::Z, DIK_Z, KeyState::Trigger);
 	keyManager->SetKey(Key::Y, DIK_Y, KeyState::Trigger);
@@ -151,14 +116,10 @@ void InitializeScene::Initialize() {
 #else
 	keyManager->SetMouse(Key::Correct, 0, KeyState::Trigger);
 #endif
-#pragma endregion
 }
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
-	return std::make_unique<TitleScene>();
-	return std::make_unique<GameScene>();
-	return std::make_unique<TestScene>();
 	return nullptr;
 }
 
@@ -166,6 +127,7 @@ void InitializeScene::Draw() {
 	auto swapChain = commonData_->window.get();
 	auto display = commonData_->display.get();
 
+	//SwapChainの塗りつぶし処理とImGui処理だけ行う
 	directContext_->SetRenderTarget(swapChain, true);
 	engine_->DrawImGui();
 	swapChain->ToPresent(directContext_);
