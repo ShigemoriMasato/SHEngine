@@ -15,20 +15,48 @@ $zipPath = Join-Path $env:TEMP "cmake-$version.zip"                   # 一時�
 # 管理者権限のチェック
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Write-Error "環境変数を書き換えるため、このスクリプトは【管理者権限】で実行する必要があります。PowerShellを管理者として開き直してください。"
+    Write-Error "環境変数を書き換えるため、このスクリプトは【管理者権限】で実行する必要があります。batファイルを管理者として開き直してください。"
     exit
 }
 
-# 2. すでに同じバージョンが入っていないかチェック
-if (Test-Path (Join-Path $installDir "bin\cmake.exe")) {
-    Write-Host "[INFO] CMake $version はすでに $installDir にインストールされています。" -ForegroundColor Green
-} else {
-    # 3. ダウンロード処理
+# 2. 現在利用可能なCMakeのバージョンを確認
+$requiredVersion = [Version]$version
+$cmakeCommand = Get-Command cmake -ErrorAction SilentlyContinue
+$installedVersion = $null
+$useBinPath = $null
+$needInstall = $true
+
+if ($cmakeCommand) {
+    try {
+        $installedVersionText = (& $cmakeCommand.Source --version | Select-Object -First 1) -replace '^cmake version ', ''
+        $installedVersion = [Version]$installedVersionText
+
+        if ($installedVersion -ge $requiredVersion) {
+            # 4.3.2以上がすでにある場合はインストールしない
+            $needInstall = $false
+            $useBinPath = Split-Path $cmakeCommand.Source -Parent
+            Write-Host "[INFO] CMake $installedVersion がすでにインストールされています。" -ForegroundColor Green
+            Write-Host "[INFO] 必要なバージョン $version 以上なので、インストールをスキップします。" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[INFO] CMake $installedVersion が見つかりましたが、$version より古いため更新します。" -ForegroundColor Yellow
+        }
+    }
+    catch {
+        Write-Host "[WARNING] CMakeのバージョンを確認できなかったため、$version をインストールします。" -ForegroundColor Yellow
+    }
+}
+else {
+    Write-Host "[INFO] CMakeがインストールされていないため、$version をインストールします。" -ForegroundColor Cyan
+}
+
+# 3. 必要な場合のみCMake 4.3.2をインストール
+if ($needInstall) {
     Write-Host "[INFO] CMake $version をダウンロード中..." -ForegroundColor Cyan
     Write-Host "URL: $url" -ForegroundColor Gray
     Invoke-WebRequest -Uri $url -OutFile $zipPath -UserAgent "Mozilla/5.0"
 
-    # 4. 展開先のフォルダを綺麗に準備
+    # 展開先のフォルダを準備
     if (-not (Test-Path $installParentDir)) {
         New-Item -ItemType Directory -Path $installParentDir | Out-Null
     }
@@ -36,45 +64,77 @@ if (Test-Path (Join-Path $installDir "bin\cmake.exe")) {
         Remove-Item -Recurse -Force $installDir
     }
 
-    # 5. ZIPの展開
-    Write-Host "[INFO] アーカイブをコピー・展開中..." -ForegroundColor Cyan
+    # ZIPを展開
+    Write-Host "[INFO] アーカイブを展開中..." -ForegroundColor Cyan
     Expand-Archive -Path $zipPath -DestinationPath $installParentDir -Force
 
-    # 後片付け（一時フォルダのZIPを削除）
     Remove-Item -Force $zipPath
     Write-Host "[INFO] 展開完了: $installDir" -ForegroundColor Green
+
+    $useBinPath = $binPath = Join-Path $installDir "bin"
+}
+else {
+    $binPath = $useBinPath
 }
 
-# 6. 環境変数 (PATH) への追加処理
-$binPath = Join-Path $installDir "bin"
+# 4. 環境変数 (PATH) を更新
 Write-Host "[INFO] 環境変数 (PATH) のチェックと設定中..." -ForegroundColor Cyan
 
-# システム全体のPATHを取得
 $target = [EnvironmentVariableTarget]::Machine
 $oldPath = [Environment]::GetEnvironmentVariable("Path", $target)
+$pathEntries = @($oldPath -split ';' | Where-Object { $_ -and $_.Trim() })
 
-# 重複していなければ末尾に追加
-if ($oldPath -split ';' -contains $binPath) {
-    Write-Host "[INFO] すでに PATH に登録されています。" -ForegroundColor Yellow
-} else {
-    # 古いバージョンのCMakeのPATHが残っていたら紛らわしいので、一応綺麗にする（任意）
-    # ※もし必要なら手動で古いPATHを削ってください
-    [Environment]::GetEnvironmentVariable("Path", $target)
-    # Windows標準の外部コマンドで、システム環境変数にPATHを強制追加する
-    setx /M PATH "$oldPath;$binPath"
-    
-    # 現在のPowerShellセッションのPATHにも即時反映
-    $env:Path += ";$binPath"
-    Write-Host "[SUCCESS] システムの PATH に $binPath を追加しました！" -ForegroundColor Green
+# CMakeの旧バージョン用PATHを削除する。
+# 今回のインストール先(C:\Program Files\CMake)配下のbinを対象にする。
+$cmakeParentFullPath = [IO.Path]::GetFullPath($installParentDir).TrimEnd('\')
+$cmakeParentPrefix = $cmakeParentFullPath + '\'
+
+$filteredEntries = @($pathEntries | Where-Object {
+    $entry = $_.Trim().TrimEnd('\')
+    $isOldCMakePath = $entry.StartsWith($cmakeParentPrefix, [StringComparison]::OrdinalIgnoreCase) -and
+                      $entry.EndsWith('\bin', [StringComparison]::OrdinalIgnoreCase)
+    -not $isOldCMakePath
+})
+
+# 4.3.2をインストールした場合は4.3.2を、
+# すでに4.3.2以上がある場合はそのCMakeをPATHの先頭にする。
+$filteredEntries = @($binPath) + @($filteredEntries | Where-Object {
+    $_.Trim().TrimEnd('\') -ne $binPath.TrimEnd('\')
+})
+
+$newPath = $filteredEntries -join ';'
+
+if ($newPath -ne $oldPath) {
+    # setxではなく.NET APIを使うことでPATHの長さ制限による切り詰めを避ける
+    [Environment]::SetEnvironmentVariable("Path", $newPath, $target)
+    Write-Host "[SUCCESS] システムの PATH を更新しました。" -ForegroundColor Green
+    Write-Host "[INFO] CMake PATH: $binPath" -ForegroundColor Gray
+}
+else {
+    Write-Host "[INFO] PATHはすでに正しく設定されています。" -ForegroundColor Yellow
 }
 
-# 7. 最終確認
+# 現在のPowerShellセッションにも即時反映
+$processPathEntries = @($env:Path -split ';' | Where-Object { $_ -and $_.Trim() })
+$processFilteredEntries = @($processPathEntries | Where-Object {
+    $entry = $_.Trim().TrimEnd('\')
+    $isOldCMakePath = $entry.StartsWith($cmakeParentPrefix, [StringComparison]::OrdinalIgnoreCase) -and
+                      $entry.EndsWith('\bin', [StringComparison]::OrdinalIgnoreCase)
+    -not $isOldCMakePath
+})
+$env:Path = (@($binPath) + @($processFilteredEntries | Where-Object {
+    $_.Trim().TrimEnd('\') -ne $binPath.TrimEnd('\')
+}) -join ';')
+
+# 5. 最終確認
 Write-Host "`n=== インストール確認 ===" -ForegroundColor Cyan
-if (Get-Command cmake -ErrorAction SilentlyContinue) {
-    cmake --version
+$finalCmake = Get-Command cmake -ErrorAction SilentlyContinue
+if ($finalCmake) {
+    & $finalCmake.Source --version
     Write-Host "`n[COMPLETE] すべての工程が正常に完了しました！" -ForegroundColor Green
-} else {
-    Write-Host "[WARNING] インストールはできましたが、PATHの反映にはPowerShellやPCの再起動が必要な場合があります。" -ForegroundColor Yellow
+}
+else {
+    Write-Host "[WARNING] CMakeはインストールされていますが、PATHの反映を確認できませんでした。" -ForegroundColor Yellow
 }
 
 Pause
