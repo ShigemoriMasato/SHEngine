@@ -1,6 +1,5 @@
 #pragma once
 #include "Data/SandData.h"
-#include <Core/Command/ICommandContext.h>
 #include <Render/Command/DirectCommandContext.h>
 
 namespace Sand {
@@ -33,6 +32,10 @@ public:
 
 private:
 
-	
+	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
+
+	Sand::Particle particleData_;
+	Sand::Grid gridData_;
+	Sand::FreeList freeList_;
 
 };

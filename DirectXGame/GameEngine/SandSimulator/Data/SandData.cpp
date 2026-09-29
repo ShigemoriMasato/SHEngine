@@ -14,8 +14,9 @@ void Sand::FreeList::Initialize(SHEngine::BufferContainer* bufferContainer, uint
 }
 
 void Sand::Grid::Initialize(SHEngine::BufferContainer* bufferContainer, uint32_t verticalCount, uint32_t horizontalCount, uint32_t depthCount) {
-	gridSize = bufferContainer->Create(BufferType::CBV, sizeof(float), 1);
-	gridCount = bufferContainer->Create(BufferType::CBV, sizeof(int32_t) * 3, 1);
+	gridSize = bufferContainer->Create(BufferType::CBV, sizeof(float));
+	gridCount = bufferContainer->Create(BufferType::CBV, sizeof(int32_t) * 3);
+	gridStartPos = bufferContainer->Create(BufferType::CBV, sizeof(float) * 3);
 	density = bufferContainer->Create(BufferType::SRV_UAV, sizeof(float), verticalCount * horizontalCount * depthCount, BufferNum::Single);
 
 	gridCount->CopyBuffer(&verticalCount, sizeof(int32_t));

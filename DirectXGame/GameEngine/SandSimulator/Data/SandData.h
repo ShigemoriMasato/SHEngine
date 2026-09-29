@@ -37,8 +37,10 @@ namespace Sand {
 
 		// CBV float32_t
 		SHEngine::GPUBuffer* gridSize;
-		// CBV int32_t2
+		// CBV int32_t3 xyz
 		SHEngine::GPUBuffer* gridCount;
+		// CBV float32_t3 最も左下手前の位置
+		SHEngine::GPUBuffer* gridStartPos;
 		// SRV/UAV int32_t グリッドの数だけ Atomic演算のためにint32_tで作る
 		SHEngine::GPUBuffer* density;
 	};

@@ -80,7 +80,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 /wd5260 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)SHEngine\;$(ProjectDir)externals\header\;$(ProjectDir)AppSource\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SHEngine\;$(ProjectDir)externals\header\;$(ProjectDir)GameEngine\;$(ProjectDir)AppSource\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -93,13 +93,9 @@
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
-
-if exist "$(WindowsSdkDir)bin$(TargetPlatformVersion)\arm64\dxil.dll" ( 
-copy "$(WindowsSdkDir)bin$(TargetPlatformVersion)\arm64\dxil.dll" "(TargetDir)dxil.dll"
-) else if exist "$(WindowsSdkDir)bin$(TargetPlatformVersion)\x64\dxil.dll" ( 
-copy "$(WindowsSdkDir)bin$(TargetPlatformVersion)\x64\dxil.dll" "(TargetDir)dxil.dll"
+if exist "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" (
+copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
 )
-
 xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -115,7 +111,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 /wd5260 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)SHEngine\;$(ProjectDir)externals\header\;$(ProjectDir)AppSource\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SHEngine\;$(ProjectDir)externals\header\;$(ProjectDir)GameEngine\;$(ProjectDir)AppSource\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -128,13 +124,9 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
-
-if exist "$(WindowsSdkDir)bin$(TargetPlatformVersion)\arm64\dxil.dll" ( 
-copy "$(WindowsSdkDir)bin$(TargetPlatformVersion)\arm64\dxil.dll" "(TargetDir)dxil.dll"
-) else if exist "$(WindowsSdkDir)bin$(TargetPlatformVersion)\x64\dxil.dll" ( 
-copy "$(WindowsSdkDir)bin$(TargetPlatformVersion)\x64\dxil.dll" "(TargetDir)dxil.dll"
+if exist "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" (
+copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
 )
-
 xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -150,7 +142,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 /wd5260 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)SHEngine\;$(ProjectDir)externals\header\;$(ProjectDir)AppSource\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SHEngine\;$(ProjectDir)externals\header\;$(ProjectDir)GameEngine\;$(ProjectDir)AppSource\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
     </ClCompile>
@@ -164,19 +156,17 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
-
-if exist "$(WindowsSdkDir)bin$(TargetPlatformVersion)\arm64\dxil.dll" ( 
-copy "$(WindowsSdkDir)bin$(TargetPlatformVersion)\arm64\dxil.dll" "(TargetDir)dxil.dll"
-) else if exist "$(WindowsSdkDir)bin$(TargetPlatformVersion)\x64\dxil.dll" ( 
-copy "$(WindowsSdkDir)bin$(TargetPlatformVersion)\x64\dxil.dll" "(TargetDir)dxil.dll"
+if exist "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" (
+copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
 )
-
 xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameEngine\SandSimulator\Data\SandData.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\SandSimulator.cpp" />
+    <ClCompile Include="GameEngine\SandSimulator\Renderer\SandDebugGrid.cpp" />
+    <ClCompile Include="GameEngine\SandSimulator\Renderer\SandRenderer.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\CameraEditor.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\Data\CameraEditorData.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\Data\CurveData.cpp" />
@@ -260,6 +250,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.cpp" />
     <ClInclude Include="GameEngine\SandSimulator\Data\SandData.h" />
     <ClInclude Include="GameEngine\SandSimulator\SandSimulator.h" />
+    <ClInclude Include="GameEngine\SandSimulator\Renderer\SandDebugGrid.h" />
+    <ClInclude Include="GameEngine\SandSimulator\Renderer\SandRenderer.h" />
     <ClInclude Include="SHEngine\Camera\Editor\CameraEditor.h" />
     <ClInclude Include="SHEngine\Camera\Editor\Data\CameraEditorData.h" />
     <ClInclude Include="SHEngine\Camera\Editor\Data\CurveData.h" />
