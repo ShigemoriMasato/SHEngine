@@ -13,29 +13,21 @@ struct VSOutput
     uint instanceID : INSTANCE0;
 };
 
-struct ParticleData
+cbuffer MatrixData : register(b0)
 {
-    float4x4 world;
-    float4x4 wvp;
+    float4x4 vp;
 };
 
-StructuredBuffer<ParticleData> data : register(t0);
-
-cbuffer GridCount : register(b0)
+cbuffer GridCount : register(b1)
 {
     int gridCountX;
     int gridCountY;
     int gridCountZ;
 }
 
-cbuffer GridSize : register(b1)
+cbuffer GridSize : register(b2)
 {
     float gridSize;
-}
-
-cbuffer GridOffset : register(b2)
-{
-    float3 gridOffset;
 }
 
 VSOutput main(VSInput input, uint instance : SV_InstanceID)
@@ -44,17 +36,20 @@ VSOutput main(VSInput input, uint instance : SV_InstanceID)
     int y = (instance / gridCountX) % gridCountY;
     int z = instance / (gridCountX * gridCountY);
     
-    float4x4 local = float4x4(
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    gridOffset.x + x * gridSize, gridOffset.y + y * gridSize, gridOffset.z + z * gridSize, 1.0f
+    float4x4 world = float4x4(
+    gridSize, 0.0f, 0.0f, 0.0f,
+    0.0f, gridSize, 0.0f, 0.0f,
+    0.0f, 0.0f, gridSize, 0.0f,
+    x * gridSize, y * gridSize, z * gridSize, 1.0f
     );
     
+    // this position's anchor is at the center of the cube. so it needs to be adjust to the corner(left, bottom, back) of the cube.
+    float4 adjustmentPosition = float4(input.position + float3(0.5f, 0.5f, 0.5f), 1.0f);
+    
     VSOutput output;
-    output.position = mul(mul(float4(input.position, 1.0f), local), data[instance].wvp);
+    output.position = mul(mul(float4(input.position, 1.0f), world), vp);
     output.texCoord = input.texcoord;
-    output.normal = mul(input.normal, (float3x3) data[instance].world);
+    output.normal = mul(input.normal, (float3x3) world);
     output.instanceID = instance;
     return output;
 }

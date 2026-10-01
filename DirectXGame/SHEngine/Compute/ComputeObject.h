@@ -17,8 +17,12 @@ namespace SHEngine {
 
 		// @brief Shader名を登録
 		void SetShader(std::string computeShaderName) { computeShaderName_ = computeShaderName; }
+		// @brief スレッドグループのサイズを登録(65535を超えた場合、自動的にy->zの順にシフトされる)。自由度を求めるならSetThreadGroupSizeを使用すること
+		// @param executeNum 実行するスレッドの総数
+		// @param threadSize スレッドグループのXサイズ。Y,Zは1であるものとする。
+		void SetExecuteNum(int executeNum, int threadSize = 1);
 		// @brief スレッドグループのサイズを登録
-		void SetExecuteNum(int executeNum);
+		void SetThreadGroupSize(int x, int y = 0, int z = 0) { threadGroupSize_ = { x, y, z }; }
 		// @brief CBV/SRV/UAVを登録
 		void SetGPUBuffer(BufferType bufferType, GPUBuffer* buffer);
 		// @brief 複数のCBV/SRV/UAVを登録

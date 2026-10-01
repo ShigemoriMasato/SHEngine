@@ -2,6 +2,7 @@ cbuffer GridInfo : register(b0)
 {
     int gridWidth;
     int gridHeight;
+    int gridDepth;
 };
 
 RWStructuredBuffer<float> density : register(u0);
@@ -9,7 +10,7 @@ RWStructuredBuffer<float> density : register(u0);
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID) {
     uint index = DTid.x;
-    if (index >= gridWidth * gridHeight) 
+    if (index >= gridWidth * gridHeight * gridDepth) 
         return;
     
     density[index] = 0.0f;

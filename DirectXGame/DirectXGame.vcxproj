@@ -167,6 +167,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="GameEngine\SandSimulator\SandSimulator.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Renderer\SandDebugGrid.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Renderer\SandRenderer.cpp" />
+    <ClCompile Include="GameEngine\SandSimulator\Processor\SandProcessor.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\CameraEditor.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\Data\CameraEditorData.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\Data\CurveData.cpp" />
@@ -252,6 +253,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="GameEngine\SandSimulator\SandSimulator.h" />
     <ClInclude Include="GameEngine\SandSimulator\Renderer\SandDebugGrid.h" />
     <ClInclude Include="GameEngine\SandSimulator\Renderer\SandRenderer.h" />
+    <ClInclude Include="GameEngine\SandSimulator\Processor\SandProcessor.h" />
     <ClInclude Include="SHEngine\Camera\Editor\CameraEditor.h" />
     <ClInclude Include="SHEngine\Camera\Editor\Data\CameraEditorData.h" />
     <ClInclude Include="SHEngine\Camera\Editor\Data\CurveData.h" />

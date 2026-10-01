@@ -23,10 +23,12 @@ void ComputeObject::Initialize() {
 	SetSamplerID(0);
 }
 
-void SHEngine::ComputeObject::SetExecuteNum(int executeNum) {
-	threadGroupSize_.x = std::min(65535, executeNum);
-	threadGroupSize_.y = std::clamp(executeNum / 65535, 1, 65535);
-	threadGroupSize_.z = 1;// 使うときになったら実装する
+void SHEngine::ComputeObject::SetExecuteNum(int executeNum, int threadSize) {
+	int factNum = executeNum / threadSize;
+	threadGroupSize_.x = factNum % 65535 + 1;
+	threadGroupSize_.y = (factNum / 65535) % 65535 + 1;
+	// int32_tで表せるはずがないので1とする。
+	threadGroupSize_.z = 1;
 }
 
 void SHEngine::ComputeObject::SetGPUBuffer(BufferType bufferType, GPUBuffer* buffer) {

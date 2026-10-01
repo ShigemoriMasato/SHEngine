@@ -6,10 +6,9 @@ cbuffer ParticleCount : register(b0)
 cbuffer ParticleInfo : register(b1)
 {
     float deltaTime;
-    float mass;
 }
 
-StructuredBuffer<uint> isAlive : register(t1);
+StructuredBuffer<uint> isAlive : register(t0);
 
 RWStructuredBuffer<float3> position : register(u0);
 RWStructuredBuffer<float3> velocity : register(u1);
@@ -28,7 +27,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
     if (isAlive[index] == 0)
         return;
     
-    velocity[index] += force[index] / mass * deltaTime;
+    //重量は1.0fと仮定
+    velocity[index] += force[index] / deltaTime;
     position[index] += velocity[index] * deltaTime;
     
     force[index] = float3(0.0f, 0.0f, 0.0f);

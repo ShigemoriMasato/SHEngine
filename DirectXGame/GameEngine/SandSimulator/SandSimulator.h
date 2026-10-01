@@ -10,12 +10,6 @@ namespace Sand {
 		uint32_t gridHorizontalCount;
 		uint32_t gridDepthCount;
 	};
-
-	struct AddSandConfig {
-		uint32_t particleCount;
-		Vector3 position;
-		float radius;
-	};
 }
 
 class SandSimulator {
