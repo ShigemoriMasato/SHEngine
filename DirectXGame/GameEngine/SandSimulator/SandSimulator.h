@@ -1,9 +1,14 @@
 #pragma once
 #include "Data/SandData.h"
+#include "Renderer/SandRenderer.h"
+#include "Processor/SandProcessor.h"
 #include <Render/Command/DirectCommandContext.h>
 
 namespace Sand {
 	struct InitializeData {
+		//砂1一粒分のモデル
+		const ModelData* sandModel;
+
 		uint32_t particleCount;
 
 		uint32_t gridVerticalCount;
@@ -17,12 +22,14 @@ public:
 
 	SandSimulator(const Sand::InitializeData& initData);
 
-	void Initialize(const SHEngine::ICommandContext* commandContext);
-	void Update(float deltaTime, const SHEngine::ICommandContext* commandContext);
-	void Draw(const DCC* dcc);
-	void DebugDraw(const DCC* dcc);
+	void Initialize(SHEngine::ICommandContext* commandContext);
+	void Update(float deltaTime, SHEngine::ICommandContext* commandContext);
+	void Draw(DCC* dcc);
+	void DebugDraw(DCC* dcc);
 
-	void AddSand(const Sand::AddSandConfig& config);
+	void DrawImGui();
+
+	void SetCamera(const Camera* camera);
 
 private:
 
@@ -32,4 +39,9 @@ private:
 	Sand::Grid gridData_;
 	Sand::FreeList freeList_;
 
+	std::unique_ptr<Sand::Renderer> renderer_ = nullptr;
+	std::unique_ptr<Sand::Processor> processor_ = nullptr;
+
+	float scale;
+	Vector4 color;
 };

@@ -1,6 +1,7 @@
 #include "InitializeScene.h"
 #include <imgui/imgui.h>
 #include <Test/TestScene.h>
+#include <Sand/SandScene.h>
 
 #ifdef USE_IMGUI
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -32,7 +33,7 @@ void InitializeScene::Initialize() {
 	commonData_->display = std::make_unique<SHEngine::Screen::Display>();
 	commonData_->display->Initialize(1280, 720, "MainWindow");
 	commonData_->display->CreateDepthTexture(textureManager_);
-	commonData_->display->AddRenderTarget(textureManager_, 0x0000ff);
+	commonData_->display->AddRenderTarget(textureManager_, 0xffffff);
 	commonData_->display->AddRenderTarget(textureManager_, 0xff);
 
 	commonData_->subDisplay = std::make_unique<SHEngine::Screen::Display>();
@@ -120,6 +121,7 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
+	return std::make_unique<SandScene>();
 	return nullptr;
 }
 

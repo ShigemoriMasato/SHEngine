@@ -3,25 +3,31 @@
 #include <Assets/Model/ModelData.h>
 #include <Render/Renderer.h>
 
-//仮としてVertexShaderで作成する。あとでMeshShaderに切り替える
-class SandRenderer {
-public:
+namespace Sand {
 
-	SandRenderer(Sand::Particle* particleData, ModelData* cubeModel);
+	//仮としてVertexShaderで作成する。あとでMeshShaderに切り替える
+	class Renderer {
+	public:
 
-	void Draw(DCC* dcc);
+		Renderer(Sand::Particle* particleData, const ModelData* cubeModel);
 
-	void SetCamera(Camera* camera);
+		void SetInstance(uint32_t instanceNum) { renderer_->instanceNum_ = instanceNum; }
 
-private:
+		void Draw(DCC* dcc);
 
-	void SetBufferToRenderer();
+		void SetCamera(const Camera* camera);
 
-	std::unique_ptr<SHEngine::Renderer> renderer_ = nullptr;
-	Sand::Particle* particleData_ = nullptr;
+	private:
 
-	Camera* camera_ = nullptr;
+		void SetBufferToRenderer();
 
-	Logger logger_ = GetLogger("SandSimulator");
-	bool isPutCameraErrorLog_ = false;
-};
+		std::unique_ptr<SHEngine::Renderer> renderer_ = nullptr;
+		Sand::Particle* particleData_ = nullptr;
+
+		const Camera* camera_ = nullptr;
+
+		Logger logger_ = GetLogger("SandSimulator");
+		bool isPutCameraErrorLog_ = false;
+	};
+
+}

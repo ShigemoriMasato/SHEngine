@@ -15,7 +15,7 @@ void Sand::Particle::Initialize(SHEngine::BufferContainer* bufferContainer, uint
 
 void Sand::FreeList::Initialize(SHEngine::BufferContainer* bufferContainer, uint32_t particleCount) {
 	list = bufferContainer->Create(BufferType::SRV_UAV, sizeof(int32_t), particleCount, BufferNum::Single);
-	index = bufferContainer->Create(BufferType::CBV, sizeof(int32_t), 1);
+	index = bufferContainer->Create(BufferType::UAV, sizeof(int32_t), 1, BufferNum::Single);
 	count = bufferContainer->Create(BufferType::CBV, sizeof(int32_t), 1);
 
 	count->CopyBuffer(&particleCount, sizeof(int32_t));
@@ -28,6 +28,6 @@ void Sand::Grid::Initialize(SHEngine::BufferContainer* bufferContainer, uint32_t
 	gridStartPos = bufferContainer->Create(BufferType::CBV, sizeof(float) * 3);
 	density = bufferContainer->Create(BufferType::SRV_UAV, sizeof(float), verticalCount * horizontalCount * depthCount, BufferNum::Single);
 
-	int gridCountNum[3] = { verticalCount, horizontalCount, depthCount };
+	int gridCountNum[3] = { (int)verticalCount, (int)horizontalCount, (int)depthCount };
 	gridCount->CopyBuffer(gridCountNum, sizeof(int32_t));
 }

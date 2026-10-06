@@ -6,6 +6,7 @@ cbuffer ParticleCount : register(b0)
 RWStructuredBuffer<int> freeList : register(u0);
 RWStructuredBuffer<int> freeListIndex : register(u1);
 RWStructuredBuffer<int> isAlive : register(u2);
+RWStructuredBuffer<float3> position : register(u3);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID) {
@@ -22,4 +23,6 @@ void main(uint3 DTid : SV_DispatchThreadID) {
     
     freeList[index] = index;
     isAlive[index] = 0;
+    //Debug用
+    position[index] = float3(float(index), 0.0f, 0.0f);
 }

@@ -17,7 +17,7 @@ Sand::Processor::Processor() {
 
 void Sand::Processor::Initialize(Sand::Particle* particle, Sand::Grid* grid, Sand::FreeList* freeList, SHEngine::ICommandContext* icc) {
 	initialize_->SetGPUBuffer(BufferType::CBV, freeList->count);
-	initialize_->SetGPUBuffers(BufferType::SRV, { freeList->list, freeList->index, particle->isAlive });
+	initialize_->SetGPUBuffers(BufferType::UAV, { freeList->list, freeList->index, particle->isAlive, particle->position });
 	initialize_->SetExecuteNum(freeList->countNum);
 	initialize_->Execute(icc);
 
@@ -38,4 +38,7 @@ void Sand::Processor::Initialize(Sand::Particle* particle, Sand::Grid* grid, San
 	particleMove_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale });
 	particleMove_->SetGPUBuffer(BufferType::SRV, particle->isAlive);
 	particleMove_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->velocity, particle->force });
+}
+
+void Sand::Processor::Update(float deltaTime, SHEngine::ICommandContext* icc) {
 }

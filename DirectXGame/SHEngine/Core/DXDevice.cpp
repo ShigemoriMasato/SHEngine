@@ -159,6 +159,7 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
     shaderSourceBuffer.Encoding = DXC_CP_UTF8;//utf8の文字コードであることを通知
 
 #ifdef SH_DEBUG
+    //Pix用
     LPCWSTR arguments[] = {
         wFilePath.c_str(),	            //コンパイル対象のhlslファイル名
         L"-E", L"main",                 //エントリーポイント
@@ -170,6 +171,7 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
         L"-enable-16bit-types"          //16bit型を有効化する
     };
 #else
+    //処理速度優先
     LPCWSTR arguments[] = {
         wFilePath.c_str(),	            //コンパイル対象のhlslファイル名
         L"-E", L"main",                 //エントリーポイント
