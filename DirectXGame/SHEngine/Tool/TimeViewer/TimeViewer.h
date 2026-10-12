@@ -22,7 +22,7 @@ public:
 
 private:
 
-	void Save();
+	void Save() const;
 	void Load();
 
 private:

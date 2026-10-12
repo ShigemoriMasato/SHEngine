@@ -8,36 +8,22 @@ cbuffer DeltaTime : register(b1)
     float deltatime;
 };
 
-cbuffer SpeedConfig : register(b2)
+cbuffer Config : register(b2)
 {
     float threshold;
     float attenuation;
+    
+    float floorY;
 };
 
-cbuffer floor : register(b2)
+cbuffer Gravity : register(b3)
 {
-    float floorY;
+    float3 gravity;
 };
 
 RWStructuredBuffer<float3> positions : register(u0);
 RWStructuredBuffer<float3> forces : register(u1);
 RWStructuredBuffer<float3> velocities : register(u2);
-
-uint Hash(uint x)
-{
-    x ^= x >> 16;
-    x *= 0x7feb352d;
-    x ^= x >> 15;
-    x *= 0x846ca68b;
-    x ^= x >> 16;
-    return x;
-}
-
-float randf(inout uint state)
-{
-    state = Hash(state);
-    return state / 4294967296.0;
-}
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -48,7 +34,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
-    velocities[index] += forces[index] * deltatime;
+    velocities[index] += forces[index];
     
     float3 velocity = velocities[index];
     float speed = length(velocity);
@@ -66,8 +52,13 @@ void main(uint3 DTid : SV_DispatchThreadID)
     if (positions[index].y < floorY)
     {
         positions[index].y = floorY;
-        velocities[index].y = 0;
+        velocities[index].y *= 0.f;
+        velocities[index] *= 0.5f;
+        forces[index] = float3(0, 0, 0);
+    }
+    else
+    {
+        forces[index] = float3(0, -9.8f, 0);
     }
     
-    forces[index] = float3(0, 0, 0);
 }

@@ -101,24 +101,24 @@ void CameraAnimationCurve::Save(BinaryManager& binManager) {
 	uint32_t keyCount = static_cast<uint32_t>(keys_.size());
 	binManager.Register(&keyCount);
 	for (uint32_t i = 0; i < keyCount; ++i) {
-		binManager.Register(&keys_[i].value);
-		binManager.Register(&keys_[i].time);
-		binManager.Register(&keys_[i].leftHandle);
-		binManager.Register(&keys_[i].rightHandle);
-		binManager.Register(&keys_[i].id);
+		binManager.Register(keys_[i].value);
+		binManager.Register(keys_[i].time);
+		binManager.Register(keys_[i].leftHandle);
+		binManager.Register(keys_[i].rightHandle);
+		binManager.Register(keys_[i].id);
 	}
 }
 
 void CameraAnimationCurve::Load(BinaryManager& binManager) {
 	uint32_t keyCount;
-	keyCount = binManager.Reverse<uint32_t>();
+	binManager.Reverse(keyCount);
 	keys_.resize(keyCount);
 	for (uint32_t i = 0; i < keyCount; ++i) {
-		keys_[i].value = binManager.Reverse<float>();
-		keys_[i].time = binManager.Reverse<float>();
-		keys_[i].leftHandle = binManager.Reverse<Vector2>();
-		keys_[i].rightHandle = binManager.Reverse<Vector2>();
-		keys_[i].id = binManager.Reverse<uint32_t>();
+		binManager.Reverse(keys_[i].value);
+		binManager.Reverse(keys_[i].time);
+		binManager.Reverse(keys_[i].leftHandle);
+		binManager.Reverse(keys_[i].rightHandle);
+		binManager.Reverse(keys_[i].id);
 		nextKeyId_ = std::max(nextKeyId_, keys_[i].id + 1);
 	}
 	SortKeys();

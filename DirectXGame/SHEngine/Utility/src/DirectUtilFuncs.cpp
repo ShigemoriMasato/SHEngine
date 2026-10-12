@@ -124,3 +124,12 @@ void SHEngine::Func::InsertBarrier(ID3D12GraphicsCommandList* commandList, D3D12
 	// 状態を更新
 	stateBefore = stateAfter;
 }
+
+void SHEngine::Func::InsertUAVBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* pResource) {
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.UAV.pResource = pResource;
+
+	commandList->ResourceBarrier(1, &barrier);
+}

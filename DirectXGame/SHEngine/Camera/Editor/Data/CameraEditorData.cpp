@@ -69,13 +69,14 @@ void CameraCurveData::Save(BinaryManager& binManager) {
 }
 
 void CameraCurveData::Load(BinaryManager& binManager) {
-	std::string key = binManager.Reverse<std::string>();
+	std::string key;
+	binManager.Reverse(key);
 	if (key != key_) {
 		binManager.Back();
 		return;
 	}
 
-	totalTime = binManager.Reverse<float>();
+	binManager.Reverse(totalTime);
 	posXCurve.Load(binManager);
 	posYCurve.Load(binManager);
 	posZCurve.Load(binManager);

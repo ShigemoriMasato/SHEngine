@@ -34,6 +34,8 @@ float randf(inout uint state)
     return state / 4294967296.0;
 }
 
+static const float pi = 3.14159265359;
+
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
@@ -46,9 +48,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
     uint state = seed ^ index;
     float ballLen = randf(state) * radius;
     
-    float phi = randf(state) * 6.28318530718; // 2 * PI
-    float theta = randf(state) * 3.14159265359; // PI
-    float3 dir = float3(cos(theta) * cos(phi), sin(theta), cos(theta) * sin(phi));
+    float phi = randf(state) * pi * 2.f;
+    float theta = randf(state) * pi;
+    // 球面座標系から直交座標系に変換
+    float3 dir = float3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
     
     positions[index] = center + dir * ballLen;
     forces[index] = float3(0, 0, 0);

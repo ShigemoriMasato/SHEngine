@@ -2,14 +2,6 @@
 
 TestScene::~TestScene() {
 	Save();
-
-	BinaryManager bin;
-	uint32_t fileNum = static_cast<uint32_t>(fileList_.size());
-	bin.Register(&fileNum);
-	for (uint32_t i = 0; i < fileNum; ++i) {
-		bin.Register(&fileList_[i]);
-	}
-	bin.Write("TestScene_Config.bin");
 }
 
 void TestScene::Initialize() {
@@ -41,10 +33,10 @@ void TestScene::Initialize() {
 		BinaryManager bin;
 		uint32_t fileNum = 0;
 		if (bin.Boot("TestScene_Config.bin")) {
-			fileNum = bin.Reverse<uint32_t>();
+			bin.Reverse(fileNum);
 			fileList_.resize(fileNum);
 			for (uint32_t i = 0; i < fileNum; ++i) {
-				fileList_[i] = bin.Reverse<std::string>();
+				bin.Reverse(fileList_[i]);
 			}
 		}
 	}

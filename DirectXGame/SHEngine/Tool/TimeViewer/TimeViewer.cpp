@@ -58,14 +58,14 @@ void TimeViewer::DrawImGui() {
 
 }
 
-void TimeViewer::Save() {
+void TimeViewer::Save() const {
 	BinaryManager binManager;
 	const std::string fileName = "TimeViewerConfig.bin";
 
-	binManager.Register(&scale_);
-	binManager.Register(&interval_);
-	binManager.Register(&offset_);
-	binManager.Register(&color_);
+	binManager.Register(scale_);
+	binManager.Register(interval_);
+	binManager.Register(offset_);
+	binManager.Register(color_);
 	binManager.Write(fileName);
 }
 
@@ -77,8 +77,8 @@ void TimeViewer::Load() {
 		return;
 	}
 
-	scale_ = binManager.Reverse<float>();
-	interval_ = binManager.Reverse<float>();
-	offset_ = binManager.Reverse<Vector2>();
-	color_ = binManager.Reverse<Vector4>();
+	binManager.Reverse(scale_);
+	binManager.Reverse(interval_);
+	binManager.Reverse(offset_);
+	binManager.Reverse(color_);
 }

@@ -10,12 +10,12 @@ public:
 	void BootRawData(const std::string& rawData);
 
 	template<typename T>
-	void Register(const T* data);
+	void Register(const T& data);
 	void Write(const std::string& fileName);
 
 	//Registerした順番で値を吐き出す。一回しか吐き出さない。
 	template<typename T>
-	T Reverse();
+	void Reverse(T& data);
 	void Back() { readIndex_ = prevReadIndex_; }
 
 	bool IsEmpty() const { return inputBuffer_.empty(); }
@@ -43,7 +43,7 @@ private:
 };
 
 template<typename T>
-void BinaryManager::Register(const T* data) {
+void BinaryManager::Register(const T& data) {
 	constexpr TypeID currentID = TypeIDResolver<T>::id;
 	uint32_t size = uint32_t(sizeof(T));
 
@@ -55,16 +55,15 @@ void BinaryManager::Register(const T* data) {
 	/* ID->Size->値 */
 	outputBuffer_.append(reinterpret_cast<const char*>(&currentID), sizeof(TypeID));
 	outputBuffer_.append(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
-	outputBuffer_.append(reinterpret_cast<const char*>(data), size);
+	outputBuffer_.append(reinterpret_cast<const char*>(&data), size);
 }
 
 template<typename T>
-T BinaryManager::Reverse() {
-	T value{};
+void BinaryManager::Reverse(T& data) {
 	prevReadIndex_ = readIndex_;
 
 	if (inputBuffer_.size() < headerSize) {
-		return value;
+		return;
 	}
 
 	TypeID id;
@@ -74,36 +73,33 @@ T BinaryManager::Reverse() {
 	std::memcpy(&size, inputBuffer_.data() + readIndex_ + idSize, sizeSize);
 
 	if (id != TypeIDResolver<T>::id) {
-		return value;
+		return;
 	}
 
 	if (inputBuffer_.size() < headerSize + size) {
-		return value;
+		return;
 	}
 
-	std::memcpy(&value, inputBuffer_.data() + readIndex_ + headerSize, sizeof(T));
+	std::memcpy(&data, inputBuffer_.data() + readIndex_ + headerSize, sizeof(T));
 	readIndex_ += headerSize + size;
-
-	return value;
 }
 
 template<>
-inline void BinaryManager::Register<std::string>(const std::string* data) {
+inline void BinaryManager::Register<std::string>(const std::string& data) {
 	constexpr TypeID id = TypeIDResolver<std::string>::id;
-	uint32_t size = uint32_t(data->size());
+	uint32_t size = uint32_t(data.size());
 
 	outputBuffer_.append(reinterpret_cast<const char*>(&id), sizeof(id));
 	outputBuffer_.append(reinterpret_cast<const char*>(&size), sizeof(size));
-	outputBuffer_.append(data->data(), size);
+	outputBuffer_.append(data.data(), size);
 }
 
 template<>
-inline std::string BinaryManager::Reverse<std::string>() {
-	std::string value;
+inline void BinaryManager::Reverse<std::string>(std::string& data) {
 	prevReadIndex_ = readIndex_;
 
 	if (inputBuffer_.size() < headerSize) {
-		return value;
+		return;
 	}
 
 	TypeID id;
@@ -112,16 +108,14 @@ inline std::string BinaryManager::Reverse<std::string>() {
 	std::memcpy(&size, inputBuffer_.data() + readIndex_ + idSize, sizeSize);
 
 	if (id != TypeIDResolver<std::string>::id) {
-		return value;
+		return;
 	}
 
 	if (inputBuffer_.size() < headerSize + size) {
-		return value;
+		return;
 	}
 
-	value.resize(size);
-	std::memcpy(value.data(), inputBuffer_.data() + readIndex_ + headerSize, size);
+	data.resize(size);
+	std::memcpy(data.data(), inputBuffer_.data() + readIndex_ + headerSize, size);
 	readIndex_ += headerSize + size;
-
-	return value;
 }

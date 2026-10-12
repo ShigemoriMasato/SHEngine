@@ -7,11 +7,16 @@
 class SandScene : public IScene {
 public:
 
+	~SandScene();
+
 	void Initialize() override;
 	std::unique_ptr<IScene> Update() override;
 	void Draw() override;
 
 private:
+
+	void Save() const;
+	void Load();
 
 	std::unique_ptr<DebugCamera> camera_;
 

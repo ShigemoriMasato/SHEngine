@@ -13,7 +13,7 @@ Decorate::DataManager::DataManager() {
 	if (!fileNameManager.Boot(configName)) {
 		return;
 	}
-	selectedPath_ = fileNameManager.Reverse<std::string>();
+	fileNameManager.Reverse(selectedPath_);
 }
 
 const Transform& Decorate::DataManager::GetCurrentTransform() const {
@@ -283,7 +283,8 @@ void Decorate::Save(DecoObjData& data, BinaryManager& binManager) {
 
 void Decorate::Load(DecoObjData& data, BinaryManager& binManager) {
 	const static std::string key = "DecoObjData";
-	std::string readKey = binManager.Reverse<std::string>();
+	std::string readKey;
+	binManager.Reverse<std::string>(readKey);
 
 	int nextID = 1;
 
@@ -292,15 +293,17 @@ void Decorate::Load(DecoObjData& data, BinaryManager& binManager) {
 		return;
 	}
 
-	uint32_t pathCount = binManager.Reverse<uint32_t>();
+	uint32_t pathCount;
+	binManager.Reverse<uint32_t>(pathCount);
 
 	for (uint32_t i = 0; i < pathCount; ++i) {
-		std::string path = binManager.Reverse<std::string>();
-		uint32_t transformCount = binManager.Reverse<uint32_t>();
+		std::string path;
+		uint32_t transformCount;
+		binManager.Reverse<std::string>(path);
+		binManager.Reverse<uint32_t>(transformCount);
 
 		for (uint32_t j = 0; j < transformCount; ++j) {
-			Transform transform = binManager.Reverse<Transform>();
-			data[path][nextID++] = transform;
+			binManager.Reverse<Transform>(data[path][nextID++]);
 		}
 	}
 }

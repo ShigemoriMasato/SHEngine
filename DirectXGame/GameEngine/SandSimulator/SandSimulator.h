@@ -2,6 +2,7 @@
 #include "Data/SandData.h"
 #include "Renderer/SandRenderer.h"
 #include "Processor/SandProcessor.h"
+#include "Debugger/SandConfigure.h"
 #include <Render/Command/DirectCommandContext.h>
 
 namespace Sand {
@@ -31,17 +32,24 @@ public:
 
 	void SetCamera(const Camera* camera);
 
+	void Save(BinaryManager* bin) const;
+	void Load(BinaryManager* bin);
+
 private:
 
 	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;
 
 	Sand::Particle particleData_;
-	Sand::Grid gridData_;
-	Sand::FreeList freeList_;
 
 	std::unique_ptr<Sand::Renderer> renderer_ = nullptr;
 	std::unique_ptr<Sand::Processor> processor_ = nullptr;
 
-	float scale;
+	std::unique_ptr<Sand::Configure> configure_ = nullptr;
+
+	Vector3 spherePos_ = { 0.0f, 0.0f, 0.0f };
+	float sphereRadius_ = 1.0f;
+	bool isInitialize_ = false;
+
 	Vector4 color;
+	float scale = 1.0f;
 };
