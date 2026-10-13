@@ -13,11 +13,22 @@ void Sand::Configure::DrawImGui() {
 	ImGui::DragInt("Height", &height_, 1, 0, 100);
 
 	for (auto& [name, conf] : confList_) {
+		ImGui::PushID(name.c_str());
 		ImGui::BeginDisabled(conf.isOpen);
+
 		if (ImGui::Button(name.c_str())) {
 			conf.isOpen = true;
 		}
 		ImGui::EndDisabled();
+
+		if (conf.isOpen) {
+			ImGui::SameLine();
+			if (ImGui::Button("X")) {
+				conf.isOpen = false;
+			}
+		}
+
+		ImGui::PopID();
 	}
 
 	ImGui::End();

@@ -14,7 +14,7 @@ SandSimulator::SandSimulator(const Sand::InitializeData& initData) {
 	renderer_->SetInstance(initData.particleCount);
 
 #ifdef USE_IMGUI
-	configure_->Add([&]() { 
+	configure_->Add([&]() {
 		ImGui::DragFloat3("position", (float*)&spherePos_, 0.1f, -100.0f, 100.0f);
 		ImGui::DragFloat("radius", &sphereRadius_, 0.1f, 0.0f, 100.0f);
 		isInitialize_ = ImGui::Button("Initialize");
@@ -33,6 +33,10 @@ void SandSimulator::Initialize(SHEngine::ICommandContext* commandContext) {
 }
 
 void SandSimulator::Update(float deltaTime, SHEngine::ICommandContext* commandContext) {
+	int processCount = processor_->GetProcessCount();
+	particleData_.SetProcessNum(processCount);
+	renderer_->SetInstance(processCount);
+
 	processor_->Update(commandContext, deltaTime);
 
 	particleData_.color->CopyBuffer(&color, sizeof(Vector4));

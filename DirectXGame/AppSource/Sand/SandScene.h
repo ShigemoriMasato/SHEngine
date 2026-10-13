@@ -1,6 +1,7 @@
 #pragma once
 #include <Scene/IScene.h>
 #include <SandSimulator/SandSimulator.h>
+#include <SandSimulator/CPUSample/sandCPUSample.h>
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
 
@@ -23,5 +24,7 @@ private:
 	std::unique_ptr<SandSimulator> sandSimulator_;
 
 	Grid grid_;
+
+	std::unique_ptr<SandCPUSample> sandCPUSample_;
 
 };

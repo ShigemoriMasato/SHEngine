@@ -24,6 +24,9 @@ void ComputeObject::Initialize() {
 }
 
 void SHEngine::ComputeObject::SetExecuteNum(int executeNum, int threadSize) {
+	if (executeNum <= 0) {
+		threadGroupSize_ = { 0, 0, 0 };
+	}
 	int factNum = executeNum / threadSize;
 	threadGroupSize_.x = factNum % 65535 + 1;
 	threadGroupSize_.y = (factNum / 65535) % 65535 + 1;

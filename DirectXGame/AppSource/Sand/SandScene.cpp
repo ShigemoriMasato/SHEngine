@@ -10,7 +10,7 @@ void SandScene::Initialize() {
 
 	Sand::InitializeData initData;
 	initData.sandModel = modelManager_->GetModelData(SHEngine::TestModel::Cube);
-	initData.particleCount = 10000;
+	initData.particleCount = 10000000;
 	initData.gridVerticalCount = 100;
 	initData.gridHorizontalCount = 100;
 	initData.gridDepthCount = 100;
@@ -23,6 +23,11 @@ void SandScene::Initialize() {
 	grid_.Initialize();
 
 	Load();
+
+
+	sandCPUSample_ = std::make_unique<SandCPUSample>(500, initData.sandModel);
+	sandCPUSample_->Initialize();
+	sandCPUSample_->SetCamera(camera_.get());
 }
 
 std::unique_ptr<IScene> SandScene::Update() {
@@ -33,6 +38,7 @@ std::unique_ptr<IScene> SandScene::Update() {
 	grid_.Update(camera_->GetCenter());
 
 	sandSimulator_->Update(deltaTime, computeContext_);
+	//sandCPUSample_->Update(deltaTime);
 
 	auto fence = computeContext_->MiddleExecute();
 	directContext_->WaitFenceInGPU(fence);
@@ -48,6 +54,7 @@ void SandScene::Draw() {
 
 	grid_.Draw(directContext_);
 	sandSimulator_->Draw(directContext_);
+	//sandCPUSample_->Draw(directContext_);
 
 	auto fence = directContext_->MiddleExecute();
 	computeContext_->WaitFenceInGPU(fence);
@@ -56,6 +63,13 @@ void SandScene::Draw() {
 
 	display->DrawImGui();
 	sandSimulator_->DrawImGui();
+
+#ifdef USE_IMGUI
+	ImGui::Begin("System");
+	float deltatime = engine_->GetDeltaTime();
+	ImGui::Text("FPS: %.2f", 1.0f / deltatime);
+	ImGui::End();
+#endif
 
 	directContext_->SetRenderTarget(window);
 	engine_->DrawImGui();

@@ -18,6 +18,8 @@ namespace Sand {
 		void Save(BinaryManager* bin) const;
 		void Load(BinaryManager* bin);
 
+		int GetProcessCount() const { return processCount_; }
+
 	private:
 
 		std::unique_ptr<SHEngine::ComputeObject> ballShape_ = nullptr;
@@ -35,6 +37,9 @@ namespace Sand {
 
 		Vector3 commonUpdateData_ = { 0.0f, 0.0f, 0.0f };
 		Vector3 gravityData_ = { 0.0f, -9.8f, 0.0f };
+
+		int processCount_ = 0;
+		const int maxProcessCount_;
 
 		std::mt19937 randomEngine_;
 		std::uniform_int_distribution<uint32_t> seedGenerator_;

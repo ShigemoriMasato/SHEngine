@@ -34,9 +34,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
-    velocities[index] += forces[index];
-    
+    float3 position = positions[index];
     float3 velocity = velocities[index];
+    velocity += forces[index] * deltatime;
+    
     float speed = length(velocity);
     if (speed > threshold)
     {
@@ -46,19 +47,21 @@ void main(uint3 DTid : SV_DispatchThreadID)
         velocity = velocity * attenuationFactor;
     }
     
-    velocities[index] = velocity;
-    positions[index] += velocities[index] * deltatime;
+    velocity = velocity;
+    position += velocity * deltatime;
     
-    if (positions[index].y < floorY)
+    if (position.y < floorY)
     {
-        positions[index].y = floorY;
-        velocities[index].y *= 0.f;
-        velocities[index] *= 0.5f;
+        position.y = floorY;
+        velocity.y *= 0.f;
+        velocity *= 0.75f;
         forces[index] = float3(0, 0, 0);
     }
     else
     {
-        forces[index] = float3(0, -9.8f, 0);
+        forces[index] = gravity;
     }
     
+    positions[index] = position;
+    velocities[index] = velocity;
 }
