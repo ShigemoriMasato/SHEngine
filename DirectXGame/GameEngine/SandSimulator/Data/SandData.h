@@ -31,26 +31,33 @@ namespace Sand {
 	// cell内にぴったり入る粒子数 = 0.4 / 0.05 ^ 3 = 512
 	// 圧迫を考慮して、16 ^ 3 = 4096粒子を1cellに入れることにする
 	// 1cellのサイズ = 4096 * 16 + 32 = 65,568
-	// grid全体の想定範囲 = 64 * 64 * 3
-	// 総サイズ = 65,568 * 64 * 64 * 3 = 805,306,368 = 768MB
+	// grid全体の想定範囲 = 32 * 32 * 8
+	// gridの総数 = 32 / 0.4 * 32 / 0.4 * 8 / 0.4 = 80 * 80 * 20 = 128,000
+	// 総サイズ = 65,568 * 128,000 = 8,392,960,000 = 8.4GB
 	//
 
+	struct GridConfig {
+		Vector3 gridOrigin;
+		float cellSize;
+
+		const int32_t width_ = 80;
+		const int32_t height_ = 20;
+		const int32_t depth_ = 80;
+		const int32_t particlePerCell_ = 4096;
+
+		const int cellCount = width_ * height_ * depth_;
+	};
+
 	struct Grid {
-		void Initialize(SHEngine::BufferContainer* bufferContainer, uint32_t gridNum, uint32_t cellsize);
+		void Initialize(SHEngine::BufferContainer* bufferContainer, float cellSize);
+		void SetGridConfig(Vector3 middle, float cellSize);
 
 		// SRV/UAV int32_t * gridWidth * gridHeight * gridDepth * particlePerCell そのcellの中に入っている粒子のインデックス情報を格納
-		SHEngine::GPUBuffer* grid;
+		SHEngine::GPUBuffer* cellIndices;
 		// SRV/UAV int32_t * gridWidth * gridHeight * gridDepth そのcellの中に入っている粒子の数を格納
-		SHEngine::GPUBuffer* gridIndex;
-
-	private:
-
-		constexpr static uint32_t particlePerCell_ = 4096;
-		constexpr static uint32_t gridWidth_ = 64;
-		constexpr static uint32_t gridHeight_ = 3;
-		constexpr static uint32_t gridDepth_ = 64;
-
-
+		SHEngine::GPUBuffer* cellCounts;
+		// CBV GridConfig 
+		SHEngine::GPUBuffer* gridConfig;
 
 	};
 

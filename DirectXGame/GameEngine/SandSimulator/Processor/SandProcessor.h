@@ -10,7 +10,7 @@ namespace Sand {
 	class Processor {
 	public:
 
-		Processor(SHEngine::BufferContainer* containe, Particle* particle, Configure* configure);
+		Processor(SHEngine::BufferContainer* containe, Particle* particle, Grid* grid, Configure* configure);
 
 		void Initialize(SHEngine::ICommandContext* cc, Vector3 pos, float radius);
 		void Update(SHEngine::ICommandContext* cc, float deltaTime);
@@ -25,6 +25,7 @@ namespace Sand {
 		std::unique_ptr<SHEngine::ComputeObject> ballShape_ = nullptr;
 		std::unique_ptr<SHEngine::ComputeObject> collider_ = nullptr;
 		std::unique_ptr<SHEngine::ComputeObject> acceptForce_ = nullptr;
+		std::unique_ptr<SHEngine::ComputeObject> assignCell_ = nullptr;
 
 		std::unique_ptr<SHEngine::ComputeObject> initialize_ = nullptr;
 

@@ -1,64 +1,106 @@
+
+static const int loopCount = 32;
+
 cbuffer Counter : register(b0)
 {
     uint particleCount;
 };
 
-cbuffer Scale : register(b1)
+cbuffer GridConfig : register(b1)
 {
+    float3 gridOrigin;
     float scale;
+    
+    int width;
+    int height;
+    int depth;
+    int particlePerCell;
+    
+    int cellCount;
 };
 
-cbuffer Deltatime : register(b2)
+struct Cell
 {
-    float deltatime;
-}
+    int index[4096];
+};
+
+struct Pair
+{
+    int cellIndex;
+    int particleIndices[loopCount];
+    int indexCount;
+};
 
 RWStructuredBuffer<float3> positions : register(u0);
-RWStructuredBuffer<float3> forces : register(u1);
-RWStructuredBuffer<float3> velocities : register(u2);
-
-float3 RemoveForce(float3 a, float3 b)
-{
-    float doted = dot(a, b);
-    float lengthSq = dot(b, b);
-    
-    if (lengthSq == 0.0f)
-    {
-        return a;
-    }
-    
-    return a - b * (doted / lengthSq);
-}
+RWStructuredBuffer<Cell> cellIndices : register(u1);
+RWStructuredBuffer<int> cellCounts : register(u2);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint index = DTid.x;
-    if (index >= particleCount)
+    if (index * 32 >= particleCount)
     {
         return;
     }
     
-    float collisionDistance = scale * 1.5f;
-    float3 position = positions[index];
+    bool find;
+    int i, j;
+    int registerIndex = 0;
+    Pair indexRegister[loopCount];
     
-    for (int i = 0; i < particleCount; ++i)
+    int factLoopCount = min(loopCount, particleCount - index * 32);
+    
+    for (i = 0; i < factLoopCount; ++i)
     {
-        if (i == index)
+        find = false;
+        float3 localPosition = positions[index * 32 + i] - gridOrigin;
+        int cellX = (int) (localPosition.x / scale);
+        int cellY = (int) (localPosition.y / scale);
+        int cellZ = (int) (localPosition.z / scale);
+    
+        if (cellX < 0 || cellX >= width || cellY < 0 || cellY >= height || cellZ < 0 || cellZ >= depth)
         {
             continue;
         }
         
-        float3 diff = positions[i] - position;
-        float dist = length(diff);
-        
-        if (dist < collisionDistance)
+        int cellIndex = cellX + cellY * width + cellZ * width * height;
+    
+        for (j = 0; j < registerIndex; ++j)
         {
-            float3 normalizedDiff = normalize(diff);
-            position -= normalizedDiff * (collisionDistance - dist) * 0.5f;
-            velocities[index] = RemoveForce(velocities[index], normalizedDiff);
+            if (indexRegister[j].cellIndex == cellIndex)
+            {
+                indexRegister[j].particleIndices[indexRegister[j].indexCount] = index * 32 + i;
+                ++indexRegister[j].indexCount;
+                find = true;
+                break;
+            }
+        }
+
+        if (!find)
+        {
+            indexRegister[registerIndex].cellIndex = cellIndex;
+            indexRegister[registerIndex].particleIndices[0] = index * 32 + i;
+            indexRegister[registerIndex].indexCount = 1;
+            ++registerIndex;
         }
     }
     
-    positions[index] = position + velocities[index] * deltatime;
+    for (i = 0; i < registerIndex; ++i)
+    {
+        int cellIndex = indexRegister[i].cellIndex;
+        int count = indexRegister[i].indexCount;
+        int freeIndex;
+        
+        InterlockedAdd(cellCounts[cellIndex], count, freeIndex);
+        if (freeIndex + count > particlePerCell)
+        {
+            count = max(0, particlePerCell - freeIndex);
+        }
+        
+        for (int j = 0; j < count; ++j)
+        {
+            cellIndices[cellIndex].index[freeIndex + j] = indexRegister[i].particleIndices[j];
+        }
+    }
 }

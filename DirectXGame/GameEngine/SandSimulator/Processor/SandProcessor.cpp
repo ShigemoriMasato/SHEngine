@@ -1,7 +1,7 @@
 #include "SandProcessor.h"
 #include <imgui/imgui.h>
 
-Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* particle, Configure* configure) : maxProcessCount_(particle->countNum) {
+Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* particle, Grid* grid, Configure* configure) : maxProcessCount_(particle->countNum) {
 	auto createCO = [&](const std::string& name) {
 		auto co = std::make_unique<SHEngine::ComputeObject>("SandSimulator::" + name);
 		co->SetShader("Sand/System/" + name + ".CS.hlsl");
@@ -19,21 +19,25 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 	forceData_->CopyBuffer(&commonUpdateData_, sizeof(Vector3));
 	gravity_->CopyBuffer(&gravityData_, sizeof(Vector3));
 
-	
-
 	ballShape_->SetExecuteNum(particle->countNum, 128);
 	ballShape_->SetGPUBuffers(BufferType::CBV, { particle->count, seed_, ballShapeData_ });
 	ballShape_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->force, particle->velocity });
-
-	collider_ = createCO("Collider");
-	collider_->SetExecuteNum(particle->countNum, 128);
-	collider_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale, deltaTime_ });
-	collider_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->force, particle->velocity });
 
 	acceptForce_ = createCO("AcceptForce");
 	acceptForce_->SetExecuteNum(particle->countNum, 128);
 	acceptForce_->SetGPUBuffers(BufferType::CBV, { particle->count, deltaTime_, forceData_, gravity_ });
 	acceptForce_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->force, particle->velocity });
+
+	collider_ = createCO("Collider");
+	collider_->SetExecuteNum(particle->countNum, 128);
+	collider_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale, grid->gridConfig });
+	collider_->SetGPUBuffers(BufferType::SRV, { grid->cellIndices, grid->cellCounts });
+	collider_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->force, particle->velocity });
+
+	assignCell_ = createCO("AssignCell");
+	assignCell_->SetExecuteNum(particle->countNum / 32 + 1, 128);
+	assignCell_->SetGPUBuffers(BufferType::CBV, { particle->count, grid->gridConfig });
+	assignCell_->SetGPUBuffers(BufferType::UAV, { particle->position, grid->cellIndices, grid->cellCounts });
 
 #ifdef USE_IMGUI
 	configure->Add([&]() {
@@ -65,11 +69,13 @@ void Sand::Processor::Update(SHEngine::ICommandContext* cc, float deltaTime) {
 	gravity_->CopyBuffer(&gravityData_, sizeof(Vector3));
 	forceData_->CopyBuffer(&commonUpdateData_, sizeof(Vector3));
 
+	assignCell_->SetExecuteNum(processCount_ / 32 + 1, 128);
 	acceptForce_->SetExecuteNum(processCount_, 128);
 	collider_->SetExecuteNum(processCount_, 128);
 
 	acceptForce_->Execute(cc);
-	for (int i = 0; i < 10; ++i) {
+	assignCell_->Execute(cc);
+	for (int i = 0; i < 6; ++i) {
 		collider_->Execute(cc);
 	}
 }
