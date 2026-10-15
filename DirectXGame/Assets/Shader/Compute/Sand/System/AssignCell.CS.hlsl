@@ -31,9 +31,10 @@ struct Pair
     int indexCount;
 };
 
+RWStructuredBuffer<uint> particleCountInCell : register(t1);
+
 RWStructuredBuffer<float3> positions : register(u0);
-RWStructuredBuffer<Cell> cellIndices : register(u1);
-RWStructuredBuffer<int> cellCounts : register(u2);
+RWStructuredBuffer<uint> particleIndexForCell : register(u1);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -65,42 +66,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
         }
         
         int cellIndex = cellX + cellY * width + cellZ * width * height;
-    
-        for (j = 0; j < registerIndex; ++j)
-        {
-            if (indexRegister[j].cellIndex == cellIndex)
-            {
-                indexRegister[j].particleIndices[indexRegister[j].indexCount] = index * 32 + i;
-                ++indexRegister[j].indexCount;
-                find = true;
-                break;
-            }
-        }
-
-        if (!find)
-        {
-            indexRegister[registerIndex].cellIndex = cellIndex;
-            indexRegister[registerIndex].particleIndices[0] = index * 32 + i;
-            indexRegister[registerIndex].indexCount = 1;
-            ++registerIndex;
-        }
     }
     
     for (i = 0; i < registerIndex; ++i)
     {
-        int cellIndex = indexRegister[i].cellIndex;
-        int count = indexRegister[i].indexCount;
-        int freeIndex;
         
-        InterlockedAdd(cellCounts[cellIndex], count, freeIndex);
-        if (freeIndex + count > particlePerCell)
-        {
-            count = max(0, particlePerCell - freeIndex);
-        }
-        
-        for (int j = 0; j < count; ++j)
-        {
-            cellIndices[cellIndex].index[freeIndex + j] = indexRegister[i].particleIndices[j];
-        }
     }
 }

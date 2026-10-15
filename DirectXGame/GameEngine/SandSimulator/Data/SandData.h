@@ -37,14 +37,12 @@ namespace Sand {
 	//
 
 	struct GridConfig {
-		Vector3 gridOrigin;
-		float cellSize;
+		const float cellSize = 0.4f;
+		Vector3 leftBottomBack = { -128.f, 0.0f, -128.f };
 
-		const int32_t width_ = 80;
-		const int32_t height_ = 20;
-		const int32_t depth_ = 80;
-		const int32_t particlePerCell_ = 4096;
-
+		const int32_t width_ = int32_t(256.0f / cellSize);
+		const int32_t depth_ = int32_t(64.0f / cellSize);
+		const int32_t height_ = int32_t(256.0f / cellSize);
 		const int cellCount = width_ * height_ * depth_;
 	};
 
@@ -53,9 +51,9 @@ namespace Sand {
 		void SetGridConfig(Vector3 middle, float cellSize);
 
 		// SRV/UAV int32_t * gridWidth * gridHeight * gridDepth * particlePerCell そのcellの中に入っている粒子のインデックス情報を格納
-		SHEngine::GPUBuffer* cellIndices;
+		SHEngine::GPUBuffer* particleIndicesForCell;
 		// SRV/UAV int32_t * gridWidth * gridHeight * gridDepth そのcellの中に入っている粒子の数を格納
-		SHEngine::GPUBuffer* cellCounts;
+		SHEngine::GPUBuffer* particleCountInCell;
 		// CBV GridConfig 
 		SHEngine::GPUBuffer* gridConfig;
 

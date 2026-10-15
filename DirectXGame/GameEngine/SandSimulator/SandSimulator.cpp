@@ -17,7 +17,7 @@ SandSimulator::SandSimulator(const Sand::InitializeData& initData) {
 #ifdef USE_IMGUI
 	configure_->Add([&]() {
 		ImGui::DragFloat3("position", (float*)&spherePos_, 0.1f, -100.0f, 100.0f);
-		ImGui::DragFloat("radius", &sphereRadius_, 0.1f, 0.0f, 100.0f);
+		ImGui::DragFloat("radius", &sphereRadius_, 0.01f, 0.0f, 100.0f);
 		isInitialize_ = ImGui::Button("Initialize");
 		ImGui::Text("Initialize: %s", isInitialize_ ? "true" : "false");
 		}, "Initialize");

@@ -44,7 +44,7 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 		ImGui::DragInt("Process Count", &processCount_, 128, 0, maxProcessCount_);
 		ImGui::DragFloat("Threshold", &commonUpdateData_.x, 0.01f);
 		ImGui::DragFloat("Attenuation", &commonUpdateData_.y, 0.01f);
-		ImGui::DragFloat("Floor", &commonUpdateData_.z, 0.1f);
+		ImGui::DragFloat("Floor", &commonUpdateData_.z, 0.1f, 0.0f);
 		ImGui::DragFloat3("Gravity", (float*)&gravityData_, 0.01f);
 
 		}, "Common Update");

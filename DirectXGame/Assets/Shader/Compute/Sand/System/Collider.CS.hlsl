@@ -5,29 +5,25 @@ cbuffer Counter : register(b0)
 
 cbuffer Scale : register(b1)
 {
+    //直径
     float particleScale;
 };
 
 cbuffer GridConfig : register(b2)
 {
-    float3 gridOrigin;
     float scale;
+    float3 gridOrigin;
     
     int width;
     int height;
     int depth;
-    int particlePerCell;
     
     int cellCount;
 };
 
-struct Cell
-{
-    int index[4096];
-};
-
-StructuredBuffer<Cell> cellIndices : register(t0);
-StructuredBuffer<int> cellCounts : register(t1);
+StructuredBuffer<uint> particleIndexForCell : register(t0);
+StructuredBuffer<uint> beginIndexForCell : register(t1);
+StructuredBuffer<uint> particleCountInCell : register(t2);
 
 RWStructuredBuffer<float3> positions : register(u0);
 RWStructuredBuffer<float3> velocities : register(u1);
@@ -45,21 +41,41 @@ float3 RemoveForce(float3 a, float3 b)
     return a - b * (doted / lengthSq);
 }
 
-static const int checkCellCount = 6;
-static const int3 nearCellIndex[checkCellCount] =
-{
-    { 0, 0, 1 },
-    { 0, 0, -1 },
-    { 0, 1, 0 },
-    { 0, -1, 0 },
-    { 1, 0, 0 },
-    { -1, 0, 0 }
-};
-
 int GetCellIndex(int3 cell)
 {
     return cell.x + cell.y * width + cell.z * width * height;
 }
+
+static const int checkCellCount = 26;
+static const int3 nearCellIndex[checkCellCount] =
+{
+    { -1, -1, -1 },
+    { -1, -1, 0 },
+    { -1, -1, 1 },
+    { -1, 0, -1 },
+    { -1, 0, 0 },
+    { -1, 0, 1 },
+    { -1, 1, -1 },
+    { -1, 1, 0 },
+    { -1, 1, 1 },
+    { 0, -1, -1 },
+    { 0, -1, 0 },
+    { 0, -1, 1 },
+    { 0, 0, -1 },
+    { 0, 0, 1 },
+    { 0, 1, -1 },
+    { 0, 1, 0 },
+    { 0, 1, 1 },
+    { 1, -1, -1 },
+    { 1, -1, 0 },
+    { 1, -1, 1 },
+    { 1, 0, -1 },
+    { 1, 0, 0 },
+    { 1, 0, 1 },
+    { 1, 1, -1 },
+    { 1, 1, 0 },
+    { 1, 1, 1 }
+};
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -71,7 +87,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     }
     
     int i, j;
-    float collisionDistance = particleScale * 1.2f;
+    float collisionDistance = particleScale * 0.8f;
     float3 position = positions[index];
     float3 local = position - gridOrigin;
     
@@ -95,11 +111,12 @@ void main(uint3 DTid : SV_DispatchThreadID)
         }
     
         int cellIndex = GetCellIndex(checkCell[i]);
-        int particleCountInCell = min(cellCounts[cellIndex], particlePerCell);
-    
-        for (j = 0; j < particleCountInCell; ++j)
+        int count = particleCountInCell[cellIndex];
+        int beginIndex = beginIndexForCell[cellIndex];
+        
+        for (j = 0; j < count; ++j)
         {
-            int otherIndex = cellIndices[cellIndex].index[j];
+            int otherIndex = particleIndexForCell[beginIndex + j];
         
             if (otherIndex == index)
             {
@@ -112,9 +129,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
             if (dist < collisionDistance)
             {
                 float3 normalizedDiff = normalize(diff);
-                position -= normalizedDiff * (collisionDistance - dist) * 1.2f;
+                position -= normalizedDiff * (collisionDistance - dist) * 0.8f;
                 velocities[index] = RemoveForce(velocities[index], normalizedDiff);
             }
         }
     }
+    
+    positions[index] = position;
 }
