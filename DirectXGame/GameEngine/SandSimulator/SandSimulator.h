@@ -49,7 +49,6 @@ private:
 
 	Vector3 spherePos_ = { 0.0f, 0.0f, 0.0f };
 	float sphereRadius_ = 1.0f;
-	float gridCellSize_ = 0.4f;
 	bool isInitialize_ = false;
 
 	Vector4 color;

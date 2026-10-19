@@ -1,5 +1,5 @@
 
-static const int loopCount = 32;
+static const int loopCount = 8;
 
 cbuffer Counter : register(b0)
 {
@@ -14,62 +14,81 @@ cbuffer GridConfig : register(b1)
     int width;
     int height;
     int depth;
-    int particlePerCell;
-    
     int cellCount;
-};
-
-struct Cell
-{
-    int index[4096];
 };
 
 struct Pair
 {
     int cellIndex;
-    int particleIndices[loopCount];
     int indexCount;
+    int indices[loopCount];
 };
 
-RWStructuredBuffer<uint> particleCountInCell : register(t1);
+StructuredBuffer<float3> positions : register(t0);
+StructuredBuffer<uint> beginIndexForCell : register(t1);
 
-RWStructuredBuffer<float3> positions : register(u0);
-RWStructuredBuffer<uint> particleIndexForCell : register(u1);
+// セル番号でソートしたパーティクルのインデックスを格納するバッファ
+RWStructuredBuffer<uint> particleIndexForCell : register(u0);
+// 書き込む際、別スレッドと書き込み位置が競合しないようにするバッファ (毎フレームゼロ初期化すること)
+RWStructuredBuffer<uint> indexWriteBuffer : register(u1);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    uint index = DTid.x;
-    if (index * 32 >= particleCount)
+    uint index = DTid.x * loopCount;
+    if (index >= particleCount)
     {
         return;
     }
     
-    bool find;
     int i, j;
-    int registerIndex = 0;
-    Pair indexRegister[loopCount];
-    
-    int factLoopCount = min(loopCount, particleCount - index * 32);
+    int factLoopCount = min(loopCount, particleCount - index);
+    Pair pairs[loopCount];
+    int pairRegisterIndex = 0;
+    bool find;
     
     for (i = 0; i < factLoopCount; ++i)
     {
         find = false;
-        float3 localPosition = positions[index * 32 + i] - gridOrigin;
-        int cellX = (int) (localPosition.x / scale);
-        int cellY = (int) (localPosition.y / scale);
-        int cellZ = (int) (localPosition.z / scale);
+        float3 localPosition = positions[index + i] - gridOrigin;
     
-        if (cellX < 0 || cellX >= width || cellY < 0 || cellY >= height || cellZ < 0 || cellZ >= depth)
-        {
-            continue;
-        }
+        int3 cell;
+        cell.x = (int) (localPosition.x / scale);
+        cell.y = (int) (localPosition.y / scale);
+        cell.z = (int) (localPosition.z / scale);
+    
+        int myCellIndex = cell.x + cell.y * width + cell.z * width * height;
         
-        int cellIndex = cellX + cellY * width + cellZ * width * height;
+        
+        for (j = 0; j < pairRegisterIndex; ++j)
+        {
+            if (pairs[j].cellIndex == myCellIndex)
+            {
+                pairs[j].indices[pairs[j].indexCount] = index;
+                pairs[j].indexCount++;
+                find = true;
+            }
+        }
+
+        if (!find)
+        {
+            pairs[pairRegisterIndex].cellIndex = myCellIndex;
+            pairs[pairRegisterIndex].indexCount = 1;
+            pairs[pairRegisterIndex].indices[0] = index;
+            pairRegisterIndex++;
+        }
     }
     
-    for (i = 0; i < registerIndex; ++i)
+    for (i = 0; i < pairRegisterIndex; i++)
     {
+        int freeIndex;
+        InterlockedAdd(indexWriteBuffer[pairs[i].cellIndex], pairs[i].indexCount, freeIndex);
         
+        int beginIndex = beginIndexForCell[pairs[i].cellIndex] + freeIndex;
+        
+        for (j = 0; j < pairs[i].indexCount; ++j)
+        {
+            particleIndexForCell[beginIndex + j] = pairs[i].indices[j];
+        }
     }
 }

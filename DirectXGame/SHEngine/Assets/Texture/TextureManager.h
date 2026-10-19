@@ -107,22 +107,22 @@ namespace SHEngine {
 		 * @param filePath テクスチャファイルのパス
 		 * @return テクスチャハンドル
 		 */
-		TextureData* GetTextureData(std::string filePath);
+		TextureData* GetTextureData(std::string filePath) const;
 
 		/**
 		 * @brief テクスチャデータを取得
 		 * @param handle テクスチャハンドル
 		 * @return TextureDataへのポインタ
 		 */
-		TextureData* GetTextureData(int handle);
+		TextureData* GetTextureData(int handle) const;
 
 		/**
 		 * @brief テクスチャリソースを取得
 		 * @param handle テクスチャハンドル
 		 * @return ID3D12ResourceのComポインタ
 		 */
-		ID3D12Resource* GetTextureResource(int handle) {
-			return textureDataList_[handle]->textureResource_.Get();
+		ID3D12Resource* GetTextureResource(int handle) const {
+			return textureDataList_.at(handle)->textureResource_.Get();
 		}
 
 		void UploadResources(ID3D12GraphicsCommandList* cmdList);

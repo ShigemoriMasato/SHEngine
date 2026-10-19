@@ -1,7 +1,7 @@
 cbuffer GridConfig : register(b0)
 {
+    float3 gridOrigin;
     float scale;
-    float3 leftBottomBack;
     
     int width;
     int height;
@@ -15,26 +15,33 @@ cbuffer GridBlock : register(b1)
 }
 
 StructuredBuffer<uint> BlockNumber : register(t0);
-StructuredBuffer<uint> registerCount : register(t1);
+StructuredBuffer<uint> particleCountInCell : register(t1);
 
 RWStructuredBuffer<uint> beginIndexForCell : register(u0);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    uint index = DTid.x * cellCountPerBlock;
+    uint index = DTid.x;
     if (index >= cellCount)
     {
         return;
     }
     
     int i, ans = 0;
-    int factLoopCount = min(cellCountPerBlock, cellCount - index);
+    int underBlockCount = index / cellCountPerBlock;
+    int indexForCurrentBlock = index % cellCountPerBlock;
+    int beginIndexForCellCount = cellCountPerBlock * underBlockCount;
     
-    for (i = 0; i < factLoopCount; ++i)
+    for (i = 0; i < underBlockCount; ++i)
     {
-        ans += registerCount[index + i];
+        ans += BlockNumber[i];
     }
 
-    BlockNumber[DTid.x] = ans;
+    for (i = 0; i < indexForCurrentBlock; ++i)
+    {
+        ans += particleCountInCell[beginIndexForCellCount + i];
+    }
+
+    beginIndexForCell[index] = ans;
 }

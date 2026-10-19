@@ -61,7 +61,7 @@ void TextureManager::LoadAllTextures() {
 	}
 }
 
-TextureData* TextureManager::GetTextureData(std::string filePath) {
+TextureData* TextureManager::GetTextureData(std::string filePath) const {
 	std::string formatFirst = "Assets/";
 	std::string factFilePath = "";
 	if (filePath.length() < formatFirst.length()) {
@@ -188,8 +188,8 @@ void TextureManager::DeleteTexture(TextureData* textureData) {
 	}
 }
 
-TextureData* TextureManager::GetTextureData(int handle) {
-	return textureDataList_[handle].get();
+TextureData* TextureManager::GetTextureData(int handle) const {
+	return textureDataList_.at(handle).get();
 }
 
 void TextureManager::UploadResources(ID3D12GraphicsCommandList* cmdList) {

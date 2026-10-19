@@ -12,22 +12,34 @@ void Sand::Particle::Initialize(SHEngine::BufferContainer* bufferContainer, uint
 	countNum = particleCount;
 }
 
-void Sand::Grid::Initialize(SHEngine::BufferContainer* bufferContainer, float cellSize) {
+void Sand::Grid::Initialize(SHEngine::BufferContainer* bufferContainer, uint32_t particleCount) {
 	GridConfig config{};
-	cellIndices = bufferContainer->Create(BufferType::SRV_UAV, sizeof(int32_t) * config.particlePerCell_, config.cellCount, BufferNum::Single);
-	cellCounts = bufferContainer->Create(BufferType::SRV_UAV, sizeof(int32_t), config.cellCount, BufferNum::Single);
-	gridConfig = bufferContainer->Create(BufferType::CBV, sizeof(GridConfig), 1);
 
-	config.gridOrigin = -Vector3(config.width_ * cellSize * 0.5f, config.height_ * cellSize * 0.5f, config.depth_ * cellSize * 0.5f);
-	config.cellSize = cellSize;
+	particleIndicesForCell = bufferContainer->Create(BufferType::SRV_UAV, sizeof(uint32_t), particleCount, BufferNum::Single);
+	particleCountInCell = bufferContainer->Create(BufferType::SRV_UAV, sizeof(uint32_t), config.cellCount, BufferNum::Single);
+	beginIndexForCell = bufferContainer->Create(BufferType::SRV_UAV, sizeof(uint32_t), config.cellCount, BufferNum::Single);
+	blockNumber = bufferContainer->Create(BufferType::SRV_UAV, sizeof(uint32_t), config.cellCount, BufferNum::Single);
+	gridConfig = bufferContainer->Create(BufferType::CBV, sizeof(GridConfig));
+
+	indexWriteBuffer = bufferContainer->Create(BufferType::UAV, sizeof(uint32_t), config.cellCount, BufferNum::Single);
+
+	config.leftBottomBack = Vector3(-config.width_ * config.cellSize * 0.5f,
+		-config.height_ * config.cellSize * 0.5f,
+		-config.depth_ * config.cellSize * 0.5f);
+
 	gridConfig->CopyBuffer(&config, sizeof(GridConfig));
 }
 
-void Sand::Grid::SetGridConfig(Vector3 middle, float cellSize) {
-	GridConfig config{};
-	config.gridOrigin = middle - Vector3(config.width_ * cellSize * 0.5f, config.height_ * cellSize * 0.5f, config.depth_ * cellSize * 0.5f);
-	config.cellSize = cellSize;
+void Sand::Grid::Update() {
+	indexWriteBuffer->ZeroReset();
+	particleCountInCell->ZeroReset();
+}
 
-	//originとcellsize以外は定数なので、最初の四つ(float4)だけコピーする
-	gridConfig->CopyBuffer(&config, sizeof(float) * 4);
+void Sand::Grid::SetGridConfig(Vector3 middle) {
+	GridConfig config{};
+	const float cellSize = config.cellSize;
+	config.leftBottomBack = middle - Vector3(config.width_ * cellSize * 0.5f, config.height_ * cellSize * 0.5f, config.depth_ * cellSize * 0.5f);
+
+	// 変数は
+	gridConfig->CopyBuffer(&config, sizeof(float) * 3);
 }

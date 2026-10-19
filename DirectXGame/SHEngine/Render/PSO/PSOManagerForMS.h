@@ -33,16 +33,22 @@ namespace SHEngine::PSO {
 			return !(*this == other);
 		}
 		bool operator<(const ConfigMSType& other) const {
-			if (ms != other.ms) return ms < other.ms;
-			if (ps != other.ps) return ps < other.ps;
+			if (rootConfig != other.rootConfig) return rootConfig < other.rootConfig;
 			for (size_t i = 0; i < 8; ++i) {
 				if (blendID[i] != other.blendID[i]) return blendID[i] < other.blendID[i];
 			}
-			if (rootConfig != other.rootConfig) return rootConfig < other.rootConfig;
+			if (ms != other.ms) return ms < other.ms;
+			if (ps != other.ps) return ps < other.ps;
+			if (as != other.as) return as < other.as;
+			if (rtvNum != other.rtvNum) return rtvNum < other.rtvNum;
 			if (rasterizerID != other.rasterizerID) return rasterizerID < other.rasterizerID;
-			if (topology != other.topology) return topology < other.topology;
 			if (depthStencilID != other.depthStencilID) return depthStencilID < other.depthStencilID;
-			return rtvNum < other.rtvNum;
+			if (topology != other.topology) return topology < other.topology;
+			if (dsvFormat != other.dsvFormat) return dsvFormat < other.dsvFormat;
+			for (int i = 0; i < 8; ++i) {
+				if (rtvFormats[i] != other.rtvFormats[i]) return rtvFormats[i] < other.rtvFormats[i];
+			}
+			return false;
 		}
 	};
 

@@ -20,7 +20,7 @@ namespace SHEngine {
 		void EndFrame();
 
 		// @brief コマンドキューの生ポインタの取得
-		ID3D12CommandQueue* GetCommandQueue() { return queue_->GetQueue(); }
+		ID3D12CommandQueue* GetCommandQueue() const { return queue_->GetQueue(); }
 
 		// @brief GPUの処理がすべて終わるのを待つ
 		void StopGPU() { queue_->StopGPU(); }
@@ -29,9 +29,9 @@ namespace SHEngine {
 
 		void WaitFenceInCPU(const Command::WaitFence& waitFence) { queue_->WaitFenceInCPU(waitFence); }
 
-		ID3D12GraphicsCommandList6* GetCommandList() { return cmdObjects_[currentCmdObjIndex_]->GetCommandList(); }
+		ID3D12GraphicsCommandList6* GetCommandList() const { return cmdObjects_[currentCmdObjIndex_]->GetCommandList(); }
 
-		uint32_t GetCurrentID() { return cmdObjects_[currentCmdObjIndex_]->GetCurrentID(); }
+		uint32_t GetCurrentID() const { return cmdObjects_[currentCmdObjIndex_]->GetCurrentID(); }
 
 	public:// 計測関係
 
@@ -45,7 +45,7 @@ namespace SHEngine {
 
 		void PrivateInitialize(DXDevice* device, Command::Type type, int initCmdObjNum = 2);
 
-		CmdObj* GetCurrentCmdObj() { return cmdObjects_[currentCmdObjIndex_].get(); }
+		CmdObj* GetCurrentCmdObj() const { return cmdObjects_[currentCmdObjIndex_].get(); }
 
 	private:
 

@@ -149,6 +149,25 @@ D3D12_GPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetGPUDescriptorHandle(BufferTy
 	return it->second.at(bufferIndex);
 }
 
+D3D12_CPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetCPUDescriptorHandle(BufferType type) const {
+	if (!(bufferType_ & type)) {
+		assert(false && "BufferType is not available");
+		return {};
+	}
+
+	if (type == BufferType::CBV) {
+		return { resources_[currentIndex_ % resources_.size()].res->GetGPUVirtualAddress() };
+	}
+	uint32_t bufferIndex = currentIndex_ % resources_.size();
+	if (type == BufferType::SRV) {
+		return srvHandles_.at(bufferIndex)->GetCPU();
+	} else if (type == BufferType::UAV) {
+		return uavHandles_.at(bufferIndex)->GetCPU();
+	}
+	assert(false && "Invalid BufferType");
+	return {};
+}
+
 void SHEngine::GPUBuffer::CopyBuffer(const void* data, size_t dataSize) {
 	//安全性担保
 	assert(dataSize <= sizeInBytes_);
@@ -214,6 +233,14 @@ void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 
 		Func::InsertBarrier(cmdList, nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
 	}
+}
+
+void SHEngine::GPUBuffer::ZeroReset() {
+	// Flush時に0で内容物をクリアするフラグを立てる
+	if (bufferType_ & BufferType::UAV) {
+		return;
+	}
+	nextData_.assign(sizeInBytes_, 0);
 }
 
 BufferType operator|(BufferType a, BufferType b) {

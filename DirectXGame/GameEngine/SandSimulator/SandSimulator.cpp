@@ -6,7 +6,7 @@ using namespace Sand;
 SandSimulator::SandSimulator(const Sand::InitializeData& initData) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	particleData_.Initialize(container_.get(), initData.particleCount);
-	gridData_.Initialize(container_.get(), 0.4f);
+	gridData_.Initialize(container_.get(), initData.particleCount);
 
 	configure_ = std::make_unique<Configure>();
 
@@ -26,10 +26,6 @@ SandSimulator::SandSimulator(const Sand::InitializeData& initData) {
 		ImGui::ColorEdit4("Color", &color.x);
 		ImGui::DragFloat("Scale", &scale, 0.01f);
 		}, "Drawer");
-
-	configure_->Add([&]() {
-		ImGui::DragFloat("Cell Size", &gridCellSize_, 0.002f, 0.002f);
-		}, "Grid");
 #endif
 }
 
@@ -41,6 +37,8 @@ void SandSimulator::Update(float deltaTime, SHEngine::ICommandContext* commandCo
 	int processCount = processor_->GetProcessCount();
 	particleData_.SetProcessNum(processCount);
 	renderer_->SetInstance(processCount);
+
+	gridData_.Update();
 
 	processor_->Update(commandContext, deltaTime);
 

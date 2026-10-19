@@ -1,6 +1,4 @@
 
-static const int loopCount = 64;
-
 cbuffer Counter : register(b0)
 {
     uint particleCount;
@@ -8,8 +6,8 @@ cbuffer Counter : register(b0)
 
 cbuffer GridConfig : register(b1)
 {
+    float3 gridOrigin;
     float scale;
-    float3 leftBottomBack;
     
     int width;
     int height;
@@ -19,12 +17,15 @@ cbuffer GridConfig : register(b1)
 
 struct Pair
 {
-    int cellIndex;
-    int indexCount;
+    int first;
+    int second;
 };
 
-RWStructuredBuffer<float3> positions : register(u0);
-RWStructuredBuffer<uint> particleCountInCell : register(u1);
+StructuredBuffer<float3> positions : register(t0);
+
+RWStructuredBuffer<uint> particleCountInCell : register(u0);
+
+static const int loopCount = 8;
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -37,7 +38,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     bool find;
     int i, j, registerIndex = 0;
-    Pair indexRegister[loopCount];
+    Pair beginIndex[loopCount];
     
     int factLoopCount = min(loopCount, particleCount - index);
     
@@ -45,7 +46,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     for (i = 0; i < factLoopCount; ++i)
     {
         find = false;
-        float3 localPosition = positions[index + i] + leftBottomBack;
+        float3 localPosition = positions[index + i] - gridOrigin;
         int cellX = (int) (localPosition.x / scale);
         int cellY = (int) (localPosition.y / scale);
         int cellZ = (int) (localPosition.z / scale);
@@ -56,13 +57,13 @@ void main(uint3 DTid : SV_DispatchThreadID)
         }
         
         int cellIndex = cellX + cellY * width + cellZ * width * height;
-    
+        
         // すでに登録済みのセルかどうかを確認
         for (j = 0; j < registerIndex; ++j)
         {
-            if (indexRegister[j].cellIndex == cellIndex)
+            if (beginIndex[j].first == cellIndex)
             {
-                ++indexRegister[j].indexCount;
+                ++beginIndex[j].second;
                 find = true;
                 break;
             }
@@ -71,14 +72,14 @@ void main(uint3 DTid : SV_DispatchThreadID)
         //登録済みでない場合は登録し、登録した数(registerIndex)を1増やす
         if (!find)
         {
-            indexRegister[registerIndex].cellIndex = cellIndex;
-            indexRegister[registerIndex].indexCount = 1;
+            beginIndex[registerIndex].first = cellIndex;
+            beginIndex[registerIndex].second = 1;
             ++registerIndex;
         }
     }
     
     for (i = 0; i < registerIndex; ++i)
     {
-        InterlockedAdd(particleCountInCell[indexRegister[i].cellIndex], indexRegister[i].indexCount);
+        InterlockedAdd(particleCountInCell[beginIndex[i].first], beginIndex[i].second);
     }
 }

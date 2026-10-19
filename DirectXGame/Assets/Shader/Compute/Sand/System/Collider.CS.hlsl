@@ -11,13 +11,12 @@ cbuffer Scale : register(b1)
 
 cbuffer GridConfig : register(b2)
 {
-    float scale;
     float3 gridOrigin;
+    float scale;
     
     int width;
     int height;
     int depth;
-    
     int cellCount;
 };
 
@@ -87,7 +86,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
     }
     
     int i, j;
-    float collisionDistance = particleScale * 0.8f;
+    //オブジェクトの位置を詳細に見るために、粒子の半径より少し大きめの距離を設定
+    float collisionDistance = particleScale * 1.2f;
     float3 position = positions[index];
     float3 local = position - gridOrigin;
     
@@ -126,7 +126,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float3 diff = positions[otherIndex] - position;
             float dist = length(diff);
         
-            if (dist < collisionDistance)
+            if (dist < collisionDistance  && dist != 0)
             {
                 float3 normalizedDiff = normalize(diff);
                 position -= normalizedDiff * (collisionDistance - dist) * 0.8f;

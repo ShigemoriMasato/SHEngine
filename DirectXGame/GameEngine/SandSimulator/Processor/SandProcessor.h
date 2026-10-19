@@ -23,15 +23,21 @@ namespace Sand {
 	private:
 
 		std::unique_ptr<SHEngine::ComputeObject> ballShape_ = nullptr;
-		std::unique_ptr<SHEngine::ComputeObject> collider_ = nullptr;
+
+		std::unique_ptr<SHEngine::ComputeObject> frameInitialize_ = nullptr;
 		std::unique_ptr<SHEngine::ComputeObject> acceptForce_ = nullptr;
+		std::unique_ptr<SHEngine::ComputeObject> counter_ = nullptr;
+		std::unique_ptr<SHEngine::ComputeObject> splitBlock_ = nullptr;
+		std::unique_ptr<SHEngine::ComputeObject> prefixSum_ = nullptr;
 		std::unique_ptr<SHEngine::ComputeObject> assignCell_ = nullptr;
+		std::unique_ptr<SHEngine::ComputeObject> collider_ = nullptr;
 
 		std::unique_ptr<SHEngine::ComputeObject> initialize_ = nullptr;
 
 		SHEngine::GPUBuffer* deltaTime_ = nullptr;
 		SHEngine::GPUBuffer* seed_ = nullptr;
 		SHEngine::GPUBuffer* ballShapeData_ = nullptr;
+		SHEngine::GPUBuffer* cellCountPerBlockBuffer_ = nullptr;
 
 		SHEngine::GPUBuffer* forceData_ = nullptr;
 		SHEngine::GPUBuffer* gravity_ = nullptr;
@@ -41,6 +47,8 @@ namespace Sand {
 
 		int processCount_ = 0;
 		const int maxProcessCount_;
+
+		int cellCountPerBlock_ = 128;
 
 		std::mt19937 randomEngine_;
 		std::uniform_int_distribution<uint32_t> seedGenerator_;

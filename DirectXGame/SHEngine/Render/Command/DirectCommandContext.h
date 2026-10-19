@@ -12,7 +12,7 @@ namespace SHEngine {
 
 		void SetRenderTarget(Screen::IDisplay* display, bool clear = true, bool setViewPort = true);
 
-		Screen::IDisplay* GetRenderTarget() { return renderTarget_; }
+		Screen::IDisplay* GetRenderTarget() const { return renderTarget_; }
 
 	private:
 

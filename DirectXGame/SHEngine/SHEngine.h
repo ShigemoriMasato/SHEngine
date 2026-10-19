@@ -50,14 +50,14 @@ namespace SHEngine {
 		void DrawImGui();
 
 	public: // Getter
-		TextureManager* GetTextureManager() { return textureManager_.get(); }
-		FontLoader* GetFontLoader() { return fontLoader_.get(); }
-		ModelManager* GetModelManager() { return modelManager_.get(); }
-		DirectCommandContext* GetDirectCommandContext() { return directCmdContext_.get(); }
-		ComputeCommandContext* GetComputeCommandContext() { return computeCmdContext_.get(); }
-		Input* GetInput() { return input_.get(); }
-		FPSObserver* GetFPSObserver() { return fpsObserver_.get(); }
-		float GetDeltaTime() { return fpsObserver_->GetDeltatime(); }
+		TextureManager* GetTextureManager() const { return textureManager_.get(); }
+		FontLoader* GetFontLoader() const { return fontLoader_.get(); }
+		ModelManager* GetModelManager() const { return modelManager_.get(); }
+		DirectCommandContext* GetDirectCommandContext() const { return directCmdContext_.get(); }
+		ComputeCommandContext* GetComputeCommandContext() const { return computeCmdContext_.get(); }
+		Input* GetInput() const { return input_.get(); }
+		FPSObserver* GetFPSObserver() const { return fpsObserver_.get(); }
+		float GetDeltaTime() const { return fpsObserver_->GetDeltatime(); }
 
 		HINSTANCE GetHInstance() const { return hInstance_; }
 

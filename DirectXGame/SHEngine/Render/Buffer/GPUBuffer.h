@@ -39,8 +39,13 @@ namespace SHEngine {
 		// @brief GPUBufferの状態を実際にGPUへ反映させる。
 		void Flush(ID3D12GraphicsCommandList* cmdList);
 
+		// @brief GPUBufferの状態を初期化する。Flush時に切り替える。 (UAVの場合は使用できない)
+		void ZeroReset();
+
 		// @brief GPUBufferのGPUディスクリプタハンドルを取得する。
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(BufferType type) const;
+		// @brief GPUBufferのCPUディスクリプタハンドルを取得する。
+		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(BufferType type) const;
 
 		// @brief Viewの種類を取得する
 		uint8_t GetBufferType() const { return bufferType_; }
@@ -62,6 +67,8 @@ namespace SHEngine {
 		static void SetCurrentIndex(uint32_t frame) { currentIndex_ = frame; }
 
 		static inline DXDevice* device_ = nullptr;
+		
+		Logger logger_ = GetLogger("Engine");
 
 		struct Resource {
 			Microsoft::WRL::ComPtr<ID3D12Resource> res;
@@ -85,6 +92,7 @@ namespace SHEngine {
 		std::vector<uint8_t> nextData_;
 		D3D12_RESOURCE_STATES nextState_ = {};
 
+		bool isZeroResetForUAV_ = false;
 
 		static inline uint32_t currentIndex_ = 0;
 	};

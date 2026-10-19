@@ -54,23 +54,23 @@ namespace SHEngine {
 
 		/// @brief DirectX12デバイスを取得
 		/// @return ID3D12Device*
-		ID3D12Device2* GetDevice() { return device_.Get(); }
+		ID3D12Device2* GetDevice() const { return device_.Get(); }
 
 		/// @brief DXGIファクトリを取得
 		/// @return IDXGIFactory7*
-		IDXGIFactory7* GetDxgiFactory() { return dxgiFactory_.Get(); }
+		IDXGIFactory7* GetDxgiFactory() const { return dxgiFactory_.Get(); }
 
 		/// @brief SRV/CBV/UAVディスクリプタヒープマネージャーを取得
 		/// @return SRVManager*
-		SRVManager* GetSRVManager() { return srvManager_.get(); }
+		SRVManager* GetSRVManager() const { return srvManager_.get(); }
 
 		/// @brief RTVディスクリプタヒープマネージャーを取得
 		/// @return RTVManager*
-		RTVManager* GetRTVManager() { return rtvManager_.get(); }
+		RTVManager* GetRTVManager() const { return rtvManager_.get(); }
 
 		/// @brief DSVディスクリプタヒープマネージャーを取得
 		/// @return DSVManager*
-		DSVManager* GetDSVManager() { return dsvManager_.get(); }
+		DSVManager* GetDSVManager() const { return dsvManager_.get(); }
 
 		IDxcBlob* CompileShader(const std::string& filePath, ShaderType shaderType);
 
