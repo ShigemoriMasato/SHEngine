@@ -27,6 +27,8 @@ SandSimulator::SandSimulator(const Sand::InitializeData& initData) {
 		ImGui::DragFloat("Scale", &scale, 0.01f);
 		}, "Drawer");
 #endif
+
+	timeViewer_ = std::make_unique<TimeViewer>();
 }
 
 void SandSimulator::Initialize(SHEngine::ICommandContext* commandContext) {

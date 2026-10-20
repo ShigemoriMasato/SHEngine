@@ -20,6 +20,14 @@ namespace Sand {
 
 		int GetProcessCount() const { return processCount_; }
 
+	public:
+
+		struct TimeConfig {
+			double prefixSum = 0.0f;
+		};
+
+		TimeConfig GetTimeConfig() const { return timeConfig_; }
+
 	private:
 
 		std::unique_ptr<SHEngine::ComputeObject> ballShape_ = nullptr;
@@ -49,6 +57,9 @@ namespace Sand {
 		const int maxProcessCount_;
 
 		int cellCountPerBlock_ = 128;
+
+
+		TimeConfig timeConfig_ = {};
 
 		std::mt19937 randomEngine_;
 		std::uniform_int_distribution<uint32_t> seedGenerator_;

@@ -4,6 +4,7 @@
 #include "Processor/SandProcessor.h"
 #include "Debugger/SandConfigure.h"
 #include <Render/Command/DirectCommandContext.h>
+#include <Tool/TimeViewer/TimeViewer.h>
 
 namespace Sand {
 	struct InitializeData {
@@ -53,4 +54,6 @@ private:
 
 	Vector4 color;
 	float scale = 1.0f;
+
+	std::unique_ptr<TimeViewer> timeViewer_ = nullptr;
 };

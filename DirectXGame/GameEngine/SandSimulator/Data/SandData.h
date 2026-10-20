@@ -29,8 +29,8 @@ namespace Sand {
 		Vector3 leftBottomBack = {};
 		const float cellSize = 0.4f;
 
-		const int32_t width_ = int32_t(64.0f / cellSize);
-		const int32_t height_ = int32_t(64.0f / cellSize);
+		const int32_t width_ = int32_t(16.0f / cellSize);
+		const int32_t height_ = int32_t(16.0f / cellSize);
 		const int32_t depth_ = int32_t(32.0f / cellSize);
 		const int cellCount = width_ * height_ * depth_;
 	};

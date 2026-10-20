@@ -112,11 +112,17 @@ void Sand::Processor::Update(SHEngine::ICommandContext* cc, float deltaTime) {
 
 	counter_->Execute(cc);
 	splitBlock_->Execute(cc);
+
+	cc->BeginTimeStamp("PrefixSum");
 	prefixSum_->Execute(cc);
+	cc->EndTimeStamp();
+
 	assignCell_->Execute(cc);
 	for (int i = 0; i < 1; ++i) {
 		collider_->Execute(cc);
 	}
+
+	timeConfig_.prefixSum = cc->GetTimeStampResult("PrefixSum");
 }
 
 void Sand::Processor::Save(BinaryManager* bin) const {

@@ -13,12 +13,10 @@ cbuffer GridConfig : register(b0)
 RWStructuredBuffer<uint> particleCountInCell : register(u0);
 RWStructuredBuffer<uint> indexWriteBuffer : register(u1);
 
-static const int loopCount = 8;
-
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    uint index = DTid.x * loopCount;
+    uint index = DTid.x;
     if (index >= cellCount)
     {
         return;
