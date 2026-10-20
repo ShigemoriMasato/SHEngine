@@ -37,8 +37,11 @@ std::unique_ptr<IScene> SandScene::Update() {
 
 	grid_.Update(camera_->GetCenter());
 
-	sandSimulator_->Update(deltaTime, computeContext_);
-	//sandCPUSample_->Update(deltaTime);
+	if (isCPUSample_) {
+		sandCPUSample_->Update(deltaTime);
+	} else {
+		sandSimulator_->Update(deltaTime, computeContext_);
+	}
 
 	auto fence = computeContext_->MiddleExecute();
 	directContext_->WaitFenceInGPU(fence);
@@ -53,8 +56,12 @@ void SandScene::Draw() {
 	directContext_->SetRenderTarget(display);
 
 	grid_.Draw(directContext_);
-	sandSimulator_->Draw(directContext_);
-	//sandCPUSample_->Draw(directContext_);
+
+	if (isCPUSample_) {
+		sandCPUSample_->Draw(directContext_);
+	} else {
+		sandSimulator_->Draw(directContext_);
+	}
 
 	auto fence = directContext_->MiddleExecute();
 	computeContext_->WaitFenceInGPU(fence);
@@ -68,6 +75,13 @@ void SandScene::Draw() {
 	ImGui::Begin("System");
 	float deltatime = engine_->GetDeltaTime();
 	ImGui::Text("FPS: %.2f", 1.0f / deltatime);
+	ImGui::End();
+
+	ImGui::Begin("Current Process");
+	if (ImGui::Button((isCPUSample_ ? "CPU" : "GPU"))) {
+		isCPUSample_ = !isCPUSample_;
+		sandCPUSample_->Initialize();
+	}
 	ImGui::End();
 #endif
 

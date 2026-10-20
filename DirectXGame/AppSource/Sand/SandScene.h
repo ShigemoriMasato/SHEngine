@@ -27,4 +27,6 @@ private:
 
 	std::unique_ptr<SandCPUSample> sandCPUSample_;
 
+	bool isCPUSample_ = false;
+
 };

@@ -226,7 +226,7 @@ void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 
 	//同じだった場合の処理と過去の状態の更新は関数内に含まれている
 	if (resources_[bufferIndex].res && cmdList) {
-		if (currentState_[bufferIndex] == D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+		if (currentState_[bufferIndex] == D3D12_RESOURCE_STATE_UNORDERED_ACCESS && isUAVBarrier_) {
 			// UAVバリアを挿入する
 			Func::InsertUAVBarrier(cmdList, resources_[bufferIndex].res.Get());
 		}

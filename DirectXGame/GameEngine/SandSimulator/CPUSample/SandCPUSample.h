@@ -25,7 +25,7 @@ private:
 	Sand::Particle particleData_;
 	std::unique_ptr<Sand::Renderer> renderer_ = nullptr;
 
-	float scale_ = 0.1f;
+	float scale_ = 0.05f;
 
 	std::mt19937 randomEngine_;
 };

@@ -41,6 +41,8 @@ namespace SHEngine {
 
 		// @brief GPUBufferの状態を初期化する。Flush時に切り替える。 (UAVの場合は使用できない)
 		void ZeroReset();
+		// @brief UAVバリアを張るか張らないかを設定する。
+		void SetUAVBarrier(bool enable = true) { isUAVBarrier_ = enable; }
 
 		// @brief GPUBufferのGPUディスクリプタハンドルを取得する。
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(BufferType type) const;
@@ -92,7 +94,7 @@ namespace SHEngine {
 		std::vector<uint8_t> nextData_;
 		D3D12_RESOURCE_STATES nextState_ = {};
 
-		bool isZeroResetForUAV_ = false;
+		bool isUAVBarrier_ = true;
 
 		static inline uint32_t currentIndex_ = 0;
 	};

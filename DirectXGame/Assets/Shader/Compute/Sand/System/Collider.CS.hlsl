@@ -20,12 +20,24 @@ cbuffer GridConfig : register(b2)
     int cellCount;
 };
 
+cbuffer ColliderConfig : register(b3)
+{
+    float elasticity;
+    float friction;
+};
+
 StructuredBuffer<uint> particleIndexForCell : register(t0);
 StructuredBuffer<uint> beginIndexForCell : register(t1);
 StructuredBuffer<uint> particleCountInCell : register(t2);
+StructuredBuffer<float3> positions : register(t3);
 
-RWStructuredBuffer<float3> positions : register(u0);
+RWStructuredBuffer<float3> outputPositions : register(u0);
 RWStructuredBuffer<float3> velocities : register(u1);
+
+float3 ProjectVector(float3 a, float3 normalized)
+{
+    return normalized * dot(a, normalized);
+}
 
 float3 RemoveForce(float3 a, float3 b)
 {
@@ -37,7 +49,7 @@ float3 RemoveForce(float3 a, float3 b)
         return a;
     }
     
-    return a - b * (doted / lengthSq);
+    return -b * (doted / lengthSq);
 }
 
 int GetCellIndex(int3 cell)
@@ -87,8 +99,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     int i, j;
     //オブジェクトの位置を詳細に見るために、粒子の半径より少し大きめの距離を設定
-    float collisionDistance = particleScale * 1.2f;
+    float collisionDistance = particleScale * 1.5f;
     float3 position = positions[index];
+    float3 velocity = float3(0, 0, 0);
+    float3 prevVelocity = velocities[index];
     float3 local = position - gridOrigin;
     
     int3 cell;
@@ -100,7 +114,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     checkCell[0] = cell;
     for (i = 0; i < checkCellCount; ++i)
     {
-        checkCell[i + 1] = cell + checkCell[i];
+        checkCell[i + 1] = cell + nearCellIndex[i];
     }
     
     for (i = 0; i < checkCellCount + 1; ++i)
@@ -126,14 +140,31 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float3 diff = positions[otherIndex] - position;
             float dist = length(diff);
         
-            if (dist < collisionDistance  && dist != 0)
+            if (dist < collisionDistance && dist != 0)
             {
-                float3 normalizedDiff = normalize(diff);
-                position -= normalizedDiff * (collisionDistance - dist) * 0.8f;
-                velocities[index] = RemoveForce(velocities[index], normalizedDiff);
+                float3 n = normalize(diff);
+                position -= n * (collisionDistance - dist) * 0.5f;
             }
         }
     }
     
-    positions[index] = position;
+    if (position.y < 0.0f)
+    {
+        velocity.y = 0.0f;
+        //地面との摩擦
+        velocity *= 0.75f;
+    }
+    
+    position += velocity * 0.01666666f;
+    
+    if (position.y < 0.0f)
+    {
+        position.y = 0.0f;
+        velocity.y = 0.0f;
+    }
+    
+    velocity += prevVelocity;
+    
+    outputPositions[index] = position;
+    velocities[index] = velocity;
 }

@@ -38,26 +38,31 @@ namespace Sand {
 		std::unique_ptr<SHEngine::ComputeObject> splitBlock_ = nullptr;
 		std::unique_ptr<SHEngine::ComputeObject> prefixSum_ = nullptr;
 		std::unique_ptr<SHEngine::ComputeObject> assignCell_ = nullptr;
-		std::unique_ptr<SHEngine::ComputeObject> collider_ = nullptr;
+		std::unique_ptr<SHEngine::ComputeObject> colliderGo_ = nullptr;		//Subに書き込む側
+		std::unique_ptr<SHEngine::ComputeObject> colliderBack_ = nullptr;	//Posに書き込む側
 
 		std::unique_ptr<SHEngine::ComputeObject> initialize_ = nullptr;
 
 		SHEngine::GPUBuffer* deltaTime_ = nullptr;
 		SHEngine::GPUBuffer* seed_ = nullptr;
-		SHEngine::GPUBuffer* ballShapeData_ = nullptr;
+		SHEngine::GPUBuffer* ballShapeBuffer_ = nullptr;
 		SHEngine::GPUBuffer* cellCountPerBlockBuffer_ = nullptr;
+		SHEngine::GPUBuffer* colliderBuffer_ = nullptr;
+
+		//当たり判定時、他のスレッドが読み取る際に書き込みが行われると正しい結果が得られない問題を解決するためのバッファ。
+		SHEngine::GPUBuffer* subPosition_ = nullptr;
 
 		SHEngine::GPUBuffer* forceData_ = nullptr;
 		SHEngine::GPUBuffer* gravity_ = nullptr;
 
 		Vector3 commonUpdateData_ = { 0.0f, 0.0f, 0.0f };
 		Vector3 gravityData_ = { 0.0f, -9.8f, 0.0f };
+		Vector2 colliderData_ = { 0.0f, 0.0f };
 
 		int processCount_ = 0;
 		const int maxProcessCount_;
 
 		int cellCountPerBlock_ = 128;
-
 
 		TimeConfig timeConfig_ = {};
 

@@ -13,18 +13,20 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 
 	ballShape_ = createCO("BallShape");
 
+	subPosition_ = container->Create(BufferType::SRV_UAV, sizeof(float) * 3, particle->countNum);
 	deltaTime_ = container->Create(BufferType::CBV, sizeof(float));
 	seed_ = container->Create(BufferType::CBV, sizeof(uint32_t));
-	ballShapeData_ = container->Create(BufferType::CBV, sizeof(float) * 4);
+	ballShapeBuffer_ = container->Create(BufferType::CBV, sizeof(float) * 4);
 	gravity_ = container->Create(BufferType::CBV, sizeof(Vector3));
 	forceData_ = container->Create(BufferType::CBV, sizeof(Vector3));
 	cellCountPerBlockBuffer_ = container->Create(BufferType::CBV, sizeof(uint32_t));
+	colliderBuffer_ = container->Create(BufferType::CBV, sizeof(float) * 2);
 	commonUpdateData_ = { 0.0f, 0.75f, 0.0f };
 	forceData_->CopyBuffer(&commonUpdateData_, sizeof(Vector3));
 	gravity_->CopyBuffer(&gravityData_, sizeof(Vector3));
 
 	ballShape_->SetExecuteNum(particle->countNum, 128);
-	ballShape_->SetGPUBuffers(BufferType::CBV, { particle->count, seed_, ballShapeData_ });
+	ballShape_->SetGPUBuffers(BufferType::CBV, { particle->count, seed_, ballShapeBuffer_ });
 	ballShape_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->force, particle->velocity });
 
 	acceptForce_ = createCO("AcceptForce");
@@ -61,11 +63,17 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 	assignCell_->SetGPUBuffers(BufferType::SRV, { particle->position, grid->beginIndexForCell });
 	assignCell_->SetGPUBuffers(BufferType::UAV, { grid->particleIndicesForCell, grid->indexWriteBuffer });
 
-	collider_ = createCO("Collider");
-	collider_->SetExecuteNum(particle->countNum, 128);
-	collider_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale, grid->gridConfig });
-	collider_->SetGPUBuffers(BufferType::SRV, { grid->particleIndicesForCell, grid->beginIndexForCell, grid->particleCountInCell });
-	collider_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->velocity });
+	colliderGo_ = createCO("Collider");
+	colliderGo_->SetExecuteNum(particle->countNum, 128);
+	colliderGo_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale, grid->gridConfig, colliderBuffer_ });
+	colliderGo_->SetGPUBuffers(BufferType::SRV, { grid->particleIndicesForCell, grid->beginIndexForCell, grid->particleCountInCell, particle->position });
+	colliderGo_->SetGPUBuffers(BufferType::UAV, { subPosition_, particle->velocity });
+
+	colliderBack_ = createCO("Collider");
+	colliderBack_->SetExecuteNum(particle->countNum, 128);
+	colliderBack_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale, grid->gridConfig, colliderBuffer_ });
+	colliderBack_->SetGPUBuffers(BufferType::SRV, { grid->particleIndicesForCell, grid->beginIndexForCell, grid->particleCountInCell, subPosition_ });
+	colliderBack_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->velocity });
 
 #ifdef USE_IMGUI
 	configure->Add([&]() {
@@ -77,6 +85,11 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 		ImGui::DragFloat3("Gravity", (float*)&gravityData_, 0.01f);
 
 		}, "Common Update");
+
+	configure->Add([&]() {
+		ImGui::DragFloat("反発係数", &colliderData_.x, 0.01f);
+		ImGui::DragFloat("摩擦係数", &colliderData_.y, 0.01f);
+		}, "Collider");
 #endif
 
 	uint32_t seed = seedGenerator_(randomEngine_);
@@ -85,7 +98,7 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 
 void Sand::Processor::Initialize(SHEngine::ICommandContext* cc, Vector3 pos, float radius) {
 	Vector4 ballSphereBuffer = { pos.x, pos.y, pos.z, radius };
-	ballShapeData_->CopyBuffer(&ballSphereBuffer, sizeof(float) * 4);
+	ballShapeBuffer_->CopyBuffer(&ballSphereBuffer, sizeof(float) * 4);
 	ballShape_->SetExecuteNum(processCount_, 128);
 	ballShape_->Execute(cc);
 }
@@ -99,12 +112,14 @@ void Sand::Processor::Update(SHEngine::ICommandContext* cc, float deltaTime) {
 	gravity_->CopyBuffer(&gravityData_, sizeof(Vector3));
 	forceData_->CopyBuffer(&commonUpdateData_, sizeof(Vector3));
 	cellCountPerBlockBuffer_->CopyBuffer(&cellCountPerBlock_, sizeof(uint32_t));
+	colliderBuffer_->CopyBuffer(&colliderData_, sizeof(float) * 2);
 
 	//実行数の調整
 	acceptForce_->SetExecuteNum(processCount_, 128);
 	counter_->SetExecuteNum(processCount_ / 8 + 1, 128);
 	assignCell_->SetExecuteNum(processCount_ / 8 + 1, 128);
-	collider_->SetExecuteNum(processCount_, 128);
+	colliderGo_->SetExecuteNum(processCount_, 128);
+	colliderBack_->SetExecuteNum(processCount_, 128);
 
 	frameInitialize_->Execute(cc);
 
@@ -118,8 +133,9 @@ void Sand::Processor::Update(SHEngine::ICommandContext* cc, float deltaTime) {
 	cc->EndTimeStamp();
 
 	assignCell_->Execute(cc);
-	for (int i = 0; i < 1; ++i) {
-		collider_->Execute(cc);
+	for (int i = 0; i < 5; ++i) {
+		colliderGo_->Execute(cc);
+		colliderBack_->Execute(cc);
 	}
 
 	timeConfig_.prefixSum = cc->GetTimeStampResult("PrefixSum");
@@ -130,6 +146,7 @@ void Sand::Processor::Save(BinaryManager* bin) const {
 	bin->Register(gravityData_);
 	bin->Register(processCount_);
 	bin->Register(cellCountPerBlock_);
+	bin->Register(colliderData_);
 }
 
 void Sand::Processor::Load(BinaryManager* bin) {
@@ -137,4 +154,5 @@ void Sand::Processor::Load(BinaryManager* bin) {
 	bin->Reverse(gravityData_);
 	bin->Reverse(processCount_);
 	bin->Reverse(cellCountPerBlock_);
+	bin->Reverse(colliderData_);
 }
