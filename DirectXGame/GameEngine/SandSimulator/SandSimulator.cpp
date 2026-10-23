@@ -3,29 +3,27 @@
 
 using namespace Sand;
 
-SandSimulator::SandSimulator(const Sand::InitializeData& initData) {
+SandSimulator::SandSimulator(const Sand::InitializeData& initData, ImGuiWindowManager* imgui) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 	particleData_.Initialize(container_.get(), initData.particleCount);
 	gridData_.Initialize(container_.get(), initData.particleCount);
 
-	configure_ = std::make_unique<Configure>();
-
-	processor_ = std::make_unique<Processor>(container_.get(), &particleData_, &gridData_, configure_.get());
+	processor_ = std::make_unique<Processor>(container_.get(), &particleData_, &gridData_, imgui);
 	renderer_ = std::make_unique<Renderer>(&particleData_, initData.sandModel);
 	renderer_->SetInstance(initData.particleCount);
 
 #ifdef USE_IMGUI
-	configure_->Add([&]() {
+	imgui->Add([&]() {
 		ImGui::DragFloat3("position", (float*)&spherePos_, 0.1f, -100.0f, 100.0f);
 		ImGui::DragFloat("radius", &sphereRadius_, 0.01f, 0.0f, 100.0f);
 		isInitialize_ = ImGui::Button("Initialize");
 		ImGui::Text("Initialize: %s", isInitialize_ ? "true" : "false");
-		}, "Initialize");
+		}, "Initialize", "SandSimulator");
 
-	configure_->Add([&]() {
+	imgui->Add([&]() {
 		ImGui::ColorEdit4("Color", &color.x);
 		ImGui::DragFloat("Scale", &scale, 0.01f);
-		}, "Drawer");
+		}, "Drawer", "SandSimulator");
 #endif
 
 	timeViewer_ = std::make_unique<TimeViewer>();
@@ -57,10 +55,6 @@ void SandSimulator::Draw(DCC* dcc) {
 }
 
 void SandSimulator::DebugDraw(DCC* dcc) {
-}
-
-void SandSimulator::DrawImGui() {
-	configure_->DrawImGui();
 }
 
 void SandSimulator::SetCamera(const Camera* camera) {

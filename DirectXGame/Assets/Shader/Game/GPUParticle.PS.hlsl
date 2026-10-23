@@ -11,7 +11,6 @@ struct PSOutput
 };
 
 StructuredBuffer<float16_t4> colors : register(t0);
-StructuredBuffer<uint> types : register(t1);
 
 PSOutput main(PSInput input)
 {

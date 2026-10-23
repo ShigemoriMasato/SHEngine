@@ -1,7 +1,7 @@
 #include "SandProcessor.h"
 #include <imgui/imgui.h>
 
-Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* particle, Grid* grid, Configure* configure) : maxProcessCount_(particle->countNum) {
+Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* particle, Grid* grid, ImGuiWindowManager* configure) : maxProcessCount_(particle->countNum) {
 	auto createCO = [&](const std::string& name) {
 		auto co = std::make_unique<SHEngine::ComputeObject>("SandSimulator::" + name);
 		co->SetShader("Sand/System/" + name + ".CS.hlsl");
@@ -84,12 +84,12 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 		ImGui::DragFloat("Floor", &commonUpdateData_.z, 0.1f, 0.0f);
 		ImGui::DragFloat3("Gravity", (float*)&gravityData_, 0.01f);
 
-		}, "Common Update");
+		}, "Common Update", "SandSimulator");
 
 	configure->Add([&]() {
 		ImGui::DragFloat("反発係数", &colliderData_.x, 0.01f);
 		ImGui::DragFloat("摩擦係数", &colliderData_.y, 0.01f);
-		}, "Collider");
+		}, "Collider", "SandSimulator");
 #endif
 
 	uint32_t seed = seedGenerator_(randomEngine_);

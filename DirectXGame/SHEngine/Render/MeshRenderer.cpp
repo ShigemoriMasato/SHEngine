@@ -80,7 +80,7 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 		config.buffer->Flush(cmdList);
 		if (config.type == BufferType::CBV) {
 			cmdList->SetGraphicsRootConstantBufferView(rootIndex++, config.buffer->GetGPUDescriptorHandle(config.type).ptr);
-		} else  {
+		} else {
 			cmdList->SetGraphicsRootDescriptorTable(rootIndex++, config.buffer->GetGPUDescriptorHandle(config.type));
 		}
 	}

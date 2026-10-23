@@ -207,6 +207,13 @@ void SHEngine::GPUBuffer::TransitionBarrier(ShaderType shaderType, BufferType bu
 				{BufferType::SRV, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE},
 				{BufferType::UAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS}
 			}
+		},
+		{
+			ShaderType::AMPLIFICATION_SHADER, {
+				{BufferType::CBV, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER},
+				{BufferType::SRV, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE},
+				{BufferType::UAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS}
+			}
 		}
 	};
 

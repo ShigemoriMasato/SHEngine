@@ -11,11 +11,15 @@ public:
 
 	template<typename T>
 	void Register(const T& data);
+	template<typename T>
+	void Register(const T* const& data);
 	void Write(const std::string& fileName);
 
 	//Registerした順番で値を吐き出す。一回しか吐き出さない。
 	template<typename T>
 	void Reverse(T& data);
+	template<typename T>
+	void Reverse(const T*& data);
 	void Back() { readIndex_ = prevReadIndex_; }
 
 	bool IsEmpty() const { return inputBuffer_.empty(); }
@@ -59,6 +63,11 @@ void BinaryManager::Register(const T& data) {
 }
 
 template<typename T>
+void BinaryManager::Register(const T* const& data) {
+	Register(*data);
+}
+
+template<typename T>
 void BinaryManager::Reverse(T& data) {
 	prevReadIndex_ = readIndex_;
 
@@ -82,6 +91,11 @@ void BinaryManager::Reverse(T& data) {
 
 	std::memcpy(&data, inputBuffer_.data() + readIndex_ + headerSize, sizeof(T));
 	readIndex_ += headerSize + size;
+}
+
+template<typename T>
+void BinaryManager::Reverse(const T*& data) {
+	Reverse(*data);
 }
 
 template<>

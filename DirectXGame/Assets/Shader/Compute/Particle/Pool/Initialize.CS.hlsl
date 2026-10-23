@@ -7,6 +7,8 @@ cbuffer ParticleNum : register(b0)
     uint32_t maxNum;
 };
 
+static const float32_t minValue = 1.175494351E-38;
+
 [numthreads(1024, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID, uint3 GroupId : SV_GroupID)
 {
@@ -23,6 +25,5 @@ void main(uint3 DTid : SV_DispatchThreadID, uint3 GroupId : SV_GroupID)
         freeListIndex[0] = maxNum - 1;
     }
     
-    float32_t minValue = 1.175494351E-38;
     position[index] = float3(minValue, minValue, minValue);
 }

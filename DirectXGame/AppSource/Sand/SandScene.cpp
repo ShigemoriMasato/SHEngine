@@ -15,7 +15,7 @@ void SandScene::Initialize() {
 	initData.gridHorizontalCount = 100;
 	initData.gridDepthCount = 100;
 
-	sandSimulator_ = std::make_unique<SandSimulator>(initData);
+	sandSimulator_ = std::make_unique<SandSimulator>(initData, &imguiManager_);
 	sandSimulator_->Initialize(computeContext_);
 
 	sandSimulator_->SetCamera(camera_.get());
@@ -69,7 +69,7 @@ void SandScene::Draw() {
 	display->ToTexture(directContext_);
 
 	display->DrawImGui();
-	sandSimulator_->DrawImGui();
+	imguiManager_.DrawImGui();
 
 #ifdef USE_IMGUI
 	ImGui::Begin("System");

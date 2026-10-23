@@ -4,6 +4,7 @@
 #include <SandSimulator/CPUSample/sandCPUSample.h>
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
+#include <Tool/ImGui/ImGuiWindowManager.h>
 
 class SandScene : public IScene {
 public:
@@ -26,6 +27,8 @@ private:
 	Grid grid_;
 
 	std::unique_ptr<SandCPUSample> sandCPUSample_;
+
+	ImGuiWindowManager imguiManager_;
 
 	bool isCPUSample_ = false;
 

@@ -2,7 +2,7 @@
 #include "Data/SandData.h"
 #include "Renderer/SandRenderer.h"
 #include "Processor/SandProcessor.h"
-#include "Debugger/SandConfigure.h"
+#include <Tool/ImGui/ImGuiWindowManager.h>
 #include <Render/Command/DirectCommandContext.h>
 #include <Tool/TimeViewer/TimeViewer.h>
 
@@ -22,7 +22,7 @@ namespace Sand {
 class SandSimulator {
 public:
 
-	SandSimulator(const Sand::InitializeData& initData);
+	SandSimulator(const Sand::InitializeData& initData, ImGuiWindowManager* imgui);
 
 	void Initialize(SHEngine::ICommandContext* commandContext);
 	void Update(float deltaTime, SHEngine::ICommandContext* commandContext);
@@ -45,8 +45,6 @@ private:
 
 	std::unique_ptr<Sand::Renderer> renderer_ = nullptr;
 	std::unique_ptr<Sand::Processor> processor_ = nullptr;
-
-	std::unique_ptr<Sand::Configure> configure_ = nullptr;
 
 	Vector3 spherePos_ = { 0.0f, 0.0f, 0.0f };
 	float sphereRadius_ = 1.0f;

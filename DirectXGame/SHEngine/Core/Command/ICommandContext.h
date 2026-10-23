@@ -65,3 +65,5 @@ namespace SHEngine {
 
 	};
 }
+
+using ICC = SHEngine::ICommandContext;

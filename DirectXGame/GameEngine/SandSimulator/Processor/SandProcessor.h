@@ -1,7 +1,7 @@
 #pragma once
 #include <SandSimulator/Data/SandData.h>
 #include <Compute/ComputeObject.h>
-#include <SandSimulator/Debugger/SandConfigure.h>
+#include <Tool/ImGui/ImGuiWindowManager.h>
 #include <Tool/Binary/BinaryManager.h>
 #include <random>
 
@@ -10,7 +10,7 @@ namespace Sand {
 	class Processor {
 	public:
 
-		Processor(SHEngine::BufferContainer* containe, Particle* particle, Grid* grid, Configure* configure);
+		Processor(SHEngine::BufferContainer* containe, Particle* particle, Grid* grid, ImGuiWindowManager* configure);
 
 		void Initialize(SHEngine::ICommandContext* cc, Vector3 pos, float radius);
 		void Update(SHEngine::ICommandContext* cc, float deltaTime);
