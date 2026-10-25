@@ -23,6 +23,8 @@ namespace SHEngine::PSO {
 
 		void CompileAllShader();
 
+		void ResetShader(const std::string& shaderName = "All");
+
 	private:
 
 		/// @brief シェーダー管理

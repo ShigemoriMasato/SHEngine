@@ -9,15 +9,33 @@ void SHEngine::PSO::ManagerMSType::Initialize() {
 	psoMap_.clear();
 }
 
-void SHEngine::PSO::ManagerMSType::SetPSO(const ConfigMSType& config, ID3D12GraphicsCommandList* cmdList) {
-	if (psoMap_.find(config) == psoMap_.end()) {
+bool SHEngine::PSO::ManagerMSType::SetPSO(const ConfigMSType& config, ID3D12GraphicsCommandList* cmdList) {
+	const auto& it = psoMap_.find(config);
+	if (it == psoMap_.end()) {
 		PipelineStateStream psoStream = {};
+
+		D3D12_SHADER_BYTECODE as, ms, ps;
+		if (!config.as.empty()) {
+			as = shelfManager_->GetShaderBytecode(ShaderType::AMPLIFICATION_SHADER, config.as);
+			if (as.BytecodeLength == 0) {
+				psoMap_[config] = nullptr;
+				return false;
+			}
+		}
+
+		ms = shelfManager_->GetShaderBytecode(ShaderType::MESH_SHADER, config.ms);
+		ps = shelfManager_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps);
+
+		if (ms.BytecodeLength == 0 || ps.BytecodeLength == 0) {
+			psoMap_[config] = nullptr;
+			return false;
+		}
 
 		auto rootSignature = shelfManager_->GetRootSignature(config.rootConfig);
 		psoStream.rootSignature = CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE(rootSignature);
-		psoStream.as = CD3DX12_PIPELINE_STATE_STREAM_AS(shelfManager_->GetShaderBytecode(ShaderType::AMPLIFICATION_SHADER, config.as));
-		psoStream.ms = CD3DX12_PIPELINE_STATE_STREAM_MS(shelfManager_->GetShaderBytecode(ShaderType::MESH_SHADER, config.ms));
-		psoStream.ps = CD3DX12_PIPELINE_STATE_STREAM_PS(shelfManager_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps));
+		psoStream.as = CD3DX12_PIPELINE_STATE_STREAM_AS(as);
+		psoStream.ms = CD3DX12_PIPELINE_STATE_STREAM_MS(ms);
+		psoStream.ps = CD3DX12_PIPELINE_STATE_STREAM_PS(ps);
 		psoStream.blend = CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC(CD3DX12_BLEND_DESC(shelfManager_->GetBlendState(config.blendID)));
 		psoStream.depth = CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL(CD3DX12_DEPTH_STENCIL_DESC(shelfManager_->GetDepthStencilDesc(config.depthStencilID)));
 		psoStream.rasterizer = CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER(CD3DX12_RASTERIZER_DESC(shelfManager_->GetRasterizerDesc(config.rasterizerID)));
@@ -41,11 +59,22 @@ void SHEngine::PSO::ManagerMSType::SetPSO(const ConfigMSType& config, ID3D12Grap
 		psoDesc.pPipelineStateSubobjectStream = &psoStream;
 
 		auto& pso = psoMap_[config];
-		device_->GetDevice()->CreatePipelineState(&psoDesc, IID_PPV_ARGS(pso.GetAddressOf()));
+		HRESULT hr = device_->GetDevice()->CreatePipelineState(&psoDesc, IID_PPV_ARGS(pso.GetAddressOf()));
 
+		if (FAILED(hr)) {
+			pso = nullptr;
+			return false;
+		}
+	}
+
+	auto pso = psoMap_[config].Get();
+	if (!pso) {
+		return false;
 	}
 
 	cmdList->SetGraphicsRootSignature(shelfManager_->GetRootSignature(config.rootConfig));
 	cmdList->IASetPrimitiveTopology(shelfManager_->GetD3Topology(config.topology));
-	cmdList->SetPipelineState(psoMap_[config].Get());
+	cmdList->SetPipelineState(pso);
+
+	return true;
 }

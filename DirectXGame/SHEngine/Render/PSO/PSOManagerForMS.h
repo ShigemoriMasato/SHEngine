@@ -61,7 +61,7 @@ namespace SHEngine::PSO {
 		void Initialize();
 
 		/// @brief PSOを設定する。初めて使用するPSOの場合は作成する
-		void SetPSO(const ConfigMSType& config, ID3D12GraphicsCommandList* cmdList);
+		bool SetPSO(const ConfigMSType& config, ID3D12GraphicsCommandList* cmdList);
 
 	private:
 

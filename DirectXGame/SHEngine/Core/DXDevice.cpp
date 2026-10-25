@@ -150,8 +150,13 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
     //hlslファイルを読む
     IDxcBlobEncoding* shaderSource = nullptr;
     HRESULT hr = dxcUtils_->LoadFile(wFilePath.c_str(), nullptr, &shaderSource);
-    //読めなかったら止める
-    assert(SUCCEEDED(hr));
+
+	//読めなかった場合はエラー
+	if (FAILED(hr)) {
+		logger_->error("Failed to load shader file: {}", filePath);
+        return nullptr;
+	}
+
     //読み込んだファイルの内容を設定する
     DxcBuffer shaderSourceBuffer;
     shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
@@ -200,8 +205,10 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
     shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
     if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
         logger_->error(shaderError->GetStringPointer());
-        //警告・エラーが起きている状態なので止める
-        assert(false);
+        shaderSource->Release();
+        shaderError->Release();
+        shaderResult->Release();
+        return nullptr;
     }
 
     //コンパイル結果から実行用のバイナリ部分を取得
@@ -213,6 +220,7 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
 
     //もう使わないリソースを開放
     shaderSource->Release();
+    shaderError->Release();
     shaderResult->Release();
 
     //実行用のバイナリを返却

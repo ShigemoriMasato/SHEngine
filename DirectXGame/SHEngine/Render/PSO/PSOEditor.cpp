@@ -16,20 +16,32 @@ void Editor::Initialize(DXDevice* device, ShelfManager* shelfManager) {
 	topologyList_[static_cast<size_t>(Topology::Point)] = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
 }
 
-void Editor::SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config) {
+bool Editor::SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config) {
 	// すでに同じ設定がされている場合は何もしない(フレーム時初めての設定の場合は例外的に設定するようにする)
-	if (nowConfig_ == config && !frameFirst) {
-		return;
+	if (nowConfig_ == config && !frameFirst_) {
+		return true;
 	}
 
-	frameFirst = false;
+	frameFirst_ = false;
+
+	auto pso = psoManager_->GetPSO(config);
+	if (!pso) {
+		return false;
+	}
+
 	commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(config.rootConfig));
 	commandList->IASetPrimitiveTopology(topologyList_[uint32_t(config.topology)]);
-	commandList->SetPipelineState(psoManager_->GetPSO(config));
+	commandList->SetPipelineState(pso);
 
 	nowConfig_ = config;
+
+	return true;
+}
+
+void SHEngine::PSO::Editor::ResetShader(const std::string& shaderName) {
+	psoManager_->ResetShader(shaderName);
 }
 
 void Editor::FrameInitialize() {
-	frameFirst = true;
+	frameFirst_ = true;
 }

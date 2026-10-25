@@ -12,8 +12,11 @@ Manager::Manager(DXDevice* device, ShelfManager* shelfManager) {
 }
 
 Manager::~Manager() {
-	for(const auto& [config, pso] : psoMap_) {
-		pso->Release();
+	for (auto& [config, pso] : psoMap_) {
+		if (pso) {
+			pso->Release();
+			pso = nullptr;
+		}
 	}
 }
 
@@ -40,6 +43,7 @@ void Manager::CreatePSO(PSO::Config config) {
 	psoDesc.pRootSignature = shelfManager_->GetRootSignature(config.rootConfig);
 	psoDesc.VS = shelfManager_->GetShaderBytecode(ShaderType::VERTEX_SHADER, config.vs);
 	psoDesc.PS = shelfManager_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps);
+
 	psoDesc.DepthStencilState = shelfManager_->GetDepthStencilDesc(config.depthStencilID);
 	psoDesc.BlendState = shelfManager_->GetBlendState(config.blendID);
 	psoDesc.RasterizerState = shelfManager_->GetRasterizerDesc(config.rasterizerID);
@@ -70,12 +74,19 @@ void Manager::CreatePSO(PSO::Config config) {
 	psoDesc.InputLayout.pInputElementDescs = inputElementDescs.data();
 	psoDesc.InputLayout.NumElements = static_cast<UINT>(inputElementDescs.size());
 
+	// 失敗を未然に防ぐ
+	if (psoDesc.VS.BytecodeLength == D3D12_SHADER_BYTECODE().BytecodeLength || psoDesc.PS.BytecodeLength == D3D12_SHADER_BYTECODE().BytecodeLength) {
+		psoMap_[config] = nullptr;
+		return;
+	}
+
 	ID3D12PipelineState* pso = nullptr;
 
 	HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso));
 
 	if (FAILED(hr)) {
-		assert(false && "Failed to create PSO");
+		logger_->info("Failed to create PSO: {}. HRESULT: 0x{:X}", config.vs + " + " + config.ps, hr);
+		psoMap_[config] = nullptr;
 	}
 
 	psoMap_[config] = pso;
@@ -93,4 +104,35 @@ ID3D12PipelineState* Manager::GetPSO(const PSO::Config& config) {
 
 ID3D12RootSignature* Manager::GetRootSignature(const RootSignatureConfig& config) const {
 	return shelfManager_->GetRootSignature(config);
+}
+
+void SHEngine::PSO::Manager::ResetShader(const std::string& shaderName) {
+	if (shaderName == "All") {
+		for (auto& [config, pso] : psoMap_) {
+			if (pso) {
+				pso->Release();
+				pso = nullptr;
+			}
+		}
+		psoMap_.clear();
+	} else {
+		std::vector<Config> key;
+		key.reserve(64);
+		for (auto& [config, pso] : psoMap_) {
+			if (config.vs == shaderName || config.ps == shaderName) {
+				key.push_back(config);
+			}
+		}
+
+		for (const auto& k : key) {
+			auto pso = psoMap_[k];
+			if (pso) {
+				pso->Release();
+				pso = nullptr;
+			}
+			psoMap_.erase(k);
+		}
+	}
+
+	shelfManager_->ResetShader(shaderName);
 }

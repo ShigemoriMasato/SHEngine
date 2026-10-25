@@ -142,7 +142,10 @@ void SHEngine::Renderer::Draw(DirectCommandContext* dcc) {
 	auto vbvs = drawData_.GetVertexBufferView(cmdList);
 	auto ibv = drawData_.GetIndexBufferView(cmdList);
 
-	psoEditor_->SetPSO(cmdList, psoConfig_);
+	bool result = psoEditor_->SetPSO(cmdList, psoConfig_);
+	if (!result) {
+		return;
+	}
 
 	cmdList->IASetVertexBuffers(0, UINT(vbvs.size()), vbvs.data());
 	if (indexCount > 0) {

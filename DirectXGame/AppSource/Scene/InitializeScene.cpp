@@ -1,8 +1,6 @@
 #include "InitializeScene.h"
 #include <imgui/imgui.h>
 #include <Test/TestScene.h>
-#include <Game/GameScene.h>
-#include <Sand/SandScene.h>
 #include <Particle/ParticleScene.h>
 
 #ifdef USE_IMGUI
@@ -123,9 +121,7 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
-	return std::make_unique<GameScene>();
 	return std::make_unique<ParticleScene>();
-	return std::make_unique<SandScene>();
 	return nullptr;
 }
 

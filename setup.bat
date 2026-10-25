@@ -11,7 +11,6 @@ echo 1 : ImGui
 echo 2 : DirectXTex
 echo 3 : Assimp
 echo 4 : FreeType
-echo 9 : HeaderCopy
 echo - : Shutdown
 echo ==========================
 
@@ -31,22 +30,7 @@ exit /b 1
 
 :BUILD_ALL
 
-echo === Init Directory ===
-set "GENERATE_DIR=externals/generated/Lib"
-if exist "%GENERATE_DIR%" (
- rmdir /s /q "%GENERATE_DIR%"
- echo Deleted %GENERATED_DIR% !!
-)
-set "HEADER_DIR=externals/header"
-if exist "%HEADER_DIR%" (
- rmdir /s /q "%HEADER_DIR%"
- echo Deleted %HEADER_DIR% !!
-)
-set "PROJ_DIR=externals/generated/Project/"
-if exist "%PROJ_DIR%" (
- rmdir /s /q "%PROJ_DIR%"
- echo Deleted %PROJ_DIR% !!
-)
+call :CLEAN_GENERATED_FILES
 
 echo === only spdlog ready for debug ===
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\spdlog" -DestDir "externals\header\spdlog"
@@ -84,6 +68,8 @@ goto END
 
 :BUILD_ASSIMP
 
+call :CLEAN_ASSIMP_FILES
+
 git clone --branch v6.0.5 --depth 1 --recurse-submodules --shallow-submodules https://github.com/assimp/assimp.git "externals/generated/Project/assimp_clone/"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\assimp_clone" -BuildDir "externals\generated\Project\assimp"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\assimp\assimp.slnx" -Platform x64
@@ -92,6 +78,8 @@ goto END
 
 
 :BUILD_FREETYPE
+
+call :CLEAN_FREETYPE_FILES
 
 git clone --branch VER-2-14-3 --depth 1 --recurse-submodules --shallow-submodules https://github.com/freetype/freetype.git "externals/generated/Project/freetype_clone/"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\freetype_clone" -BuildDir "externals\generated\Project\freetype"
@@ -103,7 +91,6 @@ goto END
 :COPY_HEADER
 
 goto END
-
 
 
 
@@ -123,5 +110,19 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CreateDev.ps1"
 echo ===== Filter Adjustment =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\FilterAdjust.ps1"
 
+call :CLEAN_GENERATED_FILES
+
 echo ===== Completed =====
 pause
+
+
+
+:CLEAN_GENERATED_FILES
+echo === Clean generated external files ===
+for %%D in ("externals\generated\Project\assimp_clone" "externals\generated\Project\assimp" "externals\generated\Project\freetype_clone" "externals\generated\Project\freetype" "externals\generated\else") do (
+    if exist "%%~D" (
+        rmdir /s /q "%%~D"
+        echo Deleted %%~D
+    )
+)
+exit /b 0

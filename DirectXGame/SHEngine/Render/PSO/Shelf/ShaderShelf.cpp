@@ -18,7 +18,7 @@ ShaderShelf::ShaderShelf(DXDevice* device) {
 }
 
 ShaderShelf::~ShaderShelf() {
-
+	ReleaseShader("All");
 }
 
 void ShaderShelf::CompileAllShader() {
@@ -33,36 +33,18 @@ void ShaderShelf::CompileAllShader() {
 		}
 	}
 
+	ShaderType shaderType = ShaderType::VERTEX_SHADER;
+
 	for (const auto& sn : shaderNames) {
 		if (sn.find(".hlsli") != std::string::npos) {
 			continue;
 		}
-		//VertexShader
-		else if (sn.find("VS") != std::string::npos) {
-			RegisterShaderByteCode(sn, ShaderType::VERTEX_SHADER);
-		}
-		//PixelShader
-		else if (sn.find("PS") != std::string::npos) {
-			RegisterShaderByteCode(sn, ShaderType::PIXEL_SHADER);
-		}
-		//ComputeShader
-		else if (sn.find("CS") != std::string::npos) {
-			RegisterShaderByteCode(sn, ShaderType::COMPUTE_SHADER);
-		}
-		//MeshShader
-		else if (sn.find("MS") != std::string::npos) {
-			RegisterShaderByteCode(sn, ShaderType::MESH_SHADER);
-		}
-		//AmplificationShader
-		else if (sn.find("AS") != std::string::npos) {
-			RegisterShaderByteCode(sn, ShaderType::AMPLIFICATION_SHADER);
-		}
-		//これ以降も同じように追加する
 
+		shaderType = GetShaderTypeFromFileName(sn);
 
-		// 登録してない、または名前が間違っているShaderは見つかり次第エラーを出す
-		else {
-			throw std::runtime_error("Unknown shader type: " + sn);
+		// 対応するshaderであればコンパイルして登録する
+		if (shaderType != ShaderType::Count) {
+			RegisterShaderByteCode(sn, shaderType);
 		}
 	}
 }
@@ -89,16 +71,79 @@ std::list<std::string> ShaderShelf::GetShaderNames(ShaderType shaderType) {
 
 D3D12_SHADER_BYTECODE ShaderShelf::GetShaderBytecode(ShaderType shaderType, std::string shaderName) {
 	//登録されていなければCompileする
-	if (shaderBytecodes_[static_cast<int>(shaderType)][shaderName].pShaderBytecode == D3D12_SHADER_BYTECODE().pShaderBytecode) {
+	const auto& it = shaderBytecodes_[static_cast<int>(shaderType)].find(shaderName);
+	if (it == shaderBytecodes_[static_cast<int>(shaderType)].end()) {
 		RegisterShaderByteCode(shaderName, shaderType);
 	}
 	return shaderBytecodes_[static_cast<int>(shaderType)][shaderName];
 }
 
+void SHEngine::PSO::ShaderShelf::ShaderReset(const std::string& shaderName) {
+	ReleaseShader(shaderName);
+}
+
 void ShaderShelf::RegisterShaderByteCode(std::string shaderName, ShaderType shaderType) {
 	IDxcBlob* blobBuffer = device_->CompileShader(basePath_.string() + "/" + shaderName, shaderType);
+
+	// コンパイルに失敗した場合は空のバイトコードを登録する
+	if (!blobBuffer) {
+		shaderBytecodes_[int(shaderType)][shaderName] = D3D12_SHADER_BYTECODE();
+		return;
+	}
 
 	shaderBlobs_.push_back(blobBuffer);
 
 	shaderBytecodes_[int(shaderType)][shaderName] = { blobBuffer->GetBufferPointer(), blobBuffer->GetBufferSize() };
+}
+
+void SHEngine::PSO::ShaderShelf::ReleaseShader(std::string shaderName) {
+	if (shaderName == "All") {
+		//全て再コンパイルは探索の必要がなく、さらにメモリの圧迫の危険になるため、Blobまで開放する
+		for (auto& blob : shaderBlobs_) {
+			if (blob) {
+				blob->Release();
+				blob = nullptr;
+			}
+		}
+		for (int i = 0; i < static_cast<int>(ShaderType::Count); ++i) {
+			shaderBytecodes_[i].clear();
+		}
+	} else {
+		// 探索が困難なため、Blobの開放は行わない
+		ShaderType shaderType = GetShaderTypeFromFileName(shaderName);
+
+		if (shaderType != ShaderType::Count) {
+			shaderBytecodes_[int(shaderType)].erase(shaderName);
+		}
+	}
+}
+
+ShaderType SHEngine::PSO::ShaderShelf::GetShaderTypeFromFileName(const std::string& fileName) {
+	ShaderType shaderType;
+
+	if (fileName.find("VS") != std::string::npos) {
+		shaderType = ShaderType::VERTEX_SHADER;
+	}
+	//PixelShader
+	else if (fileName.find("PS") != std::string::npos) {
+		shaderType = ShaderType::PIXEL_SHADER;
+	}
+	//ComputeShader
+	else if (fileName.find("CS") != std::string::npos) {
+		shaderType = ShaderType::COMPUTE_SHADER;
+	}
+	//MeshShader
+	else if (fileName.find("MS") != std::string::npos) {
+		shaderType = ShaderType::MESH_SHADER;
+	}
+	//AmplificationShader
+	else if (fileName.find("AS") != std::string::npos) {
+		shaderType = ShaderType::AMPLIFICATION_SHADER;
+	}
+	// 登録してない、または名前が間違っているShaderは見つかり次第エラーを出す
+	else {
+		shaderType = ShaderType::Count;
+	}
+
+	return shaderType;
 }

@@ -72,7 +72,11 @@ void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {
 		psoConfig_.rtvFormats[i] = display->GetRTVFormat();
 	}
 
-	psoEditor_->SetPSO(psoConfig_, cmdList);
+	bool result = psoEditor_->SetPSO(psoConfig_, cmdList);
+
+	if (!result) {
+		return;
+	}
 
 	int rootIndex = 0;
 	for (auto& config : bufferConfigs_) {

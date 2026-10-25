@@ -39,8 +39,12 @@ namespace SHEngine::PSO {
 		 * デフォルト設定はEngine/PSO/PSOConfigに定義されている。
 		 * @param commandList コマンドリスト
 		 * @param config PSO設定
+		 * @return 設定が成功した場合はtrue、失敗した場合はfalse
 		 */
-		void SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config);
+		[[nodiscard]]
+		bool SetPSO(ID3D12GraphicsCommandList* commandList, const PSO::Config& config);
+
+		void ResetShader(const std::string& shaderName = "All");
 
 	private:
 
@@ -50,7 +54,7 @@ namespace SHEngine::PSO {
 		/// @brief 現在のPSO設定
 		PSO::Config nowConfig_{};
 
-		bool frameFirst = true;
+		bool frameFirst_ = true;
 
 		/// @brief ログ出力用logger
 		std::shared_ptr<spdlog::logger> logger_;

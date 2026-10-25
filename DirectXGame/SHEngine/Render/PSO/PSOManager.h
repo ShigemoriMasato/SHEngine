@@ -55,6 +55,9 @@ namespace SHEngine::PSO {
 		 */
 		ID3D12RootSignature* GetRootSignature(const RootSignatureConfig& config) const;
 
+
+		void ResetShader(const std::string& shaderName);
+
 	private:
 
 		/**

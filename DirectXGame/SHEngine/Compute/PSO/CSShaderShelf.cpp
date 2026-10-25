@@ -14,6 +14,9 @@ D3D12_SHADER_BYTECODE SHEngine::PSO::CSShaderShelf::GetShaderBytecode(const std:
 	}
 	else {
 		IDxcBlob* blob = device_->CompileShader(directory_ + name, ShaderType::COMPUTE_SHADER);
+		if (!blob) {
+			return {};
+		}
 		D3D12_SHADER_BYTECODE bytecode{};
 		bytecode.pShaderBytecode = blob->GetBufferPointer();
 		bytecode.BytecodeLength = blob->GetBufferSize();

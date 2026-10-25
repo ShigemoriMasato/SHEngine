@@ -1,5 +1,6 @@
-static const uint THREAD_GROUP_SIZE = 64;
-static const uint AS_WAVE = 16;
+static const uint THREAD_GROUP_SIZE = 32;
+static const uint PARTICLES_PER_THREAD = 2;
+static const uint MS_GROUPS_PER_AS_THREAD = 16;
 
 struct VertexOutput
 {
@@ -8,20 +9,18 @@ struct VertexOutput
 };
 
 StructuredBuffer<float3> positions : register(t0);
+StructuredBuffer<float> scales : register(t1);
+StructuredBuffer<uint> parentIndices : register(t2);
+StructuredBuffer<float4x4> parentMatrices : register(t3);
 
-cbuffer Size : register(b0)
+cbuffer MaxNum : register(b0)
 {
-    float size;
+    int maxNum;
 };
 cbuffer Camera : register(b1)
 {
     float4x4 vpMatrix;
     float4x4 billboardMatrix;
-    float3 cameraPosition;
-};
-cbuffer MaxNum : register(b2)
-{
-    int maxNum;
 };
 
 struct Payload
@@ -35,55 +34,77 @@ void main(
 in payload Payload asID, //ASのDispatchThreadID
 uint3 globalID : SV_DispatchThreadID,
 uint3 localID : SV_GroupThreadID,
-out vertices VertexOutput vertices[256], 
+out vertices VertexOutput vertices[256],
 out indices uint3 triangles[128]
 )
 {
-    const int vertexCount = 4;
-    const int primitiveCount = 2;
-    
-    const uint threadID = globalID.x + THREAD_GROUP_SIZE * AS_WAVE * asID.threadID;
-    const uint vertexOffset = localID.x * vertexCount;
-    const uint triangleOffset = localID.x * primitiveCount;
+    const uint vertexCount = 4;
+    const uint primitiveCount = 2;
+    const uint particlesPerGroup = THREAD_GROUP_SIZE * PARTICLES_PER_THREAD;
 
-    SetMeshOutputCounts(vertexCount * THREAD_GROUP_SIZE, primitiveCount * THREAD_GROUP_SIZE);
-    
-    if(threadID >= maxNum) {
-        return;
+    SetMeshOutputCounts(vertexCount * particlesPerGroup, primitiveCount * particlesPerGroup);
+
+    [unroll]
+    for (uint particleInGroup = 0; particleInGroup < PARTICLES_PER_THREAD; ++particleInGroup)
+    {
+        const uint threadID = asID.threadID * (MS_GROUPS_PER_AS_THREAD * particlesPerGroup)
+            + globalID.x * PARTICLES_PER_THREAD + particleInGroup;
+        const uint particleIndex = localID.x * PARTICLES_PER_THREAD + particleInGroup;
+        const uint vertexOffset = particleIndex * vertexCount;
+        const uint triangleOffset = particleIndex * primitiveCount;
+        
+        triangles[triangleOffset + 0] = uint3(vertexOffset + 0, vertexOffset + 1, vertexOffset + 2);
+        triangles[triangleOffset + 1] = uint3(vertexOffset + 1, vertexOffset + 3, vertexOffset + 2);
+        
+        vertices[vertexOffset + 0].instanceID = threadID;
+        vertices[vertexOffset + 1].instanceID = threadID;
+        vertices[vertexOffset + 2].instanceID = threadID;
+        vertices[vertexOffset + 3].instanceID = threadID;
+        
+        if (threadID >= maxNum)
+        {
+            vertices[vertexOffset + 0].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            vertices[vertexOffset + 1].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            vertices[vertexOffset + 2].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            vertices[vertexOffset + 3].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            continue;
+        }
+        
+        float3 position = positions[threadID];
+        float size = scales[threadID];
+
+        if (size < 1e-6f)
+        {
+            vertices[vertexOffset + 0].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            vertices[vertexOffset + 1].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            vertices[vertexOffset + 2].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            vertices[vertexOffset + 3].position = float4(3.0f, 3.0f, 0.0f, 1.0f);
+            continue;
+        }
+
+        float4x4 scale = float4x4(size, 0, 0, 0,
+                                    0, size, 0, 0,
+                                    0, 0, size, 0,
+                                    0, 0, 0, 1);
+        float4x4 translate = float4x4(1, 0, 0, 0,
+                                    0, 1, 0, 0,
+                                    0, 0, 1, 0,
+                                    position.x, position.y, position.z, 1);
+
+        float4x4 parentMatrix = float4x4(1, 0, 0, 0,
+                                    0, 1, 0, 0,
+                                    0, 0, 1, 0,
+                                    0, 0, 0, 1);
+
+        if (parentIndices[threadID] != 0xffffffff)
+        {
+            parentMatrix = parentMatrices[parentIndices[threadID]];
+        }
+
+        float4x4 wvpMatrix = mul(mul(mul(mul(scale, billboardMatrix), translate), parentMatrix), vpMatrix);
+        vertices[vertexOffset + 0].position = mul(float4(-0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
+        vertices[vertexOffset + 1].position = mul(float4(0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
+        vertices[vertexOffset + 2].position = mul(float4(-0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
+        vertices[vertexOffset + 3].position = mul(float4(0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
     }
-
-    vertices[vertexOffset + 0].instanceID = threadID;
-    vertices[vertexOffset + 1].instanceID = threadID;
-    vertices[vertexOffset + 2].instanceID = threadID;
-    vertices[vertexOffset + 3].instanceID = threadID;
-    
-    triangles[triangleOffset + 0] = uint3(vertexOffset + 0, vertexOffset + 1, vertexOffset + 2);
-    triangles[triangleOffset + 1] = uint3(vertexOffset + 1, vertexOffset + 3, vertexOffset + 2);
-
-    static const float minValue = 1.175494351E-38;
-    if(positions[threadID].x == minValue && positions[threadID].y == minValue && positions[threadID].z == minValue) {
-        vertices[vertexOffset + 0].position = float4(0, 0, 0, 0);
-        vertices[vertexOffset + 1].position = float4(0, 0, 0, 0);
-        vertices[vertexOffset + 2].position = float4(0, 0, 0, 0);
-        vertices[vertexOffset + 3].position = float4(0, 0, 0, 0);
-        return;
-    }
-    
-    float dist = length(positions[threadID] - cameraPosition);
-    float adjustmentSize = size * (1.0f + dist * 0.03f);
-    
-    float4x4 scale = float4x4(adjustmentSize, 0, 0, 0,
-                                0, adjustmentSize, 0, 0,
-                                0, 0, adjustmentSize, 0,
-                                0, 0, 0, 1);
-    float4x4 translate = float4x4(1, 0, 0, 0,
-                                0, 1, 0, 0,
-                                0, 0, 1, 0,
-                                positions[threadID].x, positions[threadID].y, positions[threadID].z, 1);
-    
-    float4x4 wvpMatrix = mul(mul(mul(scale, billboardMatrix), translate), vpMatrix);
-    vertices[vertexOffset + 0].position = mul(float4(-0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
-    vertices[vertexOffset + 1].position = mul(float4(0.5f, 0.5f, 0.0f, 1.0f), wvpMatrix);
-    vertices[vertexOffset + 2].position = mul(float4(-0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
-    vertices[vertexOffset + 3].position = mul(float4(0.5f, -0.5f, 0.0f, 1.0f), wvpMatrix);
 }

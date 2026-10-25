@@ -60,3 +60,7 @@ std::map<SHEngine::PSO::SamplerID, D3D12_STATIC_SAMPLER_DESC> SHEngine::PSO::She
 void SHEngine::PSO::ShelfManager::CompileAllShader() {
 	shaderShelf_->CompileAllShader();
 }
+
+void SHEngine::PSO::ShelfManager::ResetShader(const std::string& shaderName) {
+	shaderShelf_->ShaderReset(shaderName);
+}

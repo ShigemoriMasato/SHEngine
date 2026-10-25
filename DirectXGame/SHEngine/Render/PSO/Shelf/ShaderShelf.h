@@ -54,6 +54,13 @@ namespace SHEngine {
 			 */
 			D3D12_SHADER_BYTECODE GetShaderBytecode(ShaderType shaderType, std::string shaderName);
 
+			/**
+			 * @brief シェーダーをリセットする
+			 *
+			 * @param shaderName シェーダー名
+			 */
+			void ShaderReset(const std::string& shaderName);
+
 		private:
 
 			/**
@@ -63,6 +70,10 @@ namespace SHEngine {
 			 * @param shaderType シェーダーの種類
 			 */
 			void RegisterShaderByteCode(std::string shaderName, ShaderType shaderType);
+
+			void ReleaseShader(std::string shaderName = "All");
+
+			ShaderType GetShaderTypeFromFileName(const std::string& fileName);
 
 			DXDevice* device_ = nullptr;
 
