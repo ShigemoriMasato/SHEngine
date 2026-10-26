@@ -322,8 +322,8 @@ void SHEngine::Screen::Display::ToPresent(DCC* dcc) {
 }
 
 void SHEngine::Screen::Display::ToTexture(DCC* dcc) {
-	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TransitionBarrier(dcc, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+	TransitionDepthBarrier(dcc, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
 
 void SHEngine::Screen::Display::ToNonPixel(DCC* dcc) {

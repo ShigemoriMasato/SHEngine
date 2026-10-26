@@ -12,13 +12,15 @@ namespace Particle {
 
 		// @brief 毎フレーム実行する処理を追加
 		// @param output 追加したComputeObjectのポインタを返す。
+		// @param shaderPath Shader/Compute/Particle/以下を指定。.CS.hlslは不要
 		// @return 追加したComputeObjectのIDを返す。EraseProcessで削除する際に使用する。
-		uint32_t AddProcess(SHEngine::ComputeObject*& output);
+		uint32_t AddProcess(SHEngine::ComputeObject*& output, std::string shaderPath);
 
 		// @brief 一度実行したら破棄される処理を追加
 		// @param output 追加したComputeObjectのポインタを返す。
+		// @param shaderPath Shader/Compute/Particle/以下を指定。.CS.hlslは不要
 		// @return 追加したComputeObjectのIDを返す。EraseProcessで削除する際に使用する。
-		void AddTriggerProcess(SHEngine::ComputeObject*& output);
+		void AddTriggerProcess(SHEngine::ComputeObject*& output, std::string shaderPath);
 
 		// @param id AddProcessで使用したID。
 		void EraseProcess(uint32_t id);

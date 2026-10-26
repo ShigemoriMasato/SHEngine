@@ -8,15 +8,21 @@ cbuffer TextureConfig : register(b1)
     uint2 textureSize;
 };
 
+cbuffer Scale : register(b2)
+{
+    // 敷き詰める場合は0.11f
+    float scale;
+}
+
 StructuredBuffer<uint> indexList : register(t0);
 
 Texture2D<float4> texture : register(t1);
 SamplerState gSampler : register(s0);
 
-RWStructuredBuffer<float3> tmp : register(u0);
+RWStructuredBuffer<float3> positions : register(u0);
 RWStructuredBuffer<float> scales : register(u1);
 RWStructuredBuffer<float16_t4> color : register(u2);
-RWStructuredBuffer<float3> positions : register(u3);
+RWStructuredBuffer<float2> uvs : register(u3);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -42,7 +48,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     uint localIndex = indexList[index];
     
-    positions[index] = (float3(uv.x, 1.0f - uv.y, 0.0f) + float3(-0.5f, -0.5f, 0.0f)) * float3(textureSize.x * 0.1, textureSize.y * 0.1, 0.0f);
-    scales[localIndex] = 0.11f;
+    uvs[localIndex] = uv;
+    positions[localIndex] = (float3(uv.x, 0.0f, 1 - uv.y) + float3(-0.5f, 0.0f, -0.5f)) * float3(textureSize.x * 0.1, 1.0f, textureSize.y * 0.1);
+    scales[localIndex] = scale;
     color[localIndex] = float16_t4(texColor.r, texColor.g, texColor.b, texColor.a);
 }

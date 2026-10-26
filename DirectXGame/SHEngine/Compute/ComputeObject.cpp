@@ -63,7 +63,10 @@ void ComputeObject::Execute(SHEngine::ICommandContext* commandContext) {
 		samplerID_ = uint32_t(PSO::SamplerID::Default);
 	}
 
-	psoManager_->SetPSO(cmdList, cbvNum, srvNum, uavNum, useTexture_, samplerID_, computeShaderName_);
+	bool result = psoManager_->SetPSO(cmdList, cbvNum, srvNum, uavNum, useTexture_, samplerID_, computeShaderName_);
+	if (!result) {
+		return;
+	}
 
 	int rootIndex = 0;
 	for(const auto& cbv : gpuBuffers_[BufferType::CBV]) {

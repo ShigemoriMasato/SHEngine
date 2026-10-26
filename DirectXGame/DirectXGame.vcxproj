@@ -163,17 +163,19 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppSource\Scene\IScene.cpp" />
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
+    <ClCompile Include="AppSource\Game\Field\BattleField.cpp" />
     <ClCompile Include="GameEngine\Particle\Emitter.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleData.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Data\SandData.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\SandSimulator.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Renderer\SandRenderer.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Processor\SandProcessor.cpp" />
-    <ClCompile Include="AppSource\Particle\ParticleScene.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleRenderer.cpp" />
     <ClCompile Include="GameEngine\Particle\ParticleSystem.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleProcessor.cpp" />
+    <ClCompile Include="AppSource\Game\GameScene.cpp" />
     <ClCompile Include="SHEngine\Tool\ImGui\ImGuiWindowManager.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\CPUSample\SandCPUSample.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\CameraEditor.cpp" />
@@ -258,16 +260,17 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="SHEngine\Tool\ModelDrawer\ModelDrawer.cpp" />
     <ClCompile Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.cpp" />
     <ClInclude Include="AppSource\UI\SideBox.h" />
+    <ClInclude Include="AppSource\Game\Field\BattleField.h" />
     <ClInclude Include="GameEngine\Particle\Emitter.h" />
     <ClInclude Include="GameEngine\Particle\System\ParticleData.h" />
     <ClInclude Include="GameEngine\SandSimulator\Data\SandData.h" />
     <ClInclude Include="GameEngine\SandSimulator\SandSimulator.h" />
     <ClInclude Include="GameEngine\SandSimulator\Renderer\SandRenderer.h" />
     <ClInclude Include="GameEngine\SandSimulator\Processor\SandProcessor.h" />
-    <ClInclude Include="AppSource\Particle\ParticleScene.h" />
     <ClInclude Include="GameEngine\Particle\System\ParticleRenderer.h" />
     <ClInclude Include="GameEngine\Particle\ParticleSystem.h" />
     <ClInclude Include="GameEngine\Particle\System\ParticleProcessor.h" />
+    <ClInclude Include="AppSource\Game\GameScene.h" />
     <ClInclude Include="SHEngine\Tool\ImGui\ImGuiWindowManager.h" />
     <ClInclude Include="GameEngine\SandSimulator\CPUSample\SandCPUSample.h" />
     <ClInclude Include="SHEngine\Camera\Editor\CameraEditor.h" />

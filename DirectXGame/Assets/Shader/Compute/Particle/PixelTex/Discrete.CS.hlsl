@@ -10,7 +10,7 @@ cbuffer Config : register(b1)
 };
 
 StructuredBuffer<uint> indexList : register(t0);
-StructuredBuffer<float3> localPositions : register(t1);
+StructuredBuffer<float2> uvs : register(t1);
 
 RWStructuredBuffer<float3> positions : register(u0);
 RWStructuredBuffer<float> scales : register(u1);
@@ -42,8 +42,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
-    float3 localPosition = localPositions[index];
-    uint seed = asuint(localPosition.x + localPosition.y * discrete * discrete) ^ index;
+    float2 uv = uvs[indexList[index]];
+    uint seed = asuint(uv.x + uv.y * discrete * discrete) ^ index;
+    
     float3 discreteDirection = float3(Rand(seed) * range, Rand(seed) * range, Rand(seed));
-    positions[indexList[index]] = discreteDirection * discrete + localPosition;
+    positions[indexList[index]] = discreteDirection * discrete + float3(uv.x, 1 - uv.y, 0.0f);
 }

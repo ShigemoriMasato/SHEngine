@@ -24,6 +24,9 @@ public:
 
 protected:
 
+	void DefaultPreDraw();
+	void DefaultPostDraw();
+
 	CommonData* commonData_ = nullptr;
 
 	SHEngine::TextureManager* textureManager_ = nullptr;

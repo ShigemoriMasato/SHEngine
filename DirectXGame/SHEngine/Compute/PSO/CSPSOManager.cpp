@@ -9,7 +9,7 @@ void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device, std::map<SamplerI
 	pso_.clear();
 }
 
-void SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName) {
+bool SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName) {
 
 	Config config{ cbv, srv, uav, useTexture, samplerID, computeShaderName };
 	ID3D12PipelineState* pipelineState = nullptr;
@@ -30,6 +30,10 @@ void SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, int
 		desc.CS = shaderShelf_->GetShaderBytecode(computeShaderName);
 		desc.pRootSignature = rootSignature;
 
+		if (desc.CS.BytecodeLength == 0) {
+			return false; // シェーダーバイトコードが空の場合は処理を中断
+		}
+
 		HRESULT hr = device_->GetDevice()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pso.pipelineState));
 		assert(SUCCEEDED(hr) && "Failed to create compute pipeline state");
 
@@ -39,4 +43,6 @@ void SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, int
 	//cmdListにセットする
 	cmdList->SetComputeRootSignature(rootSignature);
 	cmdList->SetPipelineState(pipelineState);
+
+	return true;
 }

@@ -15,7 +15,7 @@ Particle::Emitter::Emitter(uint32_t emitterID, uint32_t particleCount, Data* dat
 	processor->Allocate(indexList_, emitterID_, countBuffer_, countNum_, icc);
 }
 
-uint32_t Particle::Emitter::AddProcess(SHEngine::ComputeObject*& output) {
+uint32_t Particle::Emitter::AddProcess(SHEngine::ComputeObject*& output, std::string shaderPath) {
 	int id = nextProcessID_++;
 	auto process = std::make_unique<SHEngine::ComputeObject>("ParticleProcess: " + std::to_string(id));
 
@@ -23,17 +23,21 @@ uint32_t Particle::Emitter::AddProcess(SHEngine::ComputeObject*& output) {
 	process->SetGPUBuffer(BufferType::SRV, indexList_);
 	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->scales, data_->colors });
 
+	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
+
 	output = process.get();
 	processes_[id] = std::move(process);
 	return id;
 }
 
-void Particle::Emitter::AddTriggerProcess(SHEngine::ComputeObject*& output) {
+void Particle::Emitter::AddTriggerProcess(SHEngine::ComputeObject*& output, std::string shaderPath) {
 	auto process = std::make_unique<SHEngine::ComputeObject>("ParticleProcess: Trigger");
 
 	process->SetGPUBuffer(BufferType::CBV, countBuffer_);
 	process->SetGPUBuffer(BufferType::SRV, indexList_);
 	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->scales, data_->colors });
+
+	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
 
 	output = process.get();
 	triggerProcesses_.push_back(std::move(process));
