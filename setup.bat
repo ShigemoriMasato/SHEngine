@@ -49,53 +49,6 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\freetype\freetype.slnx" -Platform x64
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\assimp\assimp.slnx" -Platform x64
 
-goto END
-
-
-:BUILD_IMGUI
-
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\ForImGui\ForImGui.slnx" -Platform x64
-
-goto END
-
-
-:BUILD_DIRECTXTEX
-
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\DirectXTex\DirectXTex_Desktop_2022_Win10.sln" -Platform x64
-
-goto END
-
-
-:BUILD_ASSIMP
-
-call :CLEAN_ASSIMP_FILES
-
-git clone --branch v6.0.5 --depth 1 --recurse-submodules --shallow-submodules https://github.com/assimp/assimp.git "externals/generated/Project/assimp_clone/"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\assimp_clone" -BuildDir "externals\generated\Project\assimp"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\assimp\assimp.slnx" -Platform x64
-
-goto END
-
-
-:BUILD_FREETYPE
-
-call :CLEAN_FREETYPE_FILES
-
-git clone --branch VER-2-14-3 --depth 1 --recurse-submodules --shallow-submodules https://github.com/freetype/freetype.git "externals/generated/Project/freetype_clone/"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\freetype_clone" -BuildDir "externals\generated\Project\freetype"
-powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\freetype\freetype.slnx" -Platform x64
-
-goto END
-
-
-:COPY_HEADER
-
-goto END
-
-
-
-:END
-
 echo ===== Copy Header =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\DirectXTex\DirectXTex" -DestDir "externals\header\DirectXTex"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\ForImGui\ImGui" -DestDir "externals\header\imgui"
@@ -104,6 +57,59 @@ powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -So
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\assimp_clone\include\assimp" -DestDir "externals\header\assimp"
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\assimp\include\assimp" -DestDir "externals\header\assimp"
 
+goto END
+
+
+:BUILD_IMGUI
+
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\ForImGui\ForImGui.slnx" -Platform x64
+
+echo ===== Copy Header =====
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\ForImGui\ImGui" -DestDir "externals\header\imgui"
+
+goto END
+
+
+:BUILD_DIRECTXTEX
+
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\src\DirectXTex\DirectXTex_Desktop_2022_Win10.sln" -Platform x64
+
+echo ===== Copy Header =====
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\src\DirectXTex\DirectXTex" -DestDir "externals\header\DirectXTex"
+
+goto END
+
+
+:BUILD_ASSIMP
+
+call :CLEAN_GENERATED_FILES
+
+git clone --branch v6.0.5 --depth 1 --recurse-submodules --shallow-submodules https://github.com/assimp/assimp.git "externals/generated/Project/assimp_clone/"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\assimp_clone" -BuildDir "externals\generated\Project\assimp"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\assimp\assimp.slnx" -Platform x64
+
+echo ===== Copy Header =====
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\assimp_clone\include\assimp" -DestDir "externals\header\assimp"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\assimp\include\assimp" -DestDir "externals\header\assimp"
+
+goto END
+
+
+:BUILD_FREETYPE
+
+call :CLEAN_GENERATED_FILES
+
+git clone --branch VER-2-14-3 --depth 1 --recurse-submodules --shallow-submodules https://github.com/freetype/freetype.git "externals/generated/Project/freetype_clone/"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CmakeProject.ps1" -SourceDir "externals\generated\Project\freetype_clone" -BuildDir "externals\generated\Project\freetype"
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\BuildExternals.ps1" -ProjectPath "externals\generated\Project\freetype\freetype.slnx" -Platform x64
+
+echo ===== Copy Header =====
+powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CopyHeader.ps1" -SourceDir "externals\generated\Project\freetype_clone\include" -DestDir "externals\header"
+
+goto END
+
+
+:END
 echo ===== Create Development .lib =====
 powershell -ExecutionPolicy Bypass -NoProfile -File "Scripts\CreateDev.ps1"
 

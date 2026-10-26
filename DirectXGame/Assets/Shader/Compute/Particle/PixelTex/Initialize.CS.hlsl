@@ -42,7 +42,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     uint localIndex = indexList[index];
     
-    positions[index] = (float3(uv.x, 1.0f - uv.y, 0.0f) + float3(-0.5f, -0.5f, 0.0f)) * float3(textureSize.x, textureSize.y, 0.0f);
-    scales[localIndex] = 1.1f;
+    positions[index] = (float3(uv.x, 1.0f - uv.y, 0.0f) + float3(-0.5f, -0.5f, 0.0f)) * float3(textureSize.x * 0.1, textureSize.y * 0.1, 0.0f);
+    scales[localIndex] = 0.11f;
     color[localIndex] = float16_t4(texColor.r, texColor.g, texColor.b, texColor.a);
 }

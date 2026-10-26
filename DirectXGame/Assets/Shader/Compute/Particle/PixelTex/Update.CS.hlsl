@@ -6,6 +6,7 @@ cbuffer ParticleCount : register(b0)
 cbuffer Config : register(b1)
 {
     float discrete;
+    float range;
 };
 
 StructuredBuffer<uint> indexList : register(t0);
@@ -43,6 +44,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     float3 localPosition = localPositions[index];
     uint seed = asuint(localPosition.x + localPosition.y * discrete * discrete) * index;
-    float3 discreteDirection = float3(Rand(seed) * 0.1f, Rand(seed) * 0.1f, Rand(seed));
+    float3 discreteDirection = float3(Rand(seed) * range, Rand(seed) * range, Rand(seed));
     positions[indexList[index]] = discreteDirection * discrete + localPosition;
 }

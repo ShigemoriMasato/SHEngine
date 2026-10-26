@@ -30,5 +30,5 @@ private:
 	SHEngine::GPUBuffer* discreteBuffer_ = nullptr;
 
 	Transform transform_;
-	float discrete_;
+	Vector2 discrete_;
 };
