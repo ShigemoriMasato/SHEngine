@@ -22,7 +22,7 @@ private:
 
 	ImGuiWindowManager imguiManager_;
 
-	ParticleSystem particleSystem_{ 1024 * 1024 * 2 };
+	ParticleSystem particleSystem_{ 1024 * 1024 * 2, true };
 	std::unique_ptr<SHEngine::BufferContainer> container_;
 
 	Particle::Emitter* emitter_;

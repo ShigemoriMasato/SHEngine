@@ -43,7 +43,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     }
     
     float3 localPosition = localPositions[index];
-    uint seed = asuint(localPosition.x + localPosition.y * discrete * discrete) * index;
+    uint seed = asuint(localPosition.x + localPosition.y * discrete * discrete) ^ index;
     float3 discreteDirection = float3(Rand(seed) * range, Rand(seed) * range, Rand(seed));
     positions[indexList[index]] = discreteDirection * discrete + localPosition;
 }

@@ -8,7 +8,7 @@ namespace Particle {
 	class Renderer {
 	public:
 
-		void Initialize(Data* data, SHEngine::BufferContainer* container);
+		void Initialize(Data* data, SHEngine::BufferContainer* container, bool isCube);
 		void Update();
 		void Draw(DCC* dcc);
 

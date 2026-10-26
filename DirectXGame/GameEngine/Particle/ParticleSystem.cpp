@@ -1,6 +1,6 @@
 #include "ParticleSystem.h"
 
-ParticleSystem::ParticleSystem(uint32_t particleCount) {
+ParticleSystem::ParticleSystem(uint32_t particleCount, bool isCube) {
 	container_ = std::make_unique<SHEngine::BufferContainer>();
 
 	data_.Initialize(container_.get(), particleCount);
@@ -9,7 +9,7 @@ ParticleSystem::ParticleSystem(uint32_t particleCount) {
 	processor_ = std::make_unique<Particle::Processor>(&data_, &freeList_);
 
 	renderer_ = std::make_unique<Particle::Renderer>();
-	renderer_->Initialize(&data_, container_.get());
+	renderer_->Initialize(&data_, container_.get(), isCube);
 	renderer_->SetInstance(particleCount);
 }
 

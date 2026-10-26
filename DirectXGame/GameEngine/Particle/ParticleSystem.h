@@ -6,7 +6,7 @@
 class ParticleSystem {
 public:
 
-	ParticleSystem(uint32_t particleCount);
+	ParticleSystem(uint32_t particleCount, bool isCube = false);
 
 	void Initialize(ICC* icc);
 	void Update(ICC* icc);

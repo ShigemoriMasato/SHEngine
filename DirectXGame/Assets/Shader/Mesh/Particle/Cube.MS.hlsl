@@ -37,7 +37,7 @@ struct Payload
 [numthreads(THREAD_GROUP_SIZE, 1, 1)]
 void main(
     in payload Payload asID,
-    uint3 globalID : SV_DispatchThreadID,　// このスレッドが全体(ASのDispatchMesh)で何番目か
+    uint3 globalID : SV_DispatchThreadID, // このスレッドが全体(ASのDispatchMesh)で何番目か
     uint3 localID : SV_GroupThreadID, //このスレッドがグループ内で何番目か
     out vertices VertexOutput vertices[128],
     out indices uint3 triangles[192])
@@ -59,12 +59,12 @@ void main(
 
     static const uint3 cubeTriangles[12] =
     {
-        uint3(0, 2, 1), uint3(0, 3, 2), // -Z
-        uint3(4, 5, 6), uint3(4, 6, 7), // +Z
-        uint3(0, 1, 5), uint3(0, 5, 4), // -X
-        uint3(3, 7, 6), uint3(3, 6, 2), // +X
-        uint3(0, 4, 7), uint3(0, 7, 3), // -Y
-        uint3(1, 2, 6), uint3(1, 6, 5) // +Y
+        uint3(0, 1, 2), uint3(0, 2, 3), // -Z
+        uint3(4, 6, 5), uint3(4, 7, 6), // +Z
+        uint3(0, 5, 1), uint3(0, 4, 5), // -X
+        uint3(3, 6, 7), uint3(3, 2, 6), // +X
+        uint3(0, 7, 4), uint3(0, 3, 7), // -Y
+        uint3(1, 6, 2), uint3(1, 5, 6) // +Y
     };
     
     const uint particleID = asID.threadID * (MS_GROUPS_PER_AS_THREAD * CUBES_PER_GROUP) + globalID.x;
@@ -112,19 +112,12 @@ void main(
         parentMatrix = parentMatrices[parentIndex];
     }
 
-    const float4x4 scaleMatrix = float4x4(
+    const float4x4 worldMatrix = float4x4(
             size, 0, 0, 0,
             0, size, 0, 0,
             0, 0, size, 0,
-            0, 0, 0, 1);
-    const float4x4 translateMatrix = float4x4(
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
             position.x, position.y, position.z, 1);
-    const float4x4 wvpMatrix = mul(
-            mul(mul(mul(scaleMatrix, billboardMatrix), translateMatrix), parentMatrix),
-            vpMatrix);
+    const float4x4 wvpMatrix = mul(mul(worldMatrix, parentMatrix), vpMatrix);
 
     [unroll]
     for (uint vertex = 0; vertex < VERTICES_PER_CUBE; ++vertex)

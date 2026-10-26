@@ -1,12 +1,17 @@
 #include "ParticleRenderer.h"
 
-void Particle::Renderer::Initialize(Data* data, SHEngine::BufferContainer* container) {
+void Particle::Renderer::Initialize(Data* data, SHEngine::BufferContainer* container, bool isCube) {
 	cameraBuffer_ = container->Create(BufferType::CBV, sizeof(CameraData));
 
 	meshRenderer_ = std::make_unique<SHEngine::MeshRenderer>();
 
-	meshRenderer_->SetAS("Mesh/Particle/Quad.AS.hlsl");
-	meshRenderer_->SetMS("Mesh/Particle/Quad.MS.hlsl");
+	if (isCube) {
+		meshRenderer_->SetAS("Mesh/Particle/Cube.AS.hlsl");
+		meshRenderer_->SetMS("Mesh/Particle/Cube.MS.hlsl");
+	} else {
+		meshRenderer_->SetAS("Mesh/Particle/Quad.AS.hlsl");
+		meshRenderer_->SetMS("Mesh/Particle/Quad.MS.hlsl");
+	}
 	meshRenderer_->SetPS("Game/GPUParticle.PS.hlsl");
 
 	meshRenderer_->SetGPUBuffers({ data->count }, ShaderType::AMPLIFICATION_SHADER, BufferType::CBV);
