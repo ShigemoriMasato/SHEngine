@@ -16,7 +16,7 @@ private:
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	ImGuiWindowManager imguiManager_;
 
-	ParticleSystem particleSystem_ = { 16777216 };
+	ParticleSystem particleSystem_ = { 4194304, true };
 	
 	std::unique_ptr<BattleField> battleField_ = nullptr;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include <SHEngine.h>
 #include "CommonData.h"
+#include <Render/PostEffect.h>
 
 class IScene {
 public:
@@ -20,6 +21,8 @@ public:
 		input_ = engine->GetInput();
 		engine_ = engine;
 		commonData_ = commonData;
+
+		postEffect_.Initialize(textureManager_, true);
 	}
 
 protected:
@@ -38,5 +41,10 @@ protected:
 	SHEngine::Input* input_ = nullptr;
 
 	SHEngine::Engine* engine_ = nullptr;
+
+private:
+
+	PostEffect postEffect_;
+	PostEffectConfig postEffectConfig_;
 
 };

@@ -182,10 +182,14 @@ std::string ModelManager::FilePathChecker(std::string& filePath) {
 
 ModelData SHEngine::ModelManager::CreateModelData(const aiScene* scene, std::string filePath) {
 	ModelData result;
+	const std::string ignoreString = "Assets/";
+	std::string directoryPath = filePath.substr(ignoreString.length());
+
 	//コードがごちゃつくのでModelLoaderに処理を投げる
 	result.nodes = ModelLoader::LoadNodes(scene);
 	result.meshes = ModelLoader::LoadMeshes(scene);
-	result.materials = ModelLoader::LoadMaterials(scene, filePath, textureManager_);
+
+	result.materials = ModelLoader::LoadMaterials(scene, directoryPath, textureManager_);
 	result.skeleton = ModelLoader::CreateSkeleton(result.nodes, scene);
 
 	return result;

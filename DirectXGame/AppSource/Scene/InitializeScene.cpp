@@ -133,4 +133,8 @@ void InitializeScene::Draw() {
 	directContext_->SetRenderTarget(swapChain, true);
 	engine_->DrawImGui();
 	swapChain->ToPresent(directContext_);
+
+	//画像の読み込み処理などもあるため、落ち着くまで待機する
+	auto fence = directContext_->MiddleExecute();
+	directContext_->WaitFenceInCPU(fence);
 }

@@ -5,7 +5,7 @@
 #include <utility>
 #include <Utility/Vector.h>
 #include <DirectXTex/DirectXTex.h>
-
+#include <Tool/Logger/Logger.h>
 
 namespace SHEngine {
 
@@ -22,7 +22,7 @@ namespace SHEngine {
 
 		enum class Type {
 			Normal,
-			DDS,
+			CubeTexture,
 		};
 
 		TextureData() = default;
@@ -57,6 +57,7 @@ namespace SHEngine {
 	private:
 
 		static inline int debugTextureCount = 0;
+		static inline Logger logger_ = GetLogger("Engine");
 
 		uint32_t width_ = 0;
 		uint32_t height_ = 0;

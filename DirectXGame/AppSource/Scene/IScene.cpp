@@ -22,7 +22,16 @@ void IScene::DefaultPostDraw() {
 	ImGui::End();
 #endif
 
+#ifdef SH_RELEASE
+	postEffectConfig_.dcc = directContext_;
+	postEffectConfig_.origin = commonData_->display.get();
+	postEffectConfig_.output = commonData_->window.get();
+	postEffect_.Draw(postEffectConfig_);
+	directContext_->SetRenderTarget(window, false);
+#else
 	directContext_->SetRenderTarget(window);
+#endif
+
 	engine_->DrawImGui();
 	window->ToPresent(directContext_);
 }

@@ -13,17 +13,19 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::TextureManage
 	texture_ = container_->Create(display_->GetTextureData());
 	uvs_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector2), textureSize_ * textureSize_);
 
-	const float scale = 0.05f;
+	const float scale = 0.1f;
 	const uint32_t textureConfig[2] = { textureSize_, textureSize_ };
 	scale_->CopyBuffer(&scale, sizeof(float));
 	textureConfig_->CopyBuffer(textureConfig, sizeof(uint32_t) * 2);
 
+#ifdef USE_IMGUI
 	imguiManager->Add([this]() {
 		ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f, 0.01f);
 		ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
 		ImGui::DragFloat3("Position", &transform_.position.x, 0.01f);
 		ImGui::Image(ImTextureRef(display_->GetTextureData()->GetSRVHandle().ptr), { 64, 64 });
 	}, "BattleField");
+#endif
 
 	SHEngine::ComputeObject* update;
 	emitter_->AddProcess(update, "PixelTex/ApplyTex");

@@ -434,6 +434,8 @@ FodyWeavers.xsd
 */[Dd]umps/
 *.dmp
 */[Ll]ogs
+# TextureのCompile後の生成ファイル
+*/Compiled/
 # ImGuiの生成ファイル
 *.ini
 # 自分のプロジェクトのフィルター(ビルド時に成型するため)

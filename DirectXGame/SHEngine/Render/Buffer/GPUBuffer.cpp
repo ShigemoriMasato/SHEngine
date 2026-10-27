@@ -58,7 +58,12 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint
 		hr = device_->GetDevice()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE,
 			&bufferResourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
 			IID_PPV_ARGS(&bufferResource));
-		assert(SUCCEEDED(hr));
+		if (FAILED(hr)) {
+			logger_->error("Failed to create GPUBuffer resource. hr: {}", hr);
+			HRESULT hr2 = device_->GetDevice()->GetDeviceRemovedReason();
+			logger_->error("Device removed reason: {}", hr2);
+			assert(false);
+		}
 
 		if ((bufferType_ & BufferType::UAV) == 0) {
 			auto& mapped = mappedData_.emplace_back();

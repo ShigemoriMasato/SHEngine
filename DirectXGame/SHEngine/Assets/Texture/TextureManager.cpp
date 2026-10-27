@@ -39,14 +39,14 @@ void TextureManager::Initialize(DXDevice* device) {
 
 	logger_ = GetLogger("Engine");
 
-	LoadTexture("Assets/.EngineResource/Texture/white1x1.png");
-	LoadTexture("Assets/.EngineResource/Texture/uvChecker.png");
-	errorTextureHandle_ = LoadTexture("Assets/.EngineResource/Texture/error.png");
+	LoadTexture(".EngineResource/Texture/white1x1.png");
+	LoadTexture(".EngineResource/Texture/uvChecker.png");
+	errorTextureHandle_ = LoadTexture(".EngineResource/Texture/error.png");
 
-	LoadTexture("Assets/.EngineResource/Texture/File.png");
-	LoadTexture("Assets/.EngineResource/Texture/Folder.png");
-	LoadTexture("Assets/.EngineResource/Texture/Model.png");
-	LoadTexture("Assets/.EngineResource/Texture/Texture.png");
+	LoadTexture(".EngineResource/Texture/File.png");
+	LoadTexture(".EngineResource/Texture/Folder.png");
+	LoadTexture(".EngineResource/Texture/Model.png");
+	LoadTexture(".EngineResource/Texture/Texture.png");
 }
 
 void TextureManager::AllTextureClear() {
@@ -55,31 +55,14 @@ void TextureManager::AllTextureClear() {
 
 void TextureManager::LoadAllTextures() {
 	auto files = SearchFilePathsAddChild("Assets/Texture/", ".png");
-	
+
 	for (const auto& filePath : files) {
-		LoadTexture(filePath);
+		LoadTexture("Texture/" + filePath);
 	}
 }
 
 TextureData* TextureManager::GetTextureData(std::string filePath) const {
-	std::string formatFirst = "Assets/";
-	std::string factFilePath = "";
-	if (filePath.length() < formatFirst.length()) {
-		factFilePath = "Assets/Texture/" + filePath;
-	} else {
-		for (int i = 0; i < formatFirst.length(); ++i) {
-			if (filePath[i] != formatFirst[i]) {
-				factFilePath = "Assets/Texture/" + filePath;
-				break;
-			}
-
-			if (i == formatFirst.length() - 1) {
-				factFilePath = filePath;
-			}
-		}
-	}
-
-	auto it = loadedTexturePaths_.find(factFilePath);
+	auto it = loadedTexturePaths_.find(filePath);
 	if (it != loadedTexturePaths_.end()) {
 		return GetTextureData(it->second);
 	}
@@ -89,36 +72,20 @@ TextureData* TextureManager::GetTextureData(std::string filePath) const {
 int TextureManager::LoadTexture(const std::string& filePath) {
 	auto textureData = std::make_unique<TextureData>();
 
-	std::string formatFirst = "Assets/";
-	std::string factFilePath = "";
-	if (filePath.length() < formatFirst.length()) {
-		factFilePath = "Assets/Texture/" + filePath;
-	} else {
-		for (int i = 0; i < formatFirst.length(); ++i) {
-			if (filePath[i] != formatFirst[i]) {
-				factFilePath = "Assets/Texture/" + filePath;
-				break;
-			}
-
-			if (i == formatFirst.length() - 1) {
-				factFilePath = filePath;
-			}
-		}
-	}
-
 	//ファイルが存在しなかったらエラーテクスチャを返す
-	if (!std::filesystem::exists(factFilePath)) {
-		logger_->error("Texture File is Not Found: {}", factFilePath);
-		return errorTextureHandle_;
-	}
 
 	//すでに読み込んでいたらそのハンドルを返す
-	auto it = loadedTexturePaths_.find(factFilePath);
+	auto it = loadedTexturePaths_.find(filePath);
 	if (it != loadedTexturePaths_.end()) {
 		return it->second;
 	}
 
-	auto scratchImage = textureData->Create(factFilePath, device_->GetDevice(), srvManager_);
+	auto scratchImage = textureData->Create(filePath, device_->GetDevice(), srvManager_);
+
+	if (scratchImage.GetImageCount() == 0) {
+		return errorTextureHandle_;
+	}
+
 	int offset = textureData->GetHandle();
 
 	uploadStandby_.emplace_back(offset, std::move(scratchImage));
@@ -126,7 +93,7 @@ int TextureManager::LoadTexture(const std::string& filePath) {
 	textureData->textureManager_ = this;
 	textureDataList_[offset] = std::move(textureData);
 	CheckMaxCount(offset);
-	loadedTexturePaths_[factFilePath] = offset;
+	loadedTexturePaths_[filePath] = offset;
 
 	return offset;
 }

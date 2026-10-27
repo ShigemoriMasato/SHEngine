@@ -13,7 +13,7 @@ namespace {
 	DirectX::ScratchImage CreateMipImages(const std::string& filePath) {
 		//DDSファイルかどうかの判定
 		std::filesystem::path path(filePath);
-		bool isDDS = path.extension() == ".dds" || path.extension() == ".DDS";
+		bool isDDS = path.extension() == ".dds" || path.extension() == ".CubeTexture";
 
 		DirectX::ScratchImage image{};
 		HRESULT hr = S_OK;
@@ -246,15 +246,72 @@ void TextureData::Create(uint32_t width, uint32_t height, ID3D12Device* device, 
 
 DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* device, SRVManager* srvManager) {
 	std::filesystem::path path(filePath);
-	if (path.extension() == ".dds") {
-		type_ = Type::DDS;
-	}
+	//DirectX::ScratchImage mipImages;
+	//bool createMipimage = false;
+
+	//std::string ddsFilePath = "Compiled/" + filePath.substr(0, filePath.find_last_of('.')) + ".dds";
+
+	////読み込む対象がCompileされていない場合
+	//if (!std::filesystem::exists(ddsFilePath)) {
+	//	if (!std::filesystem::exists("Assets/" + filePath)) {
+	//		// 何処にもファイルが存在しないのでエラー
+	//		return {};
+	//	}
+
+	//	//既にddsの場合はCompiledにコピーする
+	//	if (path.extension() == ".dds" || path.extension() == ".CubeTexture") {
+	//		std::filesystem::copy_file("Assets/" + filePath, "Compiled/" + filePath, std::filesystem::copy_options::overwrite_existing);
+	//	} else {
+	//		createMipimage = true;
+
+	//		//ddsに変換してCompiledにコピーする
+	//		DirectX::ScratchImage tmp;
+	//		tmp = CreateMipImages("Assets/" + filePath);
+
+	//		logger_->info("Compressing texture: {} width: {}, height: {}", filePath, tmp.GetMetadata().width, tmp.GetMetadata().height);
+
+	//		HRESULT hr = DirectX::Compress(tmp.GetImages(), tmp.GetImageCount(), tmp.GetMetadata(),
+	//			DXGI_FORMAT_BC7_UNORM_SRGB, DirectX::TEX_COMPRESS_DEFAULT | DirectX::TEX_COMPRESS_BC7_QUICK,
+	//			DirectX::TEX_THRESHOLD_DEFAULT, mipImages);
+
+	//		if (FAILED(hr)) {
+	//			//とりあえずpntをそのまま使う
+	//			logger_->warn("Failed to compress texture: " + filePath);
+	//			mipImages = std::move(tmp);
+	//		} else {
+
+	//			std::filesystem::create_directories("Compiled/" + filePath.substr(0, filePath.find_last_of('/')));
+	//			hr = DirectX::SaveToDDSFile(
+	//				mipImages.GetImages(),
+	//				mipImages.GetImageCount(),
+	//				mipImages.GetMetadata(),
+	//				DirectX::DDS_FLAGS_NONE,
+	//				(ConvertString(ddsFilePath)).c_str());
+
+	//			if (FAILED(hr)) {
+	//				logger_->warn("Failed to save DDSTexture: " + filePath);
+	//			}
+	//		}
+	//	}
+	//}
+
+	//// まだ作ってない場合はCompiledからddsを読み込む
+	//if (!createMipimage) {
+	//	mipImages = CreateMipImages(ddsFilePath);
+	//}
 
 	//TextureResourceを作成
-	DirectX::ScratchImage mipImages = CreateMipImages(filePath);
+	DirectX::ScratchImage mipImages = CreateMipImages("Assets/" + filePath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 
 	textureResource_.Attach(CreateTextureResource(device, metadata));
+
+	if (metadata.IsCubemap()) {
+		type_ = Type::CubeTexture;
+	} else if (metadata.dimension != DirectX::TEX_DIMENSION_TEXTURE2D) {
+		logger_->error("This Format is not supported. : " + filePath);
+		return {};
+	}
 
 	//画像サイズの取得
 	width_ = static_cast<uint32_t>(metadata.width);
@@ -264,7 +321,7 @@ DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* de
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	if (type_ == Type::DDS) {
+	if (type_ == Type::CubeTexture) {
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 	} else {
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;

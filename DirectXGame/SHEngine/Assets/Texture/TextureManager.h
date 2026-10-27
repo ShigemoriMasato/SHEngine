@@ -44,7 +44,7 @@ namespace SHEngine {
 
 		/**
 		 * @brief ファイルからテクスチャを読み込む
-		 * @param filePath テクスチャファイルのパス
+		 * @param filePath Assets/下のパスを指定する
 		 * @return テクスチャハンドル
 		 */
 		int LoadTexture(const std::string& filePath);
@@ -104,7 +104,7 @@ namespace SHEngine {
 
 		/**
 		 * @brief ファイルからテクスチャを取得（未読込のときerrorテクスチャを返す）
-		 * @param filePath テクスチャファイルのパス
+		 * @param filePath Assets/下のパスを指定する
 		 * @return テクスチャハンドル
 		 */
 		TextureData* GetTextureData(std::string filePath) const;
