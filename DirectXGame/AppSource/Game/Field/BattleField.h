@@ -12,6 +12,8 @@ public:
 	void Update(float deltaTime, ICC* icc);
 	void Draw(DCC* dcc);
 
+	void ApplyTexture(ICC* icc);
+
 private:
 
 	Particle::Emitter* emitter_;
@@ -21,6 +23,8 @@ private:
 	SHEngine::GPUBuffer* textureConfig_ = nullptr;
 	SHEngine::GPUBuffer* texture_ = nullptr;
 	SHEngine::GPUBuffer* uvs_ = nullptr;
+
+	std::unique_ptr<SHEngine::ComputeObject> update_ = nullptr;
 
 	std::unique_ptr<SHEngine::Screen::Display> display_ = nullptr;
 

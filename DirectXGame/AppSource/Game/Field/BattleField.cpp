@@ -27,16 +27,14 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::TextureManage
 	}, "BattleField");
 #endif
 
-	SHEngine::ComputeObject* update;
-	emitter_->AddProcess(update, "PixelTex/ApplyTex");
-	update->SetGPUBuffers(BufferType::SRV, { uvs_, texture_ });
-	update->SetExecuteNum(textureSize_ * textureSize_, 128);
-	update->SetSamplerID(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
+	update_ = emitter_->AddOprionalProcess("PixelTex/ApplyTex");
+	update_->SetGPUBuffers(BufferType::SRV, { uvs_, texture_ });
+	update_->SetExecuteNum(textureSize_ * textureSize_, 128);
+	update_->SetSamplerID(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 }
 
 void BattleField::Initialize() {
-	SHEngine::ComputeObject* init;
-	emitter_->AddTriggerProcess(init, "PixelTex/Initialize");
+	SHEngine::ComputeObject* init = emitter_->AddTriggerProcess("PixelTex/Initialize");
 
 	init->SetGPUBuffers(BufferType::CBV, { textureConfig_, scale_ });
 	init->SetGPUBuffers(BufferType::SRV, { texture_ });
@@ -59,4 +57,8 @@ void BattleField::Draw(DCC* dcc) {
 	if (renderTarget) {
 		dcc->SetRenderTarget(renderTarget, false, true);
 	}
+}
+
+void BattleField::ApplyTexture(ICC* icc) {
+	update_->Execute(icc);
 }

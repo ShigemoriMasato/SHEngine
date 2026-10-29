@@ -11,16 +11,20 @@ namespace Particle {
 		Emitter(uint32_t emitterID, uint32_t particleCount, Data* data, FreeList* freeList, Processor* processor, ICC* icc, SHEngine::BufferContainer* container);
 
 		// @brief 毎フレーム実行する処理を追加
-		// @param output 追加したComputeObjectのポインタを返す。
 		// @param shaderPath Shader/Compute/Particle/以下を指定。.CS.hlslは不要
-		// @return 追加したComputeObjectのIDを返す。EraseProcessで削除する際に使用する。
-		uint32_t AddProcess(SHEngine::ComputeObject*& output, std::string shaderPath);
+		// @param output 追加したComputeObjectのIDを返す。EraseProcessで削除する際に使用する。nullptrでは無視される
+		// @return 追加したComputeObjectのポインタを返す。
+		SHEngine::ComputeObject* AddProcess(std::string shaderPath, uint32_t* output = nullptr);
 
 		// @brief 一度実行したら破棄される処理を追加
-		// @param output 追加したComputeObjectのポインタを返す。
 		// @param shaderPath Shader/Compute/Particle/以下を指定。.CS.hlslは不要
-		// @return 追加したComputeObjectのIDを返す。EraseProcessで削除する際に使用する。
-		void AddTriggerProcess(SHEngine::ComputeObject*& output, std::string shaderPath);
+		// @return 追加したComputeObjectのポインタを返す。
+		SHEngine::ComputeObject* AddTriggerProcess(std::string shaderPath);
+
+		// @brief Managerで実行されず、自分のタイミングで実行する必要がある処理を追加
+		// @param shaderPath Shader/Compute/Particle/以下を指定。.CS.hlslは不要
+		// @return 追加したComputeObjectのポインタを返す。
+		std::unique_ptr<SHEngine::ComputeObject> AddOprionalProcess(std::string shaderPath);
 
 		// @param id AddProcessで使用したID。
 		void EraseProcess(uint32_t id);
