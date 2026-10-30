@@ -68,7 +68,7 @@ void SHEngine::Command::Queue::WaitFenceInCPU(const WaitFence& fence) {
 		return;
 	}
 
-	if (!(fence.fence->GetCompletedValue() >= fence.value)) {
+	if (fence.fence->GetCompletedValue() >= fence.value) {
 		return;
 	}
 
@@ -79,7 +79,7 @@ void SHEngine::Command::Queue::WaitFenceInCPU(const WaitFence& fence) {
 }
 
 void SHEngine::Command::Queue::WaitFenceInGPU(const WaitFence& fence) {
-	commandQueue_->Wait(fence.fence, fence.value - 1);
+	commandQueue_->Wait(fence.fence, fence.value);
 }
 
 void SHEngine::Command::Queue::StopGPU() {
