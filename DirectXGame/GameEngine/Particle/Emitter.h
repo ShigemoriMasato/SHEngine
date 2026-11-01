@@ -34,6 +34,9 @@ namespace Particle {
 
 		void SetParentMatrix(const Matrix4x4& matrix);
 
+		// デバッグ用。このエミッターが所有するすべてのBufferを取り出す。
+		std::vector<SHEngine::GPUBuffer*> GetBuffer() const;
+
 		uint32_t GetParticleCount() const { return countNum_; }
 		SHEngine::GPUBuffer* GetIndexList() const { return indexList_; }
 		SHEngine::GPUBuffer* GetCountBuffer() const { return countBuffer_; }

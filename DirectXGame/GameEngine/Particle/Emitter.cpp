@@ -29,9 +29,8 @@ SHEngine::ComputeObject* Particle::Emitter::AddProcess(std::string shaderPath, u
 		*output = id;
 	}
 
-	auto output = process.get();
 	processes_[id] = std::move(process);
-	return output;
+	return processes_[id].get();
 }
 
 SHEngine::ComputeObject* Particle::Emitter::AddTriggerProcess(std::string shaderPath) {
@@ -87,4 +86,12 @@ void Particle::Emitter::Update(uint32_t processorKey, ICC* icc) {
 
 void Particle::Emitter::SetParentMatrix(const Matrix4x4& matrix) {
 	processor_->SetParentMatrix(id_, matrix);
+}
+
+std::vector<SHEngine::GPUBuffer*> Particle::Emitter::GetBuffer() const {
+	return {
+		countBuffer_,
+		indexList_,
+		data_->positions, data_->scales, data_->colors
+	};
 }

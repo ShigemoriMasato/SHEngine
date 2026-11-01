@@ -259,6 +259,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="SHEngine\Tool\AnimationModel\SkinningModel.cpp" />
     <ClCompile Include="SHEngine\Tool\ModelDrawer\ModelDrawer.cpp" />
     <ClCompile Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.cpp" />
+    <ClCompile Include="AppSource\Game\Field\ShootingStar\ShootingStar.cpp" />
     <ClInclude Include="AppSource\UI\SideBox.h" />
     <ClInclude Include="AppSource\Game\Field\BattleField.h" />
     <ClInclude Include="GameEngine\Particle\Emitter.h" />
@@ -341,6 +342,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="SHEngine\Tool\AnimationModel\SkinningModel.h" />
     <ClInclude Include="SHEngine\Tool\ModelDrawer\ModelDrawer.h" />
     <ClInclude Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.h" />
+    <ClInclude Include="AppSource\Game\Field\ShootingStar\ShootingStar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHEngine\Assets\Audio\Data\AudioData.h" />
