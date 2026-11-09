@@ -8,6 +8,7 @@ struct PSInput
 struct PSOutput
 {
     float4 color : SV_TARGET;
+    float4 blurMask : SV_TARGET1;
 };
 
 StructuredBuffer<float16_t4> colors : register(t0);
@@ -19,5 +20,6 @@ PSOutput main(PSInput input)
     if(output.color.a < 0.01f){
         discard;
     }
+    output.blurMask = output.color;
     return output;
 }

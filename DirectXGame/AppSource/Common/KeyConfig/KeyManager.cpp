@@ -151,7 +151,7 @@ void KeyManager::Update() {
 
 			switch (info.stickDirection) {
 			case StickDirection::Right:
-				stickState.first = nowStick.x;
+				stickState.first = prevStick.x;
 				stickState.second = nowStick.x;
 				break;
 			case StickDirection::Left:

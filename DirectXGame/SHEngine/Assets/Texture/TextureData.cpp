@@ -246,62 +246,61 @@ void TextureData::Create(uint32_t width, uint32_t height, ID3D12Device* device, 
 
 DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* device, SRVManager* srvManager) {
 	std::filesystem::path path(filePath);
-	//DirectX::ScratchImage mipImages;
-	//bool createMipimage = false;
+	DirectX::ScratchImage mipImages;
+	bool createMipimage = false;
 
-	//std::string ddsFilePath = "Compiled/" + filePath.substr(0, filePath.find_last_of('.')) + ".dds";
+	std::string ddsFilePath = "Compiled/" + filePath.substr(0, filePath.find_last_of('.')) + ".dds";
 
-	////読み込む対象がCompileされていない場合
-	//if (!std::filesystem::exists(ddsFilePath)) {
-	//	if (!std::filesystem::exists("Assets/" + filePath)) {
-	//		// 何処にもファイルが存在しないのでエラー
-	//		return {};
-	//	}
+	//読み込む対象がCompileされていない場合
+	if (!std::filesystem::exists(ddsFilePath)) {
+		if (!std::filesystem::exists("Assets/" + filePath)) {
+			// 何処にもファイルが存在しないのでエラー
+			return {};
+		}
 
-	//	//既にddsの場合はCompiledにコピーする
-	//	if (path.extension() == ".dds" || path.extension() == ".CubeTexture") {
-	//		std::filesystem::copy_file("Assets/" + filePath, "Compiled/" + filePath, std::filesystem::copy_options::overwrite_existing);
-	//	} else {
-	//		createMipimage = true;
+		//既にddsの場合はCompiledにコピーする
+		if (path.extension() == ".dds" || path.extension() == ".CubeTexture") {
+			std::filesystem::copy_file("Assets/" + filePath, "Compiled/" + filePath, std::filesystem::copy_options::overwrite_existing);
+		} else {
+			createMipimage = true;
 
-	//		//ddsに変換してCompiledにコピーする
-	//		DirectX::ScratchImage tmp;
-	//		tmp = CreateMipImages("Assets/" + filePath);
+			//ddsに変換してCompiledにコピーする
+			DirectX::ScratchImage tmp;
+			tmp = CreateMipImages("Assets/" + filePath);
 
-	//		logger_->info("Compressing texture: {} width: {}, height: {}", filePath, tmp.GetMetadata().width, tmp.GetMetadata().height);
+			logger_->info("Compressing texture: {} width: {}, height: {}", filePath, tmp.GetMetadata().width, tmp.GetMetadata().height);
 
-	//		HRESULT hr = DirectX::Compress(tmp.GetImages(), tmp.GetImageCount(), tmp.GetMetadata(),
-	//			DXGI_FORMAT_BC7_UNORM_SRGB, DirectX::TEX_COMPRESS_DEFAULT | DirectX::TEX_COMPRESS_BC7_QUICK,
-	//			DirectX::TEX_THRESHOLD_DEFAULT, mipImages);
+			HRESULT hr = DirectX::Compress(tmp.GetImages(), tmp.GetImageCount(), tmp.GetMetadata(),
+				DXGI_FORMAT_BC7_UNORM_SRGB, DirectX::TEX_COMPRESS_DEFAULT | DirectX::TEX_COMPRESS_BC7_QUICK,
+				DirectX::TEX_THRESHOLD_DEFAULT, mipImages);
 
-	//		if (FAILED(hr)) {
-	//			//とりあえずpntをそのまま使う
-	//			logger_->warn("Failed to compress texture: " + filePath);
-	//			mipImages = std::move(tmp);
-	//		} else {
+			if (FAILED(hr)) {
+				//とりあえずpntをそのまま使う
+				logger_->warn("Failed to compress texture: " + filePath);
+				mipImages = std::move(tmp);
+			} else {
 
-	//			std::filesystem::create_directories("Compiled/" + filePath.substr(0, filePath.find_last_of('/')));
-	//			hr = DirectX::SaveToDDSFile(
-	//				mipImages.GetImages(),
-	//				mipImages.GetImageCount(),
-	//				mipImages.GetMetadata(),
-	//				DirectX::DDS_FLAGS_NONE,
-	//				(ConvertString(ddsFilePath)).c_str());
+				std::filesystem::create_directories("Compiled/" + filePath.substr(0, filePath.find_last_of('/')));
+				hr = DirectX::SaveToDDSFile(
+					mipImages.GetImages(),
+					mipImages.GetImageCount(),
+					mipImages.GetMetadata(),
+					DirectX::DDS_FLAGS_NONE,
+					(ConvertString(ddsFilePath)).c_str());
 
-	//			if (FAILED(hr)) {
-	//				logger_->warn("Failed to save DDSTexture: " + filePath);
-	//			}
-	//		}
-	//	}
-	//}
+				if (FAILED(hr)) {
+					logger_->warn("Failed to save DDSTexture: " + filePath);
+				}
+			}
+		}
+	}
 
-	//// まだ作ってない場合はCompiledからddsを読み込む
-	//if (!createMipimage) {
-	//	mipImages = CreateMipImages(ddsFilePath);
-	//}
+	// まだ作ってない場合はCompiledからddsを読み込む
+	if (!createMipimage) {
+		mipImages = CreateMipImages(ddsFilePath);
+	}
 
 	//TextureResourceを作成
-	DirectX::ScratchImage mipImages = CreateMipImages("Assets/" + filePath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 
 	textureResource_.Attach(CreateTextureResource(device, metadata));

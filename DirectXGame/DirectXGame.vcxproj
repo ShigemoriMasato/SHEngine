@@ -95,8 +95,7 @@
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 if exist "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" (
 copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-)
-xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,8 +125,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 if exist "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" (
 copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-)
-xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
@@ -158,14 +156,14 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 if exist "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" (
 copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-)
-xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppSource\Scene\IScene.cpp" />
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
     <ClCompile Include="AppSource\Game\Field\BattleField.cpp" />
+    <ClCompile Include="AppSource\Game\Boss\Beam\ExplosionBeam.cpp" />
     <ClCompile Include="GameEngine\Particle\Emitter.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleData.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Data\SandData.cpp" />
@@ -176,6 +174,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClCompile Include="GameEngine\Particle\ParticleSystem.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleProcessor.cpp" />
     <ClCompile Include="AppSource\Game\GameScene.cpp" />
+    <ClCompile Include="SHEngine\Render\PostEffect\PostEffectLauncher.cpp" />
+    <ClCompile Include="SHEngine\Render\PostEffect\Base\IPostEffect.cpp" />
     <ClCompile Include="SHEngine\Tool\ImGui\ImGuiWindowManager.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\CPUSample\SandCPUSample.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\CameraEditor.cpp" />
@@ -272,6 +272,8 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="GameEngine\Particle\ParticleSystem.h" />
     <ClInclude Include="GameEngine\Particle\System\ParticleProcessor.h" />
     <ClInclude Include="AppSource\Game\GameScene.h" />
+    <ClInclude Include="SHEngine\Render\PostEffect\PostEffectLauncher.h" />
+    <ClInclude Include="SHEngine\Render\PostEffect\Base\IPostEffect.h" />
     <ClInclude Include="SHEngine\Tool\ImGui\ImGuiWindowManager.h" />
     <ClInclude Include="GameEngine\SandSimulator\CPUSample\SandCPUSample.h" />
     <ClInclude Include="SHEngine\Camera\Editor\CameraEditor.h" />
@@ -343,6 +345,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <ClInclude Include="SHEngine\Tool\ModelDrawer\ModelDrawer.h" />
     <ClInclude Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.h" />
     <ClInclude Include="AppSource\Game\Field\ShootingStar\ShootingStar.h" />
+    <ClInclude Include="AppSource\Game\Boss\Beam\ExplosionBeam.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHEngine\Assets\Audio\Data\AudioData.h" />

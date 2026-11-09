@@ -432,6 +432,7 @@ FodyWeavers.xsd
 # 出力ファイル
 [Gg]enerated/
 */[Dd]umps/
+*/ForSubmit/
 *.dmp
 */[Ll]ogs
 # TextureのCompile後の生成ファイル

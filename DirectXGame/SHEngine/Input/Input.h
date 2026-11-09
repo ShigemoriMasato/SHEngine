@@ -27,7 +27,7 @@ enum class XBoxController {
 	kLeftShoulder,
 	kLeftTrigger,
 
-	kButtomCount
+	kButtonCount
 };
 
 namespace SHEngine {
@@ -134,7 +134,7 @@ namespace SHEngine {
 
 		XINPUT_STATE xBoxState_{};
 		/// @brief XBoxボタン状態フラグ
-		bool xBoxButtonFlug_[int(XBoxController::kButtomCount)];
+		bool xBoxButtonFlug_[int(XBoxController::kButtonCount)];
 		/// @brief XBoxスティック状態（0:右 1:左）
 		Vector2 xBoxStickState_[2];
 
