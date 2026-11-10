@@ -1,17 +1,17 @@
 #include "PostEffect.hlsli"
 
-Texture2D<float4> gTexture[] : register(t8);
+Texture2D textures[] : register(t8);
 SamplerState gSampler : register(s0);
 
-cbuffer TextureIndexBuffer : register(b0)
+cbuffer TextureIndex : register(b0)
 {
-    uint textureIndex;
+    int textureIndex;
 }
 
 PixelShaderOutput main(PixelShaderInput input)
 {
     PixelShaderOutput output;
-    output.color = gTexture[textureIndex].Sample(gSampler, input.texcoord);
+    output.color = textures[textureIndex].Sample(gSampler, input.texcoord);
     if (output.color.a < 0.01f)
     {
         discard;

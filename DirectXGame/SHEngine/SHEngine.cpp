@@ -7,7 +7,7 @@
 #include <Render/Renderer.h>
 #include <Render/MeshRenderer.h>
 #include <Tool/DecoEditor/Data/decoObjectController.h>
-#include <Render/PostEffect.h>
+#include <Render/PostEffect/PostEffectContext.h>
 
 #pragma comment(lib, "Dbghelp.lib")
 
@@ -19,7 +19,7 @@ static LONG WINAPI ClashHandler(EXCEPTION_POINTERS* pExceptionPointers) {
 }
 
 SHEngine::Engine::~Engine() {
-	PostEffect::StaticFinalize();
+	PostEffectContext::StaticFinalize();
 	AudioManager::GetInstance()->Finalize();
 	imGuiWrapper_->Finalize();
 	CoUninitialize();
@@ -73,7 +73,7 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	Text::SetFontLoader(fontLoader_.get());
 	ComputeObject::StaticInitialize(csPsoManager_.get(), device_->GetSRVManager()->GetStartPtr());
 	AudioManager::GetInstance()->Initialize();
-	PostEffect::StaticInitialize();
+	PostEffectContext::StaticInitialize(this);
 
 #ifdef SH_RELEASE
 	shelfManager_->CompileAllShader();

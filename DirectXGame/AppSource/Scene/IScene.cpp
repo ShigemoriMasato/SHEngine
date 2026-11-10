@@ -22,11 +22,11 @@ void IScene::DefaultPostDraw() {
 	ImGui::End();
 #endif
 
-#ifdef SH_RELEASE
-	postEffectConfig_.dcc = directContext_;
-	postEffectConfig_.origin = commonData_->display.get();
-	postEffectConfig_.output = commonData_->window.get();
-	postEffect_.Draw(postEffectConfig_);
+#ifdef USE_IMGUI
+	if (initialized_) {
+		pec_.Begin(display);
+		pec_.End(window);
+	}
 	directContext_->SetRenderTarget(window, false);
 #else
 	directContext_->SetRenderTarget(window);

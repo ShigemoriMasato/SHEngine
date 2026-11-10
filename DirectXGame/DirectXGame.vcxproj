@@ -174,8 +174,9 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClCompile Include="GameEngine\Particle\ParticleSystem.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleProcessor.cpp" />
     <ClCompile Include="AppSource\Game\GameScene.cpp" />
-    <ClCompile Include="SHEngine\Render\PostEffect\PostEffectLauncher.cpp" />
-    <ClCompile Include="SHEngine\Render\PostEffect\Base\IPostEffect.cpp" />
+    <ClCompile Include="SHEngine\Render\PostEffect\PostEffectContext.cpp" />
+    <ClCompile Include="SHEngine\Render\PostEffect\IPostEffect.cpp" />
+    <ClCompile Include="SHEngine\Render\PostEffect\SimplePostEffectData.cpp" />
     <ClCompile Include="SHEngine\Tool\ImGui\ImGuiWindowManager.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\CPUSample\SandCPUSample.cpp" />
     <ClCompile Include="SHEngine\Camera\Editor\CameraEditor.cpp" />
@@ -260,6 +261,7 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClCompile Include="SHEngine\Tool\ModelDrawer\ModelDrawer.cpp" />
     <ClCompile Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.cpp" />
     <ClCompile Include="AppSource\Game\Field\ShootingStar\ShootingStar.cpp" />
+    <ClCompile Include="SHEngine\Render\PostEffect\SimplePostEffect.cpp" />
     <ClInclude Include="AppSource\UI\SideBox.h" />
     <ClInclude Include="AppSource\Game\Field\BattleField.h" />
     <ClInclude Include="GameEngine\Particle\Emitter.h" />
@@ -272,8 +274,9 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClInclude Include="GameEngine\Particle\ParticleSystem.h" />
     <ClInclude Include="GameEngine\Particle\System\ParticleProcessor.h" />
     <ClInclude Include="AppSource\Game\GameScene.h" />
-    <ClInclude Include="SHEngine\Render\PostEffect\PostEffectLauncher.h" />
-    <ClInclude Include="SHEngine\Render\PostEffect\Base\IPostEffect.h" />
+    <ClInclude Include="SHEngine\Render\PostEffect\PostEffectContext.h" />
+    <ClInclude Include="SHEngine\Render\PostEffect\IPostEffect.h" />
+    <ClInclude Include="SHEngine\Render\PostEffect\SimplePostEffectData.h" />
     <ClInclude Include="SHEngine\Tool\ImGui\ImGuiWindowManager.h" />
     <ClInclude Include="GameEngine\SandSimulator\CPUSample\SandCPUSample.h" />
     <ClInclude Include="SHEngine\Camera\Editor\CameraEditor.h" />
@@ -346,6 +349,7 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClInclude Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.h" />
     <ClInclude Include="AppSource\Game\Field\ShootingStar\ShootingStar.h" />
     <ClInclude Include="AppSource\Game\Boss\Beam\ExplosionBeam.h" />
+    <ClInclude Include="SHEngine\Render\PostEffect\SimplePostEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHEngine\Assets\Audio\Data\AudioData.h" />

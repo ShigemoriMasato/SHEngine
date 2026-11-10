@@ -1,7 +1,7 @@
 #pragma once
 #include <SHEngine.h>
 #include "CommonData.h"
-#include <Render/PostEffect.h>
+#include <Render/PostEffect/PostEffectContext.h>
 
 class IScene {
 public:
@@ -22,7 +22,11 @@ public:
 		engine_ = engine;
 		commonData_ = commonData;
 
-		postEffect_.Initialize(textureManager_, true);
+		if (commonData_->display) {
+			initialized_ = true;
+			auto size = commonData_->display->GetTextureData()->GetSize();
+			pec_.Initialize((uint32_t)size.first, (uint32_t)size.second);
+		}
 	}
 
 protected:
@@ -44,7 +48,7 @@ protected:
 
 private:
 
-	PostEffect postEffect_;
-	PostEffectConfig postEffectConfig_;
+	bool initialized_ = false;
+	PostEffectContext pec_;
 
 };

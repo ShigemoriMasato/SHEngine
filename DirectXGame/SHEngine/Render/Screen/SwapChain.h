@@ -40,7 +40,7 @@ namespace SHEngine::Screen {
 		TextureData* GetDepthTexture() const override { return displays_[currentBufferIndex_]->GetDepthTexture(); }
 
 		/// @brief RTVのフォーマットを取得する
-		DXGI_FORMAT GetRTVFormat() override { return DXGI_FORMAT_R8G8B8A8_UNORM;  }
+		DXGI_FORMAT GetRTVFormat() override { return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;  }
 
 		// @brief RTVの数を取得する
 		int GetRTVNum() { return 1; };
