@@ -22,7 +22,7 @@ void IScene::DefaultPostDraw() {
 	ImGui::End();
 #endif
 
-#ifdef USE_IMGUI
+#ifndef USE_IMGUI
 	if (initialized_) {
 		pec_.Begin(display);
 		pec_.End(window);

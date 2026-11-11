@@ -41,6 +41,8 @@ public:
 
 	void Explosion(const ExplosionConfig& config);
 
+	ExplosionConfig GetTestConfig() const { return testConfig_; }
+
 private: // items
 
 	std::unique_ptr<ShootingStar> shootingStar_ = nullptr;

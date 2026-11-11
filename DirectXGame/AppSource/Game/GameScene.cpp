@@ -23,21 +23,24 @@ void GameScene::Initialize() {
 	if (beamConfigFile.Boot("ExplosionBeam.bin")) {
 		beamConfig_.Load(beamConfigFile);
 	}
-	explosionBeam_ = std::make_unique<ExplosionBeam>(&particleSystem_, engine_, computeContext_, 4000000, "Texture/uvChecker.png");
-	explosionBeam_->SetConfig(beamConfig_);
+	//explosionBeam_ = std::make_unique<ExplosionBeam>(&particleSystem_, engine_, computeContext_, 4000000, "Texture/uvChecker.png");
+	//explosionBeam_->SetConfig(beamConfig_);
 	imguiManager_.Add([this]() {
 		beamConfig_.DrawImGui();
 	}, "ExplosionBeam");
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
+	commonData_->keyManager->Update();
+	auto key = commonData_->keyManager->GetKeyStates();
+
 	debugCamera_->Update();
 	float deltaTime = engine_->GetDeltaTime();
 
 	battleField_->Update(deltaTime);
 
-	explosionBeam_->SetConfig(beamConfig_);
-	explosionBeam_->Update(deltaTime);
+	//explosionBeam_->SetConfig(beamConfig_);
+	//explosionBeam_->Update(deltaTime);
 	particleSystem_.Update(computeContext_);
 	battleField_->Draw(directContext_);
 
@@ -48,6 +51,13 @@ std::unique_ptr<IScene> GameScene::Update() {
 
 	auto endApply = computeContext_->MiddleExecute();
 	directContext_->WaitFenceInGPU(endApply);
+
+	if (key[Key::One]) {
+		battleField_->Explosion(battleField_->GetTestConfig());
+	}
+	if (key[Key::Two]) {
+		battleField_->Initialize();
+	}
 
 	return std::unique_ptr<IScene>();
 }
