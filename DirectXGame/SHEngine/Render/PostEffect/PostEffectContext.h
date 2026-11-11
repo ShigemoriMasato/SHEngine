@@ -32,6 +32,8 @@ public:// PostEffectで使用する関数群
 
 	// Beginが呼ばれていない場合はnullptrが返される。
 	SHEngine::GPUBuffer* GetSourceIndex() const;
+	// Beginが呼ばれていない場合はnullptrが返される。
+	SHEngine::GPUBuffer* GetDestinationIndex() const;
 
 	SHEngine::Renderer* GetRenderer() const { return renderer_.get(); };
 	DCC* GetDCC() const { return engine_->GetDirectCommandContext(); }

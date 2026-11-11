@@ -15,10 +15,10 @@ void SHEngine::Screen::IDisplay::SetViewportInPrivate(DCC* dcc, Vector2 min, Vec
 	cmdList->RSSetViewports(1, &viewPort);
 
 	D3D12_RECT scissorRect{};
-	scissorRect.left = 0;
-	scissorRect.top = 0;
-	scissorRect.right = static_cast<LONG>(size.x - min.x);
-	scissorRect.bottom = static_cast<LONG>(size.y - min.y);
+	scissorRect.left = static_cast<LONG>(min.x);
+	scissorRect.top = static_cast<LONG>(min.y);
+	scissorRect.right = static_cast<LONG>(size.x + min.x);
+	scissorRect.bottom = static_cast<LONG>(size.y + min.y);
 
 	cmdList->RSSetScissorRects(1, &scissorRect);
 }

@@ -203,7 +203,6 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClCompile Include="SHEngine\Render\Buffer\BufferContainer.cpp" />
     <ClCompile Include="SHEngine\Render\Buffer\GPUBuffer.cpp" />
     <ClCompile Include="SHEngine\Render\Font\Text.cpp" />
-    <ClCompile Include="SHEngine\Render\PostEffect.cpp" />
     <ClCompile Include="SHEngine\Render\Renderer.cpp" />
     <ClCompile Include="SHEngine\Tool\Binary\BinaryManager.cpp" />
     <ClCompile Include="SHEngine\Assets\Audio\AudioManager.cpp" />
@@ -262,6 +261,7 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClCompile Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.cpp" />
     <ClCompile Include="AppSource\Game\Field\ShootingStar\ShootingStar.cpp" />
     <ClCompile Include="SHEngine\Render\PostEffect\SimplePostEffect.cpp" />
+    <ClCompile Include="SHEngine\Render\PostEffect\BloomEffect.cpp" />
     <ClInclude Include="AppSource\UI\SideBox.h" />
     <ClInclude Include="AppSource\Game\Field\BattleField.h" />
     <ClInclude Include="GameEngine\Particle\Emitter.h" />
@@ -302,8 +302,6 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClInclude Include="SHEngine\Render\Buffer\BufferContainer.h" />
     <ClInclude Include="SHEngine\Render\Buffer\GPUBuffer.h" />
     <ClInclude Include="SHEngine\Render\Font\Text.h" />
-    <ClInclude Include="SHEngine\Render\PostEffect.h" />
-    <ClInclude Include="SHEngine\Render\PostEffectData.h" />
     <ClInclude Include="SHEngine\Render\Renderer.h" />
     <ClInclude Include="SHEngine\Tool\Binary\BinaryManager.h" />
     <ClInclude Include="SHEngine\Assets\Audio\AudioManager.h" />
@@ -350,6 +348,7 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClInclude Include="AppSource\Game\Field\ShootingStar\ShootingStar.h" />
     <ClInclude Include="AppSource\Game\Boss\Beam\ExplosionBeam.h" />
     <ClInclude Include="SHEngine\Render\PostEffect\SimplePostEffect.h" />
+    <ClInclude Include="SHEngine\Render\PostEffect\BloomEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHEngine\Assets\Audio\Data\AudioData.h" />

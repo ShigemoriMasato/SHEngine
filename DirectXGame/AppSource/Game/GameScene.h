@@ -4,6 +4,8 @@
 #include <Camera/DebugCamera.h>
 #include <Game/Field/BattleField.h>
 #include <Game/Boss/Beam/ExplosionBeam.h>
+#include <Render/PostEffect/PostEffectContext.h>
+#include <Render/PostEffect/BloomEffect.h>
 
 class GameScene : public IScene {
 public:
@@ -26,4 +28,8 @@ private:
 	std::unique_ptr<ExplosionBeam> explosionBeam_ = nullptr;
 
 	ExplosionBeamConfig beamConfig_;
+
+	PostEffectContext postEffectContext_;
+	BloomEffect bloomEffect_;
+	Bloom bloom_;
 };

@@ -90,13 +90,24 @@ void PostEffectContext::End(SHEngine::Screen::IDisplay* output) {
 
 SHEngine::GPUBuffer* PostEffectContext::GetSourceIndex() const {
 	if (!display_) {
-		nullptr;
+		return nullptr;
 	}
 
 	if (source_ == display_) {
 		return displayIndexBuffer_.get();
 	}
 	return intermediateIndexBuffer_.get();
+}
+
+SHEngine::GPUBuffer* PostEffectContext::GetDestinationIndex() const {
+	if (!display_) {
+		return nullptr;
+	}
+
+	if (source_ == display_) {
+		return intermediateIndexBuffer_.get();
+	}
+	return displayIndexBuffer_.get();
 }
 
 void PostEffectContext::CommonEnd() {

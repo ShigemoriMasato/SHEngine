@@ -28,6 +28,10 @@ void GameScene::Initialize() {
 	imguiManager_.Add([this]() {
 		beamConfig_.DrawImGui();
 	}, "ExplosionBeam");
+
+	postEffectContext_.Initialize(1280, 720);
+	bloomEffect_.Initialize(*engine_);
+	bloomEffect_.SetMaskTexture(commonData_->display->GetTextureAllData()[1]->GetHandle());
 }
 
 std::unique_ptr<IScene> GameScene::Update() {
@@ -64,13 +68,14 @@ std::unique_ptr<IScene> GameScene::Update() {
 
 void GameScene::Draw() {
 	DefaultPreDraw();
+	auto display = commonData_->display.get();
 
 	particleSystem_.Draw(directContext_);
 
 	auto particleDraw = directContext_->MiddleExecute();
 	computeContext_->WaitFenceInGPU(particleDraw);
 
-	directContext_->SetRenderTarget(commonData_->window.get(), false, true);
+	directContext_->SetRenderTarget(display, false, true);
 
 	//================
 	// その他描画処理
@@ -81,8 +86,20 @@ void GameScene::Draw() {
 	//================
 	// その他描画処理
 	//================
+
+#ifdef USE_IMGUI
+	ImGui::Begin("Bloom");
+	bloomEffect_.DrawImGui();
+	ImGui::End();
+#endif
 
 	imguiManager_.DrawImGui();
+
+	display->ToTexture(directContext_);
+
+	postEffectContext_.Begin(display);
+	bloomEffect_.Apply(&postEffectContext_);
+	postEffectContext_.End();
 
 	DefaultPostDraw();
 }
