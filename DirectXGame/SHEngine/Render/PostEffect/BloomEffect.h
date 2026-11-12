@@ -4,15 +4,13 @@
 #include <array>
 #include <vector>
 
-// Bloomの合成強度、ぼかし半径（縮小画像のピクセル単位）、縮小段数。
 struct Bloom {
-	uint32_t clientKernel; // ブラーの幅
-	float sigma; // ガウス関数の標準偏差
+	uint32_t sampleCount = 16; // ブラーの比較ピクセル数
+	uint32_t textureWidth; // Textureの幅
+	uint32_t textureHeight; // Textureの高さ
+	uint32_t maskTexture_;
 
-	float strength = 1.0f;
-	int maskTexture_;
-
-	uint32_t iterations = 4;
+	float strength = 0.8f;// 合成強度
 };
 
 class BloomEffect : public IPostEffect {
@@ -37,8 +35,6 @@ private:
 	const uint32_t width_;
 	const uint32_t height_;
 
-	std::unique_ptr<SHEngine::Screen::Display> composite_;
-	std::unique_ptr<SHEngine::GPUBuffer> compositeIndexBuffer_;
 	std::unique_ptr<SHEngine::Screen::Display> intermediate_;
 	std::unique_ptr<SHEngine::GPUBuffer> indexBuffer_;
 	std::unique_ptr<SHEngine::GPUBuffer> maskIndexBuffer_;

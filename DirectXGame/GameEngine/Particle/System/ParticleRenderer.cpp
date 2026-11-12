@@ -21,7 +21,7 @@ void Particle::Renderer::Initialize(Data* data, SHEngine::BufferContainer* conta
 
 	meshRenderer_->SetGPUBuffers({ data->colors }, ShaderType::PIXEL_SHADER, BufferType::SRV);
 
-	meshRenderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add, 0);
+	//meshRenderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add, 0);
 	meshRenderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add, 1);
 }
 

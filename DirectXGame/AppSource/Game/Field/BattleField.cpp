@@ -6,7 +6,7 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::Engine* engin
 
 	display_ = std::make_unique<SHEngine::Screen::Display>();
 	display_->Initialize(textureSize_, textureSize_, "BattleField");
-	display_->AddRenderTarget(tm, 0x333333ff);	// 見た目
+	display_->AddRenderTarget(tm, 0xff);	// 見た目
 	display_->AddRenderTarget(tm, 0xff);		// 起伏
 
 	emitter_ = particleSystem->CreateEmitter(textureSize_ * textureSize_, icc);

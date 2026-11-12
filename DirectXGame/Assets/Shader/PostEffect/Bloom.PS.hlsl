@@ -15,7 +15,7 @@ cbuffer CompositeTextureIndex : register(b1)
 
 cbuffer BlurData : register(b2)
 {
-    uint2 pad;
+    uint4 pad;
     float strength = 1.0f;
 };
 

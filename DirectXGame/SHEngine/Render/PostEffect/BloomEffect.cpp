@@ -10,55 +10,38 @@ void BloomEffect::Initialize(SHEngine::Engine& engine) {
 	intermediate_->Initialize(width_, height_, "Bloom::Intermediate");
 	intermediate_->AddRenderTarget(tm, 0xff);
 
-	composite_ = std::make_unique<SHEngine::Screen::Display>();
-	composite_->Initialize(width_, height_ * 2, "Bloom::Composite");
-	composite_->AddRenderTarget(tm, 0xff);
-
 	indexBuffer_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(int));
 	int index = intermediate_->GetTextureData()->GetHandle();
 	indexBuffer_->CopyBuffer(&index, sizeof(index));
 
-	compositeIndexBuffer_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(int));
-	index = composite_->GetTextureData()->GetHandle();
-	compositeIndexBuffer_->CopyBuffer(&index, sizeof(index));
-
 	maskIndexBuffer_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(int));
 
 	buffer_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Bloom));
+
+	bloom_.textureWidth = width_;
+	bloom_.textureHeight = height_;
 }
 
 void BloomEffect::DrawImGui() {
 #ifdef USE_IMGUI
-	static int clientKernel = bloom_.clientKernel;
-	if (ImGui::DragInt("Client Kernel", &clientKernel, 1)) {
-		bloom_.clientKernel = std::max(1, clientKernel);
+	int sampleCount = bloom_.sampleCount;
+	if (ImGui::DragInt("Sample Count", &sampleCount, 1)) {
+		bloom_.sampleCount = sampleCount;
 	}
-
-	ImGui::DragFloat("Sigma", &bloom_.sigma, 0.01f);
 	ImGui::DragFloat("Strength", &bloom_.strength, 0.01f);
-
-	static int iterations = bloom_.iterations;
-	if (ImGui::DragInt("Iterations", &iterations, 1, 1, 8)) {
-		bloom_.iterations = iterations;
-	}
 
 	ImGui::Image(ImTextureRef(intermediate_->GetTextureData()->GetSRVHandle().ptr), ImVec2(320, 180));
 #endif
 }
 
 void BloomEffect::Save(BinaryManager& bin) const {
-	bin.Register(bloom_.clientKernel);
-	bin.Register(bloom_.sigma);
+	bin.Register(bloom_.sampleCount);
 	bin.Register(bloom_.strength);
-	bin.Register(bloom_.iterations);
 }
 
 void BloomEffect::Load(BinaryManager& bin) {
-	bin.Reverse(bloom_.clientKernel);
-	bin.Reverse(bloom_.sigma);
+	bin.Reverse(bloom_.sampleCount);
 	bin.Reverse(bloom_.strength);
-	bin.Reverse(bloom_.iterations);
-	SetBloom(bloom_);
 }
 
 void BloomEffect::SetBloom(const Bloom& bloom) {
@@ -74,37 +57,24 @@ void BloomEffect::Apply(PostEffectContext* context) {
 	maskIndexBuffer_->CopyBuffer(&bloom_.maskTexture_, sizeof(bloom_.maskTexture_));
 	buffer_->CopyBuffer(&bloom_, sizeof(Bloom));
 
+	// Blurを適用する
+	// 横方向のブラー
+	dcc->SetRenderTarget(dst);
 	renderer->ResetGPUBuffers();
 	renderer->SetVS("PostEffect/PostEffect.VS.hlsl");
-	renderer->SetPS("PostEffect/GaussBlur.PS.hlsl");
+	renderer->SetPS("PostEffect/BlurHorizontal.PS.hlsl");
 	renderer->SetGPUBuffers({ maskIndexBuffer_.get(), buffer_.get() }, ShaderType::PIXEL_SHADER, BufferType::CBV);
 	renderer->SetUseTexture(true);
 	renderer->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
+	renderer->Draw(dcc);
+	dst->ToTexture(dcc);
 
-	float drawY = 0.0f;
-	float scale = 1.0f;
-
-	// 中間レンダーターゲットに対して、縮小した画像を描画していく
-	dcc->SetRenderTarget(composite_.get(), true, false);
-	for (uint32_t i = 0; i < bloom_.iterations; ++i) {
-		Vector2 min = { 0.0f, drawY };
-		Vector2 size = Vector2(static_cast<float>(width_), static_cast<float>(height_)) * scale;
-
-		dst->SetViewport(dcc, min, size);
-		drawY += size.y;
-		scale *= 0.5f;
-
-		renderer->Draw(dcc);
-	}
-
-	composite_->ToTexture(dcc);
-
-	// 中間レンダーターゲットのテクスチャを引き伸ばし、平均をとるように合成する
+	// 縦方向のブラー
 	dcc->SetRenderTarget(intermediate_.get());
 	renderer->ResetGPUBuffers();
 	renderer->SetVS("PostEffect/PostEffect.VS.hlsl");
-	renderer->SetPS("PostEffect/BloomComposite.PS.hlsl");
-	renderer->SetGPUBuffers({ compositeIndexBuffer_.get(), buffer_.get()}, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer->SetPS("PostEffect/BlurVertical.PS.hlsl");
+	renderer->SetGPUBuffers({ context->GetDestinationIndex(), buffer_.get() }, ShaderType::PIXEL_SHADER, BufferType::CBV);
 	renderer->SetUseTexture(true);
 	renderer->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 	renderer->Draw(dcc);
@@ -120,6 +90,7 @@ void BloomEffect::Apply(PostEffectContext* context) {
 	renderer->SetGPUBuffers({ context->GetSourceIndex(), indexBuffer_.get(), buffer_.get() }, ShaderType::PIXEL_SHADER, BufferType::CBV);
 	renderer->SetUseTexture(true);
 	renderer->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
+	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Normal);
 	renderer->Draw(dcc);
 
 	dst->ToTexture(dcc);
