@@ -12,6 +12,7 @@ echo 1 : ImGui
 echo 2 : DirectXTex
 echo 3 : Assimp
 echo 4 : FreeType
+echo 9 : FilterAdjust
 echo - : Shutdown
 echo ==========================
 
@@ -22,6 +23,7 @@ if "%BUILD_MODE%"=="1" goto BUILD_IMGUI
 if "%BUILD_MODE%"=="2" goto BUILD_DIRECTXTEX
 if "%BUILD_MODE%"=="3" goto BUILD_ASSIMP
 if "%BUILD_MODE%"=="4" goto BUILD_FREETYPE
+if "%BUILD_MODE%"=="9" goto FILTER_ADJUST
 if "%BUILD_MODE%"=="-" exit
 
 echo Invalid Number
@@ -121,6 +123,12 @@ call :CLEAN_GENERATED_FILES
 echo ===== Completed =====
 pause
 
+:FILTER_ADJUST
+echo ===== Filter Adjustment =====
+powershell -ExecutionPolicy Bypass -NoProfile -File "..\Scripts\src\FilterAdjust.ps1"
+
+echo ===== Completed =====
+pause
 
 
 :CLEAN_GENERATED_FILES
