@@ -2,7 +2,6 @@
 #include <Scene/IScene.h>
 #include <Particle/ParticleSystem.h>
 #include <Game/Field/BattleField.h>
-#include <Game/Boss/Beam/ExplosionBeam.h>
 #include <Render/PostEffect/PostEffectContext.h>
 #include <Render/PostEffect/BloomEffect.h>
 
@@ -73,9 +72,6 @@ private:
 	ParticleSystem particleSystem_ = { 5242880, true };
 
 	std::unique_ptr<BattleField> battleField_ = nullptr;
-	std::unique_ptr<ExplosionBeam> explosionBeam_ = nullptr;
-
-	ExplosionBeamConfig beamConfig_;
 
 	PostEffectContext postEffectContext_;
 	BloomEffect bloomEffect_;

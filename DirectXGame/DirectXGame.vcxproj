@@ -163,7 +163,6 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClCompile Include="AppSource\Scene\IScene.cpp" />
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
     <ClCompile Include="AppSource\Game\Field\BattleField.cpp" />
-    <ClCompile Include="AppSource\Game\Boss\Beam\ExplosionBeam.cpp" />
     <ClCompile Include="GameEngine\Particle\Emitter.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleData.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Data\SandData.cpp" />
@@ -416,7 +415,6 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClInclude Include="SHEngine\Tool\ModelDrawer\ModelDrawer.h" />
     <ClInclude Include="SHEngine\Tool\ModelDrawer\SkinningProcessor.h" />
     <ClInclude Include="AppSource\Game\Field\ShootingStar\ShootingStar.h" />
-    <ClInclude Include="AppSource\Game\Boss\Beam\ExplosionBeam.h" />
     <ClInclude Include="SHEngine\Render\PostEffect\SimplePostEffect.h" />
     <ClInclude Include="SHEngine\Render\PostEffect\BloomEffect.h" />
   </ItemGroup>
