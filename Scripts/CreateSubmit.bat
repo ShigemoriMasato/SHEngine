@@ -5,8 +5,6 @@ set "SUBMIT_DIR=%~dp0ForSubmit"
 
 rmdir /s /q "ForSubmit"
 
-pause
-
 echo [1/4] Release ビルドと実行ファイルのコピー...
 powershell.exe -ExecutionPolicy Bypass -NoProfile -File "%~dp0src\BuildForSubmit.ps1"
 if errorlevel 1 goto :error
