@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <Tool/Binary/BinaryManager.h>
 #include <Render/Screen/IDisplay.h>
+#include "InputDevice.h"
 
 enum class Key {
 	// 移動系 -===========
@@ -27,6 +28,10 @@ enum class Key {
 	Correct,//確定キー
 	Reverse,//取消キー
 	Pause,//ポーズキー
+
+	// ゲーム操作系 -===========
+
+	Fire,//射撃キー(Hold)。UI決定のCorrectとは独立させる
 
 	// Debug -===========
 
@@ -92,6 +97,20 @@ public:
 	//0.左クリック 1.右クリック 2.ホイールクリック
 	void SetMouse(Key action, int mouseButton, KeyState state);
 
+	// ================- アナログ入力 -================
+	// GetKeyStatesの方向boolはメニュー操作用にそのまま残し、ゲーム操作用のアナログ値はこちらで取得する。
+
+	/// @brief デッドゾーン適用後の左スティック値。x:右が正 y:上が正、長さは0～1。
+	/// デッドゾーン外側は (長さ - デッドゾーン) / (1 - デッドゾーン) に再スケールし、傾き量を保つ(一律に長さ1へ正規化しない)
+	Vector2 GetLeftStick() const;
+	/// @brief デッドゾーン適用後の右スティック値。仕様はGetLeftStickと同じ
+	Vector2 GetRightStick() const;
+	/// @brief スティックのデッドゾーン(0～0.95)。右スティックのデッドゾーンは操作デバイスの切り替え判定にも使う
+	void SetStickDeadZone(float leftDeadZone, float rightDeadZone);
+
+	/// @brief 最後に有効な操作を行ったデバイス。両方同時に操作された場合はコントローラーを優先する
+	InputDevice GetActiveDevice() const { return activeDevice_; }
+
 private:
 
 	SHEngine::Screen::IDisplay* display_ = nullptr;
@@ -126,4 +145,12 @@ private:
 
 	//最終的な状態を格納する
 	std::unordered_map<Key, bool> resultKeyFlags_;
+
+	//操作デバイスの判定
+	void UpdateActiveDevice();
+	static Vector2 ApplyDeadZone(const Vector2& stick, float deadZone);
+
+	float leftStickDeadZone_ = 0.2f;
+	float rightStickDeadZone_ = 0.25f;
+	InputDevice activeDevice_ = InputDevice::Controller;
 };
