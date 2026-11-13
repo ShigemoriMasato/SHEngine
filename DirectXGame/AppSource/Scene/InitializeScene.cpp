@@ -91,6 +91,15 @@ void InitializeScene::Initialize() {
 	keyManager->SetButton(Key::Pause, XBoxController::kStart, KeyState::Trigger);
 
 	//================================================================================
+	// ゲーム操作。射撃はUI決定(Correct)と分け、Space / Xbox A を Hold で割り当てる。
+
+	keyManager->SetKey(Key::Fire, DIK_SPACE, KeyState::Hold);
+	keyManager->SetButton(Key::Fire, XBoxController::kA, KeyState::Hold);
+
+	// 左:移動、右:照準。右スティックのデッドゾーンは操作デバイス切り替え判定にも使う
+	keyManager->SetStickDeadZone(0.2f, 0.25f);
+
+	//================================================================================
 
 	keyManager->SetKey(Key::Z, DIK_Z, KeyState::Trigger);
 	keyManager->SetKey(Key::Y, DIK_Y, KeyState::Trigger);

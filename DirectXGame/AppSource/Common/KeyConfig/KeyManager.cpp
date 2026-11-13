@@ -1,4 +1,5 @@
 #include "KeyManager.h"
+#include <algorithm>
 
 void KeyManager::Initialize(SHEngine::Input* input, SHEngine::Screen::IDisplay* display) {
 	input_ = input;
@@ -223,6 +224,8 @@ void KeyManager::Update() {
 			}
 		}
 	}
+
+	UpdateActiveDevice();
 }
 
 Vector2 KeyManager::GetCursorPos() const {
@@ -256,4 +259,71 @@ void KeyManager::SetStick(Key action, bool isLeftStick, StickDirection direction
 
 void KeyManager::SetMouse(Key action, int mouseButton, KeyState state) {
 	mouseMap_[action].emplace_back(mouseButton, state);
+}
+
+Vector2 KeyManager::GetLeftStick() const {
+	return ApplyDeadZone(stickHistory_.back().first, leftStickDeadZone_);
+}
+
+Vector2 KeyManager::GetRightStick() const {
+	return ApplyDeadZone(stickHistory_.back().second, rightStickDeadZone_);
+}
+
+void KeyManager::SetStickDeadZone(float leftDeadZone, float rightDeadZone) {
+	leftStickDeadZone_ = std::clamp(leftDeadZone, 0.0f, 0.95f);
+	rightStickDeadZone_ = std::clamp(rightDeadZone, 0.0f, 0.95f);
+}
+
+Vector2 KeyManager::ApplyDeadZone(const Vector2& stick, float deadZone) {
+	float length = stick.Length();
+	if (!(length > deadZone)) {
+		return { 0.0f, 0.0f };
+	}
+
+	//デッドゾーンの外側を0～1へ再スケールする(傾き量は保つ)
+	float scaledLength = std::min((length - deadZone) / (1.0f - deadZone), 1.0f);
+	return stick * (scaledLength / length);
+}
+
+void KeyManager::UpdateActiveDevice() {
+	// ================- コントローラー操作の有無 -================
+	bool controllerUsed = false;
+	for (const auto& [button, pressed] : buttonHistory_.back()) {
+		if (pressed) {
+			controllerUsed = true;
+			break;
+		}
+	}
+	if (stickHistory_.back().first.Length() > leftStickDeadZone_ ||
+		stickHistory_.back().second.Length() > rightStickDeadZone_) {
+		controllerUsed = true;
+	}
+
+	// ================- キーボード／マウス操作の有無 -================
+	bool keyboardMouseUsed = false;
+	for (const auto& [dik, pressed] : keyHistory_.back()) {
+		if (pressed) {
+			keyboardMouseUsed = true;
+			break;
+		}
+	}
+	if (!keyboardMouseUsed) {
+		for (const auto& [button, pressed] : mouseHistory_.back()) {
+			if (pressed) {
+				keyboardMouseUsed = true;
+				break;
+			}
+		}
+	}
+	if (!keyboardMouseUsed) {
+		Vector2 mouseMove = input_->GetMouseMove();
+		keyboardMouseUsed = mouseMove.x != 0.0f || mouseMove.y != 0.0f;
+	}
+
+	//両方同時に操作された場合はコントローラーを優先する。どちらも操作が無ければ現状維持
+	if (controllerUsed) {
+		activeDevice_ = InputDevice::Controller;
+	} else if (keyboardMouseUsed) {
+		activeDevice_ = InputDevice::KeyboardMouse;
+	}
 }
