@@ -449,3 +449,6 @@ DirectXGame/externals/header/
 *.blender
 *.blender1
 *.aseprite
+# rootにあるREADME.md以外のマークダウンを除外
+/*.md
+!/README.md
