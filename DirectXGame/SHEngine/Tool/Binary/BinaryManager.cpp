@@ -47,8 +47,10 @@ bool BinaryManager::Boot(const std::string& fileName) {
 		return false;
 	}
 
-	inputBuffer_.erase(0, sizeof(fileVersion)); // バージョンを読み取った後、バッファから削除 
+	inputBuffer_.erase(0, sizeof(fileVersion)); // バージョンを読み取った後、バッファから削除
 	readIndex_ = 0; // 読み取りインデックスをリセット
+	prevReadIndex_ = 0;
+	failed_ = false;
 
 	return true;
 }
@@ -56,4 +58,6 @@ bool BinaryManager::Boot(const std::string& fileName) {
 void BinaryManager::BootRawData(const std::string& rawData) {
 	inputBuffer_ = rawData;
 	readIndex_ = 0; // 読み取りインデックスをリセット
+	prevReadIndex_ = 0;
+	failed_ = false;
 }
