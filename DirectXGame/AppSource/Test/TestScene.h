@@ -3,10 +3,12 @@
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
 
-#include <Camera/Editor/CameraEditor.h>
 #include <Tool/DecoEditor/DecoEditor.h>
 
 #include <Tool/ModelDrawer/ModelDrawer.h>
+
+#include <Tool/CurveEditor/CurvePlayer.h>
+#include <Tool/CurveEditor/CurveEditor.h>
 
 class TestScene : public IScene {
 public:
@@ -29,16 +31,14 @@ private:
 	Camera orthoCamera_;
 	std::unique_ptr<Grid> grid_;
 
-	CameraEditor cameraEditor_;
-	std::unique_ptr<DecoEditor> decoEditor_;
-
-	CameraCurveData cameraCurveData_;
-	DecoObjData decoObjData_;
-	std::unordered_map<std::string, std::map<int, std::pair<Vector4, uint32_t>>> decoObjDataBuffer_;
-
-	std::unique_ptr<SHEngine::Screen::Display> gameDisplay_;
 
 	ModelDrawer cameraRenderer_{};
+
+	CurveEditor curveEditor_{ "TestCurve" };
+	std::vector<CurveBinder> curveBinders_;
+
+	Vector3 testParam_;
+	float testParam2_ = 0.0f;
 
 private:
 

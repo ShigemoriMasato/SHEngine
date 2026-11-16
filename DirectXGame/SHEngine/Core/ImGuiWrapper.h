@@ -19,6 +19,11 @@ namespace SHEngine {
 
 		void Render(ID3D12GraphicsCommandList* cmdList);
 
+		/// @brief メインウィンドウの外に出した ImGui ウィンドウを更新・描画する。
+		/// NewFrame の先頭で自動的に呼ばれる(呼ばれていなければ)。
+		/// メインのコマンドリストを実行した後に呼ぶこと。1フレームに何度呼んでもよい
+		void RenderPlatformWindows();
+
 		void EndFrame();
 
 		void Finalize();
@@ -34,6 +39,11 @@ namespace SHEngine {
 
 		DXDevice* device_;
 		std::vector<SRVHandle> srvHandles_;
+
+		/// @brief このフレームで Render したか(外のウィンドウを描画するかの判定)
+		bool isRendered_ = false;
+		/// @brief NewFrame 済みで、まだ外のウィンドウを更新していないか
+		bool isFrameStarted_ = false;
 
 		constexpr static int bufferNum_ = 3;
 	};

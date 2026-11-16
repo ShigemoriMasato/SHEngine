@@ -49,37 +49,6 @@ void Camera::SetProjectionMatrix(OrthographicDesc desc) {
 	projectionMatrix_ = MakeOrthographicMatrix(desc.left, desc.top, desc.right, desc.bottom, desc.nearClip, desc.farClip);
 }
 
-bool Camera::UpdateCurve(float deltaTime, bool repeat) {
-	if (curveData_.totalTime <= 0.0f) {
-		return false;
-	}
-
-	bool ans = false;
-	
-	timer_ += deltaTime;
-	if (timer_ > curveData_.totalTime) {
-		if (repeat) {
-			timer_ -= curveData_.totalTime;
-		} else {
-			timer_ = curveData_.totalTime;
-		}
-
-		ans = true;
-	}
-	
-	position_.x = curveData_.posXCurve.Evaluate(timer_);
-	position_.y = curveData_.posYCurve.Evaluate(timer_);
-	position_.z = curveData_.posZCurve.Evaluate(timer_);
-
-	rotation_.x = curveData_.rotXCurve.Evaluate(timer_);
-	rotation_.y = curveData_.rotYCurve.Evaluate(timer_);
-	rotation_.z = curveData_.rotZCurve.Evaluate(timer_);
-
-	MakeMatrix();
-
-	return ans;
-}
-
 void Camera::MakeMatrix() {
 	if (!isSetMatrix) {
 		transformMatrix_ = MakeTranslationMatrix(-position_) * MakeRotationMatrix(rotation_) * MakeScaleMatrix(scale_);
@@ -121,8 +90,4 @@ Vector3 Camera::GetDirection() const {
 	Vector3 direction = { 0.0f, 0.0f, 1.0f };
 	direction = MakeRotationMatrix(rotation_) * direction;
 	return direction.Normalize();
-}
-
-void Camera::Inport(const CameraCurveData& data) {
-	curveData_ = data;
 }

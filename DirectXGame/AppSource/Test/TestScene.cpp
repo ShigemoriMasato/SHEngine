@@ -17,35 +17,17 @@ void TestScene::Initialize() {
 	grid_ = std::make_unique<Grid>();
 	grid_->Initialize();
 
-	gameDisplay_ = std::make_unique<SHEngine::Screen::Display>();
-	gameDisplay_->Initialize(1280, 720, "GameDisplay");
-	gameDisplay_->AddRenderTarget(textureManager_, 0xff);
-	gameDisplay_->CreateDepthTexture(textureManager_);
-
 	// ===================== 超えられない壁 =================================
-
-	cameraEditor_.Initialize(gameCamera_.get());
-	decoEditor_ = std::make_unique<DecoEditor>(engine_, commonData_->display.get());
-
-	Load();
-
-	{
-		BinaryManager bin;
-		uint32_t fileNum = 0;
-		if (bin.Boot("TestScene_Config.bin")) {
-			bin.Reverse(fileNum);
-			fileList_.resize(fileNum);
-			for (uint32_t i = 0; i < fileNum; ++i) {
-				bin.Reverse(fileList_[i]);
-			}
-		}
-	}
-
-	cameraEditor_.SetData(cameraCurveData_);
-	decoEditor_->SetData(decoObjData_);
 
 	auto model = modelManager_->GetModelData(SHEngine::TestModel::Camera);
 	cameraRenderer_.Initialize(model);
+
+	curveBinders_.resize(2);
+	curveBinders_[0].BindVector3("Test1", &testParam_);
+	curveBinders_[1].BindFloat("Test2", &testParam2_);
+
+	curveEditor_.SetBinder(&curveBinders_[0]);
+	curveEditor_.SetBinder(&curveBinders_[1]);
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
@@ -62,34 +44,14 @@ std::unique_ptr<IScene> TestScene::Update() {
 	commonData_->display->DrawImGui();
 	ImGuizmo::OriginalSetRect(commonData_->display.get());
 
-	cameraEditor_.Update(input_, debugCamera_.get(), deltaTime);
-
-	decoEditor_->Update(debugCamera_.get(), directContext_);
-
-	cameraCurveData_ = cameraEditor_.GetData();
-	decoObjData_ = decoEditor_->GetData();
-
 	cameraRenderer_.SetTransform({ gameCamera_->GetViewMatrix().Inverse() });
 	cameraRenderer_.Update(debugCamera_.get(), deltaTime);
 
-#ifdef USE_IMGUI
+	// ===================== 超えられない壁 =================================
 
-	std::string currentFilePath;
-	uint32_t currentID;
-	decoEditor_->GetCurrentObj(currentFilePath, currentID);
+	curveEditor_.Update(deltaTime);
 
-	if (currentID == 0) {
-		return nullptr;
-	}
-
-	auto& conf = decoObjDataBuffer_[currentFilePath][currentID];
-
-	ImGui::Begin("EmitterConfig");
-	ImGui::ColorEdit4("Color", &conf.first.x);
-	ImGui::DragInt("EmitNum", (int*)&conf.second, 1000, 0, 1000000);
-	ImGui::End();
-
-#endif
+	curveEditor_.DrawWindow();
 
 	return nullptr;
 }
@@ -108,22 +70,10 @@ void TestScene::Draw() {
 
 	cameraRenderer_.Draw(directContext_);
 
-	decoEditor_->Draw(directContext_);
-
 	// ↑↑↑ オブジェクト描画 ==============================================
 
 	display->ToTexture(directContext_);
 
-	directContext_->SetRenderTarget(gameDisplay_.get());
-	grid_->SetCamera(gameCamera_.get());
-	grid_->Draw(directContext_);
-
-	decoEditor_->SetDrawCamera(gameCamera_.get());
-	decoEditor_->NormalDraw(directContext_);
-
-	gameDisplay_->ToTexture(directContext_);
-
-	gameDisplay_->DrawImGui();
 	SelectFile();
 
 	directContext_->SetRenderTarget(window);
@@ -136,8 +86,6 @@ void TestScene::Save() {
 	const std::string fileName = basePath_ + currentFileName_ + extension_;
 
 	// ↓↓↓ 保存するデータ ==============================================
-
-	cameraCurveData_.Save(bin);
 
 	// ↑↑↑ 保存するデータ ==============================================
 
@@ -152,10 +100,6 @@ void TestScene::Load() {
 		return;
 	}
 
-	cameraCurveData_.Load(bin);
-
-	cameraEditor_.SetData(cameraCurveData_);
-	decoEditor_->SetData(decoObjData_);
 }
 
 void TestScene::SelectFile() {

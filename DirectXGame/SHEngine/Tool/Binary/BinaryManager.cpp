@@ -6,11 +6,12 @@
 namespace fs = std::filesystem;
 
 void BinaryManager::Write(const std::string& fileName) {
-	std::ofstream file(basePath + fileName, std::ios::binary);
+	std::filesystem::path fullPath = basePath + fileName;
+	std::ofstream file(fullPath, std::ios::binary);
 
 	if (!file) {
-		fs::create_directories(basePath); // ディレクトリが存在しない場合は作成
-		file.open(basePath + fileName, std::ios::binary); // 再度ファイルを開く
+		fs::create_directories(fullPath.parent_path()); // ディレクトリが存在しない場合は作成
+		file.open(fullPath, std::ios::binary); // 再度ファイルを開く
 
 		if (!file) {
 			// 作成に失敗している状態。

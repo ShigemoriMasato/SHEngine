@@ -12,10 +12,17 @@ void ImGuiWrapper::Initialize(DXDevice* device, DirectCommandContext* directCont
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(window->GetHwnd());
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = "Assets/ImGui/imgui.ini"; // 設定ファイルのパスを指定
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // ドッキングを有効化
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // ウィンドウをメインウィンドウの外に出せるようにする(バックエンドの初期化より前に設定する)
+
+	// メインウィンドウの外に出したウィンドウは OS のウィンドウになるので、角丸と透過をなくして見た目を揃える
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.WindowRounding = 0.0f;
+	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+
+	ImGui_ImplWin32_Init(window->GetHwnd());
 	std::filesystem::create_directory("Assets/ImGui"); // ini用ディレクトリを作成
 	io.Fonts->AddFontFromFileTTF("Assets/.EngineResource/Fonts/MPLUS1p-Medium.ttf", 17.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
 	
@@ -50,13 +57,24 @@ void ImGuiWrapper::NewFrame() {
 #ifdef USE_IMGUI
 	ImGuiIO& io = ImGui::GetIO();
 
+	// 前フレームの外のウィンドウをここで更新・描画する。
+	// Engine::BeginFrame から呼ばれるので、前フレームのメインのコマンドリストは実行済み
+	if (isFrameStarted_) {
+		RenderPlatformWindows();
+	}
+	isFrameStarted_ = true;
+	isRendered_ = false;
+
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
 
-	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Always);
+	// マルチビューポートでは ImGui の座標がデスクトップ座標になるため、メインウィンドウの位置・サイズに合わせる
+	const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(mainViewport->Pos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(mainViewport->Size, ImGuiCond_Always);
+	ImGui::SetNextWindowViewport(mainViewport->ID);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f); // 角丸をなくす
 
@@ -84,6 +102,29 @@ void ImGuiWrapper::Render(ID3D12GraphicsCommandList* cmdList) {
 
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
+	isRendered_ = true;
+
+#endif
+}
+
+void ImGuiWrapper::RenderPlatformWindows() {
+#ifdef USE_IMGUI
+
+	if (!isFrameStarted_ || !(ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)) {
+		return;
+	}
+
+	// Render されなかったフレームでも EndFrame と UpdatePlatformWindows は毎フレーム必要
+	ImGui::EndFrame();
+	ImGui::UpdatePlatformWindows();
+
+	// 外のウィンドウはバックエンドが専用のコマンドリストで描画し、メインと同じキューで実行する。
+	// ゲーム画面のテクスチャなどを参照するため、メインのコマンドリストを実行した後に呼ぶこと
+	if (isRendered_) {
+		ImGui::RenderPlatformWindowsDefault();
+	}
+	isRendered_ = false;
+	isFrameStarted_ = false;
 
 #endif
 }
@@ -104,7 +145,9 @@ void ImGuiWrapper::Finalize() {
 
 void ImGuizmo::OriginalSetRect(SHEngine::Screen::IDisplay* display) {
 #ifdef USE_IMGUI
-	Vector2 pos = display ? display->GetPos() : Vector2(0.0f, 0.0f);
+	// display->GetPos() は ImGui 上の位置(デスクトップ座標)。display が無い場合はメインウィンドウの左上
+	const ImVec2 mainPos = ImGui::GetMainViewport()->Pos;
+	Vector2 pos = display ? display->GetPos() : Vector2(mainPos.x, mainPos.y);
 	Vector2 size = display ? display->GetSize() : Vector2(1280.0f, 720.0f);
 
 	ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
