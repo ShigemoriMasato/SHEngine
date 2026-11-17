@@ -43,28 +43,29 @@ void ModelManager::Initialize(TextureManager* textureManager) {
 	LoadModel("Assets/.EngineResource/Model/Camera");
 }
 
-const ModelData* ModelManager::LoadModel(std::string filePath) {
+const ModelData* ModelManager::LoadModel(const std::string& filePath) {
+	std::string fileBuffer = filePath;
 	// ファイルパスの確認と修正
-	std::string fileName = FilePathChecker(filePath);
+	const std::string fileName = FilePathChecker(fileBuffer);
 
 	// ファイル名が見つからない場合
 	if (fileName.empty()) {
-		logger_->error("Model file not found in directory: {}", filePath);
+		logger_->error("Model file not found in directory: {}", fileBuffer);
 		return 0; // キューブのIDを返す
 	}
 
 	// すでに読み込んでいたらIDを返す
-	const auto it = modelFilePaths_.find(filePath);
+	const auto it = modelFilePaths_.find(fileBuffer);
 	if (it != modelFilePaths_.end()) {
-		logger_->debug("Model already loaded: {}", filePath);
+		logger_->debug("Model already loaded: {}", fileBuffer);
 		return modelData_[it->second].get();
 	}
 
-	logger_->info("Loading Model: {}/{}", filePath, fileName);
+	logger_->info("Loading Model: {}/{}", fileBuffer, fileName);
 
 	//Assimp
 	Assimp::Importer importer;
-	std::string path = (filePath + "/" + fileName);
+	std::string path = (fileBuffer + "/" + fileName);
 	const aiScene* scene = nullptr;
 	scene = importer.ReadFile(path.c_str(), aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 	if (!scene) {
@@ -83,6 +84,10 @@ const ModelData* ModelManager::LoadModel(std::string filePath) {
 
 const ModelData* SHEngine::ModelManager::GetModelData(TestModel model) {
 	return modelData_[static_cast<int>(model)].get();
+}
+
+const ModelData* SHEngine::ModelManager::GetModelData(const std::string& filePath) {
+	return LoadModel(filePath);
 }
 
 void ModelManager::LoadAllModels() {

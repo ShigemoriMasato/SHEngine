@@ -112,6 +112,7 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::S, DIK_S, KeyState::Trigger);
 	keyManager->SetKey(Key::R, DIK_R, KeyState::Trigger);
 	keyManager->SetKey(Key::T, DIK_T, KeyState::Trigger);
+	keyManager->SetKey(Key::Escape, DIK_ESCAPE, KeyState::Trigger);
 
 	keyManager->SetKey(Key::One, DIK_1, KeyState::Trigger);
 	keyManager->SetKey(Key::Two, DIK_2, KeyState::Trigger);

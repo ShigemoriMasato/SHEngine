@@ -9,7 +9,7 @@ DamageResolver::DamageResolver(PlayerManager* playerManager, EnemyManager* enemy
 DamageResolver::Result DamageResolver::Resolve(const std::vector<CollisionEvent>& events) {
 	Result result;
 
-	// 1. 弾丸 → 敵
+	// 弾丸 → 敵
 	for (const CollisionEvent& event : events) {
 		if (event.type != CollisionEventType::BulletEnemyHit) {
 			continue;
@@ -21,12 +21,12 @@ DamageResolver::Result DamageResolver::Resolve(const std::vector<CollisionEvent>
 			continue;
 		}
 
-		enemy->ApplyDamage(bullet->GetDamage());
+		enemy->HitBullet(bullet->GetDamage());
 		// 消滅する弾丸でも、このフレーム中に既に検出された他の敵への命中は有効
 		bullet->OnHit();
 	}
 
-	// 2. 敵 → プレイヤー(要求の受付可否はPlayerが判断する)
+	// 敵 → プレイヤー(要求の受付可否はPlayerが判断する)
 	for (const CollisionEvent& event : events) {
 		if (event.type != CollisionEventType::PlayerEnemyContact) {
 			continue;
@@ -40,10 +40,10 @@ DamageResolver::Result DamageResolver::Resolve(const std::vector<CollisionEvent>
 		playerManager_->RequestDamage(enemy->GetContactDamage());
 	}
 
-	// 3. 被弾要求を1回だけ適用
+	// 被弾要求を1回だけ適用
 	result.playerDamaged = playerManager_->ApplyPendingDamage();
 
-	// 4. 敵の死亡を確定
+	// 敵の死亡を確定
 	result.defeatedEnemies = enemyManager_->ConfirmDeaths();
 
 	return result;

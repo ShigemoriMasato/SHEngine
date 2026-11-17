@@ -33,6 +33,9 @@ void PlayerManager::Shot(const PlayerInput& input, const Vector2& aimDirection) 
 }
 
 bool PlayerManager::RequestDamage(int32_t amount) {
+	if (config_.isInvincible) {
+		return false;
+	}
 	return player_->RequestDamage(amount);
 }
 
@@ -56,4 +59,8 @@ void PlayerManager::SetConfig(const PlayerConfig& config) {
 
 void PlayerManager::SaveConfig() const {
 	ConfigFile::Save(PlayerConfig::kFileName, config_);
+}
+
+void PlayerManager::DrawImGui() {
+	config_.DrawImGui();
 }

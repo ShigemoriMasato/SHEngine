@@ -1,30 +1,46 @@
 #include "ImGuiWindowManager.h"
 #include <imgui/imgui.h>
 
+void ImGuiWindowManager::PushGroup(const std::string& groupName) {
+	groupStack_.push_back(groupName);
+}
+
+void ImGuiWindowManager::PopGroup() {
+	if (!groupStack_.empty()) {
+		groupStack_.pop_back();
+	}
+}
+
 void ImGuiWindowManager::Add(std::function<void()> drawImGui, const std::string& name, std::string group) {
-	if(group.empty()) {
+	std::string factGroup;
+	for (const auto& g : groupStack_) {
+		factGroup += g + "/";
+	}
+	factGroup += group;
+
+	if(factGroup.empty()) {
 		confTree_.emplace(name, Branch{ Conf{false}, {} });
 		drawImGuiList_[name] = drawImGui;
 		return;
 	}
 
-	if (group[group.size() - 1] != '/') {
-		group += '/';
+	if (factGroup[factGroup.size() - 1] != '/') {
+		factGroup += '/';
 	}
 
-	size_t pos = group.find('/');
+	size_t pos = factGroup.find('/');
 	size_t prevPos = 0;
 	auto branch = &confTree_;
 	while (pos != std::string::npos) {
-		std::string parentName = group.substr(prevPos, pos - prevPos);
+		std::string parentName = factGroup.substr(prevPos, pos - prevPos);
 		branch = &(*branch)[parentName].children;
 		prevPos = pos + 1;
-		pos = group.find('/', pos + 1);
+		pos = factGroup.find('/', pos + 1);
 	}
 
 	branch->emplace(name, Branch{ Conf{false}, {} });
 
-	drawImGuiList_[group + name] = drawImGui;
+	drawImGuiList_[factGroup + name] = drawImGui;
 }
 
 void ImGuiWindowManager::DrawImGui() {
@@ -64,7 +80,7 @@ void ImGuiWindowManager::DrawImGui() {
 		pos = name.find('/');
 		prevPos = 0;
 		auto* branch = &confTree_;
-		if (pos != std::string::npos) {
+		while (pos != std::string::npos) {
 			branch = &(*branch)[name.substr(prevPos, pos - prevPos)].children;
 			prevPos = pos + 1;
 			pos = name.find('/', pos + 1);

@@ -164,6 +164,7 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClCompile Include="AppSource\UI\SideBox.cpp" />
     <ClCompile Include="AppSource\Game\ShootingGame\Field\BattleField.cpp" />
     <ClCompile Include="AppSource\Common\DeltaTime\DeltaTimeManager.cpp" />
+    <ClCompile Include="AppSource\Game\Particle\DeathEffect\DeathEffect.cpp" />
     <ClCompile Include="GameEngine\Particle\Emitter.cpp" />
     <ClCompile Include="GameEngine\Particle\System\ParticleData.cpp" />
     <ClCompile Include="GameEngine\SandSimulator\Data\SandData.cpp" />
@@ -297,6 +298,7 @@ copy /Y "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir
     <ClInclude Include="AppSource\UI\SideBox.h" />
     <ClInclude Include="AppSource\Game\ShootingGame\Field\BattleField.h" />
     <ClInclude Include="AppSource\Common\DeltaTime\DeltaTimeManager.h" />
+    <ClInclude Include="AppSource\Game\Particle\DeathEffect\DeathEffect.h" />
     <ClInclude Include="GameEngine\Particle\Emitter.h" />
     <ClInclude Include="GameEngine\Particle\System\ParticleData.h" />
     <ClInclude Include="GameEngine\SandSimulator\Data\SandData.h" />

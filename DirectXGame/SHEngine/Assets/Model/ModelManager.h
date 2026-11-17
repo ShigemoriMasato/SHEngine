@@ -50,9 +50,10 @@ namespace SHEngine {
 		 * @param filePath モデルファイルのパス
 		 * @return モデルID
 		 */
-		const ModelData* LoadModel(std::string filePath);
+		const ModelData* LoadModel(const std::string& filePath);
 
 		const ModelData* GetModelData(TestModel model);
+		const ModelData* GetModelData(const std::string& filePath);
 
 		/**
 		 * @brief Assets/Models/以下にあるすべてのモデルファイルを読み込む

@@ -10,7 +10,6 @@ struct CommonData {
 	std::unique_ptr<SHEngine::Screen::Display> subDisplay = nullptr;	// サブディスプレイ
 
 	std::unique_ptr<KeyManager> keyManager = nullptr;	// キーマネージャーの共通データ
-	int postEffectDrawDataIndex = -1;
 
-	std::string stageName_ = "Stage1";	// 現在のステージ名
+	bool shutDown_ = false;	// システム終了フラグ
 };

@@ -3,6 +3,7 @@
 #include <Game/ShootingGame/Common/GameMath.h>
 #include <algorithm>
 #include <cmath>
+#include <imgui/imgui.h>
 
 void CameraConfig::Save(BinaryManager& manager) const {
 	manager.Register(kVersion);
@@ -27,6 +28,14 @@ bool CameraConfig::Load(BinaryManager& manager) {
 	return true;
 }
 
+void CameraConfig::DrawImGui() {
+#ifdef USE_IMGUI
+	ImGui::DragFloat("Distance", &distance, 0.1f);
+	ImGui::DragFloat("Pitch", &pitch, 0.01f);
+	ImGui::DragFloat("Follow Sharpness", &followSharpness, 0.1f);
+#endif
+}
+
 void CameraConfig::Validate() {
 	const CameraConfig defaults{};
 	distance = ConfigFile::Sanitize(distance, 1.0f, 500.0f, defaults.distance);
@@ -35,6 +44,15 @@ void CameraConfig::Validate() {
 	fovY = ConfigFile::Sanitize(fovY, 0.1f, 2.5f, defaults.fovY);
 	nearClip = ConfigFile::Sanitize(nearClip, 0.01f, 10.0f, defaults.nearClip);
 	farClip = ConfigFile::Sanitize(farClip, 10.0f, 100000.0f, defaults.farClip);
+}
+
+GameCameraController::GameCameraController() {
+	binder_.BindVector3("Position", &offsetPosition_);
+	binder_.BindVector3("Rotation", &offsetRotation_);
+
+	editor_.SetBinder(&binder_);
+
+	player_.SetBinder(&binder_);
 }
 
 void GameCameraController::Initialize(const Vector2& screenSize, const Vector3& target) {
@@ -53,7 +71,27 @@ void GameCameraController::Update(float deltaTime, const Vector3& target) {
 	// フレームレートに依存しない指数補間
 	const float t = 1.0f - std::exp(-config_.followSharpness * deltaTime);
 	focus_ = focus_ + (target - focus_) * t;
+
 	ApplyMatrix();
+}
+
+void GameCameraController::UpdateCurve(float deltaTime) {
+	editor_.Update(deltaTime);
+	player_.Update(deltaTime);
+}
+
+void GameCameraController::DrawImGui() {
+	editor_.DrawImGui();
+}
+
+void GameCameraController::ConfigImGui() {
+	config_.DrawImGui();
+}
+
+void GameCameraController::Boot(const std::string& itemName) {
+	if (player_.Load(kCurveGroupName, itemName)) {
+		player_.Play();
+	}
 }
 
 void GameCameraController::SaveConfig() const {
@@ -83,7 +121,8 @@ void GameCameraController::ApplyMatrix() {
 		-GameMath::Dot(right, eye),		-GameMath::Dot(up, eye),	-GameMath::Dot(forward, eye),	1.0f
 	};
 
-	camera_.SetPosition(eye);
-	camera_.SetTransform(view);
+	const Matrix4x4 offsetMatrix = Matrix::MakeRotationMatrix(offsetRotation_) * Matrix::MakeTranslationMatrix(offsetPosition_);
+
+	camera_.SetTransform(view * offsetMatrix);
 	camera_.MakeMatrix();
 }

@@ -50,6 +50,20 @@ void ShootingGame::Initialize(const Vector2& screenSize) {
 	bulletRenderer_.Initialize(modelManager);
 	fieldRenderer_.Initialize(sphere);
 	fieldRenderer_.Update(fieldConfig_);
+
+	// ImGuiManagerに描画関数を登録する
+	imguiManager_->PushGroup("Camera");
+	imguiManager_->Add([&]() {
+		cameraController_.ConfigImGui();
+		}, "Config");
+	imguiManager_->Add([&]() {
+		cameraController_.DrawImGui();
+		}, "Curve");
+	imguiManager_->PopGroup();
+
+	imguiManager_->Add([&]() {
+		playerManager_->DrawImGui();
+		}, "Player");
 }
 
 void ShootingGame::Update(float deltaTime) {
@@ -74,6 +88,14 @@ void ShootingGame::UpdateGame(float deltaTime) {
 	//Playerの入力・移動
 	playerManager_->Update(deltaTime, playerInput);
 
+	if (playerManager_->IsSpecialActivated()) {
+		cameraController_.Boot("Special");
+		// todo: 敵を瞬殺するオブジェクトの生成
+	}
+
+	// カメラアニメーション
+	const float systemDeltaTime = engine_->GetDeltaTime();
+	cameraController_.UpdateCurve(systemDeltaTime);
 	//カメラ追従
 	cameraController_.Update(deltaTime, playerManager_->GetWorldPosition());
 

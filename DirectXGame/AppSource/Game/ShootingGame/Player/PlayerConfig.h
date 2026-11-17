@@ -19,6 +19,8 @@ struct PlayerConfig {
 	float invincibleTime = 1.0f;	// 被弾後の全体無敵時間(秒, 0～60)。次の被弾から
 	int32_t specialGaugeMax = 10;	// 必殺技ゲージの上限(撃破数, 1～10000)。即時反映
 
+	bool isInvincible = false;	// 無敵状態(デバッグ用)。即時反映
+
 	void Save(BinaryManager& manager) const;
 	bool Load(BinaryManager& manager);
 	void DrawImGui();

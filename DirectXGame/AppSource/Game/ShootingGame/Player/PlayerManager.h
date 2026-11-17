@@ -49,6 +49,8 @@ public:
 	void SetConfig(const PlayerConfig& config);
 	void SaveConfig() const;
 
+	void DrawImGui();
+
 	static constexpr uint32_t kPlayerBodyID = 0;
 
 private:
