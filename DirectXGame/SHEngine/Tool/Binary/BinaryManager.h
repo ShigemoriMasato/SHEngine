@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <string>
 #include <cstring>
 #include <cstdint>
@@ -22,6 +23,8 @@ public:
 	bool Reverse(T& data);
 	template<typename T>
 	bool Reverse(T*& data);
+	template<typename T>
+	bool Reverse(std::vector<T>& data);
 	void Back() { readIndex_ = prevReadIndex_; }
 
 	bool IsEmpty() const { return inputBuffer_.empty(); }
@@ -37,6 +40,19 @@ private:
 	bool ReadHeader(TypeID expected, uint32_t& outSize);
 	template<typename T>
 	void RegisterValue(const T& data);
+
+	// std::vector用コード
+	template<typename T>
+	void RegisterValue(const std::vector<T>& data);
+	template<typename T>
+	bool RegisterVectorValue(std::string& buffer, const T* data, uint32_t size);
+	template<typename T>
+	bool RegisterVectorValue(std::string& buffer, const std::vector<T>* data, uint32_t size);
+
+	template<typename T>
+	bool ReadVector(std::vector<T>& data, uint32_t size, uint32_t& readBuffer);
+	template<typename T>
+	bool ReadVector(std::vector<std::vector<T>>& data, uint32_t size, uint32_t& readBuffer);
 
 	std::string inputBuffer_;
 	std::string outputBuffer_;
@@ -143,6 +159,31 @@ bool BinaryManager::Reverse(T*& data) {
 	return Reverse(*data);
 }
 
+template<typename T>
+inline bool BinaryManager::Reverse(std::vector<T>& data) {
+	TypeID id = *reinterpret_cast<TypeID*>(inputBuffer_.data() + readIndex_);
+
+	if (id != TypeID::Vector) {
+		failed_ = true;
+		return false;
+	}
+
+	readIndex_ += sizeof(TypeID);
+	uint32_t allDataSize = *reinterpret_cast<uint32_t*>(inputBuffer_.data() + readIndex_);
+	readIndex_ += sizeof(uint32_t);
+	uint32_t elementSize = *reinterpret_cast<uint32_t*>(inputBuffer_.data() + readIndex_);
+	readIndex_ += sizeof(uint32_t);
+
+	uint32_t tmpReadIndex = readIndex_;
+	if (!ReadVector(data, elementSize, tmpReadIndex)) {
+		failed_ = true;
+		return false;
+	}
+
+	readIndex_ = tmpReadIndex;
+	return true;
+}
+
 template<>
 inline void BinaryManager::RegisterValue<std::string>(const std::string& data) {
 	constexpr TypeID id = TypeIDResolver<std::string>::id;
@@ -164,5 +205,105 @@ inline bool BinaryManager::Reverse<std::string>(std::string& data) {
 
 	data.assign(inputBuffer_.data() + readIndex_ + headerSize, size);
 	readIndex_ += headerSize + size;
+	return true;
+}
+
+template<typename T>
+inline void BinaryManager::RegisterValue(const std::vector<T>& data) {
+	constexpr TypeID id = TypeIDResolver<std::vector<T>>::id;
+	const uint32_t size = uint32_t(data.size());
+
+	std::string tmp;
+
+	if (!RegisterVectorValue(tmp, data.data(), size)) {
+		return;
+	}
+
+	const uint32_t allSize = tmp.size();
+
+	outputBuffer_.append(reinterpret_cast<const char*>(&id), sizeof(id));				//std::vectorである印
+	outputBuffer_.append(reinterpret_cast<const char*>(&allSize), sizeof(allSize));		//読み飛ばし用
+	outputBuffer_.append(reinterpret_cast<const char*>(&size), sizeof(size));			//vectorの要素数
+	outputBuffer_.append(tmp);
+}
+
+template<typename T>
+inline bool BinaryManager::RegisterVectorValue(std::string& buffer, const T* data, uint32_t size) {
+	static_assert(TypeIDResolver<T>::id != TypeID::kUnknown,
+		"BinaryManager::RegisterVectorValue: 未対応の型です。Value.h に TypeIDResolver を追加してください");
+	static_assert(std::is_trivially_copyable_v<T>,
+		"BinaryManager::RegisterVectorValue: memcpy できない型は登録できません");
+
+	constexpr TypeID currentID = TypeIDResolver<T>::id;
+	uint32_t typeSize = uint32_t(sizeof(T));
+	buffer.append(reinterpret_cast<const char*>(&currentID), sizeof(TypeID));
+	buffer.append(reinterpret_cast<const char*>(&typeSize), sizeof(typeSize));
+	buffer.append(reinterpret_cast<const char*>(data), size_t(typeSize) * size);
+
+	return true;
+}
+
+template<typename T>
+inline bool BinaryManager::RegisterVectorValue(std::string& buffer, const std::vector<T>* data, uint32_t size) {
+	constexpr TypeID currentID = TypeIDResolver<std::vector<T>>::id;
+	buffer.append(reinterpret_cast<const char*>(&currentID), sizeof(TypeID));
+
+	for (uint32_t i = 0; i < size; ++i) {
+		const uint32_t dataSize = uint32_t(data[i].size());
+		buffer.append(reinterpret_cast<const char*>(&dataSize), sizeof(dataSize));
+
+		if (!RegisterVectorValue(buffer, data[i].data(), dataSize)) {
+			failed_ = true;
+			return false;
+		}
+	}
+
+	return true;
+}
+
+template<typename T>
+inline bool BinaryManager::ReadVector(std::vector<T>& data, uint32_t size, uint32_t& readBuffer) {
+	constexpr TypeID currentID = TypeIDResolver<T>::id;
+	TypeID id = *reinterpret_cast<const TypeID*>(inputBuffer_.data() + readBuffer);
+	readBuffer += sizeof(TypeID);
+
+	if (id != currentID) {
+		failed_ = true;
+		return false;
+	}
+
+	uint32_t typeSize = *reinterpret_cast<uint32_t*>(inputBuffer_.data() + readBuffer);
+	readBuffer += sizeof(uint32_t);
+
+	if (typeSize != sizeof(T)) {
+		failed_ = true;
+		return false;
+	}
+
+	data.resize(size);
+	std::memcpy(data.data(), inputBuffer_.data() + readBuffer, sizeof(T) * size);
+	readBuffer += size_t(typeSize) * size;
+	return true;
+}
+
+template<typename T>
+inline bool BinaryManager::ReadVector(std::vector<std::vector<T>>& data, uint32_t size, uint32_t& readBuffer) {
+	constexpr TypeID currentID = TypeIDResolver<std::vector<T>>::id;
+	TypeID id = *reinterpret_cast<const TypeID*>(inputBuffer_.data() + readBuffer);
+	readBuffer += sizeof(TypeID);
+
+	if (currentID != id) {
+		failed_ = true;
+		return false;
+	}
+
+	data.resize(size);
+	for (auto& d : data) {
+		uint32_t elementSize = *reinterpret_cast<uint32_t*>(inputBuffer_.data() + readBuffer);
+		readBuffer += sizeof(uint32_t);
+
+		ReadVector(d, elementSize, readBuffer);
+	}
+
 	return true;
 }

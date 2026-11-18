@@ -40,8 +40,8 @@ public:
 	/// @brief 描画スナップショット(高さはフィールドの床高さを加えて求める)
 	virtual EnemyDrawState GetDrawState(float floorHeight) const;
 
-	/// @brief HPを減らす。死亡の確定は ConfirmDeath で衝突解決の最後に行う
-	void ApplyDamage(float damage);
+	/// @brief 弾丸に命中したときの処理。HPを減らすなどの共通処理はここで行う。
+	virtual void HitBullet(float damage);
 	/// @brief HPが0以下なら死亡を確定する。確定したフレームだけtrue(撃破イベントを一度だけ出すため)
 	bool ConfirmDeath();
 

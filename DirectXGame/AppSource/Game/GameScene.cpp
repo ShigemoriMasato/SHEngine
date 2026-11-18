@@ -13,12 +13,15 @@ void GameScene::Initialize() {
 	const Vector2 screenSize = { static_cast<float>(size.first), static_cast<float>(size.second) };
 
 	shootingGame_ = std::make_unique<ShootingGame>(engine_, commonData_->keyManager.get(), &particleSystem_, &imguiManager_);
+	imguiManager_.PushGroup("Game");
 	shootingGame_->Initialize(screenSize);
+	imguiManager_.PopGroup();
 
 	// パーティクルの描画にもゲームカメラを使う
 	particleSystem_.SetCamera(shootingGame_->GetCamera());
 
-	postEffectContext_.Initialize(1280, 720);
+	auto displaySize = commonData_->display->GetTextureData()->GetSize();
+	postEffectContext_.Initialize(displaySize.first, displaySize.second);
 	bloomEffect_.Initialize(*engine_);
 	bloomEffect_.SetMaskTexture(commonData_->display->GetTextureAllData()[1]->GetHandle());
 	imguiManager_.Add([&]() {
@@ -59,6 +62,12 @@ std::unique_ptr<IScene> GameScene::Update() {
 	if (key[Key::Two]) {
 		battleField_->Initialize();
 	}
+
+#ifdef SH_DEBUG
+	if (key[Key::Escape]) {
+		commonData_->shutDown_ = true;
+	}
+#endif
 
 	return std::unique_ptr<IScene>();
 }

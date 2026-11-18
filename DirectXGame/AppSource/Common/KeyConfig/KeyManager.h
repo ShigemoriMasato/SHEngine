@@ -48,6 +48,7 @@ enum class Key {
 	S,
 	R,
 	T,
+	Escape,
 
 	One,
 	Two,

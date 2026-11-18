@@ -23,7 +23,7 @@ EnemyDrawState Enemy::GetDrawState(float floorHeight) const {
 	return state;
 }
 
-void Enemy::ApplyDamage(float damage) {
+void Enemy::HitBullet(float damage) {
 	if (isDead_ || damage <= 0.0f) {
 		return;
 	}

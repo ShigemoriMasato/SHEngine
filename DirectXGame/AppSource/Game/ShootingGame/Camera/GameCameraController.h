@@ -3,6 +3,8 @@
 #include <Utility/Vector.h>
 #include <cstdint>
 #include <string>
+#include <Tool/CurveEditor/CurveEditor.h>
+#include <Tool/CurveEditor/CurvePlayer.h>
 
 class BinaryManager;
 
@@ -20,6 +22,7 @@ struct CameraConfig {
 
 	void Save(BinaryManager& manager) const;
 	bool Load(BinaryManager& manager);
+	void DrawImGui();
 	void Validate();
 };
 
@@ -28,12 +31,22 @@ struct CameraConfig {
 class GameCameraController {
 public:
 
+	GameCameraController();
+
 	/// @param screenSize 描画先の解像度(アスペクト比に使う)
 	/// @param target 初期の注視点(ワールド)。最初は補間せず即座に合わせる
 	void Initialize(const Vector2& screenSize, const Vector3& target);
 
-	/// @brief (3) 注視点を補間して追従し、行列を更新する
+	/// @brief 注視点を補間して追従し、行列を更新する
 	void Update(float deltaTime, const Vector3& target);
+	/// @brief CurveEditorとCurvePlayerの更新。deltatimeはゲームの物ではなく、エンジンから取得した物を使用する。
+	void UpdateCurve(float deltaTime);
+
+	void DrawImGui();
+	void ConfigImGui();
+
+	// Editorで設定したアイテムを再生する。
+	void Boot(const std::string& itemName);
 
 	const Camera* GetCamera() const { return &camera_; }
 	Matrix4x4 GetViewMatrix() const { return camera_.GetViewMatrix(); }
@@ -53,4 +66,15 @@ private:
 	CameraConfig config_{};
 	Camera camera_;
 	Vector3 focus_ = {};	// 現在の注視点(補間後)
+
+	Matrix4x4 offsetMatrix_ = {};	// 注視点の回転・オフセットを反映したカメラ行列
+
+	Vector3 offsetRotation_ = {};	// 注視点の回転(ワールド)
+	Vector3 offsetPosition_ = {};	// カメラの注視点からのオフセット位置(ワールド)
+
+	CurveBinder binder_;
+
+	static inline const std::string kCurveGroupName = "GameCamera";
+	CurvePlayer player_;
+	CurveEditor editor_{ kCurveGroupName };
 };

@@ -18,8 +18,10 @@ enum class TypeID : uint8_t {
 	uint32_t,
 	uint64_t,
 	Char,
+	Vector,
 
 	//VectorとかMatrixとか
+	BaseStructure = 0x10,
 	Vector2,
 	Vector3,
 	Vector4,
@@ -59,6 +61,8 @@ template<> struct TypeIDResolver<uint16_t> { static constexpr TypeID id = TypeID
 template<> struct TypeIDResolver<uint32_t> { static constexpr TypeID id = TypeID::uint32_t; };
 template<> struct TypeIDResolver<uint64_t> { static constexpr TypeID id = TypeID::uint64_t; };
 template<> struct TypeIDResolver<char> { static constexpr TypeID id = TypeID::Char; };
+template<typename T> struct TypeIDResolver<std::vector<T>> { static constexpr TypeID id = TypeID::Vector; };
+
 template<> struct TypeIDResolver<Vector2> { static constexpr TypeID id = TypeID::Vector2; };
 template<> struct TypeIDResolver<Vector3> { static constexpr TypeID id = TypeID::Vector3; };
 template<> struct TypeIDResolver<Vector4> { static constexpr TypeID id = TypeID::Vector4; };
@@ -66,5 +70,6 @@ template<> struct TypeIDResolver<Matrix2x2> { static constexpr TypeID id = TypeI
 template<> struct TypeIDResolver<Matrix3x3> { static constexpr TypeID id = TypeID::Matrix3x3; };
 template<> struct TypeIDResolver<Matrix4x4> { static constexpr TypeID id = TypeID::Matrix4x4; };
 template<> struct TypeIDResolver<Quaternion> { static constexpr TypeID id = TypeID::Quaternion; };
+
 template<> struct TypeIDResolver<Transform> { static constexpr TypeID id = TypeID::Transform; };
 template<> struct TypeIDResolver<QuaternionTransform> { static constexpr TypeID id = TypeID::QTransform; };

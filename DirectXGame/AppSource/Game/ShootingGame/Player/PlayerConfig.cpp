@@ -39,6 +39,7 @@ void PlayerConfig::DrawImGui() {
 	ImGui::DragInt("Max HP", &maxHp, 1);
 	ImGui::DragFloat("Invincible Time", &invincibleTime, 0.1f);
 	ImGui::DragInt("Special Gauge Max", &specialGaugeMax, 1);
+	ImGui::Checkbox("Is Invincible", &isInvincible);
 
 #endif
 }
