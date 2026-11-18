@@ -33,6 +33,7 @@ void CameraConfig::DrawImGui() {
 	ImGui::DragFloat("Distance", &distance, 0.1f);
 	ImGui::DragFloat("Pitch", &pitch, 0.01f);
 	ImGui::DragFloat("Follow Sharpness", &followSharpness, 0.1f);
+	ImGui::DragFloat("Shake Attenuation", &shakeAttenuation, 0.1f);
 #endif
 }
 
@@ -72,7 +73,9 @@ void GameCameraController::Update(float deltaTime, const Vector3& target) {
 	const float t = 1.0f - std::exp(-config_.followSharpness * deltaTime);
 	focus_ = focus_ + (target - focus_) * t;
 
-	shakeOffset_ = { std::sin(leftShake_) * 0.5f, 0.0f, 0.0f };
+	shakeOffset_ = { shakeDist_(randomEngine_) * leftShake_, shakeDist_(randomEngine_) * leftShake_, shakeDist_(randomEngine_) * leftShake_ };
+
+	leftShake_ -= deltaTime * config_.shakeAttenuation;
 
 	ApplyMatrix();
 }
@@ -83,7 +86,14 @@ void GameCameraController::UpdateCurve(float deltaTime) {
 }
 
 void GameCameraController::DrawImGui() {
+#ifdef USE_IMGUI
 	editor_.DrawImGui();
+
+	if(ImGui::Button("Shake"))
+	{
+		Shake(1.0f);
+	}
+#endif
 }
 
 void GameCameraController::ConfigImGui() {

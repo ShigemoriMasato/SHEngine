@@ -3,6 +3,7 @@
 #include <Utility/Vector.h>
 #include <cstdint>
 #include <string>
+#include <random>
 #include <Tool/CurveEditor/CurveEditor.h>
 #include <Tool/CurveEditor/CurvePlayer.h>
 
@@ -19,6 +20,7 @@ struct CameraConfig {
 	float fovY = 0.8f;				// 縦視野角(ラジアン, 0.1～2.5)
 	float nearClip = 0.1f;			// ニアクリップ(ワールド単位, 0.01～10)
 	float farClip = 1000.0f;		// ファークリップ(ワールド単位, 10～100000)
+	float shakeAttenuation = 2.0f;	// 揺れの減衰率(0～1)。上がれば上がるほどシェイクが早く収束する
 
 	void Save(BinaryManager& manager) const;
 	bool Load(BinaryManager& manager);
@@ -59,6 +61,9 @@ public:
 private:
 
 	void ApplyMatrix();
+
+	std::mt19937 randomEngine_{ std::random_device{}() };
+	std::uniform_real_distribution<float> shakeDist_{ -1.0f, 1.0f };
 
 	float leftShake_ = 0.0f;	// 左右の揺れ(ラジアン)
 	Vector3 shakeOffset_ = {};
