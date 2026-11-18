@@ -132,6 +132,23 @@ AudioManager::GetInstance()->SetVolume(0.5f); // 全体音量 (0.0〜1.0)
 
 `AudioData::SetVolume()` は個別データの音量、`PlayData::SetVolume()` は個別再生音の音量を調整します。
 
+##### ピッチ(音程)の変更
+
+`Play()` / `CustomPlay()` の第2引数でピッチ倍率を指定できます。ピッチは再生速度の倍率なので、音程と一緒に音の長さも変わります(2.0で1オクターブ上・長さ半分)。範囲は `AudioData::kMinPitch` 〜 `AudioData::kMaxPitch`(4.0 = 2オクターブ上)で、範囲外の値は丸められます。
+
+```cpp
+auto* se = AudioManager::GetInstance()->GetData("SE/pop.mp3");
+se->Play(0, 1.5f); // 1.5倍のピッチで鳴らす
+
+// 半音単位で指定する場合。コンボ数に応じて音程を上げる、など
+se->Play(0, AudioData::SemitonesToPitch(static_cast<float>(combo % 12)));
+
+// 再生中の音のピッチを変える場合はCustomPlayを使う
+auto playing = se->CustomPlay(0, 1.0f);
+playing->SetPitch(0.5f); // 1オクターブ下げる
+float pitch = playing->GetPitch();
+```
+
 ---
 
 ## 4. 描画の方法

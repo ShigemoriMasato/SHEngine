@@ -1,11 +1,13 @@
 #include "PlayData.h"
 #include "AudioData.h"
 #include <cassert>
+#include <algorithm>
 
-PlayData::PlayData(IXAudio2SourceVoice* playSource, AudioData* parentData, bool isCustom) {
+PlayData::PlayData(IXAudio2SourceVoice* playSource, AudioData* parentData, bool isCustom, float pitch) {
 	playSource_ = playSource;
 	parentData_ = parentData;
 	isCustom_ = isCustom;
+	pitch_ = std::clamp(pitch, AudioData::kMinPitch, AudioData::kMaxPitch);
 }
 
 PlayData::~PlayData() {
@@ -37,6 +39,12 @@ bool PlayData::IsPlaying() const {
 	XAUDIO2_VOICE_STATE state;
 	playSource_->GetState(&state);
 	return state.BuffersQueued > 0;
+}
+
+void PlayData::SetPitch(float pitch) {
+	pitch_ = std::clamp(pitch, AudioData::kMinPitch, AudioData::kMaxPitch);
+	HRESULT hr = playSource_->SetFrequencyRatio(pitch_);
+	assert(SUCCEEDED(hr));
 }
 
 void PlayData::SetVolume(float volume) {

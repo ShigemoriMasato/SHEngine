@@ -1,6 +1,7 @@
 #include "AudioData.h"
 #include <cassert>
 #include <algorithm>
+#include <cmath>
 
 AudioData::AudioData(IXAudio2* xAudio) {
 	xAudio_ = xAudio;
@@ -37,9 +38,11 @@ void AudioData::SetOverallVolume(float volume) {
 	overallVolume_ = volume;
 }
 
-void AudioData::Play(int loopCount) {
+IXAudio2SourceVoice* AudioData::StartSourceVoice(int loopCount, float pitch) {
 	IXAudio2SourceVoice* playSource;
-	xAudio_->CreateSourceVoice(&playSource, &wfex_);
+	// MaxFrequencyRatioの既定値は2.0(1オクターブ上まで)なので、kMaxPitchまで上げられるよう指定する
+	HRESULT hr = xAudio_->CreateSourceVoice(&playSource, &wfex_, 0, kMaxPitch);
+	assert(SUCCEEDED(hr));
 
 	XAUDIO2_BUFFER buffer = {};
 	buffer.pAudioData = audioData_.data();
@@ -47,38 +50,37 @@ void AudioData::Play(int loopCount) {
 	buffer.AudioBytes = static_cast<UINT32>(audioData_.size());
 	buffer.LoopCount = std::clamp(loopCount, 0, 255);
 
-	HRESULT hr = playSource->SubmitSourceBuffer(&buffer);
+	hr = playSource->SubmitSourceBuffer(&buffer);
 	assert(SUCCEEDED(hr));
+
+	// 鳴り始めから狙った音程・音量になるよう、Startより前に設定する
+	playSource->SetFrequencyRatio(std::clamp(pitch, kMinPitch, kMaxPitch));
+	playSource->SetVolume(volume_ * overallVolume_);
+
 	hr = playSource->Start();
 	assert(SUCCEEDED(hr));
 
-	playSource->SetVolume(volume_ * overallVolume_);
+	return playSource;
+}
 
-	autoDataList_.push_back(std::make_unique<PlayData>(playSource, this, false));
+void AudioData::Play(int loopCount, float pitch) {
+	IXAudio2SourceVoice* playSource = StartSourceVoice(loopCount, pitch);
+
+	autoDataList_.push_back(std::make_unique<PlayData>(playSource, this, false, pitch));
 	playDataList_.push_back(autoDataList_.back().get());
 }
 
-std::unique_ptr<PlayData> AudioData::CustomPlay(int loopCount) {
-	IXAudio2SourceVoice* playSource;
-	xAudio_->CreateSourceVoice(&playSource, &wfex_);
+std::unique_ptr<PlayData> AudioData::CustomPlay(int loopCount, float pitch) {
+	IXAudio2SourceVoice* playSource = StartSourceVoice(loopCount, pitch);
 
-	XAUDIO2_BUFFER buffer = {};
-	buffer.pAudioData = audioData_.data();
-	buffer.Flags = XAUDIO2_END_OF_STREAM;
-	buffer.AudioBytes = static_cast<UINT32>(audioData_.size());
-	buffer.LoopCount = std::clamp(loopCount, 0, 255);
-
-	HRESULT hr = playSource->SubmitSourceBuffer(&buffer);
-	assert(SUCCEEDED(hr));
-	hr = playSource->Start();
-	assert(SUCCEEDED(hr));
-
-	playSource->SetVolume(volume_ * overallVolume_);
-
-	auto data = std::make_unique<PlayData>(playSource, this, true);
+	auto data = std::make_unique<PlayData>(playSource, this, true, pitch);
 	playDataList_.push_back(data.get());
 
 	return std::move(data);
+}
+
+float AudioData::SemitonesToPitch(float semitones) {
+	return std::pow(2.0f, semitones / 12.0f);
 }
 
 void AudioData::ReleasePlayData(PlayData* data) {
