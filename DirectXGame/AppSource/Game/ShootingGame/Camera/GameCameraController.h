@@ -39,11 +39,16 @@ public:
 	Matrix4x4 GetViewMatrix() const { return camera_.GetViewMatrix(); }
 	Matrix4x4 GetViewProjectionMatrix() const { return camera_.GetVPMatrix(); }
 
+	void Shake(float strength);
+
 	void SaveConfig() const;
 
 private:
 
 	void ApplyMatrix();
+
+	float leftShake_ = 0.0f;	// 左右の揺れ(ラジアン)
+	Vector3 shakeOffset_ = {};
 
 	CameraConfig config_{};
 	Camera camera_;

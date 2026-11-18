@@ -53,7 +53,14 @@ void GameCameraController::Update(float deltaTime, const Vector3& target) {
 	// フレームレートに依存しない指数補間
 	const float t = 1.0f - std::exp(-config_.followSharpness * deltaTime);
 	focus_ = focus_ + (target - focus_) * t;
+
+	shakeOffset_ = { std::sin(leftShake_) * 0.5f, 0.0f, 0.0f };
+
 	ApplyMatrix();
+}
+
+void GameCameraController::Shake(float strength) {
+	leftShake_ += strength;
 }
 
 void GameCameraController::SaveConfig() const {
