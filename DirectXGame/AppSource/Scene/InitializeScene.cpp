@@ -91,12 +91,17 @@ void InitializeScene::Initialize() {
 	keyManager->SetButton(Key::Pause, XBoxController::kStart, KeyState::Trigger);
 
 	//================================================================================
-	// ゲーム操作。射撃はUI決定(Correct)と分け、Space / Xbox A を Hold で割り当てる。
 
 	keyManager->SetKey(Key::Fire, DIK_SPACE, KeyState::Hold);
-	keyManager->SetButton(Key::Fire, XBoxController::kA, KeyState::Hold);
+	keyManager->SetMouse(Key::Fire, 0, KeyState::Hold);
+	keyManager->SetButton(Key::Fire, XBoxController::kRightTrigger, KeyState::Hold);
+	keyManager->SetButton(Key::Fire, XBoxController::kRightShoulder, KeyState::Hold);
 
-	// 左:移動、右:照準。右スティックのデッドゾーンは操作デバイス切り替え判定にも使う
+	keyManager->SetKey(Key::Special, DIK_F, KeyState::Trigger);
+	keyManager->SetMouse(Key::Special, 1, KeyState::Trigger);
+	keyManager->SetButton(Key::Special, XBoxController::kLeftTrigger, KeyState::Trigger);
+	keyManager->SetButton(Key::Special, XBoxController::kLeftShoulder, KeyState::Trigger);
+
 	keyManager->SetStickDeadZone(0.2f, 0.25f);
 
 	//================================================================================
@@ -107,6 +112,7 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::S, DIK_S, KeyState::Trigger);
 	keyManager->SetKey(Key::R, DIK_R, KeyState::Trigger);
 	keyManager->SetKey(Key::T, DIK_T, KeyState::Trigger);
+	keyManager->SetKey(Key::Escape, DIK_ESCAPE, KeyState::Trigger);
 
 	keyManager->SetKey(Key::One, DIK_1, KeyState::Trigger);
 	keyManager->SetKey(Key::Two, DIK_2, KeyState::Trigger);
@@ -131,6 +137,7 @@ void InitializeScene::Initialize() {
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
 	return std::make_unique<GameScene>();
+	return std::make_unique<TestScene>();
 	return nullptr;
 }
 

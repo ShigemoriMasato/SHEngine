@@ -227,6 +227,13 @@ Vector2 SHEngine::Screen::Display::GetCursorPos(Vector2 windowCursor) {
 	ImVec2 windowPos = { imguiPos_.x, imguiPos_.y };
 	ImVec2 windowSize = { imguiWidth_, imguiHeight_ };
 	ImGui::End();
+
+	// マルチビューポートでは imguiPos_ がデスクトップ座標になるため、
+	// windowCursor と同じメインウィンドウのクライアント座標に揃える
+	const ImVec2 mainPos = ImGui::GetMainViewport()->Pos;
+	windowPos.x -= mainPos.x;
+	windowPos.y -= mainPos.y;
+
 	//ウィンドウ基準のカーソル位置をImGui上の位置に変換
 	Vector2 imguiCursor;
 	imguiCursor.x = (windowCursor.x - windowPos.x) / windowSize.x * width_;

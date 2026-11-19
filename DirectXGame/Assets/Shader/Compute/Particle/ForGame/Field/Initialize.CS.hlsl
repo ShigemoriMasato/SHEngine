@@ -61,7 +61,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     uint localIndex = indexList[index];
     
     uvs[localIndex] = uv;
-    positions[localIndex] = (float3(uv.x, 0.0f, 1 - uv.y) + float3(-0.5f, 0.0f, -0.5f)) * float3(textureSize.x * 0.1, 1.0f, textureSize.y * 0.1);
+    positions[localIndex] = (float3(uv.x, 0.0f, 1 - uv.y) + float3(-0.5f, -0.5f, -0.5f)) * float3(textureSize.x * 0.1, 1.0f, textureSize.y * 0.1);
     scales[localIndex] = scale;
     
     // debug

@@ -1,6 +1,5 @@
 #pragma once
 #include <Utility/MatrixFactory.h>
-#include "Editor/Data/CameraEditorData.h"
 #include <Render/Buffer/GPUBuffer.h>
 #include <memory>
 
@@ -77,8 +76,6 @@ public:
 	void SetProjectionMatrix(PerspectiveFovDesc desc);
 	void SetProjectionMatrix(OrthographicDesc desc);
 
-	bool UpdateCurve(float deltaTime, bool repeat = true);
-
 	//TransformとProjectionMatrixをかけて、VPMatrixを作成する
 	virtual void MakeMatrix();
 	virtual void DrawImGui();
@@ -99,8 +96,6 @@ public:
 	virtual Vector3 GetRotation() const { return rotation_; }
 	Vector3 GetDirection() const;
 
-	void Inport(const CameraCurveData& data);
-
 	SHEngine::GPUBuffer* GetVPBuffer() const { return vpBuffer_.get(); }
 
 protected:
@@ -119,9 +114,6 @@ protected:
 
 	/// @brief 投影行列が設定済みかどうか
 	bool isSetMatrix = false;
-
-	CameraCurveData curveData_ = { };
-	float timer_ = 0.0f;
 
 	std::unique_ptr<SHEngine::GPUBuffer> vpBuffer_ = nullptr;
 };

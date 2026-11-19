@@ -45,7 +45,8 @@ void BloomEffect::Load(BinaryManager& bin) {
 }
 
 void BloomEffect::SetBloom(const Bloom& bloom) {
-	bloom_ = bloom;
+	bloom_.sampleCount = bloom.sampleCount;
+	bloom_.strength = bloom.strength;
 }
 
 void BloomEffect::Apply(PostEffectContext* context) {
@@ -53,6 +54,9 @@ void BloomEffect::Apply(PostEffectContext* context) {
 	auto dst = context->GetDestination();
 	auto dcc = context->GetDCC();
 	auto renderer = context->GetRenderer();
+
+	// シェーダーでサンプル数で割るため 0 にしない
+	bloom_.sampleCount = std::max(bloom_.sampleCount, 1u);
 
 	maskIndexBuffer_->CopyBuffer(&bloom_.maskTexture_, sizeof(bloom_.maskTexture_));
 	buffer_->CopyBuffer(&bloom_, sizeof(Bloom));
@@ -95,4 +99,11 @@ void BloomEffect::Apply(PostEffectContext* context) {
 
 	dst->ToTexture(dcc);
 	context->Toggle();
+}
+
+void Bloom::DrawImGui() {
+#ifdef USE_IMGUI
+	ImGui::DragInt("Sample Count", (int*)&sampleCount, 1, 1, 64);
+	ImGui::DragFloat("Strength", &strength, 0.01f, 0.0f, 1.0f);
+#endif
 }

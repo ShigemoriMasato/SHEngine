@@ -39,6 +39,9 @@ void SceneManager::Draw() {
 }
 
 bool SceneManager::IsLoop() const {
+	if (commonData_->shutDown_) {
+		return false;
+	}
 	if (commonData_->window && commonData_->window->IsDestoroy()) {
 		return false;
 	}

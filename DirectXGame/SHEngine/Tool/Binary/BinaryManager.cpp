@@ -6,11 +6,12 @@
 namespace fs = std::filesystem;
 
 void BinaryManager::Write(const std::string& fileName) {
-	std::ofstream file(basePath + fileName, std::ios::binary);
+	std::filesystem::path fullPath = basePath + fileName;
+	std::ofstream file(fullPath, std::ios::binary);
 
 	if (!file) {
-		fs::create_directories(basePath); // ディレクトリが存在しない場合は作成
-		file.open(basePath + fileName, std::ios::binary); // 再度ファイルを開く
+		fs::create_directories(fullPath.parent_path()); // ディレクトリが存在しない場合は作成
+		file.open(fullPath, std::ios::binary); // 再度ファイルを開く
 
 		if (!file) {
 			// 作成に失敗している状態。
@@ -47,8 +48,10 @@ bool BinaryManager::Boot(const std::string& fileName) {
 		return false;
 	}
 
-	inputBuffer_.erase(0, sizeof(fileVersion)); // バージョンを読み取った後、バッファから削除 
+	inputBuffer_.erase(0, sizeof(fileVersion)); // バージョンを読み取った後、バッファから削除
 	readIndex_ = 0; // 読み取りインデックスをリセット
+	prevReadIndex_ = 0;
+	failed_ = false;
 
 	return true;
 }
@@ -56,4 +59,6 @@ bool BinaryManager::Boot(const std::string& fileName) {
 void BinaryManager::BootRawData(const std::string& rawData) {
 	inputBuffer_ = rawData;
 	readIndex_ = 0; // 読み取りインデックスをリセット
+	prevReadIndex_ = 0;
+	failed_ = false;
 }

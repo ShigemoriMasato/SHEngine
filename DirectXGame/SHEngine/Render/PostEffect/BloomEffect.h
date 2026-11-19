@@ -6,11 +6,14 @@
 
 struct Bloom {
 	uint32_t sampleCount = 16; // ブラーの比較ピクセル数
-	uint32_t textureWidth; // Textureの幅
-	uint32_t textureHeight; // Textureの高さ
-	uint32_t maskTexture_;
+	// 以下 3 つは BloomEffect が設定する(SetBloom では上書きされない)
+	uint32_t textureWidth = 0; // Textureの幅
+	uint32_t textureHeight = 0; // Textureの高さ
+	uint32_t maskTexture_ = 0;
 
 	float strength = 0.8f;// 合成強度
+
+	void DrawImGui();
 };
 
 class BloomEffect : public IPostEffect {

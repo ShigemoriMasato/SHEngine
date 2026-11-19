@@ -32,6 +32,7 @@ enum class Key {
 	// ゲーム操作系 -===========
 
 	Fire,//射撃キー(Hold)。UI決定のCorrectとは独立させる
+	Special,
 
 	// Debug -===========
 
@@ -47,6 +48,7 @@ enum class Key {
 	S,
 	R,
 	T,
+	Escape,
 
 	One,
 	Two,
