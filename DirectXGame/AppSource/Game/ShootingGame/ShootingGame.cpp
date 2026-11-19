@@ -67,10 +67,6 @@ void ShootingGame::Initialize(const Vector2& screenSize) {
 }
 
 void ShootingGame::Update(float deltaTime) {
-	if (isGameOver_) {
-		return;
-	}
-
 	UpdateGame(deltaTime);
 }
 

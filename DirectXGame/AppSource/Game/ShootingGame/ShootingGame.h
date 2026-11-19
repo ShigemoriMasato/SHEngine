@@ -38,7 +38,7 @@ public:
 	/// @param screenSize 描画先の解像度
 	void Initialize(const Vector2& screenSize);
 
-	/// @brief ゲーム進行(2)～(11)とフィールドの更新
+	/// @brief ゲーム進行とフィールドの更新
 	void Update(float deltaTime);
 
 	/// @brief フィールドのテクスチャ描画・適用(ParticleSystem::Updateの後に呼ぶ)
