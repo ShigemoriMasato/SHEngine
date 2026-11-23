@@ -6,7 +6,7 @@
 class DeathEffect {
 public:
 
-	DeathEffect(ParticleSystem* particleSystem, SHEngine::ModelManager* modelManager);
+	DeathEffect(ParticleSystem* particleSystem, SHEngine::ModelManager* modelManager, ICC* icc);
 	void Initialize();
 
 	void Update(float deltaTime);
@@ -33,7 +33,8 @@ private:
 	SHEngine::GPUBuffer* initialPositions_ = nullptr;
 
 	// 発生させるパーティクルの数
-	int emitCount_ = 0;
+	const int emitCount_ = 1024;
+	const int maxEmitCount_ = emitCount_ * 128;
 
 	std::unordered_map<std::string, PolygonData> polygonDataMap_;
 	std::unordered_map<std::string, int> emitCountMap_;
