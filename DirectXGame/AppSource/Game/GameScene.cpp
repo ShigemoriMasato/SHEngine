@@ -18,7 +18,7 @@ void GameScene::Initialize() {
 	imguiManager_.PopGroup();
 
 	// パーティクルの描画にもゲームカメラを使う
-	particleSystem_.SetCamera(shootingGame_->GetCamera());
+	shootingGame_->ResetCameras();
 
 	auto displaySize = commonData_->display->GetTextureData()->GetSize();
 	postEffectContext_.Initialize(displaySize.first, displaySize.second);
@@ -51,8 +51,17 @@ std::unique_ptr<IScene> GameScene::Update() {
 	}
 
 	particleSystem_.Update(computeContext_);
+	
+	battleField_->Update(deltaTime);
+	battleField_->Draw(directContext_);
 
-	shootingGame_->ApplyField();
+	auto fieldTextureDrawed = directContext_->MiddleExecute();
+	computeContext_->WaitFenceInGPU(fieldTextureDrawed);
+
+	battleField_->ApplyTexture(computeContext_);
+
+	auto endApply = computeContext_->MiddleExecute();
+	directContext_->WaitFenceInGPU(endApply);
 
 	shootingGame_->UpdateRenderers(deltaTime);
 

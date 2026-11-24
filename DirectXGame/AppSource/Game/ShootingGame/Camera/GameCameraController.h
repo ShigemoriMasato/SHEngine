@@ -1,5 +1,6 @@
 #pragma once
 #include <Camera/Camera.h>
+#include <Camera/DebugCamera.h>
 #include <Utility/Vector.h>
 #include <cstdint>
 #include <string>
@@ -33,7 +34,7 @@ struct CameraConfig {
 class GameCameraController {
 public:
 
-	GameCameraController();
+	GameCameraController(SHEngine::Input* input);
 
 	/// @param screenSize 描画先の解像度(アスペクト比に使う)
 	/// @param target 初期の注視点(ワールド)。最初は補間せず即座に合わせる
@@ -50,7 +51,7 @@ public:
 	// Editorで設定したアイテムを再生する。
 	void Boot(const std::string& itemName);
 
-	const Camera* GetCamera() const { return &camera_; }
+	const Camera* GetCamera() const { return useCamera_; }
 	Matrix4x4 GetViewMatrix() const { return camera_.GetViewMatrix(); }
 	Matrix4x4 GetViewProjectionMatrix() const { return camera_.GetVPMatrix(); }
 
@@ -70,6 +71,9 @@ private:
 
 	CameraConfig config_{};
 	Camera camera_;
+	DebugCamera debugCamera_;
+	const Camera* useCamera_ = nullptr;	// デバッグカメラが有効な場合はそちらを使う
+
 	Vector3 focus_ = {};	// 現在の注視点(補間後)
 
 	Matrix4x4 offsetMatrix_ = {};	// 注視点の回転・オフセットを反映したカメラ行列

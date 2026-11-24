@@ -34,6 +34,9 @@ enum class Key {
 	Fire,//射撃キー(Hold)。UI決定のCorrectとは独立させる
 	Special,
 
+	Ascend,//上昇キー(Hold)
+	Descend,//下降キー(Hold)
+
 	// Debug -===========
 
 	Restart,//リスタートキー

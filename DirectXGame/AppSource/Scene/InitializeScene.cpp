@@ -2,6 +2,7 @@
 #include <imgui/imgui.h>
 #include <Test/TestScene.h>
 #include <Game/GameScene.h>
+#include <Space/SpaceScene.h>
 
 #ifdef USE_IMGUI
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -98,9 +99,14 @@ void InitializeScene::Initialize() {
 	keyManager->SetButton(Key::Fire, XBoxController::kRightShoulder, KeyState::Hold);
 
 	keyManager->SetKey(Key::Special, DIK_F, KeyState::Trigger);
-	keyManager->SetMouse(Key::Special, 1, KeyState::Trigger);
 	keyManager->SetButton(Key::Special, XBoxController::kLeftTrigger, KeyState::Trigger);
 	keyManager->SetButton(Key::Special, XBoxController::kLeftShoulder, KeyState::Trigger);
+
+	keyManager->SetKey(Key::Ascend, DIK_SPACE, KeyState::Hold);
+	keyManager->SetButton(Key::Ascend, XBoxController::kRightTrigger, KeyState::Hold);
+
+	keyManager->SetKey(Key::Descend, DIK_LCONTROL, KeyState::Hold);
+	keyManager->SetButton(Key::Descend, XBoxController::kLeftTrigger, KeyState::Hold);
 
 	keyManager->SetStickDeadZone(0.2f, 0.25f);
 
@@ -136,6 +142,7 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
+	return std::make_unique<SpaceScene>();
 	return std::make_unique<GameScene>();
 	return std::make_unique<TestScene>();
 	return nullptr;

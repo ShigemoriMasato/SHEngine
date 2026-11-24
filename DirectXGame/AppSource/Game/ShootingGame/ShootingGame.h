@@ -41,9 +41,6 @@ public:
 	/// @brief ゲーム進行とフィールドの更新
 	void Update(float deltaTime);
 
-	/// @brief フィールドのテクスチャ描画・適用(ParticleSystem::Updateの後に呼ぶ)
-	void ApplyField();
-
 	/// @brief 描画スナップショットをRendererへ渡す(ゲーム状態はRendererから変更しない)
 	void UpdateRenderers(float deltaTime);
 
@@ -51,7 +48,10 @@ public:
 	void DrawImGui();
 
 	/// @brief ゲームカメラ(ParticleSystemの描画にも使う)
-	const Camera* GetCamera() const { return cameraController_.GetCamera(); }
+	const Camera* GetCamera() const { return cameraController_->GetCamera(); }
+
+	/// @brief カメラを参照する外部システム(ParticleSystem等)のカメラを、全てゲームカメラで再設定する
+	void ResetCameras();
 
 	bool UseSpecial() const;
 
@@ -80,7 +80,7 @@ private:
 	//   FieldConfig > CollisionAdapter > BulletManager > GunManager > PlayerManager / EnemyManager > DamageResolver
 	// (PlayerはGunを、GunはBulletManagerを、各ManagerはCollisionAdapterとFieldConfigを非所有で参照する)
 
-	GameCameraController cameraController_;
+	std::unique_ptr<GameCameraController> cameraController_;
 
 	FieldConfig fieldConfig_{};
 	AimController aimController_;

@@ -5,6 +5,8 @@ VisualStudioVersion = 18.6.11806.211
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXGame", "DirectXGame\DirectXGame.vcxproj", "{303AA779-AFDF-40C9-842A-F121D04240E3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SHEngine", "DirectXGame\SHEngine\SHEngine.vcxproj", "{5C34C724-CD4C-42FD-868B-EF65EEB076A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -18,6 +20,12 @@ Global
 		{303AA779-AFDF-40C9-842A-F121D04240E3}.Development|x64.Build.0 = Development|x64
 		{303AA779-AFDF-40C9-842A-F121D04240E3}.Release|x64.ActiveCfg = Release|x64
 		{303AA779-AFDF-40C9-842A-F121D04240E3}.Release|x64.Build.0 = Release|x64
+		{5C34C724-CD4C-42FD-868B-EF65EEB076A3}.Debug|x64.ActiveCfg = Debug|x64
+		{5C34C724-CD4C-42FD-868B-EF65EEB076A3}.Debug|x64.Build.0 = Debug|x64
+		{5C34C724-CD4C-42FD-868B-EF65EEB076A3}.Development|x64.ActiveCfg = Development|x64
+		{5C34C724-CD4C-42FD-868B-EF65EEB076A3}.Development|x64.Build.0 = Development|x64
+		{5C34C724-CD4C-42FD-868B-EF65EEB076A3}.Release|x64.ActiveCfg = Release|x64
+		{5C34C724-CD4C-42FD-868B-EF65EEB076A3}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

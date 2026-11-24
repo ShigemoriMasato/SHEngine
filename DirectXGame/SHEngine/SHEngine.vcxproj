@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Development|x64">
+      <Configuration>Development</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{5c34c724-cd4c-42fd-868b-ef65eeb076a3}</ProjectGuid>
+    <RootNamespace>SHEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>SHEngine</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)Generated\lib\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Generated\outputs\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NOMINMAX;USE_IMGUI;_DEBUG;_WINDOWS;SH_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 /wd5260 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\externals\header\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NOMINMAX;NDEBUG;_WINDOWS;SH_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 /wd5260 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\externals\header\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NOMINMAX;USE_IMGUI;NDEBUG;_WINDOWS;SH_DEVELOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 /wd5260 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\externals\header\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>  <ItemGroup>
+    <ClCompile Include="Assets\Audio\AudioManager.cpp" />
+    <ClCompile Include="Assets\Audio\Data\AudioData.cpp" />
+    <ClCompile Include="Assets\Audio\Data\MP3Data.cpp" />
+    <ClCompile Include="Assets\Audio\Data\PlayData.cpp" />
+    <ClCompile Include="Assets\Audio\Data\WAVData.cpp" />
+    <ClCompile Include="Assets\Fonts\FontLoader.cpp" />
+    <ClCompile Include="Assets\Model\ModelLoader.cpp" />
+    <ClCompile Include="Assets\Model\ModelManager.cpp" />
+    <ClCompile Include="Assets\Texture\TextureData.cpp" />
+    <ClCompile Include="Assets\Texture\TextureManager.cpp" />
+    <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="Camera\DebugCamera.cpp" />
+    <ClCompile Include="Collision\Collider.cpp" />
+    <ClCompile Include="Collision\ColliderManager.cpp" />
+    <ClCompile Include="Collision\Data\CollisionVisitor.cpp" />
+    <ClCompile Include="Compute\ComputeCommandContext.cpp" />
+    <ClCompile Include="Compute\ComputeObject.cpp" />
+    <ClCompile Include="Compute\PSO\CSPSOManager.cpp" />
+    <ClCompile Include="Compute\PSO\CSRootSignature.cpp" />
+    <ClCompile Include="Compute\PSO\CSShaderShelf.cpp" />
+    <ClCompile Include="Core\Command\CommandObject.cpp" />
+    <ClCompile Include="Core\Command\CommandSet.cpp" />
+    <ClCompile Include="Core\Command\ICommandContext.cpp" />
+    <ClCompile Include="Core\Command\Measure\MeasureShaderTime.cpp" />
+    <ClCompile Include="Core\Command\SHCmdQueue.cpp" />
+    <ClCompile Include="Core\DXDevice.cpp" />
+    <ClCompile Include="Core\FrameCounter.cpp" />
+    <ClCompile Include="Core\ImGuiWrapper.cpp" />
+    <ClCompile Include="Core\View\DSVManager.cpp" />
+    <ClCompile Include="Core\View\RTVManager.cpp" />
+    <ClCompile Include="Core\View\SRVManager.cpp" />
+    <ClCompile Include="Core\View\ViewFunc.cpp" />
+    <ClCompile Include="Input\Input.cpp" />
+    <ClCompile Include="Render\Buffer\BufferContainer.cpp" />
+    <ClCompile Include="Render\Buffer\GPUBuffer.cpp" />
+    <ClCompile Include="Render\Buffer\ReadBackBuffer.cpp" />
+    <ClCompile Include="Render\Command\DirectCommandContext.cpp" />
+    <ClCompile Include="Render\DrawData.cpp" />
+    <ClCompile Include="Render\Font\Text.cpp" />
+    <ClCompile Include="Render\MeshRenderer.cpp" />
+    <ClCompile Include="Render\PostEffect\BloomEffect.cpp" />
+    <ClCompile Include="Render\PostEffect\IPostEffect.cpp" />
+    <ClCompile Include="Render\PostEffect\PostEffectContext.cpp" />
+    <ClCompile Include="Render\PostEffect\SimplePostEffect.cpp" />
+    <ClCompile Include="Render\PostEffect\SimplePostEffectData.cpp" />
+    <ClCompile Include="Render\PSO\PSOEditor.cpp" />
+    <ClCompile Include="Render\PSO\PSOManager.cpp" />
+    <ClCompile Include="Render\PSO\PSOManagerForMS.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\BlendStateShelf.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\DepthStencilShelf.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\InputLayoutShelf.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\RasterizerShelf.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\RootSignatureShelf.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\ShaderShelf.cpp" />
+    <ClCompile Include="Render\PSO\ShelfManager.cpp" />
+    <ClCompile Include="Render\Renderer.cpp" />
+    <ClCompile Include="Render\Screen\Display.cpp" />
+    <ClCompile Include="Render\Screen\IDisplay.cpp" />
+    <ClCompile Include="Render\Screen\SwapChain.cpp" />
+    <ClCompile Include="Render\Screen\WindowsAPI.cpp" />
+    <ClCompile Include="SHEngine.cpp" />
+    <ClCompile Include="Tool\AnimationModel\AnimationModel.cpp" />
+    <ClCompile Include="Tool\AnimationModel\SkinningModel.cpp" />
+    <ClCompile Include="Tool\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Tool\CurveEditor\Binding\CurveBinder.cpp" />
+    <ClCompile Include="Tool\CurveEditor\CurveEditor.cpp" />
+    <ClCompile Include="Tool\CurveEditor\CurvePlayer.cpp" />
+    <ClCompile Include="Tool\CurveEditor\Data\CurveAsset.cpp" />
+    <ClCompile Include="Tool\CurveEditor\Data\CurveAssetIO.cpp" />
+    <ClCompile Include="Tool\DecoEditor\Data\DecoDataManager.cpp" />
+    <ClCompile Include="Tool\DecoEditor\Data\DecoObjectController.cpp" />
+    <ClCompile Include="Tool\DecoEditor\Data\DecoObjectManager.cpp" />
+    <ClCompile Include="Tool\DecoEditor\Data\DecoPathManager.cpp" />
+    <ClCompile Include="Tool\DecoEditor\DecoEditor.cpp" />
+    <ClCompile Include="Tool\FPS\FPSObserver.cpp" />
+    <ClCompile Include="Tool\Grid\Grid.cpp" />
+    <ClCompile Include="Tool\ImGui\ImGuiWindowManager.cpp" />
+    <ClCompile Include="Tool\Json\JsonManager.cpp" />
+    <ClCompile Include="Tool\Logger\Logger.cpp" />
+    <ClCompile Include="Tool\ModelDrawer\ModelDrawer.cpp" />
+    <ClCompile Include="Tool\ModelDrawer\SkinningProcessor.cpp" />
+    <ClCompile Include="Tool\TimeViewer\TimeViewer.cpp" />
+    <ClCompile Include="Utility\src\Color.cpp" />
+    <ClCompile Include="Utility\src\ConvertString.cpp" />
+    <ClCompile Include="Utility\src\DirectUtilFuncs.cpp" />
+    <ClCompile Include="Utility\src\Easing.cpp" />
+    <ClCompile Include="Utility\src\MatrixFactory.cpp" />
+    <ClCompile Include="Utility\src\MyMath.cpp" />
+    <ClCompile Include="Utility\src\Operator.cpp" />
+    <ClCompile Include="Utility\src\SearchFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Assets\Audio\AudioManager.h" />
+    <ClInclude Include="Assets\Audio\Data\AudioData.h" />
+    <ClInclude Include="Assets\Audio\Data\MP3Data.h" />
+    <ClInclude Include="Assets\Audio\Data\PlayData.h" />
+    <ClInclude Include="Assets\Audio\Data\WAVData.h" />
+    <ClInclude Include="Assets\Fonts\FontLoader.h" />
+    <ClInclude Include="Assets\Model\ModelData.h" />
+    <ClInclude Include="Assets\Model\ModelLoader.h" />
+    <ClInclude Include="Assets\Model\ModelManager.h" />
+    <ClInclude Include="Assets\Texture\TextureData.h" />
+    <ClInclude Include="Assets\Texture\TextureManager.h" />
+    <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="Camera\DebugCamera.h" />
+    <ClInclude Include="Collision\Collider.h" />
+    <ClInclude Include="Collision\ColliderManager.h" />
+    <ClInclude Include="Collision\Data\CollisionInfo.h" />
+    <ClInclude Include="Collision\Data\CollisionVisitor.h" />
+    <ClInclude Include="Compute\ComputeCommandContext.h" />
+    <ClInclude Include="Compute\ComputeObject.h" />
+    <ClInclude Include="Compute\PSO\CSPSOManager.h" />
+    <ClInclude Include="Compute\PSO\CSRootSignature.h" />
+    <ClInclude Include="Compute\PSO\CSShaderShelf.h" />
+    <ClInclude Include="Core\Command\CommandObject.h" />
+    <ClInclude Include="Core\Command\CommandSet.h" />
+    <ClInclude Include="Core\Command\ICommandContext.h" />
+    <ClInclude Include="Core\Command\Measure\MeasureShaderTime.h" />
+    <ClInclude Include="Core\Command\SHCmdQueue.h" />
+    <ClInclude Include="Core\DXDevice.h" />
+    <ClInclude Include="Core\FrameCounter.h" />
+    <ClInclude Include="Core\ImGuiWrapper.h" />
+    <ClInclude Include="Core\View\DSVManager.h" />
+    <ClInclude Include="Core\View\RTVManager.h" />
+    <ClInclude Include="Core\View\SRVManager.h" />
+    <ClInclude Include="Core\View\ViewFunc.h" />
+    <ClInclude Include="Input\Input.h" />
+    <ClInclude Include="Render\Buffer\BufferContainer.h" />
+    <ClInclude Include="Render\Buffer\GPUBuffer.h" />
+    <ClInclude Include="Render\Buffer\ReadBackBuffer.h" />
+    <ClInclude Include="Render\Command\DirectCommandContext.h" />
+    <ClInclude Include="Render\DrawData.h" />
+    <ClInclude Include="Render\Font\Text.h" />
+    <ClInclude Include="Render\MeshRenderer.h" />
+    <ClInclude Include="Render\PostEffect\BloomEffect.h" />
+    <ClInclude Include="Render\PostEffect\IPostEffect.h" />
+    <ClInclude Include="Render\PostEffect\PostEffectContext.h" />
+    <ClInclude Include="Render\PostEffect\SimplePostEffect.h" />
+    <ClInclude Include="Render\PostEffect\SimplePostEffectData.h" />
+    <ClInclude Include="Render\PSO\PSOConfig.h" />
+    <ClInclude Include="Render\PSO\PSOEditor.h" />
+    <ClInclude Include="Render\PSO\PSOManager.h" />
+    <ClInclude Include="Render\PSO\PSOManagerForMS.h" />
+    <ClInclude Include="Render\PSO\Shelf\BlendStateShelf.h" />
+    <ClInclude Include="Render\PSO\Shelf\DepthStencilShelf.h" />
+    <ClInclude Include="Render\PSO\Shelf\InputLayoutShelf.h" />
+    <ClInclude Include="Render\PSO\Shelf\RasterizerShelf.h" />
+    <ClInclude Include="Render\PSO\Shelf\RootSignatureShelf.h" />
+    <ClInclude Include="Render\PSO\Shelf\ShaderShelf.h" />
+    <ClInclude Include="Render\PSO\ShelfManager.h" />
+    <ClInclude Include="Render\Renderer.h" />
+    <ClInclude Include="Render\Screen\Display.h" />
+    <ClInclude Include="Render\Screen\IDisplay.h" />
+    <ClInclude Include="Render\Screen\SwapChain.h" />
+    <ClInclude Include="Render\Screen\WindowsAPI.h" />
+    <ClInclude Include="SHEngine.h" />
+    <ClInclude Include="Tool\AnimationModel\AnimationModel.h" />
+    <ClInclude Include="Tool\AnimationModel\SkinningModel.h" />
+    <ClInclude Include="Tool\Binary\BinaryManager.h" />
+    <ClInclude Include="Tool\Binary\Value.h" />
+    <ClInclude Include="Tool\CurveEditor\Binding\CurveBinder.h" />
+    <ClInclude Include="Tool\CurveEditor\CurveEditor.h" />
+    <ClInclude Include="Tool\CurveEditor\CurveEditorLog.h" />
+    <ClInclude Include="Tool\CurveEditor\CurvePlayer.h" />
+    <ClInclude Include="Tool\CurveEditor\Data\CurveAsset.h" />
+    <ClInclude Include="Tool\CurveEditor\Data\CurveAssetIO.h" />
+    <ClInclude Include="Tool\DecoEditor\Data\DecoDataManager.h" />
+    <ClInclude Include="Tool\DecoEditor\Data\DecoObjectController.h" />
+    <ClInclude Include="Tool\DecoEditor\Data\DecoObjectManager.h" />
+    <ClInclude Include="Tool\DecoEditor\Data\DecoPathManager.h" />
+    <ClInclude Include="Tool\DecoEditor\DecoEditor.h" />
+    <ClInclude Include="Tool\FPS\FPSObserver.h" />
+    <ClInclude Include="Tool\Grid\Grid.h" />
+    <ClInclude Include="Tool\ImGui\ImGuiWindowManager.h" />
+    <ClInclude Include="Tool\Json\JsonManager.h" />
+    <ClInclude Include="Tool\Logger\CustomLogSetting.h" />
+    <ClInclude Include="Tool\Logger\Logger.h" />
+    <ClInclude Include="Tool\ModelDrawer\ModelDrawer.h" />
+    <ClInclude Include="Tool\ModelDrawer\SkinningProcessor.h" />
+    <ClInclude Include="Tool\TimeViewer\TimeViewer.h" />
+    <ClInclude Include="Utility\Color.h" />
+    <ClInclude Include="Utility\ConvertString.h" />
+    <ClInclude Include="Utility\CreateDump.h" />
+    <ClInclude Include="Utility\DataStructures.h" />
+    <ClInclude Include="Utility\DirectUtilFuncs.h" />
+    <ClInclude Include="Utility\Easing.h" />
+    <ClInclude Include="Utility\Matrix.h" />
+    <ClInclude Include="Utility\MatrixFactory.h" />
+    <ClInclude Include="Utility\MyMath.h" />
+    <ClInclude Include="Utility\Operator.h" />
+    <ClInclude Include="Utility\Quaternion.h" />
+    <ClInclude Include="Utility\SearchFile.h" />
+    <ClInclude Include="Utility\Vector.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

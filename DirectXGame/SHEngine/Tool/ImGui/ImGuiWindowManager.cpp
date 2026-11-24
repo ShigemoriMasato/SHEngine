@@ -1,6 +1,12 @@
 #include "ImGuiWindowManager.h"
 #include <imgui/imgui.h>
 
+ImGuiWindowManager::ImGuiWindowManager() {
+}
+
+ImGuiWindowManager::~ImGuiWindowManager() {
+}
+
 void ImGuiWindowManager::PushGroup(const std::string& groupName) {
 	groupStack_.push_back(groupName);
 }

@@ -21,7 +21,7 @@ SHEngine::ComputeObject* Particle::Emitter::AddProcess(std::string shaderPath, u
 
 	process->SetGPUBuffer(BufferType::CBV, countBuffer_);
 	process->SetGPUBuffer(BufferType::SRV, indexList_);
-	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->scales, data_->colors });
+	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->rotations, data_->scales, data_->colors });
 
 	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
 
@@ -38,7 +38,7 @@ SHEngine::ComputeObject* Particle::Emitter::AddTriggerProcess(std::string shader
 
 	process->SetGPUBuffer(BufferType::CBV, countBuffer_);
 	process->SetGPUBuffer(BufferType::SRV, indexList_);
-	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->scales, data_->colors });
+	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->rotations, data_->scales, data_->colors });
 
 	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
 
@@ -54,7 +54,7 @@ std::unique_ptr<SHEngine::ComputeObject> Particle::Emitter::AddOprionalProcess(s
 
 	process->SetGPUBuffer(BufferType::CBV, countBuffer_);
 	process->SetGPUBuffer(BufferType::SRV, indexList_);
-	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->scales, data_->colors });
+	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->rotations, data_->scales, data_->colors });
 
 	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
 
@@ -70,6 +70,10 @@ void Particle::Emitter::EraseProcess(uint32_t id) {
 
 void Particle::Emitter::Update(uint32_t processorKey, ICC* icc) {
 	if (processorKey != processorKey_) {
+		return;
+	}
+
+	if (isReleased_) {
 		return;
 	}
 

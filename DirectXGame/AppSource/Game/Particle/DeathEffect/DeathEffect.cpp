@@ -73,7 +73,10 @@ DeathEffect::DeathEffect(ParticleSystem* particleSystem, SHEngine::ModelManager*
 	}
 
 	emitter_ = particleSystem->CreateEmitter(maxEmitCount_, icc);
+
+	
 }
 
 void DeathEffect::Initialize() {
+
 }

@@ -17,9 +17,10 @@ cbuffer Scale : register(b2)
 StructuredBuffer<uint> indexList : register(t0);
 
 RWStructuredBuffer<float3> positions : register(u0);
-RWStructuredBuffer<float> scales : register(u1);
-RWStructuredBuffer<float16_t4> color : register(u2);
-RWStructuredBuffer<float2> uvs : register(u3);
+RWStructuredBuffer<float3> rotations : register(u1);
+RWStructuredBuffer<float> scales : register(u2);
+RWStructuredBuffer<float16_t4> color : register(u3);
+RWStructuredBuffer<float2> uvs : register(u4);
 
 float4 ColorGradation(float t)
 {
@@ -63,8 +64,4 @@ void main(uint3 DTid : SV_DispatchThreadID)
     uvs[localIndex] = uv;
     positions[localIndex] = (float3(uv.x, 0.0f, 1 - uv.y) + float3(-0.5f, -0.5f, -0.5f)) * float3(textureSize.x * 0.1, 1.0f, textureSize.y * 0.1);
     scales[localIndex] = scale;
-    
-    // debug
-    float distRatio = saturate(length(positions[localIndex].xz) / (60.f));
-    color[localIndex] = float16_t4(ColorGradation(distRatio)) * float16_t4(0.3f, 0.3f, 0.3f, 1.0f);
 }

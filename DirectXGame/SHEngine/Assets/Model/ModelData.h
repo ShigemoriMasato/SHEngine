@@ -73,6 +73,7 @@ struct ModelData {
     std::vector<Mesh> meshes;
     std::vector<Material> materials;
     Skeleton skeleton;
+    std::string modelName;
 };
 
 // Animation =======================================================================================

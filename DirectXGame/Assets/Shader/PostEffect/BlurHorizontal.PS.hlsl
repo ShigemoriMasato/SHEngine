@@ -20,12 +20,17 @@ float4 main(PixelShaderInput input) : SV_TARGET
     float offset = 1.0 / textureSize.x; // 水平方向のオフセット
     float scale = 1.0 / sampleCount; // サンプル数で割ることで平均化
     float2 baseUV = input.texcoord - float2(offset * sampleCount / 2, 0.0f);
+    float allRatio = 0.0f;
     
     for (uint i = 0; i < sampleCount; ++i)
     {
         float2 uv = baseUV + float2(i * offset, 0.0f);
-        color.rgb += textures[textureIndex].Sample(gSampler, uv).rgb * scale;
+        float ratio = sin(scale * i * 3.14159265358f);
+        color.rgb += textures[textureIndex].Sample(gSampler, uv).rgb * ratio;
+        allRatio += ratio;
     }
+
+    color.rgb /= allRatio;
     
     return color;
 }

@@ -11,7 +11,7 @@ ShootingGame::ShootingGame(SHEngine::Engine* engine, const KeyManager* keyManage
 	, computeContext_(engine->GetComputeCommandContext())
 	, keyManager_(keyManager)
 	, particleSystem_(particleSystem)
-	, imguiManager_(imguiManager) {
+	, imguiManager_(imguiManager){
 }
 
 ShootingGame::~ShootingGame() {
@@ -38,14 +38,14 @@ void ShootingGame::Initialize(const Vector2& screenSize) {
 
 	damageResolver_ = std::make_unique<DamageResolver>(playerManager_.get(), enemyManager_.get(), bulletManager_.get());
 
-	cameraController_.Initialize(screenSize_, playerManager_->GetWorldPosition());
+	cameraController_ = std::make_unique<GameCameraController>(engine_->GetInput());
+	cameraController_->Initialize(screenSize_, playerManager_->GetWorldPosition());
 	aimController_.Initialize();
 
-	// 仮置き: プレイヤー・境界マーカー用のモデルが未作成のため、テスト用Sphereで代用している(必要アセット.md参照)。
-	// モデルはModelManager所有のため解放・複製しない
+	// モデルの設定
 	SHEngine::ModelManager* modelManager = engine_->GetModelManager();
 	const ModelData* sphere = modelManager->GetModelData(SHEngine::TestModel::Sphere);
-	playerRenderer_.Initialize(sphere);
+	playerRenderer_.Initialize(modelManager->LoadModel("GameObject/Player"));
 	enemyRenderer_.Initialize(modelManager);
 	bulletRenderer_.Initialize(modelManager);
 	fieldRenderer_.Initialize(sphere);
@@ -54,10 +54,10 @@ void ShootingGame::Initialize(const Vector2& screenSize) {
 	// ImGuiManagerに描画関数を登録する
 	imguiManager_->PushGroup("Camera");
 	imguiManager_->Add([&]() {
-		cameraController_.ConfigImGui();
+		cameraController_->ConfigImGui();
 		}, "Config");
 	imguiManager_->Add([&]() {
-		cameraController_.DrawImGui();
+		cameraController_->DrawImGui();
 		}, "Curve");
 	imguiManager_->PopGroup();
 
@@ -68,14 +68,8 @@ void ShootingGame::Initialize(const Vector2& screenSize) {
 
 void ShootingGame::Update(float deltaTime) {
 	UpdateGame(deltaTime);
-}
 
-void ShootingGame::ApplyField() {
-	auto fieldTextureDrawed = directContext_->MiddleExecute();
-	computeContext_->WaitFenceInGPU(fieldTextureDrawed);
-
-	auto endApply = computeContext_->MiddleExecute();
-	directContext_->WaitFenceInGPU(endApply);
+	ResetCameras();
 }
 
 void ShootingGame::UpdateGame(float deltaTime) {
@@ -85,19 +79,19 @@ void ShootingGame::UpdateGame(float deltaTime) {
 	playerManager_->Update(deltaTime, playerInput);
 
 	if (playerManager_->IsSpecialActivated()) {
-		cameraController_.Boot("Special");
+		cameraController_->Boot("Special");
 		// todo: 敵を瞬殺するオブジェクトの生成
 	}
 
 	// カメラアニメーション
 	const float systemDeltaTime = engine_->GetDeltaTime();
-	cameraController_.UpdateCurve(systemDeltaTime);
+	cameraController_->UpdateCurve(systemDeltaTime);
 	//カメラ追従
-	cameraController_.Update(deltaTime, playerManager_->GetWorldPosition());
+	cameraController_->Update(deltaTime, playerManager_->GetWorldPosition());
 
 	//更新後のカメラ行列から照準を作る(カメラ行列はAimControllerにだけ渡す)
-	aimController_.Update(playerManager_->GetWorldPosition(), cameraController_.GetViewMatrix(),
-		cameraController_.GetViewProjectionMatrix(), MakeAimInput());
+	aimController_.Update(playerManager_->GetWorldPosition(), cameraController_->GetViewMatrix(),
+		cameraController_->GetViewProjectionMatrix(), MakeAimInput());
 
 	//敵の更新・生成
 	EnemyTarget target;
@@ -144,7 +138,7 @@ void ShootingGame::UpdateRenderers(float deltaTime) {
 }
 
 void ShootingGame::Draw() {
-	const Camera* camera = cameraController_.GetCamera();
+	const Camera* camera = cameraController_->GetCamera();
 
 	fieldRenderer_.Draw(directContext_, camera);
 	enemyRenderer_.Draw(directContext_, camera);
@@ -165,6 +159,11 @@ void ShootingGame::DrawImGui() {
 #endif
 }
 
+void ShootingGame::ResetCameras() {
+	const Camera* camera = cameraController_->GetCamera();
+	particleSystem_->SetCamera(camera);
+}
+
 bool ShootingGame::UseSpecial() const {
 	return playerManager_->IsSpecialActivated();
 }
@@ -172,7 +171,7 @@ bool ShootingGame::UseSpecial() const {
 void ShootingGame::SaveConfigs() const {
 	// 調整値だけを保存する(実行中状態は保存しない)。初回はファイルが既定値で作られる
 	ConfigFile::Save(FieldConfig::kFileName, fieldConfig_);
-	cameraController_.SaveConfig();
+	cameraController_->SaveConfig();
 	aimController_.SaveConfig();
 	if (playerManager_) {
 		playerManager_->SaveConfig();

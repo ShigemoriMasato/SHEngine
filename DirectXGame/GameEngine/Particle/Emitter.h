@@ -38,8 +38,12 @@ namespace Particle {
 		std::vector<SHEngine::GPUBuffer*> GetBuffer() const;
 
 		uint32_t GetParticleCount() const { return countNum_; }
-		SHEngine::GPUBuffer* GetIndexList() const { return indexList_; }
-		SHEngine::GPUBuffer* GetCountBuffer() const { return countBuffer_; }
+		SHEngine::GPUBuffer* GetIndexList() const { return isReleased_ ? nullptr : indexList_; }
+		SHEngine::GPUBuffer* GetCountBuffer() const { return isReleased_ ? nullptr : countBuffer_; }
+
+		bool IsReleased() const { return isReleased_; }
+
+		void Release() { isReleased_ = true; };
 
 	private:
 
@@ -59,6 +63,8 @@ namespace Particle {
 		const uint32_t id_;
 
 		Processor* processor_ = nullptr;
+
+		bool isReleased_ = false;
 	};
 
 }

@@ -21,10 +21,11 @@ Texture2D<float4> heightTexture : register(t3);
 SamplerState gSampler : register(s0);
 
 
-RWStructuredBuffer<float3> position : register(u0);
-RWStructuredBuffer<float> scales : register(u1);
-RWStructuredBuffer<float16_t4> color : register(u2);
-RWStructuredBuffer<float16_t3> velocity : register(u3);
+RWStructuredBuffer<float3> positions : register(u0);
+RWStructuredBuffer<float3> rotations : register(u1);
+RWStructuredBuffer<float> scales : register(u2);
+RWStructuredBuffer<float16_t4> color : register(u3);
+RWStructuredBuffer<float16_t3> velocity : register(u4);
 
 [numthreads(128, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -54,5 +55,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
     //position[localIndex].y = heightColor.r * heightScale;
     position[localIndex] += velocity[index] * deltaTime;
     velocity[index] *= float16_t(0.99f);
-    //color[localIndex] = float16_t4(texColor.r, texColor.g, texColor.b, texColor.a);
+    color[localIndex] = float16_t4(texColor.r, texColor.g, texColor.b, texColor.a);
 }

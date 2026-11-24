@@ -2,6 +2,7 @@
 
 void Particle::Data::Initialize(SHEngine::BufferContainer* container, uint32_t particleCount) {
 	positions = container->Create(BufferType::SRV_UAV, sizeof(Vector3), particleCount, BufferNum::Single);
+	rotations = container->Create(BufferType::SRV_UAV, sizeof(Vector3), particleCount, BufferNum::Single);
 	scales = container->Create(BufferType::SRV_UAV, sizeof(float), particleCount, BufferNum::Single);
 	colors = container->Create(BufferType::SRV_UAV, sizeof(Vector4) / 2, particleCount, BufferNum::Single);
 	parentIndices = container->Create(BufferType::SRV_UAV, sizeof(uint32_t), particleCount, BufferNum::Single);

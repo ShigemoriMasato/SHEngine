@@ -35,8 +35,6 @@ private:
 	BloomEffect bloomEffect_;
 	Bloom bloom_;
 
-	
-
 	// ゲーム本体。ParticleSystem・ImGuiWindowManagerを非所有で参照するため、それらより後に宣言する(先に破棄される)
 	std::unique_ptr<ShootingGame> shootingGame_ = nullptr;
 };

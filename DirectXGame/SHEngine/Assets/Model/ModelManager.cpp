@@ -44,6 +44,7 @@ void ModelManager::Initialize(TextureManager* textureManager) {
 }
 
 const ModelData* ModelManager::LoadModel(const std::string& filePath) {
+	// 書式統一後のファイルパス
 	std::string fileBuffer = filePath;
 	// ファイルパスの確認と修正
 	const std::string fileName = FilePathChecker(fileBuffer);
@@ -76,8 +77,8 @@ const ModelData* ModelManager::LoadModel(const std::string& filePath) {
 	//読み込み
 	int id = int(modelData_.size());
 	auto& modelData = modelData_.emplace_back(std::make_unique<ModelData>());
-	*modelData = CreateModelData(scene, filePath);
-	modelFilePaths_[filePath] = id;
+	*modelData = CreateModelData(scene, fileBuffer);
+	modelFilePaths_[fileBuffer] = id;
 
 	return modelData.get();
 }
@@ -196,6 +197,8 @@ ModelData SHEngine::ModelManager::CreateModelData(const aiScene* scene, std::str
 
 	result.materials = ModelLoader::LoadMaterials(scene, directoryPath, textureManager_);
 	result.skeleton = ModelLoader::CreateSkeleton(result.nodes, scene);
+
+	result.modelName = filePath;
 
 	return result;
 }

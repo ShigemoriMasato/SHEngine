@@ -13,6 +13,7 @@ public:
 	void Draw(DCC* dcc);
 
 	Particle::Emitter* CreateEmitter(int countNum, ICC* icc);
+	void EraseEmitter(Particle::Emitter* emitter);
 
 	void SetCamera(const Camera* camera);
 

@@ -22,11 +22,12 @@ cbuffer Config : register(b1)
 StructuredBuffer<uint> indexList : register(t0);
 StructuredBuffer<float2> uvs : register(t1);
 
-RWStructuredBuffer<float3> position : register(u0);
-RWStructuredBuffer<float> scales : register(u1);
-RWStructuredBuffer<float16_t4> color : register(u2);
+RWStructuredBuffer<float3> positions : register(u0);
+RWStructuredBuffer<float3> rotations : register(u1);
+RWStructuredBuffer<float> scales : register(u2);
+RWStructuredBuffer<float16_t4> color : register(u3);
 
-RWStructuredBuffer<float16_t3> velocities : register(u3);
+RWStructuredBuffer<float16_t3> velocities : register(u4);
 
 static const float pie = 3.14159265358f;
 
@@ -98,5 +99,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
     velocities[index] = (float16_t3(vel.x, heightVel, vel.y) + float16_t3(randVel));
      
     // デバッグ
-    color[localIndex] = float16_t4(ColorGradation(distRatio)) * float16_t4(0.3f, 0.3f, 0.3f, 1.0f);
+    //color[localIndex] = float16_t4(ColorGradation(distRatio)) * float16_t4(0.3f, 0.3f, 0.3f, 1.0f);
 }

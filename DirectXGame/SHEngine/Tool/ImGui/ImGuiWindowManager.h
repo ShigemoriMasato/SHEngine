@@ -6,6 +6,9 @@
 class ImGuiWindowManager {
 public:
 
+	ImGuiWindowManager();
+	~ImGuiWindowManager();
+
 	// @brief 今後追加されるアイテムをこのグループに所属させる。
 	void PushGroup(const std::string& groupName);
 	// @brief ひとつ前のグループに戻る。グループがない場合は何もしない。

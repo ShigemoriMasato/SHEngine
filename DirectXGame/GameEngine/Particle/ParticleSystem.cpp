@@ -36,6 +36,16 @@ Particle::Emitter* ParticleSystem::CreateEmitter(int countNum, ICC* icc) {
 	return emitters_.back().get();
 }
 
+void ParticleSystem::EraseEmitter(Particle::Emitter* emitter) {
+	for (auto it = emitters_.begin(); it != emitters_.end(); ++it) {
+		if (it->get() == emitter) {
+			emitter->Release();
+			emitters_.erase(it);
+			break;
+		}
+	}
+}
+
 void ParticleSystem::SetCamera(const Camera* camera) {
 	renderer_->SetCamera(camera);
 }

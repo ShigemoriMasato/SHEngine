@@ -1,0 +1,322 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{58ba4352-6eba-4079-aa20-dec288e7ef32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Audio">
+      <UniqueIdentifier>{e0fa2201-d601-4d83-a766-aa7bb7274132}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Audio\Data">
+      <UniqueIdentifier>{9b0449f5-5719-4923-b4e3-bcf453437565}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Fonts">
+      <UniqueIdentifier>{4bc06b54-9ae0-46d5-81b8-c0392396918e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Model">
+      <UniqueIdentifier>{6e0a4e65-e30a-4942-8a26-7efe765d316b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Texture">
+      <UniqueIdentifier>{4785ac9c-084c-4252-9573-74836302e7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{cdf7e884-769e-4594-abcc-2f4bf436785d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collision">
+      <UniqueIdentifier>{7a042295-fa9d-4d24-97e1-5f2f98ac8882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collision\Data">
+      <UniqueIdentifier>{44f8eff5-0dba-4046-ae94-e661fb2d2bca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compute">
+      <UniqueIdentifier>{88c7e018-db8b-4608-ab94-251077b411bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compute\PSO">
+      <UniqueIdentifier>{1a817e9a-34e7-4a07-9804-afcee995bf57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{e640dce8-17fd-4e22-a2cc-e11cdde9e667}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Command">
+      <UniqueIdentifier>{72f14bf9-e866-4e9c-ad67-378d5072053c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Command\Measure">
+      <UniqueIdentifier>{6eef38cf-f208-4fba-9165-b4af5282764e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\View">
+      <UniqueIdentifier>{0c7184ac-8568-4f80-a788-f577c648736d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{c9aec303-447c-4990-a4a0-e96833947bce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{08fcda85-7d7d-438c-b495-d145e22aac8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Buffer">
+      <UniqueIdentifier>{f4222a5b-a455-4338-afd1-71a4cbde6f62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Command">
+      <UniqueIdentifier>{74f41aca-f089-4823-ba39-bafe382bca8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Font">
+      <UniqueIdentifier>{dbfd0f19-8dd3-4325-996f-b2debb454188}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\PostEffect">
+      <UniqueIdentifier>{4282d264-5e65-4926-a4ed-6801ece7bcfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\PSO">
+      <UniqueIdentifier>{7115cb0f-042a-41a8-875c-46aebc30b992}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\PSO\Shelf">
+      <UniqueIdentifier>{f12448b8-edfe-447f-b6c4-4a7785fa431c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Screen">
+      <UniqueIdentifier>{fed97f82-cd9c-4be2-9f68-ae7a68cc97e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool">
+      <UniqueIdentifier>{4949a54f-4e8f-48fd-8c5f-cf87f806a629}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\AnimationModel">
+      <UniqueIdentifier>{aa3b3fe6-d620-482f-b1d9-e4e8ec58a675}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\Binary">
+      <UniqueIdentifier>{29e01d7b-c56b-4c34-9126-89064501dd82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\CurveEditor">
+      <UniqueIdentifier>{d63ac48d-2c08-48cb-99c9-9196326f0290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\CurveEditor\Binding">
+      <UniqueIdentifier>{d837ceeb-fe4e-4936-a148-f0c129889249}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\CurveEditor\Data">
+      <UniqueIdentifier>{91292131-e775-4a25-8865-bdb0126531a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\DecoEditor">
+      <UniqueIdentifier>{dd9dc6a2-cc3e-4a39-8621-d42c1158f89d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\DecoEditor\Data">
+      <UniqueIdentifier>{aaa037dd-8d57-400e-8de4-4b09ac5b2244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\FPS">
+      <UniqueIdentifier>{d3424904-d42c-4a02-bb89-6e38896164ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\Grid">
+      <UniqueIdentifier>{ce5d913c-fb0f-46a1-8630-f72676e150c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\ImGui">
+      <UniqueIdentifier>{2eaf53d8-9e35-4c52-81cb-2a51b081a337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\Json">
+      <UniqueIdentifier>{2584b0d5-6fd4-4d90-a920-78ff619cbcbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\Logger">
+      <UniqueIdentifier>{2f7265a8-462b-4ac8-bf79-4a8ef19dd5cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\ModelDrawer">
+      <UniqueIdentifier>{abbef7c7-630c-4234-b175-30acb266a900}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool\TimeViewer">
+      <UniqueIdentifier>{1c50aeaa-ab10-42ab-a652-142ceea5022d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{c85f988a-5231-4328-a654-789cbb497d74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\src">
+      <UniqueIdentifier>{0871fd07-8dff-4d87-9df0-466626f42803}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SHEngine.cpp" />
+    <ClCompile Include="Assets\Audio\AudioManager.cpp"><Filter>Assets\Audio</Filter></ClCompile>
+    <ClCompile Include="Assets\Audio\Data\AudioData.cpp"><Filter>Assets\Audio\Data</Filter></ClCompile>
+    <ClCompile Include="Assets\Audio\Data\MP3Data.cpp"><Filter>Assets\Audio\Data</Filter></ClCompile>
+    <ClCompile Include="Assets\Audio\Data\PlayData.cpp"><Filter>Assets\Audio\Data</Filter></ClCompile>
+    <ClCompile Include="Assets\Audio\Data\WAVData.cpp"><Filter>Assets\Audio\Data</Filter></ClCompile>
+    <ClCompile Include="Assets\Fonts\FontLoader.cpp"><Filter>Assets\Fonts</Filter></ClCompile>
+    <ClCompile Include="Assets\Model\ModelLoader.cpp"><Filter>Assets\Model</Filter></ClCompile>
+    <ClCompile Include="Assets\Model\ModelManager.cpp"><Filter>Assets\Model</Filter></ClCompile>
+    <ClCompile Include="Assets\Texture\TextureData.cpp"><Filter>Assets\Texture</Filter></ClCompile>
+    <ClCompile Include="Assets\Texture\TextureManager.cpp"><Filter>Assets\Texture</Filter></ClCompile>
+    <ClCompile Include="Camera\Camera.cpp"><Filter>Camera</Filter></ClCompile>
+    <ClCompile Include="Camera\DebugCamera.cpp"><Filter>Camera</Filter></ClCompile>
+    <ClCompile Include="Collision\Collider.cpp"><Filter>Collision</Filter></ClCompile>
+    <ClCompile Include="Collision\ColliderManager.cpp"><Filter>Collision</Filter></ClCompile>
+    <ClCompile Include="Collision\Data\CollisionVisitor.cpp"><Filter>Collision\Data</Filter></ClCompile>
+    <ClCompile Include="Compute\ComputeCommandContext.cpp"><Filter>Compute</Filter></ClCompile>
+    <ClCompile Include="Compute\ComputeObject.cpp"><Filter>Compute</Filter></ClCompile>
+    <ClCompile Include="Compute\PSO\CSPSOManager.cpp"><Filter>Compute\PSO</Filter></ClCompile>
+    <ClCompile Include="Compute\PSO\CSRootSignature.cpp"><Filter>Compute\PSO</Filter></ClCompile>
+    <ClCompile Include="Compute\PSO\CSShaderShelf.cpp"><Filter>Compute\PSO</Filter></ClCompile>
+    <ClCompile Include="Core\DXDevice.cpp"><Filter>Core</Filter></ClCompile>
+    <ClCompile Include="Core\FrameCounter.cpp"><Filter>Core</Filter></ClCompile>
+    <ClCompile Include="Core\ImGuiWrapper.cpp"><Filter>Core</Filter></ClCompile>
+    <ClCompile Include="Core\Command\CommandObject.cpp"><Filter>Core\Command</Filter></ClCompile>
+    <ClCompile Include="Core\Command\CommandSet.cpp"><Filter>Core\Command</Filter></ClCompile>
+    <ClCompile Include="Core\Command\ICommandContext.cpp"><Filter>Core\Command</Filter></ClCompile>
+    <ClCompile Include="Core\Command\SHCmdQueue.cpp"><Filter>Core\Command</Filter></ClCompile>
+    <ClCompile Include="Core\Command\Measure\MeasureShaderTime.cpp"><Filter>Core\Command\Measure</Filter></ClCompile>
+    <ClCompile Include="Core\View\DSVManager.cpp"><Filter>Core\View</Filter></ClCompile>
+    <ClCompile Include="Core\View\RTVManager.cpp"><Filter>Core\View</Filter></ClCompile>
+    <ClCompile Include="Core\View\SRVManager.cpp"><Filter>Core\View</Filter></ClCompile>
+    <ClCompile Include="Core\View\ViewFunc.cpp"><Filter>Core\View</Filter></ClCompile>
+    <ClCompile Include="Input\Input.cpp"><Filter>Input</Filter></ClCompile>
+    <ClCompile Include="Render\DrawData.cpp"><Filter>Render</Filter></ClCompile>
+    <ClCompile Include="Render\MeshRenderer.cpp"><Filter>Render</Filter></ClCompile>
+    <ClCompile Include="Render\Renderer.cpp"><Filter>Render</Filter></ClCompile>
+    <ClCompile Include="Render\Buffer\BufferContainer.cpp"><Filter>Render\Buffer</Filter></ClCompile>
+    <ClCompile Include="Render\Buffer\GPUBuffer.cpp"><Filter>Render\Buffer</Filter></ClCompile>
+    <ClCompile Include="Render\Buffer\ReadBackBuffer.cpp"><Filter>Render\Buffer</Filter></ClCompile>
+    <ClCompile Include="Render\Command\DirectCommandContext.cpp"><Filter>Render\Command</Filter></ClCompile>
+    <ClCompile Include="Render\Font\Text.cpp"><Filter>Render\Font</Filter></ClCompile>
+    <ClCompile Include="Render\PostEffect\BloomEffect.cpp"><Filter>Render\PostEffect</Filter></ClCompile>
+    <ClCompile Include="Render\PostEffect\IPostEffect.cpp"><Filter>Render\PostEffect</Filter></ClCompile>
+    <ClCompile Include="Render\PostEffect\PostEffectContext.cpp"><Filter>Render\PostEffect</Filter></ClCompile>
+    <ClCompile Include="Render\PostEffect\SimplePostEffect.cpp"><Filter>Render\PostEffect</Filter></ClCompile>
+    <ClCompile Include="Render\PostEffect\SimplePostEffectData.cpp"><Filter>Render\PostEffect</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\PSOEditor.cpp"><Filter>Render\PSO</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\PSOManager.cpp"><Filter>Render\PSO</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\PSOManagerForMS.cpp"><Filter>Render\PSO</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\ShelfManager.cpp"><Filter>Render\PSO</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\BlendStateShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\DepthStencilShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\InputLayoutShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\RasterizerShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\RootSignatureShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\ShaderShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\Screen\Display.cpp"><Filter>Render\Screen</Filter></ClCompile>
+    <ClCompile Include="Render\Screen\IDisplay.cpp"><Filter>Render\Screen</Filter></ClCompile>
+    <ClCompile Include="Render\Screen\SwapChain.cpp"><Filter>Render\Screen</Filter></ClCompile>
+    <ClCompile Include="Render\Screen\WindowsAPI.cpp"><Filter>Render\Screen</Filter></ClCompile>
+    <ClCompile Include="Tool\AnimationModel\AnimationModel.cpp"><Filter>Tool\AnimationModel</Filter></ClCompile>
+    <ClCompile Include="Tool\AnimationModel\SkinningModel.cpp"><Filter>Tool\AnimationModel</Filter></ClCompile>
+    <ClCompile Include="Tool\Binary\BinaryManager.cpp"><Filter>Tool\Binary</Filter></ClCompile>
+    <ClCompile Include="Tool\CurveEditor\CurveEditor.cpp"><Filter>Tool\CurveEditor</Filter></ClCompile>
+    <ClCompile Include="Tool\CurveEditor\CurvePlayer.cpp"><Filter>Tool\CurveEditor</Filter></ClCompile>
+    <ClCompile Include="Tool\CurveEditor\Binding\CurveBinder.cpp"><Filter>Tool\CurveEditor\Binding</Filter></ClCompile>
+    <ClCompile Include="Tool\CurveEditor\Data\CurveAsset.cpp"><Filter>Tool\CurveEditor\Data</Filter></ClCompile>
+    <ClCompile Include="Tool\CurveEditor\Data\CurveAssetIO.cpp"><Filter>Tool\CurveEditor\Data</Filter></ClCompile>
+    <ClCompile Include="Tool\DecoEditor\DecoEditor.cpp"><Filter>Tool\DecoEditor</Filter></ClCompile>
+    <ClCompile Include="Tool\DecoEditor\Data\DecoDataManager.cpp"><Filter>Tool\DecoEditor\Data</Filter></ClCompile>
+    <ClCompile Include="Tool\DecoEditor\Data\DecoObjectController.cpp"><Filter>Tool\DecoEditor\Data</Filter></ClCompile>
+    <ClCompile Include="Tool\DecoEditor\Data\DecoObjectManager.cpp"><Filter>Tool\DecoEditor\Data</Filter></ClCompile>
+    <ClCompile Include="Tool\DecoEditor\Data\DecoPathManager.cpp"><Filter>Tool\DecoEditor\Data</Filter></ClCompile>
+    <ClCompile Include="Tool\FPS\FPSObserver.cpp"><Filter>Tool\FPS</Filter></ClCompile>
+    <ClCompile Include="Tool\Grid\Grid.cpp"><Filter>Tool\Grid</Filter></ClCompile>
+    <ClCompile Include="Tool\ImGui\ImGuiWindowManager.cpp"><Filter>Tool\ImGui</Filter></ClCompile>
+    <ClCompile Include="Tool\Json\JsonManager.cpp"><Filter>Tool\Json</Filter></ClCompile>
+    <ClCompile Include="Tool\Logger\Logger.cpp"><Filter>Tool\Logger</Filter></ClCompile>
+    <ClCompile Include="Tool\ModelDrawer\ModelDrawer.cpp"><Filter>Tool\ModelDrawer</Filter></ClCompile>
+    <ClCompile Include="Tool\ModelDrawer\SkinningProcessor.cpp"><Filter>Tool\ModelDrawer</Filter></ClCompile>
+    <ClCompile Include="Tool\TimeViewer\TimeViewer.cpp"><Filter>Tool\TimeViewer</Filter></ClCompile>
+    <ClCompile Include="Utility\src\Color.cpp"><Filter>Utility\src</Filter></ClCompile>
+    <ClCompile Include="Utility\src\ConvertString.cpp"><Filter>Utility\src</Filter></ClCompile>
+    <ClCompile Include="Utility\src\DirectUtilFuncs.cpp"><Filter>Utility\src</Filter></ClCompile>
+    <ClCompile Include="Utility\src\Easing.cpp"><Filter>Utility\src</Filter></ClCompile>
+    <ClCompile Include="Utility\src\MatrixFactory.cpp"><Filter>Utility\src</Filter></ClCompile>
+    <ClCompile Include="Utility\src\MyMath.cpp"><Filter>Utility\src</Filter></ClCompile>
+    <ClCompile Include="Utility\src\Operator.cpp"><Filter>Utility\src</Filter></ClCompile>
+    <ClCompile Include="Utility\src\SearchFile.cpp"><Filter>Utility\src</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SHEngine.h" />
+    <ClInclude Include="Assets\Audio\AudioManager.h"><Filter>Assets\Audio</Filter></ClInclude>
+    <ClInclude Include="Assets\Audio\Data\AudioData.h"><Filter>Assets\Audio\Data</Filter></ClInclude>
+    <ClInclude Include="Assets\Audio\Data\MP3Data.h"><Filter>Assets\Audio\Data</Filter></ClInclude>
+    <ClInclude Include="Assets\Audio\Data\PlayData.h"><Filter>Assets\Audio\Data</Filter></ClInclude>
+    <ClInclude Include="Assets\Audio\Data\WAVData.h"><Filter>Assets\Audio\Data</Filter></ClInclude>
+    <ClInclude Include="Assets\Fonts\FontLoader.h"><Filter>Assets\Fonts</Filter></ClInclude>
+    <ClInclude Include="Assets\Model\ModelData.h"><Filter>Assets\Model</Filter></ClInclude>
+    <ClInclude Include="Assets\Model\ModelLoader.h"><Filter>Assets\Model</Filter></ClInclude>
+    <ClInclude Include="Assets\Model\ModelManager.h"><Filter>Assets\Model</Filter></ClInclude>
+    <ClInclude Include="Assets\Texture\TextureData.h"><Filter>Assets\Texture</Filter></ClInclude>
+    <ClInclude Include="Assets\Texture\TextureManager.h"><Filter>Assets\Texture</Filter></ClInclude>
+    <ClInclude Include="Camera\Camera.h"><Filter>Camera</Filter></ClInclude>
+    <ClInclude Include="Camera\DebugCamera.h"><Filter>Camera</Filter></ClInclude>
+    <ClInclude Include="Collision\Collider.h"><Filter>Collision</Filter></ClInclude>
+    <ClInclude Include="Collision\ColliderManager.h"><Filter>Collision</Filter></ClInclude>
+    <ClInclude Include="Collision\Data\CollisionInfo.h"><Filter>Collision\Data</Filter></ClInclude>
+    <ClInclude Include="Collision\Data\CollisionVisitor.h"><Filter>Collision\Data</Filter></ClInclude>
+    <ClInclude Include="Compute\ComputeCommandContext.h"><Filter>Compute</Filter></ClInclude>
+    <ClInclude Include="Compute\ComputeObject.h"><Filter>Compute</Filter></ClInclude>
+    <ClInclude Include="Compute\PSO\CSPSOManager.h"><Filter>Compute\PSO</Filter></ClInclude>
+    <ClInclude Include="Compute\PSO\CSRootSignature.h"><Filter>Compute\PSO</Filter></ClInclude>
+    <ClInclude Include="Compute\PSO\CSShaderShelf.h"><Filter>Compute\PSO</Filter></ClInclude>
+    <ClInclude Include="Core\DXDevice.h"><Filter>Core</Filter></ClInclude>
+    <ClInclude Include="Core\FrameCounter.h"><Filter>Core</Filter></ClInclude>
+    <ClInclude Include="Core\ImGuiWrapper.h"><Filter>Core</Filter></ClInclude>
+    <ClInclude Include="Core\Command\CommandObject.h"><Filter>Core\Command</Filter></ClInclude>
+    <ClInclude Include="Core\Command\CommandSet.h"><Filter>Core\Command</Filter></ClInclude>
+    <ClInclude Include="Core\Command\ICommandContext.h"><Filter>Core\Command</Filter></ClInclude>
+    <ClInclude Include="Core\Command\SHCmdQueue.h"><Filter>Core\Command</Filter></ClInclude>
+    <ClInclude Include="Core\Command\Measure\MeasureShaderTime.h"><Filter>Core\Command\Measure</Filter></ClInclude>
+    <ClInclude Include="Core\View\DSVManager.h"><Filter>Core\View</Filter></ClInclude>
+    <ClInclude Include="Core\View\RTVManager.h"><Filter>Core\View</Filter></ClInclude>
+    <ClInclude Include="Core\View\SRVManager.h"><Filter>Core\View</Filter></ClInclude>
+    <ClInclude Include="Core\View\ViewFunc.h"><Filter>Core\View</Filter></ClInclude>
+    <ClInclude Include="Input\Input.h"><Filter>Input</Filter></ClInclude>
+    <ClInclude Include="Render\DrawData.h"><Filter>Render</Filter></ClInclude>
+    <ClInclude Include="Render\MeshRenderer.h"><Filter>Render</Filter></ClInclude>
+    <ClInclude Include="Render\Renderer.h"><Filter>Render</Filter></ClInclude>
+    <ClInclude Include="Render\Buffer\BufferContainer.h"><Filter>Render\Buffer</Filter></ClInclude>
+    <ClInclude Include="Render\Buffer\GPUBuffer.h"><Filter>Render\Buffer</Filter></ClInclude>
+    <ClInclude Include="Render\Buffer\ReadBackBuffer.h"><Filter>Render\Buffer</Filter></ClInclude>
+    <ClInclude Include="Render\Command\DirectCommandContext.h"><Filter>Render\Command</Filter></ClInclude>
+    <ClInclude Include="Render\Font\Text.h"><Filter>Render\Font</Filter></ClInclude>
+    <ClInclude Include="Render\PostEffect\BloomEffect.h"><Filter>Render\PostEffect</Filter></ClInclude>
+    <ClInclude Include="Render\PostEffect\IPostEffect.h"><Filter>Render\PostEffect</Filter></ClInclude>
+    <ClInclude Include="Render\PostEffect\PostEffectContext.h"><Filter>Render\PostEffect</Filter></ClInclude>
+    <ClInclude Include="Render\PostEffect\SimplePostEffect.h"><Filter>Render\PostEffect</Filter></ClInclude>
+    <ClInclude Include="Render\PostEffect\SimplePostEffectData.h"><Filter>Render\PostEffect</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\PSOConfig.h"><Filter>Render\PSO</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\PSOEditor.h"><Filter>Render\PSO</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\PSOManager.h"><Filter>Render\PSO</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\PSOManagerForMS.h"><Filter>Render\PSO</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\ShelfManager.h"><Filter>Render\PSO</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\BlendStateShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\DepthStencilShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\InputLayoutShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\RasterizerShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\RootSignatureShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\ShaderShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\Screen\Display.h"><Filter>Render\Screen</Filter></ClInclude>
+    <ClInclude Include="Render\Screen\IDisplay.h"><Filter>Render\Screen</Filter></ClInclude>
+    <ClInclude Include="Render\Screen\SwapChain.h"><Filter>Render\Screen</Filter></ClInclude>
+    <ClInclude Include="Render\Screen\WindowsAPI.h"><Filter>Render\Screen</Filter></ClInclude>
+    <ClInclude Include="Tool\AnimationModel\AnimationModel.h"><Filter>Tool\AnimationModel</Filter></ClInclude>
+    <ClInclude Include="Tool\AnimationModel\SkinningModel.h"><Filter>Tool\AnimationModel</Filter></ClInclude>
+    <ClInclude Include="Tool\Binary\BinaryManager.h"><Filter>Tool\Binary</Filter></ClInclude>
+    <ClInclude Include="Tool\Binary\Value.h"><Filter>Tool\Binary</Filter></ClInclude>
+    <ClInclude Include="Tool\CurveEditor\CurveEditor.h"><Filter>Tool\CurveEditor</Filter></ClInclude>
+    <ClInclude Include="Tool\CurveEditor\CurveEditorLog.h"><Filter>Tool\CurveEditor</Filter></ClInclude>
+    <ClInclude Include="Tool\CurveEditor\CurvePlayer.h"><Filter>Tool\CurveEditor</Filter></ClInclude>
+    <ClInclude Include="Tool\CurveEditor\Binding\CurveBinder.h"><Filter>Tool\CurveEditor\Binding</Filter></ClInclude>
+    <ClInclude Include="Tool\CurveEditor\Data\CurveAsset.h"><Filter>Tool\CurveEditor\Data</Filter></ClInclude>
+    <ClInclude Include="Tool\CurveEditor\Data\CurveAssetIO.h"><Filter>Tool\CurveEditor\Data</Filter></ClInclude>
+    <ClInclude Include="Tool\DecoEditor\DecoEditor.h"><Filter>Tool\DecoEditor</Filter></ClInclude>
+    <ClInclude Include="Tool\DecoEditor\Data\DecoDataManager.h"><Filter>Tool\DecoEditor\Data</Filter></ClInclude>
+    <ClInclude Include="Tool\DecoEditor\Data\DecoObjectController.h"><Filter>Tool\DecoEditor\Data</Filter></ClInclude>
+    <ClInclude Include="Tool\DecoEditor\Data\DecoObjectManager.h"><Filter>Tool\DecoEditor\Data</Filter></ClInclude>
+    <ClInclude Include="Tool\DecoEditor\Data\DecoPathManager.h"><Filter>Tool\DecoEditor\Data</Filter></ClInclude>
+    <ClInclude Include="Tool\FPS\FPSObserver.h"><Filter>Tool\FPS</Filter></ClInclude>
+    <ClInclude Include="Tool\Grid\Grid.h"><Filter>Tool\Grid</Filter></ClInclude>
+    <ClInclude Include="Tool\ImGui\ImGuiWindowManager.h"><Filter>Tool\ImGui</Filter></ClInclude>
+    <ClInclude Include="Tool\Json\JsonManager.h"><Filter>Tool\Json</Filter></ClInclude>
+    <ClInclude Include="Tool\Logger\CustomLogSetting.h"><Filter>Tool\Logger</Filter></ClInclude>
+    <ClInclude Include="Tool\Logger\Logger.h"><Filter>Tool\Logger</Filter></ClInclude>
+    <ClInclude Include="Tool\ModelDrawer\ModelDrawer.h"><Filter>Tool\ModelDrawer</Filter></ClInclude>
+    <ClInclude Include="Tool\ModelDrawer\SkinningProcessor.h"><Filter>Tool\ModelDrawer</Filter></ClInclude>
+    <ClInclude Include="Tool\TimeViewer\TimeViewer.h"><Filter>Tool\TimeViewer</Filter></ClInclude>
+    <ClInclude Include="Utility\Color.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\ConvertString.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\CreateDump.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\DataStructures.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\DirectUtilFuncs.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\Easing.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\Matrix.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\MatrixFactory.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\MyMath.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\Operator.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\Quaternion.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\SearchFile.h"><Filter>Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\Vector.h"><Filter>Utility</Filter></ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,5 +1,11 @@
-﻿
-$proj    = Resolve-Path "DirectXGame.vcxproj"
+﻿param(
+    # 対象の .vcxproj (カレントディレクトリからの相対パス可)
+    [string]$ProjectPath = "DirectXGame.vcxproj",
+    # フィルタ生成から除外するサブディレクトリ (別プロジェクトに属するもの)
+    [string[]]$ExcludeDirs = @()
+)
+
+$proj    = Resolve-Path $ProjectPath
 $filters = "$proj.filters"
 
 Write-Output BeginFilterAdjustment
@@ -8,7 +14,11 @@ try {
     $root = (Split-Path $proj).TrimEnd('\')
 
     $files = Get-ChildItem $root -Recurse -File |
-             Where-Object { $_.Extension -match '\.(cpp|c|h|hpp)$' }
+             Where-Object { $_.Extension -match '\.(cpp|c|h|hpp)$' } |
+             Where-Object {
+                 $rel = $_.FullName.Substring($root.Length + 1)
+                 -not ($ExcludeDirs | Where-Object { $rel -like "$_\*" })
+             }
 
     $filterSet = New-Object System.Collections.Generic.HashSet[string]
 

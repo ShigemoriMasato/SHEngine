@@ -47,13 +47,15 @@ void CameraConfig::Validate() {
 	farClip = ConfigFile::Sanitize(farClip, 10.0f, 100000.0f, defaults.farClip);
 }
 
-GameCameraController::GameCameraController() {
+GameCameraController::GameCameraController(SHEngine::Input* input) {
 	binder_.BindVector3("Position", &offsetPosition_);
 	binder_.BindVector3("Rotation", &offsetRotation_);
 
 	editor_.SetBinder(&binder_);
 
 	player_.SetBinder(&binder_);
+
+	debugCamera_.Initialize(input);
 }
 
 void GameCameraController::Initialize(const Vector2& screenSize, const Vector3& target) {
@@ -63,6 +65,8 @@ void GameCameraController::Initialize(const Vector2& screenSize, const Vector3& 
 	const float height = std::max(screenSize.y, 1.0f);
 	desc.SetValue(std::max(screenSize.x, 1.0f), height, config_.fovY, config_.nearClip, config_.farClip);
 	camera_.SetProjectionMatrix(desc);
+
+	useCamera_ = &camera_;
 
 	focus_ = target;
 	ApplyMatrix();
@@ -76,6 +80,7 @@ void GameCameraController::Update(float deltaTime, const Vector3& target) {
 	shakeOffset_ = { shakeDist_(randomEngine_) * leftShake_, shakeDist_(randomEngine_) * leftShake_, shakeDist_(randomEngine_) * leftShake_ };
 
 	leftShake_ -= deltaTime * config_.shakeAttenuation;
+	leftShake_ = std::max(leftShake_, 0.0f);
 
 	ApplyMatrix();
 }
@@ -88,16 +93,25 @@ void GameCameraController::UpdateCurve(float deltaTime) {
 void GameCameraController::DrawImGui() {
 #ifdef USE_IMGUI
 	editor_.DrawImGui();
-
-	if(ImGui::Button("Shake"))
-	{
-		Shake(1.0f);
-	}
 #endif
 }
 
 void GameCameraController::ConfigImGui() {
+#ifdef USE_IMGUI
 	config_.DrawImGui();
+
+	if (ImGui::Button("Shake")) {
+		Shake(1.0f);
+	}
+
+	if (ImGui::Button("Switch")) {
+		if (useCamera_ == &camera_) {
+			useCamera_ = &debugCamera_;
+		} else {
+			useCamera_ = &camera_;
+		}
+	}
+#endif
 }
 
 void GameCameraController::Boot(const std::string& itemName) {
@@ -131,14 +145,16 @@ void GameCameraController::ApplyMatrix() {
 	const Vector3 up = GameMath::Cross(forward, right);
 
 	const Matrix4x4 view = {
-		right.x,						up.x,						forward.x,						0.0f,
-		right.y,						up.y,						forward.y,						0.0f,
-		right.z,						up.z,						forward.z,						0.0f,
-		-GameMath::Dot(right, eye),		-GameMath::Dot(up, eye),	-GameMath::Dot(forward, eye),	1.0f
+		right.x, up.x, forward.x, 0.0f,
+		right.y, up.y, forward.y, 0.0f,
+		right.z, up.z, forward.z, 0.0f,
+		-GameMath::Dot(right, eye) + shakeOffset_.x, -GameMath::Dot(up, eye) + shakeOffset_.y, -GameMath::Dot(forward, eye) + shakeOffset_.z, 1.0f
 	};
 
 	const Matrix4x4 offsetMatrix = Matrix::MakeRotationMatrix(offsetRotation_) * Matrix::MakeTranslationMatrix(offsetPosition_);
 
 	camera_.SetTransform(view * offsetMatrix);
 	camera_.MakeMatrix();
+
+	debugCamera_.Update();
 }

@@ -8,6 +8,8 @@ namespace Particle {
 
 		// @brief SRV/UAV float32_t3 * particleCount
 		SHEngine::GPUBuffer* positions;
+		// @brief SRV/UAV float32_t3 * particleCount
+		SHEngine::GPUBuffer* rotations;
 		// @brief SRV/UAV float32_t * particleCount
 		SHEngine::GPUBuffer* scales;
 		// @brief SRV/UAV float32_t4 * particleCount
