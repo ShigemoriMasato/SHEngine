@@ -23,15 +23,24 @@ namespace SHEngine {
 		void SetExecuteNum(int executeNum, int threadSize = 1);
 		// @brief スレッドグループのサイズを登録
 		void SetThreadGroupSize(int x, int y = 0, int z = 0) { threadGroupSize_ = { x, y, z }; }
-		// @brief CBV/SRV/UAVを登録
-		void SetGPUBuffer(BufferType bufferType, GPUBuffer* buffer);
-		// @brief 複数のCBV/SRV/UAVを登録
-		void SetGPUBuffers(BufferType bufferType, std::vector<GPUBuffer*> buffers);
-		// @brief テクスチャを使用するかどうかを登録。ComputeShaderでテクスチャを使用する場合はこれをtrueにする必要がある。使用するレジスタはt8~t1032(最大1024個)。
+		// @brief CBV/SRV/UAVを登録する。登録した順番がRootParameterIndexになる。
+		// @param bufferType 今回使用するBufferの種類(CBV/SRV/UAVのどれか一つ)
+		// @param registerNumber シェーダー側のレジスタ番号(b0ならCBVの0)
+		// @param buffer 使用するGPUBuffer
+		// @note 同じbufferType・registerNumberが既に登録されている場合はBufferを差し替える。
+		void SetGPUBuffer(BufferType bufferType, int registerNumber, GPUBuffer* buffer);
+		// @brief 複数のCBV/SRV/UAVを、startRegisterから連番で登録する。
+		// @param bufferType 今回使用するBufferの種類(CBV/SRV/UAVのどれか一つ)
+		// @param startRegister 先頭のBufferのレジスタ番号
+		// @param buffers 使用するGPUBufferの配列
+		void SetGPUBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& buffers);
+		// @brief 登録したCBV/SRV/UAVをすべて解除する。Buffer自体は解放されない。
+		void ResetGPUBuffers();
+		// @brief テクスチャを使用するかどうかを登録。ComputeShaderでテクスチャを使用する場合はこれをtrueにする必要がある。使用するレジスタはt8~t1031(最大1024個)。
 		void SetUseTexture(bool useTexture);
 		// @brief SamplerIDをOR演算子で登録。
-		void SetSamplerID(uint32_t samplerID) { samplerID_ = samplerID; }
-		void SetSamplerID(SHEngine::PSO::SamplerID samplerID) { samplerID_ = uint32_t(samplerID); }
+		void SetSamplerID(uint32_t samplerID) { rootConfig_.samplers = samplerID; }
+		void SetSamplerID(SHEngine::PSO::SamplerID samplerID) { rootConfig_.samplers = uint32_t(samplerID); }
 
 		// @brief 登録したCBV/SRV/UAVをComputeShaderにセットして、ComputeShaderを実行する。
 		// @param commandContext コマンドコンテキスト。DCCでもできるため、CCCである必要はないが、CCC推奨。
@@ -47,10 +56,10 @@ namespace SHEngine {
 			size_t size = 0;
 		};
 
-		std::map<BufferType, std::vector<GPUBuffer*>> gpuBuffers_;
+		// rootConfig_.rootParamsと同じ順番で対応するBufferを保持する
+		std::vector<GPUBuffer*> gpuBuffers_;
+		PSO::RootSignatureConfig rootConfig_;
 		std::string computeShaderName_;
-		bool useTexture_ = false;
-		uint32_t samplerID_ = 0;
 		struct ThreadGroupSize {
 			int x;
 			int y;

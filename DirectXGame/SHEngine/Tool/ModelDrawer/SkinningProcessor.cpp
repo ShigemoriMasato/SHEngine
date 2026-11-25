@@ -87,9 +87,9 @@ void SkinningProcessor::Update(SHEngine::ICommandContext* cmdCtx) {
 
 	for (uint32_t i = 0; i < meshNum; ++i) {
 		process_.Initialize();
-		process_.SetGPUBuffers(BufferType::UAV, { positions_[i], normals_[i] });
-		process_.SetGPUBuffers(BufferType::SRV, { influences_[i], skeletonMatrices_, originalPositions_[i], originalNormals_[i] });
-		process_.SetGPUBuffers(BufferType::CBV, { vertexNum_[i] });
+		process_.SetGPUBuffers(BufferType::UAV, 0, { positions_[i], normals_[i] });
+		process_.SetGPUBuffers(BufferType::SRV, 0, { influences_[i], skeletonMatrices_, originalPositions_[i], originalNormals_[i] });
+		process_.SetGPUBuffers(BufferType::CBV, 0, { vertexNum_[i] });
 		process_.SetExecuteNum(static_cast<int>(modelData_->meshes[i].position.size()) / 128 + 1);
 		process_.Execute(cmdCtx);
 	}

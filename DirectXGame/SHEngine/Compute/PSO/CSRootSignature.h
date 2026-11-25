@@ -9,35 +9,20 @@ namespace SHEngine::PSO {
 
 		void Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers);
 
-		ID3D12RootSignature* GetRootSignature(int cbv, int srv, int uav, bool useTexture, uint32_t samplerID);
+		// @brief 設定を基にComputeShader用のルートシグネチャを取得する。未作成なら作成してキャッシュする。
+		// @param config rootParamsの順番がそのままRootParameterIndexになる。shaderはCOMPUTE_SHADERであること。
+		ID3D12RootSignature* GetRootSignature(const RootSignatureConfig& config);
 
 	private:
 
-		struct RS {
-			Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-		};
-		struct RSConfig {
-			int cbvNum = 0;
-			int srvNum = 0;
-			int uavNum = 0;
-			bool useTexture;
-			uint32_t samplerID;
-			bool operator==(const RSConfig& other) const {
-				return cbvNum == other.cbvNum && srvNum == other.srvNum && uavNum == other.uavNum && useTexture == other.useTexture && samplerID == other.samplerID;
-			}
-			bool operator<(const RSConfig& other) const {
-				if (cbvNum != other.cbvNum) return cbvNum < other.cbvNum;
-				if (srvNum != other.srvNum) return srvNum < other.srvNum;
-				if(uavNum != other.uavNum) return uavNum < other.uavNum;
-				if (useTexture != other.useTexture) return useTexture < other.useTexture;
-				return samplerID < other.samplerID;
-			}
-		};
+		ID3D12RootSignature* CreateRootSignature(const RootSignatureConfig& config);
 
 		DXDevice* device_ = nullptr;
 
-		std::map<RSConfig, RS> rootSignatures_;
+		std::map<RootSignatureConfig, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatures_;
 		std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers_;
+
+		Logger logger_ = GetLogger("Engine");
 	};
 
 }

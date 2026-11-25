@@ -2,10 +2,8 @@
 #include <Scene/IScene.h>
 #include <Camera/DebugCamera.h>
 #include <Tool/Grid/Grid.h>
-
-#include <Tool/DecoEditor/DecoEditor.h>
-
-#include <Tool/ModelDrawer/ModelDrawer.h>
+#include <Particle/ParticleSystem.h>
+#include <Particle/EmitFunc/InnerModel.h>
 
 #include <Tool/CurveEditor/CurvePlayer.h>
 #include <Tool/CurveEditor/CurveEditor.h>
@@ -24,15 +22,15 @@ private:
 	void Save();
 	void Load();
 
-	void SelectFile();
-
 	std::unique_ptr<DebugCamera> debugCamera_;
 	std::unique_ptr<Camera> gameCamera_;
 	Camera orthoCamera_;
 	std::unique_ptr<Grid> grid_;
 
+	ParticleSystem particleSystem_{ 8388608 };
+	Particle::Emitter* emitter_ = nullptr;
 
-	ModelDrawer cameraRenderer_{};
+	std::unique_ptr<SHEngine::BufferContainer> container_;
 
 	CurveEditor curveEditor_{ "TestCurve" };
 	std::vector<CurveBinder> curveBinders_;

@@ -25,9 +25,9 @@ Decorate::ObjController::ObjController(SHEngine::Screen::Display* display, SHEng
 	idGetter_->Initialize();
 	idGetter_->SetShader("Deco/GetID.CS.hlsl");
 	idGetter_->SetExecuteNum(1);
-	idGetter_->SetGPUBuffer(BufferType::CBV, cursorBuffer_);
-	idGetter_->SetGPUBuffer(BufferType::CBV, textureIndexBuffer);
-	idGetter_->SetGPUBuffer(BufferType::UAV, ansBuffer_);
+	idGetter_->SetGPUBuffer(BufferType::CBV, 0, cursorBuffer_);
+	idGetter_->SetGPUBuffer(BufferType::CBV, 1, textureIndexBuffer);
+	idGetter_->SetGPUBuffer(BufferType::UAV, 0, ansBuffer_);
 	idGetter_->SetUseTexture(true);
 	idGetter_->SetSamplerID(SHEngine::PSO::SamplerID::Point);
 }

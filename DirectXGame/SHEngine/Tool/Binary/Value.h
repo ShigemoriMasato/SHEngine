@@ -34,6 +34,7 @@ enum class TypeID : uint8_t {
 	Custom = 0x80,
 	Transform,
 	QTransform,
+	InnerModelCell,
 };
 
 struct Vector2;
@@ -45,6 +46,7 @@ struct Matrix4x4;
 struct Quaternion;
 struct Transform;
 struct QuaternionTransform;
+namespace Particle::InnerModel { struct Cell; }
 
 template<typename T>
 struct TypeIDResolver {
@@ -73,3 +75,4 @@ template<> struct TypeIDResolver<Quaternion> { static constexpr TypeID id = Type
 
 template<> struct TypeIDResolver<Transform> { static constexpr TypeID id = TypeID::Transform; };
 template<> struct TypeIDResolver<QuaternionTransform> { static constexpr TypeID id = TypeID::QTransform; };
+template<> struct TypeIDResolver<Particle::InnerModel::Cell> { static constexpr TypeID id = TypeID::InnerModelCell; };

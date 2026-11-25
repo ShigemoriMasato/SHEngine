@@ -68,6 +68,55 @@ void TextureData::Release() {
 	textureManager_->DeleteTexture(this);
 }
 
+void TextureData::CopyBuffer(const void*, size_t) {
+	logger_->error("TextureData::CopyBuffer: Texture can't copy buffer. ({})", name_);
+	assert(false && "TextureData::CopyBuffer: Texture can't copy buffer");
+}
+
+void TextureData::SetTextureResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES initialState, bool attach) {
+	resources_.clear();
+	auto& res = resources_.emplace_back().res;
+	if (attach) {
+		res.Attach(resource);
+	} else {
+		res = resource;
+	}
+
+	// テクスチャは1枚なのでフレームごとの多重化はしない
+	currentState_.assign(1, initialState);
+	nextState_ = initialState;
+
+	bufferType_ = uint8_t(BufferType::SRV);
+	sizeInBytes_ = 0;
+	strideInBytes_ = 0;
+	num_ = 0;
+}
+
+void TextureData::CreateSRV(ID3D12Device* device, SRVManager* srvManager, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) {
+	auto& handle = srvHandles_.emplace_back(std::make_unique<SRVHandle>());
+	// テクスチャはバインドレス(t8~)の範囲に置くため0から確保する
+	handle->UpdateHandle(srvManager, 0);
+	device->CreateShaderResourceView(GetResource(), &desc, handle->GetCPU());
+	descriptorHandles_[BufferType::SRV].push_back(handle->GetGPU());
+	bufferType_ |= uint8_t(BufferType::SRV);
+}
+
+void TextureData::CreateUAV(ID3D12Device* device, SRVManager* srvManager, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc) {
+	auto& handle = uavHandles_.emplace_back(std::make_unique<SRVHandle>());
+	handle->UpdateHandle(srvManager, 0);
+	device->CreateUnorderedAccessView(GetResource(), nullptr, &desc, handle->GetCPU());
+	descriptorHandles_[BufferType::UAV].push_back(handle->GetGPU());
+	bufferType_ |= uint8_t(BufferType::UAV);
+	unordered_ = true;
+}
+
+void TextureData::SetDebugName(const std::string& prefix) {
+	name_ = prefix + " : " + std::to_string(debugTextureCount++);
+	if (GetResource()) {
+		GetResource()->SetName(ConvertString(name_).c_str());
+	}
+}
+
 void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, bool unordered, ID3D12Device* device, SRVManager* srvManager) {
 	DXGI_FORMAT dxgiformat = DXGI_FORMAT_UNKNOWN;
 	switch (format) {
@@ -113,9 +162,11 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 		clearValue.Color[i] = clearColor[i];
 	}
 
-	HRESULT hr = device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc, 
-		D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&textureResource_));
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc,
+		D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr) && "Failed to create off-screen resource");
+	SetTextureResource(resource, D3D12_RESOURCE_STATE_COMMON, true);
 
 	clearColor_ = clearColor;
 
@@ -126,18 +177,12 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	//!mipmapを使うかどうかは今後要検討
 	srvDesc.Texture2D.MipLevels = 1;
-
-
-	// SRV用ディスクリプタ位置を確保
-	srvHandle_.UpdateHandle(srvManager, 0);
-
-	// SRVを作成
-	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
+	CreateSRV(device, srvManager, srvDesc);
 
 	width_ = width;
 	height_ = height;
 
-	textureResource_->SetName(LPCWSTR(ConvertString("WindowTexture : " + std::to_string(debugTextureCount++)).c_str()));
+	SetDebugName("WindowTexture");
 
 	if (unordered) {
 		// UAVの作成
@@ -146,15 +191,13 @@ void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Fo
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 		uavDesc.Texture2D.MipSlice = 0;
 		uavDesc.Texture2D.PlaneSlice = 0;
-		// UAV用ディスクリプタ位置を確保
-		uavHandle_.UpdateHandle(srvManager, 0);
-		// UAVを作成
-		device->CreateUnorderedAccessView(textureResource_.Get(), nullptr, &uavDesc, uavHandle_.GetCPU());
+		CreateUAV(device, srvManager, uavDesc);
 	}
 }
 
 void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager, uint32_t clearColor) {
-	textureResource_.Attach(resource);
+	// SwapChainのバッファはPRESENT(=COMMON)状態で渡される
+	SetTextureResource(resource, D3D12_RESOURCE_STATE_PRESENT, true);
 
 	format_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
@@ -165,12 +208,7 @@ void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVMana
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	//!mipmapを使うかどうかは今後要検討
 	srvDesc.Texture2D.MipLevels = 1;
-
-	// SRV用ディスクリプタ位置を確保
-	srvHandle_.UpdateHandle(manager, 0);
-
-	// SRVを作成
-	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
+	CreateSRV(device, manager, srvDesc);
 
 	auto desc = resource->GetDesc();
 
@@ -178,34 +216,7 @@ void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVMana
 	height_ = static_cast<uint32_t>(desc.Height);
 	clearColor_ = ConvertColor(clearColor);
 
-	textureResource_->SetName(LPCWSTR(ConvertString("SwapChainTexture : " + std::to_string(debugTextureCount++)).c_str()));
-}
-
-void TextureData::Create(ID3D12Resource* resource, ID3D12Device* device, SRVManager* manager) {
-	textureResource_.Attach(resource);
-
-	// metadataがないのでフォーマットとミップ数は手動設定
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	//!mipmapを使うかどうかは今後要検討
-	srvDesc.Texture2D.MipLevels = 1;
-
-	format_ = DXGI_FORMAT_R32_FLOAT;
-
-	// SRV用ディスクリプタ位置を確保
-	srvHandle_.UpdateHandle(manager, 0);
-
-	// SRVを作成
-	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
-
-	auto desc = resource->GetDesc();
-
-	width_ = static_cast<uint32_t>(desc.Width);
-	height_ = static_cast<uint32_t>(desc.Height);
-
-	textureResource_->SetName(LPCWSTR(ConvertString("DepthTexture : " + std::to_string(debugTextureCount++)).c_str()));
+	SetDebugName("SwapChainTexture");
 }
 
 void TextureData::Create(uint32_t width, uint32_t height, ID3D12Device* device, SRVManager* srvManager) {
@@ -222,14 +233,21 @@ void TextureData::Create(uint32_t width, uint32_t height, ID3D12Device* device, 
 
 	CD3DX12_HEAP_PROPERTIES heap(D3D12_HEAP_TYPE_DEFAULT);
 
-	device->CreateCommittedResource(
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
 		&heap,
 		D3D12_HEAP_FLAG_NONE,
 		&desc,
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		nullptr,
-		IID_PPV_ARGS(&textureResource_)
+		IID_PPV_ARGS(&resource)
 	);
+	assert(SUCCEEDED(hr) && "Failed to create bitmap texture resource");
+	SetTextureResource(resource, D3D12_RESOURCE_STATE_COPY_DEST, true);
+
+	format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
+	width_ = width;
+	height_ = height;
 
 	//SRVの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -237,11 +255,9 @@ void TextureData::Create(uint32_t width, uint32_t height, ID3D12Device* device, 
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.Texture2D.MipLevels = 1;
-	srvHandle_.UpdateHandle(srvManager, 0);
-	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
+	CreateSRV(device, srvManager, srvDesc);
 
-	textureResource_->SetName(LPCWSTR(ConvertString("BitMapTexture : " + std::to_string(debugTextureCount++)).c_str()));
-
+	SetDebugName("BitMapTexture");
 }
 
 DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* device, SRVManager* srvManager) {
@@ -303,7 +319,8 @@ DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* de
 	//TextureResourceを作成
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 
-	textureResource_.Attach(CreateTextureResource(device, metadata));
+	SetTextureResource(CreateTextureResource(device, metadata), D3D12_RESOURCE_STATE_COPY_DEST, true);
+	format_ = metadata.format;
 
 	if (metadata.IsCubemap()) {
 		type_ = Type::CubeTexture;
@@ -327,14 +344,78 @@ DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* de
 	}
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	//SRVを作成するDescriptorHeapの場所を決める
-	srvHandle_.UpdateHandle(srvManager, 0);
-
 	//SRVを作成する
-	device->CreateShaderResourceView(textureResource_.Get(), &srvDesc, srvHandle_.GetCPU());
+	CreateSRV(device, srvManager, srvDesc);
 
-	textureResource_->SetName(LPCWSTR(ConvertString("LoadTexture : " + std::to_string(debugTextureCount++)).c_str()));
+	SetDebugName("LoadTexture");
+	// 表示名はファイル名にする
+	filePath_ = filePath;
+	name_ = path.filename().string();
 
 	//テクスチャデータをアップロードするたに必要なデータを返す
 	return mipImages;
+}
+
+void RenderTexture::CreateRTV(ID3D12Device* device, RTVManager* rtvManager) {
+	rtvHandle_.UpdateHandle(rtvManager);
+
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	rtvDesc.Format = format_;
+	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;	//2Dテクスチャとしてよみこむ
+	device->CreateRenderTargetView(GetResource(), &rtvDesc, rtvHandle_.GetCPU());
+}
+
+void DepthTexture::CreateDepth(uint32_t width, uint32_t height, ID3D12Device* device, SRVManager* srvManager, DSVManager* dsvManager) {
+	//生成するResourceの設定
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = width;
+	resourceDesc.Height = height;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	//利用するヒープの設定
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	//深度値のクリア設定
+	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue.DepthStencil.Depth = 1.0f;
+	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+
+	//Resourceの生成
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&depthClearValue,
+		IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr) && "Failed to create depth texture resource");
+	SetTextureResource(resource, D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
+
+	//DSVの作成
+	dsvHandle_.UpdateHandle(dsvManager);
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	device->CreateDepthStencilView(GetResource(), &dsvDesc, dsvHandle_.GetCPU());
+
+	//SRVの作成(R32_FLOATとして参照する)
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = 1;
+	CreateSRV(device, srvManager, srvDesc);
+
+	format_ = DXGI_FORMAT_R32_FLOAT;
+	width_ = width;
+	height_ = height;
+
+	SetDebugName("DepthTexture");
 }

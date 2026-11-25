@@ -67,7 +67,7 @@ void BloomEffect::Apply(PostEffectContext* context) {
 	renderer->ResetGPUBuffers();
 	renderer->SetVS("PostEffect/PostEffect.VS.hlsl");
 	renderer->SetPS("PostEffect/BlurHorizontal.PS.hlsl");
-	renderer->SetGPUBuffers({ maskIndexBuffer_.get(), buffer_.get() }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer->SetPSBuffers(BufferType::CBV, 0, { maskIndexBuffer_.get(), buffer_.get() });
 	renderer->SetUseTexture(true);
 	renderer->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 	renderer->Draw(dcc);
@@ -78,7 +78,7 @@ void BloomEffect::Apply(PostEffectContext* context) {
 	renderer->ResetGPUBuffers();
 	renderer->SetVS("PostEffect/PostEffect.VS.hlsl");
 	renderer->SetPS("PostEffect/BlurVertical.PS.hlsl");
-	renderer->SetGPUBuffers({ context->GetDestinationIndex(), buffer_.get() }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer->SetPSBuffers(BufferType::CBV, 0, { context->GetDestinationIndex(), buffer_.get() });
 	renderer->SetUseTexture(true);
 	renderer->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 	renderer->Draw(dcc);
@@ -91,7 +91,7 @@ void BloomEffect::Apply(PostEffectContext* context) {
 	renderer->ResetGPUBuffers();
 	renderer->SetVS("PostEffect/PostEffect.VS.hlsl");
 	renderer->SetPS("PostEffect/Bloom.PS.hlsl");
-	renderer->SetGPUBuffers({ context->GetSourceIndex(), indexBuffer_.get(), buffer_.get() }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer->SetPSBuffers(BufferType::CBV, 0, { context->GetSourceIndex(), indexBuffer_.get(), buffer_.get() });
 	renderer->SetUseTexture(true);
 	renderer->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 	renderer->SetBlendState(SHEngine::PSO::BlendStateID::Normal);

@@ -80,7 +80,7 @@ void PostEffectContext::End(SHEngine::Screen::IDisplay* output) {
 	renderer_->ResetGPUBuffers();
 	renderer_->SetPS("PostEffect/Copy.PS.hlsl");
 	renderer_->SetVS("PostEffect/PostEffect.VS.hlsl");
-	renderer_->SetGPUBuffer(GetSourceIndex(), ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer_->SetPSBuffer(BufferType::CBV, 0, GetSourceIndex());
 	renderer_->SetUseTexture(true);
 	renderer_->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 	renderer_->Draw(dcc);

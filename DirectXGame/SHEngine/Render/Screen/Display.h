@@ -38,16 +38,18 @@ namespace SHEngine::Screen {
 		void ToUnordered(SHEngine::ICommandContext* dcc, bool depthToo = false) override;
 
 		/// @brief 先頭のテクスチャだけ取得する。
-		TextureData* GetTextureData() const override { return textureData_.front(); }
+		TextureData* GetTextureData() const override { return renderTextures_.front(); }
 		/// @brief 全てのテクスチャを取得する。
-		std::vector<TextureData*> GetTextureAllData() const { return textureData_; }
-		TextureData* GetDepthTexture() const override { return depthTextureData_; }
+		std::vector<TextureData*> GetTextureAllData() const { return { renderTextures_.begin(), renderTextures_.end() }; }
+		/// @brief 全てのRenderTextureを取得する。
+		const std::vector<RenderTexture*>& GetRenderTextures() const { return renderTextures_; }
+		TextureData* GetDepthTexture() const override { return depthTexture_; }
 
 		D3D12_CPU_DESCRIPTOR_HANDLE* GetRTVHandle() override;
 		D3D12_CPU_DESCRIPTOR_HANDLE* GetDSVHandle() override;
 
 		DXGI_FORMAT GetRTVFormat() override { return rtvFormat_; }
-		uint32_t GetRenderTargetNum() override { return static_cast<uint32_t>(textureData_.size()); }
+		uint32_t GetRenderTargetNum() override { return static_cast<uint32_t>(renderTextures_.size()); }
 
 	public:	// imgui関係
 
@@ -72,27 +74,23 @@ namespace SHEngine::Screen {
 
 	private:
 
-		void CreateRenderTarget(SHEngine::TextureManager* textureManager, uint32_t index);
+		// @brief RenderTextureを追加し、RTVハンドルの配列を更新する
+		void AddRenderTexture(RenderTexture* renderTexture);
 
+		// @brief 状態はRenderTexture/DepthTexture(GPUBuffer)側で管理している
 		void TransitionBarrier(SHEngine::ICommandContext* dcc, D3D12_RESOURCE_STATES after);
 		void TransitionDepthBarrier(SHEngine::ICommandContext* dcc, D3D12_RESOURCE_STATES after);
 
 		static inline Logger logger_ = GetLogger("Engine");
 
-		std::vector<TextureData*> textureData_ = {};
-		TextureData* depthTextureData_ = nullptr;
-
-		std::vector<std::unique_ptr<RTVHandle>> rtvHandle_{};
-		DSVHandle dsvHandle_{};
+		std::vector<RenderTexture*> renderTextures_ = {};
+		DepthTexture* depthTexture_ = nullptr;
 
 		// 関数で渡す用
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandlePtr_{};
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandlePtr_ = { 0 };
 
 		DXGI_FORMAT rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-		std::vector<D3D12_RESOURCE_STATES> currentBarrier_;
-		D3D12_RESOURCE_STATES currentDepthBarrier_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
 		std::string windowName_;
 

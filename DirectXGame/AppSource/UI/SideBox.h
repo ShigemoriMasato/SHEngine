@@ -43,7 +43,7 @@ private:
 	static inline const std::string commonDataFileName_ = "SelectBoxCommon.bin";
 
 	static inline Mesh planeMesh_;
-	static inline std::unique_ptr<SHEngine::GPUBuffer> backGroundTexture_;
+	static inline SHEngine::GPUBuffer* backGroundTexture_ = nullptr; // TextureManagerが所有
 
 	//BackGroundにTextを合わせるためのオフセット
 	static inline Vector2 textPositionOffset_ = {};

@@ -1,29 +1,75 @@
 #include "MeshRenderer.h"
 #include <Render/Screen/IDisplay.h>
 
-void SHEngine::MeshRenderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType) {
-	if (shaderType != ShaderType::MESH_SHADER && shaderType != ShaderType::PIXEL_SHADER && shaderType != ShaderType::AMPLIFICATION_SHADER) {
-		logger_->info("MeshRenderer::SetGPUBuffer: This Shader is not supported.");
-		return;
-	}
-	if (uint8_t(bufferType) & (uint8_t(bufferType) - 1)) {
+void SHEngine::MeshRenderer::SetASBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer) {
+	SetGPUBuffer(ShaderType::AMPLIFICATION_SHADER, bufferType, registerNumber, gpuBuffer);
+}
+
+void SHEngine::MeshRenderer::SetASBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers) {
+	SetGPUBuffers(ShaderType::AMPLIFICATION_SHADER, bufferType, startRegister, gpuBuffers);
+}
+
+void SHEngine::MeshRenderer::EraseASBuffer(BufferType bufferType, int registerNumber) {
+	EraseGPUBuffer(ShaderType::AMPLIFICATION_SHADER, bufferType, registerNumber);
+}
+
+void SHEngine::MeshRenderer::SetMSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer) {
+	SetGPUBuffer(ShaderType::MESH_SHADER, bufferType, registerNumber, gpuBuffer);
+}
+
+void SHEngine::MeshRenderer::SetMSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers) {
+	SetGPUBuffers(ShaderType::MESH_SHADER, bufferType, startRegister, gpuBuffers);
+}
+
+void SHEngine::MeshRenderer::EraseMSBuffer(BufferType bufferType, int registerNumber) {
+	EraseGPUBuffer(ShaderType::MESH_SHADER, bufferType, registerNumber);
+}
+
+void SHEngine::MeshRenderer::SetPSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer) {
+	SetGPUBuffer(ShaderType::PIXEL_SHADER, bufferType, registerNumber, gpuBuffer);
+}
+
+void SHEngine::MeshRenderer::SetPSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers) {
+	SetGPUBuffers(ShaderType::PIXEL_SHADER, bufferType, startRegister, gpuBuffers);
+}
+
+void SHEngine::MeshRenderer::ErasePSBuffer(BufferType bufferType, int registerNumber) {
+	EraseGPUBuffer(ShaderType::PIXEL_SHADER, bufferType, registerNumber);
+}
+
+void SHEngine::MeshRenderer::SetGPUBuffer(ShaderType shaderType, BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer) {
+	if (bufferType != BufferType::CBV && bufferType != BufferType::SRV && bufferType != BufferType::UAV) {
 		logger_->error("MeshRenderer::SetGPUBuffer: Invalid BufferType. Must be CBV, SRV, or UAV.");
 		return;
 	}
-	if (bufferType == BufferType::ReadBack) {
-		logger_->error("MeshRenderer::SetGPUBuffer: ReadBack BufferType is not supported.");
+	if (!gpuBuffer) {
+		logger_->error("MeshRenderer::SetGPUBuffer: gpuBuffer is nullptr.");
 		return;
 	}
 
-	auto& rootParamConfig = psoConfig_.rootConfig.rootParams.emplace_back();
-	rootParamConfig.shader = shaderType;
-	rootParamConfig.registerNumber = registerCount_[shaderType][bufferType]++;
-	rootParamConfig.bufferType = bufferType;
+	// 同じシェーダー・種類・レジスタが登録済みなら差し替える
+	auto& rootParams = psoConfig_.rootConfig.rootParams;
+	size_t index = rootParams.size();
+	for (size_t i = 0; i < rootParams.size(); ++i) {
+		if (rootParams[i].shader == shaderType && rootParams[i].bufferType == bufferType && rootParams[i].registerNumber == registerNumber) {
+			index = i;
+			break;
+		}
+	}
 
-	auto& bufferConfig = bufferConfigs_.emplace_back();
-	bufferConfig.buffer = gpuBuffer;
-	bufferConfig.shader = shaderType;
-	bufferConfig.type = bufferType;
+	if (index < rootParams.size()) {
+		// 差し替え前のBufferをUAVリストから外す
+		GPUBuffer* oldBuffer = bufferConfigs_[index].buffer;
+		std::erase(uavBuffers_, oldBuffer);
+		bufferConfigs_[index].buffer = gpuBuffer;
+	} else {
+		rootParams.push_back({ shaderType, registerNumber, bufferType });
+
+		auto& bufferConfig = bufferConfigs_.emplace_back();
+		bufferConfig.buffer = gpuBuffer;
+		bufferConfig.shader = shaderType;
+		bufferConfig.type = bufferType;
+	}
 
 	if (shaderType == ShaderType::PIXEL_SHADER && gpuBuffer->GetBufferType() & BufferType::UAV) {
 		logger_->info("MeshRenderer::SetGPUBuffer: UAV is set in PixelShader. It will be transitioned to Common after Draw.");
@@ -31,28 +77,30 @@ void SHEngine::MeshRenderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shade
 	}
 }
 
-void SHEngine::MeshRenderer::SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType) {
-	for (const auto& gpuBuffer : gpuBuffers) {
-		SetGPUBuffer(gpuBuffer, shaderType, bufferType);
+void SHEngine::MeshRenderer::SetGPUBuffers(ShaderType shaderType, BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers) {
+	for (int i = 0; i < int(gpuBuffers.size()); ++i) {
+		SetGPUBuffer(shaderType, bufferType, startRegister + i, gpuBuffers[i]);
 	}
 }
 
-void SHEngine::MeshRenderer::ResetGPUBuffers() {
-}
-
-void SHEngine::MeshRenderer::EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer) {
-	int i = 0;
-	for (int i = 0; i < bufferConfigs_.size(); ++i) {
-		if (bufferConfigs_[i].buffer == gpuBuffer && bufferConfigs_[i].shader == shaderType && bufferConfigs_[i].type == bufferType) {
+void SHEngine::MeshRenderer::EraseGPUBuffer(ShaderType shaderType, BufferType bufferType, int registerNumber) {
+	auto& rootParams = psoConfig_.rootConfig.rootParams;
+	for (size_t i = 0; i < rootParams.size(); ++i) {
+		if (rootParams[i].shader == shaderType && rootParams[i].bufferType == bufferType && rootParams[i].registerNumber == registerNumber) {
+			std::erase(uavBuffers_, bufferConfigs_[i].buffer);
 			bufferConfigs_.erase(bufferConfigs_.begin() + i);
-			psoConfig_.rootConfig.rootParams.erase(psoConfig_.rootConfig.rootParams.begin() + i);
-			break;
+			rootParams.erase(rootParams.begin() + i);
+			return;
 		}
 	}
 
-	if (i == bufferConfigs_.size()) {
-		logger_->warn("MeshRenderer::EraseGPUBuffer: GPUBuffer not found.");
-	}
+	logger_->warn("MeshRenderer::EraseGPUBuffer: GPUBuffer not found.");
+}
+
+void SHEngine::MeshRenderer::ResetGPUBuffers() {
+	bufferConfigs_.clear();
+	uavBuffers_.clear();
+	psoConfig_.rootConfig.rootParams.clear();
 }
 
 void SHEngine::MeshRenderer::Draw(DirectCommandContext* dcc) {

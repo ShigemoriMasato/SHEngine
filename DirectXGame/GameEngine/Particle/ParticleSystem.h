@@ -17,6 +17,28 @@ public:
 
 	void SetCamera(const Camera* camera);
 
+	// ---- 描画設定 ----
+
+	// @brief PixelShaderを差し替える。Shader/以下を指定 (.hlsl まで含める)。デフォルトは "Game/GPUParticle.PS.hlsl"
+	// @note 入力は PSInput { float4 position : SV_POSITION; uint instanceID : INSTANCE0; }、出力は SV_TARGET(色) と SV_TARGET1(ブラーマスク)
+	void SetPixelShader(const std::string& ps) { renderer_->SetPixelShader(ps); }
+	// @brief PixelShaderで使用するCBV/SRV/UAVを追加する。
+	// @note SRVの t0 はパーティクルの色 (StructuredBuffer<float16_t4>) で予約済みのため、t1 以降を使うこと
+	void SetPSBuffer(BufferType bufferType, int registerNumber, SHEngine::GPUBuffer* buffer) { renderer_->SetPSBuffer(bufferType, registerNumber, buffer); }
+	// @brief PixelShaderで使用するCBV/SRV/UAVを、startRegisterから連番で追加する。
+	void SetPSBuffers(BufferType bufferType, int startRegister, const std::vector<SHEngine::GPUBuffer*>& buffers) { renderer_->SetPSBuffers(bufferType, startRegister, buffers); }
+	// @brief ブレンドモードを設定する。デフォルトは Add
+	// @param index 対象のレンダーターゲット番号。負の値なら全てのレンダーターゲット (色とブラーマスク) に設定する
+	void SetBlendMode(SHEngine::PSO::BlendStateID blendMode, int index = -1) { renderer_->SetBlendMode(blendMode, index); }
+	// @brief PixelShaderでテクスチャ (t8~) を使用するかどうか
+	void SetUseTexture(bool useTexture) { renderer_->SetUseTexture(useTexture); }
+	// @brief Samplerの設定 (PSO::SamplerID の OR)
+	void SetSampler(uint32_t samplerFlag) { renderer_->SetSampler(samplerFlag); }
+	void SetSampler(SHEngine::PSO::SamplerID samplerFlag) { renderer_->SetSampler(uint32_t(samplerFlag)); }
+
+	// @brief 描画用のGPUBuffer作成に使えるコンテナ (ParticleSystem と同じ寿命)
+	SHEngine::BufferContainer* GetBufferContainer() const { return container_.get(); }
+
 private:
 
 	std::unique_ptr<SHEngine::BufferContainer> container_ = nullptr;

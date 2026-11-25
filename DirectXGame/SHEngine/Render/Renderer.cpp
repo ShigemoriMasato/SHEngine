@@ -82,17 +82,47 @@ void SHEngine::Renderer::SetIndexBuffer(GPUBuffer* gpuBuffer) {
 	drawData_.SetIndexBuffer(gpuBuffer);
 }
 
-void SHEngine::Renderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType) {
-	if (shaderType != ShaderType::VERTEX_SHADER && shaderType != ShaderType::PIXEL_SHADER) {
-		logger_->warn("Renderer::SetGPUBuffer: Not use Resource of VS or PS");
-		assert(false);
+void SHEngine::Renderer::SetVSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer) {
+	SetGPUBuffer(ShaderType::VERTEX_SHADER, bufferType, registerNumber, gpuBuffer);
+}
+
+void SHEngine::Renderer::SetVSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers) {
+	for (int i = 0; i < int(gpuBuffers.size()); ++i) {
+		SetVSBuffer(bufferType, startRegister + i, gpuBuffers[i]);
+	}
+}
+
+void SHEngine::Renderer::SetPSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer) {
+	SetGPUBuffer(ShaderType::PIXEL_SHADER, bufferType, registerNumber, gpuBuffer);
+}
+
+void SHEngine::Renderer::SetPSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers) {
+	for (int i = 0; i < int(gpuBuffers.size()); ++i) {
+		SetPSBuffer(bufferType, startRegister + i, gpuBuffers[i]);
+	}
+}
+
+void SHEngine::Renderer::SetGPUBuffer(ShaderType shaderType, BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer) {
+	if (bufferType != BufferType::CBV && bufferType != BufferType::SRV && bufferType != BufferType::UAV) {
+		logger_->error("Renderer::SetGPUBuffer: Invalid BufferType. Must be CBV, SRV, or UAV.");
+		return;
+	}
+	if (!gpuBuffer) {
+		logger_->error("Renderer::SetGPUBuffer: gpuBuffer is nullptr.");
+		return;
 	}
 	assert((gpuBuffer->GetBufferType() & bufferType) != 0);
 
-	auto& rootParamConfig = psoConfig_.rootConfig.rootParams.emplace_back();
-	rootParamConfig.shader = shaderType;
-	rootParamConfig.registerNumber = registerCount_[shaderType][bufferType]++;
-	rootParamConfig.bufferType = bufferType;
+	// 同じシェーダー・種類・レジスタが登録済みなら差し替える
+	auto& rootParams = psoConfig_.rootConfig.rootParams;
+	for (size_t i = 0; i < rootParams.size(); ++i) {
+		if (rootParams[i].shader == shaderType && rootParams[i].bufferType == bufferType && rootParams[i].registerNumber == registerNumber) {
+			bufferConfigs_[i].buffer = gpuBuffer;
+			return;
+		}
+	}
+
+	rootParams.push_back({ shaderType, registerNumber, bufferType });
 
 	auto& bufferConfig = bufferConfigs_.emplace_back();
 	bufferConfig.buffer = gpuBuffer;
@@ -100,15 +130,8 @@ void SHEngine::Renderer::SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderTyp
 	bufferConfig.type = bufferType;
 }
 
-void SHEngine::Renderer::SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType) {
-	for (const auto& gpuBuffer : gpuBuffers) {
-		SetGPUBuffer(gpuBuffer, shaderType, bufferType);
-	}
-}
-
 void SHEngine::Renderer::ResetGPUBuffers() {
 	bufferConfigs_.clear();
-	registerCount_.clear();
 	uavBuffers_.clear();
 	psoConfig_.rootConfig.rootParams.clear();
 }

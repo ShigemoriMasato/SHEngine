@@ -26,54 +26,54 @@ Sand::Processor::Processor(SHEngine::BufferContainer* container, Particle* parti
 	gravity_->CopyBuffer(&gravityData_, sizeof(Vector3));
 
 	ballShape_->SetExecuteNum(particle->countNum, 128);
-	ballShape_->SetGPUBuffers(BufferType::CBV, { particle->count, seed_, ballShapeBuffer_ });
-	ballShape_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->force, particle->velocity });
+	ballShape_->SetGPUBuffers(BufferType::CBV, 0, { particle->count, seed_, ballShapeBuffer_ });
+	ballShape_->SetGPUBuffers(BufferType::UAV, 0, { particle->position, particle->force, particle->velocity });
 
 	acceptForce_ = createCO("AcceptForce");
 	acceptForce_->SetExecuteNum(particle->countNum, 128);
-	acceptForce_->SetGPUBuffers(BufferType::CBV, { particle->count, deltaTime_, forceData_, gravity_ });
-	acceptForce_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->force, particle->velocity });
+	acceptForce_->SetGPUBuffers(BufferType::CBV, 0, { particle->count, deltaTime_, forceData_, gravity_ });
+	acceptForce_->SetGPUBuffers(BufferType::UAV, 0, { particle->position, particle->force, particle->velocity });
 
 	frameInitialize_ = createCO("FrameInitialize");
 	frameInitialize_->SetExecuteNum(gridConfig.cellCount, 128);
-	frameInitialize_->SetGPUBuffers(BufferType::CBV, { grid->gridConfig });
-	frameInitialize_->SetGPUBuffers(BufferType::UAV, { grid->particleCountInCell, grid->indexWriteBuffer });
+	frameInitialize_->SetGPUBuffers(BufferType::CBV, 0, { grid->gridConfig });
+	frameInitialize_->SetGPUBuffers(BufferType::UAV, 0, { grid->particleCountInCell, grid->indexWriteBuffer });
 
 	counter_ = createCO("Counter");
 	counter_->SetExecuteNum(particle->countNum / 8 + 1, 128);
-	counter_->SetGPUBuffers(BufferType::CBV, { particle->count, grid->gridConfig });
-	counter_->SetGPUBuffer(BufferType::SRV, particle->position);
-	counter_->SetGPUBuffer(BufferType::UAV, grid->particleCountInCell);
+	counter_->SetGPUBuffers(BufferType::CBV, 0, { particle->count, grid->gridConfig });
+	counter_->SetGPUBuffer(BufferType::SRV, 0, particle->position);
+	counter_->SetGPUBuffer(BufferType::UAV, 0, grid->particleCountInCell);
 
 	splitBlock_ = createCO("SplitBlock");
 	splitBlock_->SetExecuteNum(gridConfig.cellCount, 128);
-	splitBlock_->SetGPUBuffers(BufferType::CBV, { grid->gridConfig, cellCountPerBlockBuffer_ });
-	splitBlock_->SetGPUBuffers(BufferType::SRV, { grid->particleCountInCell });
-	splitBlock_->SetGPUBuffers(BufferType::UAV, { grid->blockNumber });
+	splitBlock_->SetGPUBuffers(BufferType::CBV, 0, { grid->gridConfig, cellCountPerBlockBuffer_ });
+	splitBlock_->SetGPUBuffers(BufferType::SRV, 0, { grid->particleCountInCell });
+	splitBlock_->SetGPUBuffers(BufferType::UAV, 0, { grid->blockNumber });
 
 	prefixSum_ = createCO("PrefixSum");
 	prefixSum_->SetExecuteNum(gridConfig.cellCount, 128);
-	prefixSum_->SetGPUBuffers(BufferType::CBV, { grid->gridConfig, cellCountPerBlockBuffer_ });
-	prefixSum_->SetGPUBuffers(BufferType::SRV, { grid->blockNumber, grid->particleCountInCell });
-	prefixSum_->SetGPUBuffers(BufferType::UAV, { grid->beginIndexForCell });
+	prefixSum_->SetGPUBuffers(BufferType::CBV, 0, { grid->gridConfig, cellCountPerBlockBuffer_ });
+	prefixSum_->SetGPUBuffers(BufferType::SRV, 0, { grid->blockNumber, grid->particleCountInCell });
+	prefixSum_->SetGPUBuffers(BufferType::UAV, 0, { grid->beginIndexForCell });
 
 	assignCell_ = createCO("AssignCell");
 	assignCell_->SetExecuteNum(particle->countNum / 8 + 1, 128);
-	assignCell_->SetGPUBuffers(BufferType::CBV, { particle->count, grid->gridConfig });
-	assignCell_->SetGPUBuffers(BufferType::SRV, { particle->position, grid->beginIndexForCell });
-	assignCell_->SetGPUBuffers(BufferType::UAV, { grid->particleIndicesForCell, grid->indexWriteBuffer });
+	assignCell_->SetGPUBuffers(BufferType::CBV, 0, { particle->count, grid->gridConfig });
+	assignCell_->SetGPUBuffers(BufferType::SRV, 0, { particle->position, grid->beginIndexForCell });
+	assignCell_->SetGPUBuffers(BufferType::UAV, 0, { grid->particleIndicesForCell, grid->indexWriteBuffer });
 
 	colliderGo_ = createCO("Collider");
 	colliderGo_->SetExecuteNum(particle->countNum, 128);
-	colliderGo_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale, grid->gridConfig, colliderBuffer_ });
-	colliderGo_->SetGPUBuffers(BufferType::SRV, { grid->particleIndicesForCell, grid->beginIndexForCell, grid->particleCountInCell, particle->position });
-	colliderGo_->SetGPUBuffers(BufferType::UAV, { subPosition_, particle->velocity });
+	colliderGo_->SetGPUBuffers(BufferType::CBV, 0, { particle->count, particle->scale, grid->gridConfig, colliderBuffer_ });
+	colliderGo_->SetGPUBuffers(BufferType::SRV, 0, { grid->particleIndicesForCell, grid->beginIndexForCell, grid->particleCountInCell, particle->position });
+	colliderGo_->SetGPUBuffers(BufferType::UAV, 0, { subPosition_, particle->velocity });
 
 	colliderBack_ = createCO("Collider");
 	colliderBack_->SetExecuteNum(particle->countNum, 128);
-	colliderBack_->SetGPUBuffers(BufferType::CBV, { particle->count, particle->scale, grid->gridConfig, colliderBuffer_ });
-	colliderBack_->SetGPUBuffers(BufferType::SRV, { grid->particleIndicesForCell, grid->beginIndexForCell, grid->particleCountInCell, subPosition_ });
-	colliderBack_->SetGPUBuffers(BufferType::UAV, { particle->position, particle->velocity });
+	colliderBack_->SetGPUBuffers(BufferType::CBV, 0, { particle->count, particle->scale, grid->gridConfig, colliderBuffer_ });
+	colliderBack_->SetGPUBuffers(BufferType::SRV, 0, { grid->particleIndicesForCell, grid->beginIndexForCell, grid->particleCountInCell, subPosition_ });
+	colliderBack_->SetGPUBuffers(BufferType::UAV, 0, { particle->position, particle->velocity });
 
 #ifdef USE_IMGUI
 	configure->Add([&]() {

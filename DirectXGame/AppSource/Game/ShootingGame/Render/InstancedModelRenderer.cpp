@@ -71,9 +71,9 @@ void InstancedModelRenderer::Draw(DCC* dcc, const Camera* camera) {
 	for (size_t i = 0; i < renderers_.size(); ++i) {
 		auto& renderer = renderers_[i];
 		renderer->ResetGPUBuffers();
-		renderer->SetGPUBuffer(instanceBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
-		renderer->SetGPUBuffer(camera->GetVPBuffer(), ShaderType::VERTEX_SHADER, BufferType::CBV);
-		renderer->SetGPUBuffer(materialBuffers_[i], ShaderType::PIXEL_SHADER, BufferType::CBV);
+		renderer->SetVSBuffer(BufferType::SRV, 0, instanceBuffer_);
+		renderer->SetVSBuffer(BufferType::CBV, 0, camera->GetVPBuffer());
+		renderer->SetPSBuffer(BufferType::CBV, 0, materialBuffers_[i]);
 		renderer->Draw(dcc);
 	}
 }

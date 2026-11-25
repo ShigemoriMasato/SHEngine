@@ -130,20 +130,6 @@ SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint
 	}
 }
 
-SHEngine::GPUBuffer::GPUBuffer(TextureData* textureData) {
-	sizeInBytes_ = 0;
-	bufferType_ = uint8_t(BufferType::SRV);
-
-	descriptorHandles_[BufferType(bufferType_)].push_back(textureData->GetSRVHandle());
-	if (textureData->IsUnordered()) {
-		bufferType_ |= uint8_t(BufferType::UAV);
-		descriptorHandles_[BufferType::UAV].push_back(textureData->GetUAVHandle());
-	}
-
-	//リソースはTextureDataが管理しているものを使うので、ここではダミーのリソースを作っておく
-	resources_.resize(1);
-}
-
 D3D12_GPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetGPUDescriptorHandle(BufferType type) const {
 	if (type == BufferType::CBV) {
 		return { resources_[currentIndex_ % resources_.size()].res->GetGPUVirtualAddress() };
@@ -238,6 +224,16 @@ void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 
 	//同じだった場合の処理と過去の状態の更新は関数内に含まれている
 	if (resources_[bufferIndex].res && cmdList) {
+		// 読み取り専用の状態同士で、現在の状態が要求された状態を既に含んでいる場合は切り替えない。
+		// (例: ALL_SHADER_RESOURCE / GENERIC_READ の時に PIXEL_SHADER_RESOURCE を要求された)
+		// バインドレス(t8~)で参照されるテクスチャの状態を崩さないために必要。
+		constexpr D3D12_RESOURCE_STATES kReadStates = D3D12_RESOURCE_STATE_GENERIC_READ;
+		D3D12_RESOURCE_STATES current = currentState_[bufferIndex];
+		if (nextState_ != 0 && (nextState_ & ~kReadStates) == 0 && (current & ~kReadStates) == 0 &&
+			(current & nextState_) == nextState_) {
+			return;
+		}
+
 		if (currentState_[bufferIndex] == D3D12_RESOURCE_STATE_UNORDERED_ACCESS && isUAVBarrier_) {
 			// UAVバリアを挿入する
 			Func::InsertUAVBarrier(cmdList, resources_[bufferIndex].res.Get());

@@ -18,8 +18,8 @@ Particle::Processor::Processor(Data* data, FreeList* freeList) : key_(distributi
 
 	initialize_ = createCO("Initialize");
 	initialize_->SetExecuteNum(data->countNum, 1024);
-	initialize_->SetGPUBuffers(BufferType::CBV, { data->count });
-	initialize_->SetGPUBuffers(BufferType::UAV, { freeList->freeList, freeList->freeListCount, data->positions, data->scales, data->colors, data->parentIndices });
+	initialize_->SetGPUBuffers(BufferType::CBV, 0, { data->count });
+	initialize_->SetGPUBuffers(BufferType::UAV, 0, { freeList->freeList, freeList->freeListCount, data->positions, data->scales, data->colors, data->parentIndices });
 
 	allocate_ = createCO("Allocate");
 	//GPUBufferはどこに割り当てるかでBufferの種類が変わるので割愛
@@ -37,9 +37,9 @@ void Particle::Processor::Update() {
 
 void Particle::Processor::Allocate(SHEngine::GPUBuffer* indexList, SHEngine::GPUBuffer* emitterID, SHEngine::GPUBuffer* countBuffer, int countNum, ICC* icc) {
 	allocate_->Initialize();
-	allocate_->SetGPUBuffers(BufferType::CBV, { countBuffer, emitterID });
-	allocate_->SetGPUBuffers(BufferType::SRV, { freeList_->freeList });
-	allocate_->SetGPUBuffers(BufferType::UAV, { freeList_->freeListCount, indexList, data_->parentIndices });
+	allocate_->SetGPUBuffers(BufferType::CBV, 0, { countBuffer, emitterID });
+	allocate_->SetGPUBuffers(BufferType::SRV, 0, { freeList_->freeList });
+	allocate_->SetGPUBuffers(BufferType::UAV, 0, { freeList_->freeListCount, indexList, data_->parentIndices });
 	allocate_->SetExecuteNum(countNum, 256 * 32);
 	allocate_->Execute(icc);
 }

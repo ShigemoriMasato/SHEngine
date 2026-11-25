@@ -4,7 +4,7 @@
 void SideBox::StaticInitialize(SHEngine::Engine* engine) {
 	planeMesh_ = engine->GetModelManager()->GetModelData(SHEngine::TestModel::Plane)->meshes.front();
 	int textureIndex = engine->GetTextureManager()->LoadTexture("UI/SideBox.png");
-	backGroundTexture_ = std::make_unique<SHEngine::GPUBuffer>(engine->GetTextureManager()->GetTextureData(textureIndex));
+	backGroundTexture_ = engine->GetTextureManager()->GetTextureData(textureIndex);
 	LoadCommon();
 }
 
@@ -37,9 +37,9 @@ void SideBox::Initialize(std::string sentence) {
 	backGround_ = std::make_unique<SHEngine::Renderer>(SHEngine::VertexType::PostEffect, planeMesh_);
 	backGround_->SetVS("Game/UI/SideBox.VS.hlsl");
 	backGround_->SetPS("Game/UI/SideBox.PS.hlsl");
-	backGround_->SetGPUBuffer(matrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	backGround_->SetGPUBuffer(colorBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
-	backGround_->SetGPUBuffer(backGroundTexture_.get(), ShaderType::PIXEL_SHADER, BufferType::SRV);
+	backGround_->SetVSBuffer(BufferType::CBV, 0, matrixBuffer_);
+	backGround_->SetPSBuffer(BufferType::CBV, 0, colorBuffer_);
+	backGround_->SetPSBuffer(BufferType::SRV, 0, backGroundTexture_);
 	backGround_->SetDepthStencil(SHEngine::PSO::DepthStencilID::UI);
 	backGround_->SetBlendState(SHEngine::PSO::BlendStateID::Force);
 }

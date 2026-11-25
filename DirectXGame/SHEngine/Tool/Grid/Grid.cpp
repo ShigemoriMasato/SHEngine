@@ -66,7 +66,7 @@ void Grid::Draw(DCC* dcc) {
 	}
 
 	renderer_->ResetGPUBuffers();
-	renderer_->SetGPUBuffer(configBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
-	renderer_->SetGPUBuffer(vpBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
+	renderer_->SetVSBuffer(BufferType::SRV, 0, configBuffer_);
+	renderer_->SetVSBuffer(BufferType::CBV, 0, vpBuffer_);
 	renderer_->Draw(dcc);
 }

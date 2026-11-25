@@ -21,16 +21,29 @@ namespace SHEngine {
 		/// @brief インデックス情報に変化がある場合に使用する。自前で作ったリソースをIndexBufferとしてセットする。
 		void SetIndexBuffer(GPUBuffer* gpuBuffer);
 
-		/// @brief GPUBufferをセットする。register順。
-		/// @param gpuBuffer 使用するBuffer
-		/// @param shaderType どのシェーダーで使用するか
+		/// @brief VertexShaderで使用するGPUBufferをセットする。セットした順番がRootParameterIndexになる。
 		/// @param bufferType 今回使用するBufferの種類。Buffer作成時に指定したBufferTypeのどれか一つを指定する。複数指定できないことに注意。
-		void SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType);
-		/// @brief GPUBufferをセットする。register順。
-		/// @param gpuBuffers GPUBufferの配列
-		/// @param shaderType シェーダーの種類
+		/// @param registerNumber シェーダー側のレジスタ番号(b0ならCBVの0)
+		/// @param gpuBuffer 使用するBuffer
+		/// @note 同じbufferType・registerNumberが既にセットされている場合はBufferを差し替える。
+		void SetVSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer);
+		/// @brief VertexShaderで使用するGPUBufferを、startRegisterから連番でセットする。
 		/// @param bufferType バッファの種類
-		void SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType);
+		/// @param startRegister 先頭のBufferのレジスタ番号
+		/// @param gpuBuffers GPUBufferの配列
+		void SetVSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers);
+
+		/// @brief PixelShaderで使用するGPUBufferをセットする。セットした順番がRootParameterIndexになる。
+		/// @param bufferType 今回使用するBufferの種類。Buffer作成時に指定したBufferTypeのどれか一つを指定する。複数指定できないことに注意。
+		/// @param registerNumber シェーダー側のレジスタ番号(b0ならCBVの0)
+		/// @param gpuBuffer 使用するBuffer
+		/// @note 同じbufferType・registerNumberが既にセットされている場合はBufferを差し替える。
+		void SetPSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer);
+		/// @brief PixelShaderで使用するGPUBufferを、startRegisterから連番でセットする。
+		/// @param bufferType バッファの種類
+		/// @param startRegister 先頭のBufferのレジスタ番号
+		/// @param gpuBuffers GPUBufferの配列
+		void SetPSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers);
 
 		/// @brief GPUBufferをリセットする。今までSetしたBufferの設定が消える。Buffer自体は解放されない
 		void ResetGPUBuffers();
@@ -64,6 +77,9 @@ namespace SHEngine {
 
 	private:
 
+		// @brief Set**Bufferの共通処理
+		void SetGPUBuffer(ShaderType shaderType, BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer);
+
 		PSO::Config psoConfig_;
 
 		static inline PSO::Editor* psoEditor_ = nullptr;
@@ -81,8 +97,8 @@ namespace SHEngine {
 			ShaderType shader;
 			GPUBuffer* buffer;
 		};
+		// psoConfig_.rootConfig.rootParamsと同じ順番で保持する
 		std::vector<BufferConfig> bufferConfigs_;
-		RegisterCounter registerCount_;
 
 		// @brief UAVが含まれているBufferのリスト。描画後、CCCでバリアを張り替えられるようにCommonに変えるために保持する
 		std::vector<GPUBuffer*> uavBuffers_;

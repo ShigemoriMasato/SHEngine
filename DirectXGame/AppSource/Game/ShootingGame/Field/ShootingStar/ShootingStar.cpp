@@ -25,9 +25,9 @@ ShootingStar::ShootingStar(SHEngine::BufferContainer* container, const Mesh& mes
 void ShootingStar::Initialize(uint32_t textureSize, Camera* camera) {
 	textureSize_ = textureSize;
 
-	renderer_->SetGPUBuffers({ camera->GetVPBuffer(), scaleBuffer_}, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	renderer_->SetGPUBuffer(positionBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
-	renderer_->SetGPUBuffer(colorBuffer_, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer_->SetVSBuffers(BufferType::CBV, 0, { camera->GetVPBuffer(), scaleBuffer_ });
+	renderer_->SetVSBuffer(BufferType::SRV, 0, positionBuffer_);
+	renderer_->SetPSBuffer(BufferType::CBV, 0, colorBuffer_);
 }
 
 void ShootingStar::Update(float deltaTime) {

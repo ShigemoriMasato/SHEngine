@@ -19,9 +19,9 @@ SHEngine::ComputeObject* Particle::Emitter::AddProcess(std::string shaderPath, u
 	int id = nextProcessID_++;
 	auto process = std::make_unique<SHEngine::ComputeObject>("ParticleProcess: " + std::to_string(id));
 
-	process->SetGPUBuffer(BufferType::CBV, countBuffer_);
-	process->SetGPUBuffer(BufferType::SRV, indexList_);
-	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->rotations, data_->scales, data_->colors });
+	process->SetGPUBuffer(BufferType::CBV, 0, countBuffer_);
+	process->SetGPUBuffer(BufferType::SRV, 0, indexList_);
+	process->SetGPUBuffers(BufferType::UAV, 0, { data_->positions, data_->rotations, data_->scales, data_->colors });
 
 	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
 
@@ -36,9 +36,9 @@ SHEngine::ComputeObject* Particle::Emitter::AddProcess(std::string shaderPath, u
 SHEngine::ComputeObject* Particle::Emitter::AddTriggerProcess(std::string shaderPath) {
 	auto process = std::make_unique<SHEngine::ComputeObject>("ParticleProcess: Trigger");
 
-	process->SetGPUBuffer(BufferType::CBV, countBuffer_);
-	process->SetGPUBuffer(BufferType::SRV, indexList_);
-	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->rotations, data_->scales, data_->colors });
+	process->SetGPUBuffer(BufferType::CBV, 0, countBuffer_);
+	process->SetGPUBuffer(BufferType::SRV, 0, indexList_);
+	process->SetGPUBuffers(BufferType::UAV, 0, { data_->positions, data_->rotations, data_->scales, data_->colors });
 
 	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
 
@@ -52,9 +52,9 @@ SHEngine::ComputeObject* Particle::Emitter::AddTriggerProcess(std::string shader
 std::unique_ptr<SHEngine::ComputeObject> Particle::Emitter::AddOprionalProcess(std::string shaderPath) {
 	auto process = std::make_unique<SHEngine::ComputeObject>("ParticleProcess: Optional");
 
-	process->SetGPUBuffer(BufferType::CBV, countBuffer_);
-	process->SetGPUBuffer(BufferType::SRV, indexList_);
-	process->SetGPUBuffers(BufferType::UAV, { data_->positions, data_->rotations, data_->scales, data_->colors });
+	process->SetGPUBuffer(BufferType::CBV, 0, countBuffer_);
+	process->SetGPUBuffer(BufferType::SRV, 0, indexList_);
+	process->SetGPUBuffers(BufferType::UAV, 0, { data_->positions, data_->rotations, data_->scales, data_->colors });
 
 	process->SetShader("Particle/" + shaderPath + ".CS.hlsl");
 

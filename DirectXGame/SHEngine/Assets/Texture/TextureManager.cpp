@@ -16,15 +16,7 @@ namespace {
 		uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
 		ID3D12Resource* intermediateResource = Func::CreateBufferResource(device, intermediateSize);
 		UpdateSubresources(commandList, texture, intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
-
-		D3D12_RESOURCE_BARRIER barrier{};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = texture;
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		commandList->ResourceBarrier(1, &barrier);
+		// COPY_DEST → GENERIC_READ のバリアは呼び出し側(TextureData = GPUBuffer)で張る
 		return intermediateResource;
 	}
 
@@ -99,9 +91,10 @@ int TextureManager::LoadTexture(const std::string& filePath) {
 }
 
 int TextureManager::CreateWindowTexture(uint32_t width, uint32_t height, uint32_t clearColor, Format format, bool unordered) {
-	auto textureData = std::make_unique<TextureData>();
+	auto textureData = std::make_unique<RenderTexture>();
 	Vector4 clearColorVec = ConvertColor(clearColor);
 	textureData->Create(width, height, clearColorVec, format, unordered, device_->GetDevice(), srvManager_);
+	textureData->CreateRTV(device_->GetDevice(), device_->GetRTVManager());
 	int offset = textureData->GetHandle();
 	textureData->textureManager_ = this;
 	textureDataList_[offset] = std::move(textureData);
@@ -109,17 +102,18 @@ int TextureManager::CreateWindowTexture(uint32_t width, uint32_t height, uint32_
 }
 
 int TextureManager::CreateSwapChainTexture(ID3D12Resource* resource, uint32_t clearColor) {
-	auto textureData = std::make_unique<TextureData>();
+	auto textureData = std::make_unique<RenderTexture>();
 	textureData->Create(resource, device_->GetDevice(), srvManager_, clearColor);
+	textureData->CreateRTV(device_->GetDevice(), device_->GetRTVManager());
 	textureData->textureManager_ = this;
 	int offset = textureData->GetHandle();
 	textureDataList_[offset] = std::move(textureData);
 	return offset;
 }
 
-int SHEngine::TextureManager::CreateDepthTexture(ID3D12Resource* resource) {
-	auto textureData = std::make_unique<TextureData>();
-	textureData->Create(resource, device_->GetDevice(), srvManager_);
+int SHEngine::TextureManager::CreateDepthTexture(uint32_t width, uint32_t height) {
+	auto textureData = std::make_unique<DepthTexture>();
+	textureData->CreateDepth(width, height, device_->GetDevice(), srvManager_, device_->GetDSVManager());
 	textureData->textureManager_ = this;
 	int offset = textureData->GetHandle();
 	textureDataList_[offset] = std::move(textureData);
@@ -159,6 +153,14 @@ TextureData* TextureManager::GetTextureData(int handle) const {
 	return textureDataList_.at(handle).get();
 }
 
+RenderTexture* TextureManager::GetRenderTexture(int handle) const {
+	return dynamic_cast<RenderTexture*>(GetTextureData(handle));
+}
+
+DepthTexture* TextureManager::GetDepthTexture(int handle) const {
+	return dynamic_cast<DepthTexture*>(GetTextureData(handle));
+}
+
 void TextureManager::UploadResources(ID3D12GraphicsCommandList* cmdList) {
 	//中間リソースがなければ何もしない
 	if (uploadStandby_.empty()) {
@@ -170,6 +172,9 @@ void TextureManager::UploadResources(ID3D12GraphicsCommandList* cmdList) {
 	for (auto& [offset, scratchImage] : uploadStandby_) {
 		auto textureData = textureDataList_[offset].get();
 		auto intermediateResource = UploadTextureData(textureData->GetResource(), scratchImage, device_->GetDevice(), cmdList);
+		// アップロード後は読み取り専用として全シェーダーから参照できる状態にする
+		textureData->TransitionBarrier(D3D12_RESOURCE_STATE_GENERIC_READ);
+		textureData->Flush(cmdList);
 		Resource res;
 		res.res.Attach(intermediateResource);
 		intermediateResources_.push_back(res);

@@ -37,7 +37,7 @@ void SimplePostEffect::Apply(PostEffectContext* context) {
 	renderer->ResetGPUBuffers();
 	renderer->SetVS("PostEffect/PostEffect.VS.hlsl");
 	renderer->SetPS(shaderPath_);
-	renderer->SetGPUBuffers({ srcIndex, buffer_.get() }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer->SetPSBuffers(BufferType::CBV, 0, { srcIndex, buffer_.get() });
 	renderer->SetUseTexture(true);
 	renderer->SetSampler(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 

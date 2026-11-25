@@ -19,15 +19,21 @@ void TestScene::Initialize() {
 
 	// ===================== 超えられない壁 =================================
 
-	auto model = modelManager_->GetModelData(SHEngine::TestModel::Camera);
-	cameraRenderer_.Initialize(model);
-
 	curveBinders_.resize(2);
 	curveBinders_[0].BindVector3("Test1", &testParam_);
 	curveBinders_[1].BindFloat("Test2", &testParam2_);
 
 	curveEditor_.SetBinder(&curveBinders_[0]);
 	curveEditor_.SetBinder(&curveBinders_[1]);
+
+	container_ = std::make_unique<SHEngine::BufferContainer>();
+
+	particleSystem_.Initialize(computeContext_);
+	particleSystem_.SetCamera(debugCamera_.get());
+	emitter_ = particleSystem_.CreateEmitter(1024 * 1024, computeContext_);
+
+	auto model = modelManager_->GetModelData("Pyramid");
+	Particle::InnerModel::EmitInnerModel(emitter_, container_.get(), 1024 * 1024, model, 0.1f, {0.3f, 0.3f, 0.3f, 0.3f});
 }
 
 std::unique_ptr<IScene> TestScene::Update() {
@@ -39,13 +45,12 @@ std::unique_ptr<IScene> TestScene::Update() {
 
 	grid_->Update(debugCamera_->GetCenter());
 
+	particleSystem_.Update(computeContext_);
+
 	// ===================== 超えられない壁 =================================
 
 	commonData_->display->DrawImGui();
 	ImGuizmo::OriginalSetRect(commonData_->display.get());
-
-	cameraRenderer_.SetTransform({ gameCamera_->GetViewMatrix().Inverse() });
-	cameraRenderer_.Update(debugCamera_.get(), deltaTime);
 
 	// ===================== 超えられない壁 =================================
 
@@ -60,21 +65,29 @@ void TestScene::Draw() {
 	auto window = commonData_->window.get();
 	auto display = commonData_->display.get();
 
-	directContext_->SetRenderTarget(display);
-	grid_->SetCamera(debugCamera_.get());
-	grid_->Draw(directContext_);
+	{
+		auto fence = computeContext_->MiddleExecute();
+		directContext_->WaitFenceInCPU(fence);
+
+		directContext_->SetRenderTarget(display);
+		particleSystem_.Draw(directContext_);
+
+		fence = directContext_->MiddleExecute();
+		computeContext_->WaitFenceInCPU(fence);
+	}
 
 	directContext_->SetRenderTarget(display, false);
 
+	grid_->SetCamera(debugCamera_.get());
+	grid_->Draw(directContext_);
+
 	// ↓↓↓ オブジェクト描画 ==============================================
 
-	cameraRenderer_.Draw(directContext_);
+
 
 	// ↑↑↑ オブジェクト描画 ==============================================
 
 	display->ToTexture(directContext_);
-
-	SelectFile();
 
 	directContext_->SetRenderTarget(window);
 	engine_->DrawImGui();
@@ -100,46 +113,4 @@ void TestScene::Load() {
 		return;
 	}
 
-}
-
-void TestScene::SelectFile() {
-#ifdef USE_IMGUI
-
-	ImGui::Begin("Select File");
-
-	const SHEngine::TextureData* fileTexture = textureManager_->GetTextureData("Assets/.EngineResource/Texture/File.png");
-	const auto windowSize = ImGui::GetContentRegionAvail();
-	const float buttonSize = 64.f;
-	const float itemSpacing = 8.0f;
-	const float tileWidth = buttonSize + ImGui::GetStyle().FramePadding.x * 2.0f;
-	const int columnCount = std::max(1, static_cast<int>((windowSize.x + itemSpacing) / (tileWidth + itemSpacing)));
-	int itemIndex = 0;
-
-	ImGui::InputText("File Name", currentFileName_, sizeof(currentFileName_));
-
-	if (ImGui::Button("+")) {
-		const auto& it = std::find(fileList_.begin(), fileList_.end(), currentFileName_);
-		if (it == fileList_.end()) {
-			fileList_.push_back(currentFileName_);
-		}
-
-		Save();
-	}
-
-	for (const auto& fileName : fileList_) {
-		if (itemIndex % columnCount != 0) {
-			ImGui::SameLine();
-		}
-
-		if (ImGui::ImageButton(fileName.c_str(), (ImTextureRef)fileTexture->GetSRVHandle().ptr, ImVec2(buttonSize, buttonSize))) {
-			std::memcpy(currentFileName_, fileName.c_str(), sizeof(currentFileName_));
-			Load();
-		}
-		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1), fileName.c_str());
-	}
-
-	ImGui::End();
-
-#endif
 }

@@ -15,8 +15,8 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::Engine* engin
 	scale_ = container_->Create(BufferType::CBV, sizeof(float));
 	heightScale_ = container_->Create(BufferType::CBV, sizeof(float));
 	textureConfig_ = container_->Create(BufferType::CBV, sizeof(uint32_t) * 2);
-	texture_ = container_->Create(display_->GetTextureAllData()[0]);
-	heightTexture_ = container_->Create(display_->GetTextureAllData()[1]);
+	texture_ = display_->GetTextureAllData()[0];
+	heightTexture_ = display_->GetTextureAllData()[1];
 	uvs_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector2), textureSize_ * textureSize_, BufferNum::Single);
 	velocities_ = container_->Create(BufferType::SRV_UAV, sizeof(Vector3) / 2, textureSize_ * textureSize_, BufferNum::Single);
 	explosionConfig_ = container_->Create(BufferType::CBV, sizeof(ExplosionConfig));
@@ -27,8 +27,8 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::Engine* engin
 	{
 		auto white = tm->GetTextureData("Texture/white1x1.png");
 		auto uv = tm->GetTextureData("Texture/uvChecker.png");
-		testTexture_[0] = container_->Create(white);
-		testTexture_[1] = container_->Create(uv);
+		testTexture_[0] = white;
+		testTexture_[1] = uv;
 
 		debugParamBuffer_ = container_->Create(BufferType::CBV, sizeof(int));
 	}
@@ -62,9 +62,9 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::Engine* engin
 
 	update_ = emitter_->AddOprionalProcess("ForGame/Field/ApplyTex");
 	update_->SetExecuteNum(textureSize_ * textureSize_, 128);
-	update_->SetGPUBuffers(BufferType::UAV, { velocities_ });
-	update_->SetGPUBuffers(BufferType::SRV, { uvs_, texture_, heightTexture_ });
-	update_->SetGPUBuffers(BufferType::CBV, { heightScale_, deltaTime_ });
+	update_->SetGPUBuffers(BufferType::UAV, 4, { velocities_ });
+	update_->SetGPUBuffers(BufferType::SRV, 1, { uvs_, texture_, heightTexture_ });
+	update_->SetGPUBuffers(BufferType::CBV, 1, { heightScale_, deltaTime_ });
 	update_->SetSamplerID(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
 
 	engine_ = engine;
@@ -94,8 +94,8 @@ BattleField::~BattleField() {
 void BattleField::Initialize() {
 	SHEngine::ComputeObject* init = emitter_->AddTriggerProcess("ForGame/Field/Initialize");
 
-	init->SetGPUBuffers(BufferType::CBV, { textureConfig_, scale_ });
-	init->SetGPUBuffers(BufferType::UAV, { uvs_ });
+	init->SetGPUBuffers(BufferType::CBV, 1, { textureConfig_, scale_ });
+	init->SetGPUBuffers(BufferType::UAV, 4, { uvs_ });
 	init->SetExecuteNum(textureSize_ * textureSize_, 128);
 }
 
@@ -123,9 +123,9 @@ void BattleField::Explosion(const ExplosionConfig& config) {
 	explosionConfig_->CopyBuffer(&config, sizeof(ExplosionConfig));
 
 	auto explosion = emitter_->AddTriggerProcess("ForGame/Field/Explosion");
-	explosion->SetGPUBuffers(BufferType::CBV, { explosionConfig_ });
-	explosion->SetGPUBuffers(BufferType::SRV, { uvs_ });
-	explosion->SetGPUBuffers(BufferType::UAV, { velocities_ });
+	explosion->SetGPUBuffers(BufferType::CBV, 1, { explosionConfig_ });
+	explosion->SetGPUBuffers(BufferType::SRV, 1, { uvs_ });
+	explosion->SetGPUBuffers(BufferType::UAV, 4, { velocities_ });
 	explosion->SetExecuteNum(textureSize_ * textureSize_, 128);
 }
 

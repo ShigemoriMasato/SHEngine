@@ -15,27 +15,19 @@ namespace SHEngine::PSO {
 
 		void Initialize(DXDevice* device, std::map<SamplerID, D3D12_STATIC_SAMPLER_DESC> samplers);
 		
-		bool SetPSO(ID3D12GraphicsCommandList* cmdList, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName);
+		// @brief ComputeShader用のRootSignatureとPSOをcmdListにセットする。
+		// @param cmdList セットするコマンドリスト
+		// @param rootConfig ルートシグネチャの設定。rootParamsの順番がそのままRootParameterIndexになる。
+		// @param computeShaderName 使用するComputeShaderのファイル名
+		bool SetPSO(ID3D12GraphicsCommandList* cmdList, const RootSignatureConfig& rootConfig, const std::string& computeShaderName);
 
 	private:
 
 		struct Config {
-			int cbv;
-			int srv;
-			int uav;
-			bool useTexture;
-			uint32_t samplerID;
+			RootSignatureConfig rootConfig;
 			std::string computeShaderName;
-			bool operator==(const Config& other) const {
-				return cbv == other.cbv && srv == other.srv && uav == other.uav && useTexture == other.useTexture && samplerID == other.samplerID;
-			 }
 			bool operator<(const Config& other) const {
-				if (cbv != other.cbv) return cbv < other.cbv;
-				if (srv != other.srv) return srv < other.srv;
-				if (uav != other.uav) return uav < other.uav;
-				if (useTexture != other.useTexture) return useTexture < other.useTexture;
-				if (samplerID != other.samplerID) return samplerID < other.samplerID;
-				return computeShaderName < other.computeShaderName;
+				return std::tie(rootConfig, computeShaderName) < std::tie(other.rootConfig, other.computeShaderName);
 			}
 		};
 		struct PSO {

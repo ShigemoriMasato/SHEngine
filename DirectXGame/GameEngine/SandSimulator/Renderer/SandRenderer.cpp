@@ -37,8 +37,8 @@ void Renderer::SetCamera(const Camera* camera) {
 void Renderer::SetBufferToRenderer() {
 	renderer_->ResetGPUBuffers();
 
-	renderer_->SetGPUBuffers({ camera_->GetVPBuffer(), particleData_->scale }, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	renderer_->SetGPUBuffer(particleData_->position, ShaderType::VERTEX_SHADER, BufferType::SRV);
+	renderer_->SetVSBuffers(BufferType::CBV, 0, { camera_->GetVPBuffer(), particleData_->scale });
+	renderer_->SetVSBuffer(BufferType::SRV, 0, particleData_->position);
 
-	renderer_->SetGPUBuffer(particleData_->color, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer_->SetPSBuffer(BufferType::CBV, 0, particleData_->color);
 }

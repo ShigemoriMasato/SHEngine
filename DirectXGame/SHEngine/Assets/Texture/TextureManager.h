@@ -75,11 +75,12 @@ namespace SHEngine {
 		int CreateSwapChainTexture(ID3D12Resource* resource, uint32_t clearColor);
 
 		/**
-		* @brief 深度テクスチャを作成
-		* @param resource 深度テクスチャのリソース
+		* @brief 深度テクスチャ(D32_FLOAT、DSV付き)を作成
+		* @param width 幅
+		* @param height 高さ
 		* @return テクスチャハンドル
 		*/
-		int CreateDepthTexture(ID3D12Resource* resource);
+		int CreateDepthTexture(uint32_t width, uint32_t height);
 
 		/**
 		 * @brief ビットマップテクスチャを作成
@@ -117,12 +118,31 @@ namespace SHEngine {
 		TextureData* GetTextureData(int handle) const;
 
 		/**
+		 * @brief RTV付きテクスチャを取得
+		 * @param handle テクスチャハンドル
+		 * @return RenderTextureへのポインタ。RenderTextureでない場合はnullptr
+		 */
+		RenderTexture* GetRenderTexture(int handle) const;
+
+		/**
+		 * @brief 深度テクスチャを取得
+		 * @param handle テクスチャハンドル
+		 * @return DepthTextureへのポインタ。DepthTextureでない場合はnullptr
+		 */
+		DepthTexture* GetDepthTexture(int handle) const;
+
+		/**
+		 * @brief 全てのテクスチャを取得する(ハンドル → TextureData)
+		 */
+		const std::map<int, std::unique_ptr<TextureData>>& GetTextureDataList() const { return textureDataList_; }
+
+		/**
 		 * @brief テクスチャリソースを取得
 		 * @param handle テクスチャハンドル
 		 * @return ID3D12ResourceのComポインタ
 		 */
 		ID3D12Resource* GetTextureResource(int handle) const {
-			return textureDataList_.at(handle)->textureResource_.Get();
+			return textureDataList_.at(handle)->GetResource();
 		}
 
 		void UploadResources(ID3D12GraphicsCommandList* cmdList);

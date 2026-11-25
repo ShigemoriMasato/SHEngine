@@ -14,23 +14,41 @@ namespace SHEngine {
 
 		MeshRenderer() = default;
 
-		/// @brief GPUBufferをセットする。register順。
-		/// @param gpuBuffer 使用するBuffer
-		/// @param shaderType どのシェーダーで使用するか
+		/// @brief AmplificationShaderで使用するGPUBufferをセットする。セットした順番がRootParameterIndexになる。
 		/// @param bufferType 今回使用するBufferの種類。Buffer作成時に指定したBufferTypeのどれか一つを指定する。複数指定できないことに注意。
-		void SetGPUBuffer(GPUBuffer* gpuBuffer, ShaderType shaderType, BufferType bufferType);
-		/// @brief GPUBufferをセットする。register順。
-		/// @param gpuBuffers GPUBufferの配列
-		/// @param shaderType シェーダーの種類
-		/// @param bufferType バッファの種類
-		void SetGPUBuffers(const std::vector<GPUBuffer*>& gpuBuffers, ShaderType shaderType, BufferType bufferType);
+		/// @param registerNumber シェーダー側のレジスタ番号(b0ならCBVの0)
+		/// @param gpuBuffer 使用するBuffer
+		/// @note 同じbufferType・registerNumberが既にセットされている場合はBufferを差し替える。
+		void SetASBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer);
+		/// @brief AmplificationShaderで使用するGPUBufferを、startRegisterから連番でセットする。
+		void SetASBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers);
+		/// @brief AmplificationShaderにセットしたGPUBufferを外す。Buffer自体は解放されない
+		void EraseASBuffer(BufferType bufferType, int registerNumber);
+
+		/// @brief MeshShaderで使用するGPUBufferをセットする。セットした順番がRootParameterIndexになる。
+		/// @param bufferType 今回使用するBufferの種類。Buffer作成時に指定したBufferTypeのどれか一つを指定する。複数指定できないことに注意。
+		/// @param registerNumber シェーダー側のレジスタ番号(b0ならCBVの0)
+		/// @param gpuBuffer 使用するBuffer
+		/// @note 同じbufferType・registerNumberが既にセットされている場合はBufferを差し替える。
+		void SetMSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer);
+		/// @brief MeshShaderで使用するGPUBufferを、startRegisterから連番でセットする。
+		void SetMSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers);
+		/// @brief MeshShaderにセットしたGPUBufferを外す。Buffer自体は解放されない
+		void EraseMSBuffer(BufferType bufferType, int registerNumber);
+
+		/// @brief PixelShaderで使用するGPUBufferをセットする。セットした順番がRootParameterIndexになる。
+		/// @param bufferType 今回使用するBufferの種類。Buffer作成時に指定したBufferTypeのどれか一つを指定する。複数指定できないことに注意。
+		/// @param registerNumber シェーダー側のレジスタ番号(b0ならCBVの0)
+		/// @param gpuBuffer 使用するBuffer
+		/// @note 同じbufferType・registerNumberが既にセットされている場合はBufferを差し替える。
+		void SetPSBuffer(BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer);
+		/// @brief PixelShaderで使用するGPUBufferを、startRegisterから連番でセットする。
+		void SetPSBuffers(BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers);
+		/// @brief PixelShaderにセットしたGPUBufferを外す。Buffer自体は解放されない
+		void ErasePSBuffer(BufferType bufferType, int registerNumber);
+
 		/// @brief GPUBufferをリセットする。今までSetしたBufferの設定が消える。Buffer自体は解放されない
 		void ResetGPUBuffers();
-		/// @brief 指定したGPUBufferをリセットする。Buffer自体は解放されない
-		/// @param bufferType リセットするBufferをSetしたときに設定したバッファの種類
-		/// @param shaderType リセットするBufferをSetしたときに設定したシェーダーの種類
-		/// @param gpuBuffer リセットするGPUBuffer
-		void EraseGPUBuffer(BufferType bufferType, ShaderType shaderType, GPUBuffer* gpuBuffer);
 
 		// @brief AmplificationShaderのファイル名をセットする。デフォルトは"Simple.AS.hlsl"。
 		void SetAS(const std::string& as) { psoConfig_.as = as; }
@@ -63,6 +81,13 @@ namespace SHEngine {
 		static inline D3D12_GPU_DESCRIPTOR_HANDLE textureStartHandle_ = {};
 		static inline Logger logger_ = GetLogger("Engine");
 
+		// @brief Set**Bufferの共通処理
+		void SetGPUBuffer(ShaderType shaderType, BufferType bufferType, int registerNumber, GPUBuffer* gpuBuffer);
+		// @brief Erase**Bufferの共通処理
+		void EraseGPUBuffer(ShaderType shaderType, BufferType bufferType, int registerNumber);
+		// @brief Set**Buffersの共通処理
+		void SetGPUBuffers(ShaderType shaderType, BufferType bufferType, int startRegister, const std::vector<GPUBuffer*>& gpuBuffers);
+
 		PSO::ConfigMSType psoConfig_;
 
 		struct BufferConfig {
@@ -70,8 +95,8 @@ namespace SHEngine {
 			ShaderType shader;
 			GPUBuffer* buffer;
 		};
+		// psoConfig_.rootConfig.rootParamsと同じ順番で保持する
 		std::vector<BufferConfig> bufferConfigs_;
-		RegisterCounter registerCount_;
 
 		// @brief UAVが含まれているBufferのリスト。描画後、CCCでバリアを張り替えられるようにCommonに変えるために保持する
 		std::vector<GPUBuffer*> uavBuffers_;

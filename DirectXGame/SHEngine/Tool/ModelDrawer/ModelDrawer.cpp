@@ -129,12 +129,12 @@ void ModelDrawer::Draw(DCC* dcc) {
 
 	for (uint32_t i = 0; i < (uint32_t)renderers_.size(); ++i) {
 		renderers_[i]->ResetGPUBuffers();
-		renderers_[i]->SetGPUBuffers({ transformBuffer_, parentMatrixBuffer_ }, ShaderType::VERTEX_SHADER, BufferType::SRV);
-		renderers_[i]->SetGPUBuffers({ cameraBuffer_, nodeIndexBuffer_[i] }, ShaderType::VERTEX_SHADER, BufferType::CBV);
-		renderers_[i]->SetGPUBuffers({ materialBuffer_, materialIndexBuffer_[i] }, ShaderType::PIXEL_SHADER, BufferType::SRV);
+		renderers_[i]->SetVSBuffers(BufferType::SRV, 0, { transformBuffer_, parentMatrixBuffer_ });
+		renderers_[i]->SetVSBuffers(BufferType::CBV, 0, { cameraBuffer_, nodeIndexBuffer_[i] });
+		renderers_[i]->SetPSBuffers(BufferType::SRV, 0, { materialBuffer_, materialIndexBuffer_[i] });
 		if (idBuffer_) {
 			renderers_[i]->SetPS("Engine/DecoEditor.PS.hlsl");
-			renderers_[i]->SetGPUBuffer(idBuffer_, ShaderType::PIXEL_SHADER, BufferType::SRV);
+			renderers_[i]->SetPSBuffer(BufferType::SRV, 2, idBuffer_);
 		}
 		renderers_[i]->SetUseTexture(true);
 		renderers_[i]->Draw(dcc);
@@ -149,9 +149,9 @@ void ModelDrawer::NormalDraw(DCC* dcc) {
 	for (uint32_t i = 0; i < (uint32_t)renderers_.size(); ++i) {
 		renderers_[i]->ResetGPUBuffers();
 		renderers_[i]->SetPS("Engine/ModelDrawer.PS.hlsl");
-		renderers_[i]->SetGPUBuffers({ transformBuffer_, parentMatrixBuffer_ }, ShaderType::VERTEX_SHADER, BufferType::SRV);
-		renderers_[i]->SetGPUBuffers({ cameraBuffer_, nodeIndexBuffer_[i] }, ShaderType::VERTEX_SHADER, BufferType::CBV);
-		renderers_[i]->SetGPUBuffers({ materialBuffer_, materialIndexBuffer_[i] }, ShaderType::PIXEL_SHADER, BufferType::SRV);
+		renderers_[i]->SetVSBuffers(BufferType::SRV, 0, { transformBuffer_, parentMatrixBuffer_ });
+		renderers_[i]->SetVSBuffers(BufferType::CBV, 0, { cameraBuffer_, nodeIndexBuffer_[i] });
+		renderers_[i]->SetPSBuffers(BufferType::SRV, 0, { materialBuffer_, materialIndexBuffer_[i] });
 		renderers_[i]->SetUseTexture(true);
 		renderers_[i]->Draw(dcc);
 	}

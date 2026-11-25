@@ -19,9 +19,9 @@ void SHEngine::Text::Initialize(const Mesh& planeMesh, const std::string& fontPa
 	renderer_ = std::make_unique<Renderer>(SHEngine::VertexType::Default, planeMesh);
 	renderer_->SetVS("Engine/FontBasic.VS.hlsl");
 	renderer_->SetPS("Engine/FontBasic.PS.hlsl");
-	renderer_->SetGPUBuffer(matrixBuffer_, ShaderType::VERTEX_SHADER, BufferType::CBV);
-	renderer_->SetGPUBuffer(charPositionBuffer_, ShaderType::VERTEX_SHADER, BufferType::SRV);
-	renderer_->SetGPUBuffers({ textureIndexBuffer_, colorBuffer_ }, ShaderType::PIXEL_SHADER, BufferType::CBV);
+	renderer_->SetVSBuffer(BufferType::CBV, 0, matrixBuffer_);
+	renderer_->SetVSBuffer(BufferType::SRV, 0, charPositionBuffer_);
+	renderer_->SetPSBuffers(BufferType::CBV, 0, { textureIndexBuffer_, colorBuffer_ });
 	renderer_->SetUseTexture(true);
 }
 

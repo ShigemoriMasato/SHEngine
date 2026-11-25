@@ -1,10 +1,8 @@
 #pragma once
 #include <Core/DXDevice.h>
 #include <Core/Command/CommandObject.h>
-#include <Assets/Texture/TextureData.h>
 #include <Render/PSO/Shelf/RootSignatureShelf.h>
 
-using RegisterCounter = std::unordered_map<ShaderType, std::unordered_map<BufferType, int>>;
 
 enum class BufferNum : uint8_t {
 	MatchSwapChain,
@@ -27,11 +25,12 @@ namespace SHEngine {
 		// @param bufferNum バッファの数（デフォルトは3、スワップチェーンのバッファ数に合わせる）
 		GPUBuffer(BufferType bufferType, size_t strideInBytes, uint32_t num = 1, BufferNum bufferNum = BufferNum::MatchSwapChain);
 
-		// @brief Texture用のGPUBufferの作成
-		GPUBuffer(TextureData* textureData);
+		virtual ~GPUBuffer() = default;
 
 		// @brief GPUBufferへデータコピーをするときの値を変更する。Flush時に実際にGPUへコピーされる。UAVバッファにはコピーできない。
 		virtual void CopyBuffer(const void* data, size_t dataSize);
+		// @brief テクスチャ(TextureData派生)かどうか
+		virtual bool IsTexture() const { return false; }
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
 		void TransitionBarrier(ShaderType shaderType, BufferType bufferType);
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
@@ -64,6 +63,9 @@ namespace SHEngine {
 		uint32_t GetNum() const { return num_; }
 
 	protected:
+
+		// @brief 派生クラス(TextureDataなど)用。リソースは作成しないので、派生側でresources_等を設定すること。
+		GPUBuffer() = default;
 
 		friend class FrameCounter;
 		static void SetCurrentIndex(uint32_t frame) { currentIndex_ = frame; }

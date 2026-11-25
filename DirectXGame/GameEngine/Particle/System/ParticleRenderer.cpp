@@ -14,15 +14,51 @@ void Particle::Renderer::Initialize(Data* data, SHEngine::BufferContainer* conta
 	}
 	meshRenderer_->SetPS("Game/GPUParticle.PS.hlsl");
 
-	meshRenderer_->SetGPUBuffers({ data->count }, ShaderType::AMPLIFICATION_SHADER, BufferType::CBV);
+	meshRenderer_->SetASBuffers(BufferType::CBV, 0, { data->count });
 
-	meshRenderer_->SetGPUBuffers({ data->positions, data->scales, data->parentIndices, data->parents }, ShaderType::MESH_SHADER, BufferType::SRV);
-	meshRenderer_->SetGPUBuffers({ data->count, cameraBuffer_ }, ShaderType::MESH_SHADER, BufferType::CBV);
+	meshRenderer_->SetMSBuffers(BufferType::SRV, 0, { data->positions, data->scales, data->parentIndices, data->parents });
+	meshRenderer_->SetMSBuffers(BufferType::CBV, 0, { data->count, cameraBuffer_ });
 
-	meshRenderer_->SetGPUBuffers({ data->colors }, ShaderType::PIXEL_SHADER, BufferType::SRV);
+	meshRenderer_->SetPSBuffers(BufferType::SRV, 0, { data->colors });
 
-	//meshRenderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add, 0);
-	meshRenderer_->SetBlendState(SHEngine::PSO::BlendStateID::Add, 1);
+	SetBlendMode(SHEngine::PSO::BlendStateID::Add);
+}
+
+void Particle::Renderer::SetPixelShader(const std::string& ps) {
+	meshRenderer_->SetPS(ps);
+}
+
+void Particle::Renderer::SetPSBuffer(BufferType bufferType, int registerNumber, SHEngine::GPUBuffer* buffer) {
+	if (!buffer) {
+		return;
+	}
+	meshRenderer_->SetPSBuffer(bufferType, registerNumber, buffer);
+}
+
+void Particle::Renderer::SetPSBuffers(BufferType bufferType, int startRegister, const std::vector<SHEngine::GPUBuffer*>& buffers) {
+	for (int i = 0; i < int(buffers.size()); ++i) {
+		SetPSBuffer(bufferType, startRegister + i, buffers[i]);
+	}
+}
+
+void Particle::Renderer::SetBlendMode(SHEngine::PSO::BlendStateID blendMode, int index) {
+	if (index < 0) {
+		for (int i = 0; i < kRenderTargetCount; ++i) {
+			meshRenderer_->SetBlendState(blendMode, i);
+		}
+		return;
+	}
+	if (index < kRenderTargetCount) {
+		meshRenderer_->SetBlendState(blendMode, index);
+	}
+}
+
+void Particle::Renderer::SetUseTexture(bool useTexture) {
+	meshRenderer_->SetUseTexture(useTexture);
+}
+
+void Particle::Renderer::SetSampler(uint32_t samplerFlag) {
+	meshRenderer_->SetSampler(samplerFlag);
 }
 
 void Particle::Renderer::Update() {

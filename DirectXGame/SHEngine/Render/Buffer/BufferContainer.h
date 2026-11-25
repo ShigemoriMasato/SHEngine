@@ -21,11 +21,6 @@ namespace SHEngine {
 			return buffer.get();
 		}
 
-		GPUBuffer* Create(TextureData* textureData) {
-			auto& buffer = buffers_.emplace_back(std::make_unique<GPUBuffer>(textureData));
-			return buffer.get();
-		}
-
 		// @brief GPUBufferへのデータコピー。indexはCreateしたときの順番。UAVバッファにはコピーできない。
 		// @param index GPUBufferのインデックス。Createされた順番で0から振られる。
 		// @param data コピーするデータのポインタ。

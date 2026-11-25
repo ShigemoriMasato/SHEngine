@@ -9,11 +9,14 @@ void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device, std::map<SamplerI
 	pso_.clear();
 }
 
-bool SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, int cbv, int srv, int uav, bool useTexture, uint32_t samplerID, std::string computeShaderName) {
+bool SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, const RootSignatureConfig& rootConfig, const std::string& computeShaderName) {
 
-	Config config{ cbv, srv, uav, useTexture, samplerID, computeShaderName };
+	Config config{ rootConfig, computeShaderName };
 	ID3D12PipelineState* pipelineState = nullptr;
-	auto rootSignature = rootSignature_->GetRootSignature(cbv, srv, uav, useTexture, samplerID);
+	auto rootSignature = rootSignature_->GetRootSignature(rootConfig);
+	if (!rootSignature) {
+		return false;
+	}
 	const auto& it = pso_.find(config);
 
 	if (it != pso_.end()) {

@@ -3,6 +3,7 @@
 #include <Test/TestScene.h>
 #include <Game/GameScene.h>
 #include <Space/SpaceScene.h>
+#include <Particle/EmitFunc/InnerModel.h>
 
 #ifdef USE_IMGUI
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -142,9 +143,9 @@ void InitializeScene::Initialize() {
 
 std::unique_ptr<IScene> InitializeScene::Update() {
 	//更新処理
+	return std::make_unique<TestScene>();
 	return std::make_unique<SpaceScene>();
 	return std::make_unique<GameScene>();
-	return std::make_unique<TestScene>();
 	return nullptr;
 }
 
