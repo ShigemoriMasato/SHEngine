@@ -6,6 +6,10 @@ void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device, ShelfManager* she
 	pso_.clear();
 }
 
+const SHEngine::ShaderReflectionData* SHEngine::PSO::CSPSOManager::GetReflection(const std::string& computeShaderName) const {
+	return shelfManager_->GetShaderReflection(ShaderType::COMPUTE_SHADER, directory_ + computeShaderName);
+}
+
 bool SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, const RootSignatureConfig& rootConfig, const std::string& computeShaderName) {
 
 	Config config{ rootConfig, computeShaderName };

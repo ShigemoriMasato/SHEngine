@@ -1,4 +1,5 @@
 #include "ShaderShelf.h"
+#include "ShaderCache.h"
 #include <Utility/ConvertString.h>
 #include <Utility/SearchFile.h>
 #include <Core/DXDevice.h>
@@ -52,7 +53,7 @@ std::list<std::string> ShaderShelf::GetShaderNames(ShaderType shaderType) {
 	return ans;
 }
 
-D3D12_SHADER_BYTECODE ShaderShelf::GetShaderBytecode(ShaderType shaderType, std::string shaderName) {
+ShaderShelf::ShaderEntry& ShaderShelf::GetOrRegister(ShaderType shaderType, const std::string& shaderName) {
 	auto& shaders = shaders_[static_cast<int>(shaderType)];
 
 	//登録されていなければCompileする
@@ -65,7 +66,19 @@ D3D12_SHADER_BYTECODE ShaderShelf::GetShaderBytecode(ShaderType shaderType, std:
 		RegisterShaderByteCode(shaderName, shaderType);
 		it = shaders.find(shaderName);
 	}
-	return it->second.bytecode;
+	return it->second;
+}
+
+D3D12_SHADER_BYTECODE ShaderShelf::GetShaderBytecode(ShaderType shaderType, std::string shaderName) {
+	return GetOrRegister(shaderType, shaderName).bytecode;
+}
+
+const SHEngine::ShaderReflectionData* ShaderShelf::GetShaderReflection(ShaderType shaderType, const std::string& shaderName) {
+	const ShaderEntry& entry = GetOrRegister(shaderType, shaderName);
+	if (entry.bytes.empty() || !entry.reflection.IsValid()) {
+		return nullptr;
+	}
+	return &entry.reflection;
 }
 
 void SHEngine::PSO::ShaderShelf::ShaderReset(const std::string& shaderName) {
@@ -76,15 +89,33 @@ void ShaderShelf::RegisterShaderByteCode(std::string shaderName, ShaderType shad
 	auto& entry = shaders_[int(shaderType)][shaderName];
 	entry = {};
 
-	// CompileShaderは参照カウント1のBlobを返すので、Attachで所有権を受け取る
-	entry.blob.Attach(device_->CompileShader(basePath_.string() + "/" + shaderName, shaderType));
+	const std::string sourcePath = basePath_.string() + "/" + shaderName;
 
-	// コンパイルに失敗した場合は空のバイトコードを登録する
-	if (!entry.blob) {
-		return;
+	// Compiled/Shader/ にキャッシュがあり、ソースと#includeしたファイルが更新されていなければそれを使う
+	ShaderCache::CachedShader cached;
+	if (ShaderCache::Load(shaderName, sourcePath, shaderType, cached)) {
+		entry.bytes = std::move(cached.bytecode);
+		entry.reflection = std::move(cached.reflection);
+		logger_->info("Shader loaded from cache, path: {}", sourcePath);
+	} else {
+		// CompileShaderは参照カウント1のBlobを返すので、Attachで所有権を受け取る
+		std::vector<std::string> includes;
+		Microsoft::WRL::ComPtr<IDxcBlob> blob;
+		blob.Attach(device_->CompileShader(sourcePath, shaderType, &entry.reflection, &includes));
+
+		// コンパイルに失敗した場合は空のバイトコードを登録する
+		if (!blob) {
+			return;
+		}
+
+		const uint8_t* begin = static_cast<const uint8_t*>(blob->GetBufferPointer());
+		entry.bytes.assign(begin, begin + blob->GetBufferSize());
+
+		// 次回起動時用に保存する
+		ShaderCache::Save(shaderName, sourcePath, shaderType, entry.bytes, entry.reflection, includes);
 	}
 
-	entry.bytecode = { entry.blob->GetBufferPointer(), entry.blob->GetBufferSize() };
+	entry.bytecode = { entry.bytes.data(), entry.bytes.size() };
 }
 
 void SHEngine::PSO::ShaderShelf::ReleaseShader(std::string shaderName) {

@@ -18,6 +18,10 @@ namespace SHEngine::PSO {
 		// @param computeShaderName 使用するComputeShaderのファイル名(Assets/Shader/Compute/以下)
 		bool SetPSO(ID3D12GraphicsCommandList* cmdList, const RootSignatureConfig& rootConfig, const std::string& computeShaderName);
 
+		// @brief ComputeShaderのリフレクション結果を取得する(未コンパイルならコンパイルする)。失敗時はnullptr
+		// @param computeShaderName ComputeShaderのファイル名(Assets/Shader/Compute/以下)
+		const ShaderReflectionData* GetReflection(const std::string& computeShaderName) const;
+
 	private:
 
 		struct Config {

@@ -27,6 +27,8 @@ enum class ShaderType {
 
 namespace SHEngine {
 
+	struct ShaderReflectionData;
+
 	/**
 	 * @class DXDevice
 	 * @brief DirectX12デバイスとその関連リソースを管理するクラス
@@ -72,7 +74,16 @@ namespace SHEngine {
 		/// @return DSVManager*
 		DSVManager* GetDSVManager() const { return dsvManager_.get(); }
 
-		IDxcBlob* CompileShader(const std::string& filePath, ShaderType shaderType);
+		/// @brief シェーダーをコンパイルする
+		/// @param filePath シェーダーファイルのパス
+		/// @param shaderType シェーダーの種類
+		/// @param outReflection nullptrでなければ、リフレクション結果を書き込む(Releaseビルドでも取得できる)
+		/// @param outIncludes nullptrでなければ、#includeで読み込んだファイルのパスを書き込む
+		/// @return コンパイル済みBlob(参照カウント1。呼び出し側で解放すること)。失敗時はnullptr
+		IDxcBlob* CompileShader(const std::string& filePath, ShaderType shaderType, ShaderReflectionData* outReflection = nullptr, std::vector<std::string>* outIncludes = nullptr);
+
+		/// @brief シェーダーのコンパイル設定名。キャッシュの保存先を分けるために使う(Debugとそれ以外で設定が違う)
+		static const char* GetShaderCompileConfigName();
 
 		int GetBufferCount() const { return bufferCount; }
 

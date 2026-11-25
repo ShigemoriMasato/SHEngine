@@ -1,4 +1,5 @@
 #include "DXDevice.h"
+#include <Render/PSO/Shelf/ShaderReflection.h>
 #include <Utility/ConvertString.h>
 #include <format>
 
@@ -8,6 +9,45 @@
 #pragma comment(lib, "dxcompiler.lib")
 
 using namespace SHEngine;
+
+namespace {
+
+	// @brief デフォルトのIncludeHandlerをラップし、読み込んだファイル(#include)を記録する
+	// @note コンパイル中だけ使うスタック上のオブジェクトなので、参照カウントは管理しない
+	class RecordingIncludeHandler final : public IDxcIncludeHandler {
+	public:
+		explicit RecordingIncludeHandler(IDxcIncludeHandler* inner) : inner_(inner) {}
+
+		HRESULT STDMETHODCALLTYPE LoadSource(LPCWSTR pFilename, IDxcBlob** ppIncludeSource) override {
+			HRESULT hr = inner_->LoadSource(pFilename, ppIncludeSource);
+			if (SUCCEEDED(hr) && pFilename) {
+				includes_.push_back(ConvertString(std::wstring(pFilename)));
+			}
+			return hr;
+		}
+
+		HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override {
+			if (!ppvObject) {
+				return E_POINTER;
+			}
+			if (riid == __uuidof(IDxcIncludeHandler) || riid == __uuidof(IUnknown)) {
+				*ppvObject = static_cast<IDxcIncludeHandler*>(this);
+				return S_OK;
+			}
+			*ppvObject = nullptr;
+			return E_NOINTERFACE;
+		}
+		ULONG STDMETHODCALLTYPE AddRef() override { return 1; }
+		ULONG STDMETHODCALLTYPE Release() override { return 1; }
+
+		const std::vector<std::string>& GetIncludes() const { return includes_; }
+
+	private:
+		IDxcIncludeHandler* inner_ = nullptr;
+		std::vector<std::string> includes_;
+	};
+
+}
 
 DXDevice::~DXDevice() {
 }
@@ -142,7 +182,7 @@ void DXDevice::Initialize() {
     assert(SUCCEEDED(hr));
 }
 
-IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderType shaderType) {
+IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderType shaderType, ShaderReflectionData* outReflection, std::vector<std::string>* outIncludes) {
 	std::wstring& profile = compileProfiles_[shaderType];
 	std::wstring wFilePath = ConvertString(filePath);
     logger_->info("Begin CompileShader, path: {}", filePath);
@@ -189,16 +229,21 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
     };
 #endif
     //実際にShaderをコンパイルする
+    RecordingIncludeHandler includeHandler(includeHandler_.Get());
     IDxcResult* shaderResult = nullptr;
     hr = dxcCompiler_->Compile(
         &shaderSourceBuffer,	//読み込んだファイル
         arguments,			    //コンパイルオプション
         _countof(arguments),	//コンパイルオプションの数
-        includeHandler_.Get(),		    //includeが含まれた諸々
+        &includeHandler,		//includeが含まれた諸々(読み込んだファイルを記録する)
         IID_PPV_ARGS(&shaderResult)		//コンパイル結果
     );
     //コンパイルエラーではなくdxcが起動できないなどの致命的な状況
     assert(SUCCEEDED(hr));
+
+    if (outIncludes) {
+        *outIncludes = includeHandler.GetIncludes();
+    }
 
     //警告・エラーが出てたらログに出して止める
     IDxcBlobUtf8* shaderError = nullptr;
@@ -218,11 +263,45 @@ IDxcBlob* SHEngine::DXDevice::CompileShader(const std::string& filePath, ShaderT
     //成功したログを出す
     logger_->info("Compile Successd, path: {}", filePath);
 
+    //リフレクション情報の取得(-Qstrip_reflectでも別出力として取得できる)
+    if (outReflection) {
+        *outReflection = {};
+        Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
+        hr = shaderResult->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(&reflectionBlob), nullptr);
+        if (SUCCEEDED(hr) && reflectionBlob && reflectionBlob->GetBufferSize() > 0) {
+            DxcBuffer reflectionBuffer{};
+            reflectionBuffer.Ptr = reflectionBlob->GetBufferPointer();
+            reflectionBuffer.Size = reflectionBlob->GetBufferSize();
+            reflectionBuffer.Encoding = 0;
+
+            Microsoft::WRL::ComPtr<ID3D12ShaderReflection> reflection;
+            hr = dxcUtils_->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(&reflection));
+            if (SUCCEEDED(hr) && ShaderReflector::Build(reflection.Get(), shaderType, *outReflection)) {
+                logger_->debug("Shader reflection, path: {}\n{}", filePath, outReflection->ToString());
+            } else {
+                logger_->warn("Failed to create shader reflection, path: {}", filePath);
+            }
+        } else {
+            logger_->warn("Shader reflection output not found, path: {}", filePath);
+        }
+    }
+
     //もう使わないリソースを開放
     shaderSource->Release();
-    shaderError->Release();
+    if (shaderError) {
+        shaderError->Release();
+    }
     shaderResult->Release();
 
     //実行用のバイナリを返却
     return shaderBlob;
+}
+
+const char* SHEngine::DXDevice::GetShaderCompileConfigName() {
+	// CompileShaderの引数と対応させること(SH_DEBUGだけデバッグ情報付き・最適化なし)
+#ifdef SH_DEBUG
+	return "Debug";
+#else
+	return "Optimized";
+#endif
 }

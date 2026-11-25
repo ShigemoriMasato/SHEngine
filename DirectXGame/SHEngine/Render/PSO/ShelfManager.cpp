@@ -21,6 +21,10 @@ D3D12_SHADER_BYTECODE SHEngine::PSO::ShelfManager::GetShaderBytecode(ShaderType 
 	return shaderShelf_->GetShaderBytecode(shaderType, shaderName);
 }
 
+const SHEngine::ShaderReflectionData* SHEngine::PSO::ShelfManager::GetShaderReflection(ShaderType shaderType, const std::string& shaderName) {
+	return shaderShelf_->GetShaderReflection(shaderType, shaderName);
+}
+
 D3D12_BLEND_DESC SHEngine::PSO::ShelfManager::GetBlendState(const BlendStateID* id) {
 	return blendStateShelf_->GetBlendState(id);
 }

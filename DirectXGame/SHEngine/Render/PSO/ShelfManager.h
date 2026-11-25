@@ -9,6 +9,9 @@ namespace SHEngine::PSO {
 		ShelfManager(DXDevice* devive);
 
 		D3D12_SHADER_BYTECODE GetShaderBytecode(ShaderType shaderType, std::string shaderName);
+		// @brief シェーダーのリフレクション結果を取得する(未コンパイルならコンパイルする)。失敗時はnullptr
+		// @note ResetShaderで該当シェーダーがリセットされるとポインタは無効になる
+		const ShaderReflectionData* GetShaderReflection(ShaderType shaderType, const std::string& shaderName);
 		D3D12_BLEND_DESC GetBlendState(const BlendStateID* id);
 		D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc(DepthStencilID id);
 		D3D12_RASTERIZER_DESC GetRasterizerDesc(RasterizerID id);

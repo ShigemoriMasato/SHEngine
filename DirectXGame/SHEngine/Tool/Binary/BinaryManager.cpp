@@ -6,7 +6,7 @@
 namespace fs = std::filesystem;
 
 void BinaryManager::Write(const std::string& fileName) {
-	std::filesystem::path fullPath = basePath + fileName;
+	std::filesystem::path fullPath = basePath_ + fileName;
 	std::ofstream file(fullPath, std::ios::binary);
 
 	if (!file) {
@@ -15,7 +15,7 @@ void BinaryManager::Write(const std::string& fileName) {
 
 		if (!file) {
 			// 作成に失敗している状態。
-			throw std::runtime_error("Failed to open file for writing: " + basePath + fileName);
+			throw std::runtime_error("Failed to open file for writing: " + basePath_ + fileName);
 		}
 	}
 
@@ -29,13 +29,17 @@ void BinaryManager::Write(const std::string& fileName) {
 }
 
 bool BinaryManager::Boot(const std::string& fileName) {
-	const std::string path = basePath + fileName;
+	const std::string path = basePath_ + fileName;
 	std::ifstream file(path, std::ios::binary);
 	if (!file.is_open()) {
 		return false;
 	}
 
 	const auto fileSize = fs::file_size(path);
+	// バージョンすら入っていないファイルは読まない
+	if (fileSize < sizeof(version_)) {
+		return false;
+	}
 	inputBuffer_.resize(static_cast<size_t>(fileSize));
 	file.read(inputBuffer_.data(), fileSize);
 

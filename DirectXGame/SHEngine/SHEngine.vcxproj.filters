@@ -180,6 +180,8 @@
     <ClCompile Include="Render\PSO\Shelf\RasterizerShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
     <ClCompile Include="Render\PSO\Shelf\RootSignatureShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
     <ClCompile Include="Render\PSO\Shelf\ShaderShelf.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\ShaderReflection.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
+    <ClCompile Include="Render\PSO\Shelf\ShaderCache.cpp"><Filter>Render\PSO\Shelf</Filter></ClCompile>
     <ClCompile Include="Render\Screen\Display.cpp"><Filter>Render\Screen</Filter></ClCompile>
     <ClCompile Include="Render\Screen\IDisplay.cpp"><Filter>Render\Screen</Filter></ClCompile>
     <ClCompile Include="Render\Screen\SwapChain.cpp"><Filter>Render\Screen</Filter></ClCompile>
@@ -273,6 +275,8 @@
     <ClInclude Include="Render\PSO\Shelf\RasterizerShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
     <ClInclude Include="Render\PSO\Shelf\RootSignatureShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
     <ClInclude Include="Render\PSO\Shelf\ShaderShelf.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\ShaderReflection.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
+    <ClInclude Include="Render\PSO\Shelf\ShaderCache.h"><Filter>Render\PSO\Shelf</Filter></ClInclude>
     <ClInclude Include="Render\Screen\Display.h"><Filter>Render\Screen</Filter></ClInclude>
     <ClInclude Include="Render\Screen\IDisplay.h"><Filter>Render\Screen</Filter></ClInclude>
     <ClInclude Include="Render\Screen\SwapChain.h"><Filter>Render\Screen</Filter></ClInclude>

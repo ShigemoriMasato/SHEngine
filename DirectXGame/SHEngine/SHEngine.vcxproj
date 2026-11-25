@@ -153,6 +153,8 @@
     <ClCompile Include="Render\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Render\PSO\Shelf\RootSignatureShelf.cpp" />
     <ClCompile Include="Render\PSO\Shelf\ShaderShelf.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\ShaderReflection.cpp" />
+    <ClCompile Include="Render\PSO\Shelf\ShaderCache.cpp" />
     <ClCompile Include="Render\PSO\ShelfManager.cpp" />
     <ClCompile Include="Render\Renderer.cpp" />
     <ClCompile Include="Render\Screen\Display.cpp" />
@@ -246,6 +248,8 @@
     <ClInclude Include="Render\PSO\Shelf\RasterizerShelf.h" />
     <ClInclude Include="Render\PSO\Shelf\RootSignatureShelf.h" />
     <ClInclude Include="Render\PSO\Shelf\ShaderShelf.h" />
+    <ClInclude Include="Render\PSO\Shelf\ShaderReflection.h" />
+    <ClInclude Include="Render\PSO\Shelf\ShaderCache.h" />
     <ClInclude Include="Render\PSO\ShelfManager.h" />
     <ClInclude Include="Render\Renderer.h" />
     <ClInclude Include="Render\Screen\Display.h" />

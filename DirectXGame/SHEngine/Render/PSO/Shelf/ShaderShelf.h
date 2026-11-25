@@ -1,5 +1,6 @@
 #pragma once
 #include <Core/DXDevice.h>
+#include "ShaderReflection.h"
 #include <unordered_map>
 #include <filesystem>
 #include <array>
@@ -55,6 +56,17 @@ namespace SHEngine {
 			D3D12_SHADER_BYTECODE GetShaderBytecode(ShaderType shaderType, std::string shaderName);
 
 			/**
+			 * @brief 指定名のシェーダーのリフレクション結果を取得
+			 *
+			 * 未コンパイルの場合はコンパイルする。
+			 *
+			 * @param shaderType シェーダーの種類
+			 * @param shaderName シェーダー名
+			 * @return リフレクション結果。コンパイルに失敗した場合はnullptr
+			 */
+			const ShaderReflectionData* GetShaderReflection(ShaderType shaderType, const std::string& shaderName);
+
+			/**
 			 * @brief シェーダーをリセットする
 			 *
 			 * @param shaderName シェーダー名
@@ -93,10 +105,15 @@ namespace SHEngine {
 			std::filesystem::path basePath_ = "Assets/Shader";
 
 			struct ShaderEntry {
-				/// @brief コンパイル済みのBlob。bytecodeはこの中を指すので、Blobの寿命はEntryと同じ
-				Microsoft::WRL::ComPtr<IDxcBlob> blob;
+				/// @brief コンパイル済みシェーダーの中身。bytecodeはこの中を指す
+				std::vector<uint8_t> bytes;
 				D3D12_SHADER_BYTECODE bytecode{};
+				/// @brief リソースのバインド情報(必要なCBV/SRV/UAV/Texture/Samplerとレジスタ番号)
+				ShaderReflectionData reflection;
 			};
+
+			/// @brief 登録済みのEntryを取得する。未登録ならコンパイルして登録する
+			ShaderEntry& GetOrRegister(ShaderType shaderType, const std::string& shaderName);
 
 			/// @brief シェーダータイプ別のシェーダーマップ(名前->Entry)
 			std::array<std::unordered_map<std::string, ShaderEntry>, static_cast<size_t>(ShaderType::Count)> shaders_;

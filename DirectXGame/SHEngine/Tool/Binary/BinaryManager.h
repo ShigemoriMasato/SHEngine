@@ -12,6 +12,10 @@ public:
 	bool Boot(const std::string& fileName);
 	void BootRawData(const std::string& rawData);
 
+	/// @brief Boot/Writeで使用するベースパスを変更する。デフォルトは "Assets/Binary/"
+	/// @param basePath 末尾に'/'を含めること
+	void SetBasePath(const std::string& basePath) { basePath_ = basePath; }
+
 	//ポインタを渡した場合は指す先の値を登録する
 	template<typename T>
 	void Register(const T& data);
@@ -65,7 +69,7 @@ private:
 	uint32_t prevReadIndex_ = 0;
 	bool failed_ = false;
 
-	static inline const std::string basePath = "Assets/Binary/";
+	std::string basePath_ = "Assets/Binary/";
 
 	static constexpr uint32_t idSize = uint32_t(sizeof(TypeID));
 	static constexpr uint32_t sizeSize = uint32_t(sizeof(uint32_t));
