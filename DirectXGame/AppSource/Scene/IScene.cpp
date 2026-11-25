@@ -1,4 +1,5 @@
 #include "IScene.h"
+#include <Render/Buffer/ResourceRegistry.h>
 
 void IScene::DefaultPreDraw() {
 	auto display = commonData_->display.get();
@@ -20,6 +21,9 @@ void IScene::DefaultPostDraw() {
 	float deltatime = engine_->GetDeltaTime();
 	ImGui::Text("FPS: %.2f", 1.0f / deltatime);
 	ImGui::End();
+
+	// GPUBuffer・テクスチャの一覧 (Resource / Value ウィンドウ)
+	SHEngine::ResourceRegistry::DrawImGui();
 #endif
 
 #ifndef USE_IMGUI

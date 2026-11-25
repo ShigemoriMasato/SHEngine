@@ -7,6 +7,8 @@ SHEngine::Renderer::Renderer(VertexType type, const Mesh& modelData) {
 	uint32_t indexCount = uint32_t(modelData.indices.size());
 
 	container_ = std::make_unique<BufferContainer>(vertexTypeCount + (indexCount > 0 ? 1 : 0));
+	// 頂点・インデックスバッファはノードから割り当てないので一覧には出さない
+	container_->SetHidden(true);
 	drawData_.Initialize();
 
 	static const std::vector<VertexType> vertexTypes = {

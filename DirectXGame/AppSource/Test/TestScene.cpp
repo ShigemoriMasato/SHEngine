@@ -1,4 +1,5 @@
 #include "TestScene.h"
+#include <Render/Buffer/ResourceRegistry.h>
 
 TestScene::~TestScene() {
 	Save();
@@ -57,6 +58,9 @@ std::unique_ptr<IScene> TestScene::Update() {
 	curveEditor_.Update(deltaTime);
 
 	curveEditor_.DrawWindow();
+
+	// GPUBuffer・テクスチャの一覧 (Resource / Value ウィンドウ)
+	SHEngine::ResourceRegistry::DrawImGui();
 
 	return nullptr;
 }

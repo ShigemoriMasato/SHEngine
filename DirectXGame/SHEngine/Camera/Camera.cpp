@@ -39,6 +39,14 @@ namespace {
 
 Camera::Camera() {
 	vpBuffer_ = std::make_unique<SHEngine::GPUBuffer>(BufferType::CBV, sizeof(Matrix4x4));
+	// ノードから割り当てられるように一覧に登録する
+	vpBufferID_ = SHEngine::ResourceRegistry::RegisterExternal("Camera", "", vpBuffer_.get());
+	SHEngine::ResourceRegistry::RenameResource(vpBufferID_, "VP " + std::to_string(vpBufferID_));
+	vpBuffer_->SetName(SHEngine::ResourceRegistry::GetDisplayName(SHEngine::ResourceRef::Buffer(vpBufferID_)));
+}
+
+Camera::~Camera() {
+	SHEngine::ResourceRegistry::RemoveResource(vpBufferID_);
 }
 
 void Camera::SetProjectionMatrix(PerspectiveFovDesc desc) {

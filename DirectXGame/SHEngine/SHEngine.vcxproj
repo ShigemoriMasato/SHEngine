@@ -125,6 +125,7 @@
     <ClCompile Include="Core\Command\Measure\MeasureShaderTime.cpp" />
     <ClCompile Include="Core\Command\SHCmdQueue.cpp" />
     <ClCompile Include="Core\DXDevice.cpp" />
+    <ClCompile Include="Core\DeferredReleaseQueue.cpp" />
     <ClCompile Include="Core\FrameCounter.cpp" />
     <ClCompile Include="Core\ImGuiWrapper.cpp" />
     <ClCompile Include="Core\View\DSVManager.cpp" />
@@ -133,6 +134,7 @@
     <ClCompile Include="Core\View\ViewFunc.cpp" />
     <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="Render\Buffer\BufferContainer.cpp" />
+    <ClCompile Include="Render\Buffer\ResourceRegistry.cpp" />
     <ClCompile Include="Render\Buffer\GPUBuffer.cpp" />
     <ClCompile Include="Render\Buffer\ReadBackBuffer.cpp" />
     <ClCompile Include="Render\Command\DirectCommandContext.cpp" />
@@ -219,6 +221,7 @@
     <ClInclude Include="Core\Command\Measure\MeasureShaderTime.h" />
     <ClInclude Include="Core\Command\SHCmdQueue.h" />
     <ClInclude Include="Core\DXDevice.h" />
+    <ClInclude Include="Core\DeferredReleaseQueue.h" />
     <ClInclude Include="Core\FrameCounter.h" />
     <ClInclude Include="Core\ImGuiWrapper.h" />
     <ClInclude Include="Core\View\DSVManager.h" />
@@ -227,6 +230,7 @@
     <ClInclude Include="Core\View\ViewFunc.h" />
     <ClInclude Include="Input\Input.h" />
     <ClInclude Include="Render\Buffer\BufferContainer.h" />
+    <ClInclude Include="Render\Buffer\ResourceRegistry.h" />
     <ClInclude Include="Render\Buffer\GPUBuffer.h" />
     <ClInclude Include="Render\Buffer\ReadBackBuffer.h" />
     <ClInclude Include="Render\Command\DirectCommandContext.h" />

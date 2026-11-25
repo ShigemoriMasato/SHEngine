@@ -25,12 +25,19 @@ namespace SHEngine {
 		// @param bufferNum バッファの数（デフォルトは3、スワップチェーンのバッファ数に合わせる）
 		GPUBuffer(BufferType bufferType, size_t strideInBytes, uint32_t num = 1, BufferNum bufferNum = BufferNum::MatchSwapChain);
 
-		virtual ~GPUBuffer() = default;
+		// @brief リソースとSRV/UAVのディスクリプタは、GPUが使用中かもしれないので解放待ちキューに預けて数フレーム後に解放する。
+		//        エンジン終了後(キューがない)は即時解放する。
+		virtual ~GPUBuffer();
 
 		// @brief GPUBufferへデータコピーをするときの値を変更する。Flush時に実際にGPUへコピーされる。UAVバッファにはコピーできない。
 		virtual void CopyBuffer(const void* data, size_t dataSize);
 		// @brief テクスチャ(TextureData派生)かどうか
 		virtual bool IsTexture() const { return false; }
+
+		// @brief 名前を設定する。ID3D12Resourceにも同じ名前が付く(フレームごとに複数ある場合は " [i]" が付く)
+		void SetName(const std::string& name);
+		// @brief 設定された名前。未設定なら空
+		const std::string& GetName() const { return name_; }
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
 		void TransitionBarrier(ShaderType shaderType, BufferType bufferType);
 		// @brief GPUBufferのリソースバリアを設定する。Flush時に切り替える。
@@ -50,6 +57,12 @@ namespace SHEngine {
 
 		// @brief Viewの種類を取得する
 		uint8_t GetBufferType() const { return bufferType_; }
+
+		// @brief 現在のフレームで使用しているリソースの、記録上の状態を取得する
+		D3D12_RESOURCE_STATES GetCurrentState() const {
+			if (currentState_.empty()) return D3D12_RESOURCE_STATE_COMMON;
+			return currentState_[currentIndex_ % currentState_.size()];
+		}
 
 		ID3D12Resource* GetResource() const {
 			if (resources_.empty()) return nullptr;
@@ -97,6 +110,8 @@ namespace SHEngine {
 		D3D12_RESOURCE_STATES nextState_ = {};
 
 		bool isUAVBarrier_ = true;
+
+		std::string name_;
 
 		static inline uint32_t currentIndex_ = 0;
 	};

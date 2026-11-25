@@ -137,6 +137,9 @@ void DXDevice::Initialize() {
     srvManager_ = std::make_unique<SRVManager>(device_.Get(), descriptorSizeSRV, 4096);
     rtvManager_ =  std::make_unique<RTVManager>(device_.Get(), descriptorSizeRTV_, 128);
     dsvManager_ =  std::make_unique<DSVManager>(device_.Get(), descriptorSizeDSV, 128);
+
+    // GPUBufferの解放待ちキュー。BeginFrameでバッファ数フレーム前のフェンスを待つので、1フレーム余裕を持たせる
+    deferredReleaseQueue_ = std::make_unique<DeferredReleaseQueue>(uint32_t(bufferCount + 1));
 	logger_->info("Complete create DescriptorHeapManagers");
 
 #ifdef SH_DEBUG

@@ -10,6 +10,7 @@
 #include "View/SRVManager.h"
 #include "View/RTVManager.h"
 #include "View/DSVManager.h"
+#include "DeferredReleaseQueue.h"
 
 /**
  * @enum ShaderType
@@ -87,6 +88,9 @@ namespace SHEngine {
 
 		int GetBufferCount() const { return bufferCount; }
 
+		/// @brief GPUBufferの解放待ちキューを取得
+		DeferredReleaseQueue* GetDeferredReleaseQueue() const { return deferredReleaseQueue_.get(); }
+
 	private:
 
 		/// @brief DirectX12デバッグコントローラー
@@ -106,6 +110,10 @@ namespace SHEngine {
 		std::unique_ptr<DSVManager> dsvManager_;
 
 		const int bufferCount = 3;	// バッファ数（フレームバッファリングのため）
+
+		/// @brief GPUBufferの解放待ちキュー。
+		/// @note SRVHandleを保持するので、srvManager_より後に宣言して先に破棄されるようにすること
+		std::unique_ptr<DeferredReleaseQueue> deferredReleaseQueue_;
 
 	private:
 

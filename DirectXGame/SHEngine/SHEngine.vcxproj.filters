@@ -145,6 +145,7 @@
     <ClCompile Include="Compute\ComputeObject.cpp"><Filter>Compute</Filter></ClCompile>
     <ClCompile Include="Compute\PSO\CSPSOManager.cpp"><Filter>Compute\PSO</Filter></ClCompile>
     <ClCompile Include="Core\DXDevice.cpp"><Filter>Core</Filter></ClCompile>
+    <ClCompile Include="Core\DeferredReleaseQueue.cpp"><Filter>Core</Filter></ClCompile>
     <ClCompile Include="Core\FrameCounter.cpp"><Filter>Core</Filter></ClCompile>
     <ClCompile Include="Core\ImGuiWrapper.cpp"><Filter>Core</Filter></ClCompile>
     <ClCompile Include="Core\Command\CommandObject.cpp"><Filter>Core\Command</Filter></ClCompile>
@@ -161,6 +162,7 @@
     <ClCompile Include="Render\MeshRenderer.cpp"><Filter>Render</Filter></ClCompile>
     <ClCompile Include="Render\Renderer.cpp"><Filter>Render</Filter></ClCompile>
     <ClCompile Include="Render\Buffer\BufferContainer.cpp"><Filter>Render\Buffer</Filter></ClCompile>
+    <ClCompile Include="Render\Buffer\ResourceRegistry.cpp"><Filter>Render\Buffer</Filter></ClCompile>
     <ClCompile Include="Render\Buffer\GPUBuffer.cpp"><Filter>Render\Buffer</Filter></ClCompile>
     <ClCompile Include="Render\Buffer\ReadBackBuffer.cpp"><Filter>Render\Buffer</Filter></ClCompile>
     <ClCompile Include="Render\Command\DirectCommandContext.cpp"><Filter>Render\Command</Filter></ClCompile>
@@ -239,6 +241,7 @@
     <ClInclude Include="Compute\ComputeObject.h"><Filter>Compute</Filter></ClInclude>
     <ClInclude Include="Compute\PSO\CSPSOManager.h"><Filter>Compute\PSO</Filter></ClInclude>
     <ClInclude Include="Core\DXDevice.h"><Filter>Core</Filter></ClInclude>
+    <ClInclude Include="Core\DeferredReleaseQueue.h"><Filter>Core</Filter></ClInclude>
     <ClInclude Include="Core\FrameCounter.h"><Filter>Core</Filter></ClInclude>
     <ClInclude Include="Core\ImGuiWrapper.h"><Filter>Core</Filter></ClInclude>
     <ClInclude Include="Core\Command\CommandObject.h"><Filter>Core\Command</Filter></ClInclude>
@@ -255,6 +258,7 @@
     <ClInclude Include="Render\MeshRenderer.h"><Filter>Render</Filter></ClInclude>
     <ClInclude Include="Render\Renderer.h"><Filter>Render</Filter></ClInclude>
     <ClInclude Include="Render\Buffer\BufferContainer.h"><Filter>Render\Buffer</Filter></ClInclude>
+    <ClInclude Include="Render\Buffer\ResourceRegistry.h"><Filter>Render\Buffer</Filter></ClInclude>
     <ClInclude Include="Render\Buffer\GPUBuffer.h"><Filter>Render\Buffer</Filter></ClInclude>
     <ClInclude Include="Render\Buffer\ReadBackBuffer.h"><Filter>Render\Buffer</Filter></ClInclude>
     <ClInclude Include="Render\Command\DirectCommandContext.h"><Filter>Render\Command</Filter></ClInclude>

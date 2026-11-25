@@ -8,6 +8,7 @@
 #include <Render/MeshRenderer.h>
 #include <Tool/DecoEditor/Data/decoObjectController.h>
 #include <Render/PostEffect/PostEffectContext.h>
+#include <Render/Buffer/ResourceRegistry.h>
 
 #pragma comment(lib, "Dbghelp.lib")
 
@@ -19,6 +20,15 @@ static LONG WINAPI ClashHandler(EXCEPTION_POINTERS* pExceptionPointers) {
 }
 
 SHEngine::Engine::~Engine() {
+	// GPUの処理がすべて終わるのを待つ。以降、解放待ちのリソースは安全に解放できる
+	if (directCmdContext_) {
+		directCmdContext_->StopGPU();
+	}
+	if (computeCmdContext_) {
+		computeCmdContext_->StopGPU();
+	}
+
+	ResourceRegistry::SetTextureManager(nullptr);
 	PostEffectContext::StaticFinalize();
 	AudioManager::GetInstance()->Finalize();
 	imGuiWrapper_->Finalize();
@@ -44,6 +54,7 @@ void Engine::Initialize(HINSTANCE hInstance) {
 
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(device_.get());
+	ResourceRegistry::SetTextureManager(textureManager_.get());
 
 	fontLoader_ = std::make_unique<FontLoader>();
 	fontLoader_->Initialize(textureManager_.get());
@@ -103,7 +114,8 @@ void Engine::BeginFrame() {
 	input_->Update();
 	psoEditor_->FrameInitialize();
 	AudioManager::GetInstance()->Update();
-	BufferContainer::EraseListUpdate();
+	// 解放待ちのGPUBuffer(リソース・SRV/UAV)を1フレーム進める
+	device_->GetDeferredReleaseQueue()->Update();
 	if (imGuiWrapper_) {
 		imGuiWrapper_->NewFrame();
 		imguiDrew_ = false;

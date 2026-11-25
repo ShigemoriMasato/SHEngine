@@ -111,10 +111,7 @@ void TextureData::CreateUAV(ID3D12Device* device, SRVManager* srvManager, const 
 }
 
 void TextureData::SetDebugName(const std::string& prefix) {
-	name_ = prefix + " : " + std::to_string(debugTextureCount++);
-	if (GetResource()) {
-		GetResource()->SetName(ConvertString(name_).c_str());
-	}
+	SetName(prefix + " : " + std::to_string(debugTextureCount++));
 }
 
 void TextureData::Create(uint32_t width, uint32_t height, Vector4 clearColor, Format format, bool unordered, ID3D12Device* device, SRVManager* srvManager) {
@@ -350,7 +347,7 @@ DirectX::ScratchImage TextureData::Create(std::string filePath, ID3D12Device* de
 	SetDebugName("LoadTexture");
 	// 表示名はファイル名にする
 	filePath_ = filePath;
-	name_ = path.filename().string();
+	SetName(path.filename().string());
 
 	//テクスチャデータをアップロードするたに必要なデータを返す
 	return mipImages;

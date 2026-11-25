@@ -14,7 +14,7 @@ public:
 
 	/// @brief Boot/Writeで使用するベースパスを変更する。デフォルトは "Assets/Binary/"
 	/// @param basePath 末尾に'/'を含めること
-	void SetBasePath(const std::string& basePath) { basePath_ = basePath; }
+	void SetBasePath(const std::string& basePath = "Assets/Binary/") { basePath_ = basePath; }
 
 	//ポインタを渡した場合は指す先の値を登録する
 	template<typename T>

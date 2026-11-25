@@ -1,5 +1,6 @@
 #include "GPUBuffer.h"
 #include <Utility/DirectUtilFuncs.h>
+#include <Utility/ConvertString.h>
 #include <DirectXTex/d3dx12.h>
 
 SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint32_t num, BufferNum bufferNum) {
@@ -209,6 +210,44 @@ void SHEngine::GPUBuffer::TransitionBarrier(ShaderType shaderType, BufferType bu
 	};
 
 	nextState_ = states.at(shaderType).at(bufferType);
+}
+
+SHEngine::GPUBuffer::~GPUBuffer() {
+	DeferredReleaseQueue* queue = DeferredReleaseQueue::Get();
+	if (!queue) {
+		// エンジン終了後はGPUが停止しているので、そのまま解放する
+		return;
+	}
+
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> resources;
+	resources.reserve(resources_.size());
+	for (auto& resource : resources_) {
+		if (resource.res) {
+			resources.push_back(std::move(resource.res));
+		}
+	}
+
+	std::vector<std::unique_ptr<SRVHandle>> descriptors;
+	descriptors.reserve(srvHandles_.size() + uavHandles_.size());
+	for (auto& handle : srvHandles_) {
+		descriptors.push_back(std::move(handle));
+	}
+	for (auto& handle : uavHandles_) {
+		descriptors.push_back(std::move(handle));
+	}
+
+	queue->Push(std::move(resources), std::move(descriptors));
+}
+
+void SHEngine::GPUBuffer::SetName(const std::string& name) {
+	name_ = name;
+	for (size_t i = 0; i < resources_.size(); ++i) {
+		if (!resources_[i].res) {
+			continue;
+		}
+		std::string resourceName = resources_.size() > 1 ? name_ + " [" + std::to_string(i) + "]" : name_;
+		resources_[i].res->SetName(ConvertString(resourceName).c_str());
+	}
 }
 
 void SHEngine::GPUBuffer::TransitionBarrier(D3D12_RESOURCE_STATES nextState) {

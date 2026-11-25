@@ -56,8 +56,6 @@ namespace SHEngine {
 		bool IsUnordered() const { return unordered_; }
 		DXGI_FORMAT GetFormat() const { return format_; }
 		Type GetType() const { return type_; }
-		// @brief 表示用の名前
-		const std::string& GetName() const { return name_; }
 		// @brief 読み込み元のファイルパス(Assets/以下)。ファイルから読み込んでいない場合は空
 		const std::string& GetFilePath() const { return filePath_; }
 
@@ -99,7 +97,6 @@ namespace SHEngine {
 
 		bool unordered_ = false;
 
-		std::string name_;
 		std::string filePath_;
 	};
 

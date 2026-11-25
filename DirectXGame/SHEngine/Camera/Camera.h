@@ -1,6 +1,7 @@
 #pragma once
 #include <Utility/MatrixFactory.h>
 #include <Render/Buffer/GPUBuffer.h>
+#include <Render/Buffer/ResourceRegistry.h>
 #include <memory>
 
 //初期値を画面サイズ1280*720と仮定して設定
@@ -71,7 +72,7 @@ class Camera {
 public:
 
 	Camera();
-	~Camera() = default;
+	~Camera();
 	
 	void SetProjectionMatrix(PerspectiveFovDesc desc);
 	void SetProjectionMatrix(OrthographicDesc desc);
@@ -116,5 +117,8 @@ protected:
 	bool isSetMatrix = false;
 
 	std::unique_ptr<SHEngine::GPUBuffer> vpBuffer_ = nullptr;
+
+	/// @brief ResourceRegistry上のvpBuffer_のID
+	SHEngine::ResourceID vpBufferID_ = SHEngine::kInvalidResourceID;
 };
 

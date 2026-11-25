@@ -27,11 +27,12 @@ void SHEngine::Screen::Display::CreateDepthTexture(TextureManager* textureManage
 	int dsTextureIndex = textureManager->CreateDepthTexture(uint32_t(width_), uint32_t(height_));
 	depthTexture_ = textureManager->GetDepthTexture(dsTextureIndex);
 	dsvHandlePtr_ = depthTexture_->GetDSVHandle();
+	depthTexture_->SetName(windowName_ + "_Depth");
 
 	logger_->debug("Depth texture created. Size: {}x{}", width_, height_);
 }
 
-void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor) {
+void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor, const std::string& name) {
 	if (!renderTextures_.empty()) {
 		logger_->error("Swapchain用のDisplayはAddRenderTargetを一度しか呼べません。");
 		return;
@@ -39,7 +40,7 @@ void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, 
 	isOffScreen_ = false;
 
 	int textureHandle = textureManager->CreateSwapChainTexture(resource, clearColor);
-	AddRenderTexture(textureManager->GetRenderTexture(textureHandle));
+	AddRenderTexture(textureManager->GetRenderTexture(textureHandle), name);
 
 	auto size = renderTextures_.back()->GetSize();
 	if (width_ != int(size.first) || height_ != int(size.second)) {
@@ -54,7 +55,7 @@ void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, 
 	}
 }
 
-void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format, bool unordered) {
+void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format, bool unordered, const std::string& name) {
 	if (!isOffScreen_) {
 		//初期値がtrueで、falseにできるのがswapchain用のAddRenderTargetだけなので、ここでfalseであれば、既にSwapchain用のDisplayが作成されていることになる。
 		assert(isOffScreen_ && "既にSwapchain用のDisplayが作成されています。");
@@ -65,7 +66,7 @@ void SHEngine::Screen::Display::AddRenderTarget(TextureManager* textureManager, 
 	isOffScreen_ = true;
 
 	int textureHandle = textureManager->CreateWindowTexture(width_, height_, clearColor, format, unordered);
-	AddRenderTexture(textureManager->GetRenderTexture(textureHandle));
+	AddRenderTexture(textureManager->GetRenderTexture(textureHandle), name);
 }
 
 void SHEngine::Screen::Display::SetViewport(DCC* dcc, Vector2 min, Vector2 size) {
@@ -218,8 +219,16 @@ bool SHEngine::Screen::Display::IsForcus() {
 	return true;
 }
 
-void SHEngine::Screen::Display::AddRenderTexture(RenderTexture* renderTexture) {
+void SHEngine::Screen::Display::AddRenderTexture(RenderTexture* renderTexture, const std::string& name) {
 	assert(renderTexture && "Display::AddRenderTexture: renderTexture is nullptr");
+	// 名前の指定がなければ、ImGuiのウィンドウ名と同じ規則でDisplay名から付ける
+	if (!name.empty()) {
+		renderTexture->SetName(name);
+	} else {
+		size_t index = renderTextures_.size();
+		renderTexture->SetName(index == 0 ? windowName_ : windowName_ + "_" + std::to_string(index));
+	}
+
 	renderTextures_.push_back(renderTexture);
 	rtvHandlePtr_.push_back(renderTexture->GetRTVHandle());
 

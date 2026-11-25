@@ -21,8 +21,12 @@ namespace SHEngine::Screen {
 		void Initialize(int width, int height, std::string windowName = "");
 
 		void CreateDepthTexture(TextureManager* textureManager);
-		void AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor);
-		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8_UNORM, bool unordered = false);
+		/// @brief SwapChain用のRenderTargetを追加する
+		/// @param name テクスチャ(ID3D12Resource)の名前。空ならDisplay名から自動で付ける
+		void AddRenderTarget(TextureManager* textureManager, ID3D12Resource* resource, uint32_t clearColor, const std::string& name = "");
+		/// @brief OffScreen用のRenderTargetを追加する
+		/// @param name テクスチャ(ID3D12Resource)の名前。空ならDisplay名から自動で付ける("Display名" / "Display名_1" ...)
+		void AddRenderTarget(TextureManager* textureManager, uint32_t clearColor, Format format = Format::R8G8B8A8_UNORM, bool unordered = false, const std::string& name = "");
 
 		/// @brief ViewPortを設定する
 		/// @param cmdObject コマンドオブジェクト
@@ -75,7 +79,7 @@ namespace SHEngine::Screen {
 	private:
 
 		// @brief RenderTextureを追加し、RTVハンドルの配列を更新する
-		void AddRenderTexture(RenderTexture* renderTexture);
+		void AddRenderTexture(RenderTexture* renderTexture, const std::string& name);
 
 		// @brief 状態はRenderTexture/DepthTexture(GPUBuffer)側で管理している
 		void TransitionBarrier(SHEngine::ICommandContext* dcc, D3D12_RESOURCE_STATES after);
