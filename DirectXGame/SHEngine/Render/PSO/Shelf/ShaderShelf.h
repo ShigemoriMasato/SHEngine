@@ -73,21 +73,35 @@ namespace SHEngine {
 
 			void ReleaseShader(std::string shaderName = "All");
 
-			ShaderType GetShaderTypeFromFileName(const std::string& fileName);
+		public:
+
+			/**
+			 * @brief ファイル名の拡張子からシェーダーの種類を判定する
+			 *
+			 * "名前.VS.hlsl" のように、".hlsl" の直前の拡張子(VS/PS/CS/MS/AS)で判定する。
+			 *
+			 * @param fileName シェーダーファイル名(パス可)
+			 * @return シェーダーの種類。判定できない場合はShaderType::Count
+			 */
+			static ShaderType GetShaderTypeFromFileName(const std::string& fileName);
+
+		private:
 
 			DXDevice* device_ = nullptr;
 
 			/// @brief シェーダーファイルのベースパス
 			std::filesystem::path basePath_ = "Assets/Shader";
 
-			/// @brief シェーダータイプ毎のコンパイルバージョン
-			std::array<std::wstring, static_cast<size_t>(ShaderType::Count)> compileVersions_;
+			struct ShaderEntry {
+				/// @brief コンパイル済みのBlob。bytecodeはこの中を指すので、Blobの寿命はEntryと同じ
+				Microsoft::WRL::ComPtr<IDxcBlob> blob;
+				D3D12_SHADER_BYTECODE bytecode{};
+			};
 
-			/// @brief コンパイル済みシェーダーBlobのリスト
-			std::list<IDxcBlob*> shaderBlobs_;
+			/// @brief シェーダータイプ別のシェーダーマップ(名前->Entry)
+			std::array<std::unordered_map<std::string, ShaderEntry>, static_cast<size_t>(ShaderType::Count)> shaders_;
 
-			/// @brief シェーダータイプ別のバイトコードマップ(名前->Bytecode)
-			std::array<std::unordered_map<std::string, D3D12_SHADER_BYTECODE>, static_cast<size_t>(ShaderType::Count)> shaderBytecodes_;
+			Logger logger_ = GetLogger("Engine");
 		};
 
 	}// namespace PSO

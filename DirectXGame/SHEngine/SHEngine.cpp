@@ -60,7 +60,7 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	psoEditor_->Initialize(device_.get(), shelfManager_.get());
 
 	csPsoManager_ = std::make_unique<PSO::CSPSOManager>();
-	csPsoManager_->Initialize(device_.get(), shelfManager_->GetSamplers());
+	csPsoManager_->Initialize(device_.get(), shelfManager_.get());
 
 	psoManagerForMS_ = std::make_unique<PSO::ManagerMSType>(device_.get(), shelfManager_.get());
 	psoManagerForMS_->Initialize();

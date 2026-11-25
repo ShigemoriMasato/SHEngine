@@ -144,8 +144,6 @@
     <ClCompile Include="Compute\ComputeCommandContext.cpp"><Filter>Compute</Filter></ClCompile>
     <ClCompile Include="Compute\ComputeObject.cpp"><Filter>Compute</Filter></ClCompile>
     <ClCompile Include="Compute\PSO\CSPSOManager.cpp"><Filter>Compute\PSO</Filter></ClCompile>
-    <ClCompile Include="Compute\PSO\CSRootSignature.cpp"><Filter>Compute\PSO</Filter></ClCompile>
-    <ClCompile Include="Compute\PSO\CSShaderShelf.cpp"><Filter>Compute\PSO</Filter></ClCompile>
     <ClCompile Include="Core\DXDevice.cpp"><Filter>Core</Filter></ClCompile>
     <ClCompile Include="Core\FrameCounter.cpp"><Filter>Core</Filter></ClCompile>
     <ClCompile Include="Core\ImGuiWrapper.cpp"><Filter>Core</Filter></ClCompile>
@@ -238,8 +236,6 @@
     <ClInclude Include="Compute\ComputeCommandContext.h"><Filter>Compute</Filter></ClInclude>
     <ClInclude Include="Compute\ComputeObject.h"><Filter>Compute</Filter></ClInclude>
     <ClInclude Include="Compute\PSO\CSPSOManager.h"><Filter>Compute\PSO</Filter></ClInclude>
-    <ClInclude Include="Compute\PSO\CSRootSignature.h"><Filter>Compute\PSO</Filter></ClInclude>
-    <ClInclude Include="Compute\PSO\CSShaderShelf.h"><Filter>Compute\PSO</Filter></ClInclude>
     <ClInclude Include="Core\DXDevice.h"><Filter>Core</Filter></ClInclude>
     <ClInclude Include="Core\FrameCounter.h"><Filter>Core</Filter></ClInclude>
     <ClInclude Include="Core\ImGuiWrapper.h"><Filter>Core</Filter></ClInclude>

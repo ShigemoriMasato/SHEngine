@@ -140,7 +140,8 @@ ID3D12RootSignature* RootSignatureShelf::CreateRootSignature(const RootSignature
 		};
 
 	std::vector<D3D12_DESCRIPTOR_RANGE> descriptorRanges;
-	descriptorRanges.reserve(config.rootParams.size());
+	// pDescriptorRangesでポインタを保持するので、テクスチャ用の1つを含めて再確保が起きないように確保しておく
+	descriptorRanges.reserve(config.rootParams.size() + 1);
 	for (const auto& config : config.rootParams) {
 
 		registerChecker(config);
