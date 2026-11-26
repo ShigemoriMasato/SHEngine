@@ -119,6 +119,18 @@ namespace SHEngine {
 		static std::string GetDisplayName(const ResourceRef& ref);
 		// @brief 参照先をスロットに割り当てられるか
 		static bool CanBind(const ResourceRef& ref, const SlotRequest& request);
+		// @brief バッファをスロットに割り当てられるか(コードから渡されたバッファ用)
+		static bool CanBindBuffer(const GPUBuffer* buffer, const SlotRequest& request);
+
+		// @brief 保存用の名前。バッファは "Group/Name"、テクスチャは読み込んだファイルパス(なければ名前)
+		static std::string GetPersistentName(const ResourceRef& ref);
+		// @brief 保存用の名前から参照を探す。見つからなければNoneのResourceRef
+		static ResourceRef FindByPersistentName(ResourceRef::Source source, const std::string& name);
+		// @brief リソースの追加・削除・名前変更のたびに増える値。名前からの再検索を間引くために使う
+		static uint32_t GetGeneration();
+
+		// @brief Resourceウィンドウの項目をドラッグしたときのImGuiのペイロード名(中身はResourceRef)
+		static constexpr const char* kDragDropPayload = "SH_RESOURCE_REF";
 
 		// ---- 選択 (ノード画面のスロット → リソース画面) ----
 
@@ -129,7 +141,7 @@ namespace SHEngine {
 
 		// ---- ImGui ----
 
-		// @brief "Resource" と "Value" ウィンドウを描画する
+		// @brief Barrierでテクスチャを描画するか否かが切り替わるため、ImGui描画直前で呼ぶ必要がある。
 		static void DrawImGui();
 	};
 

@@ -39,7 +39,7 @@ namespace SHEngine {
 		void Release();
 
 		// @brief テクスチャにはCopyBufferできない
-		void CopyBuffer(const void* data, size_t dataSize) override;
+		void CopyBuffer(const void* data, size_t dataSize, std::source_location location = std::source_location::current()) override;
 		bool IsTexture() const override { return true; }
 
 		// @brief RTVを持っているか(RenderTextureか)

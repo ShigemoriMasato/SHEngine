@@ -135,13 +135,13 @@ void BattleField::Save() {
 	shootingStar_->Save(manager);
 	testConfig_.Save(manager);
 
-	manager.Write("BattleField");
+	manager.Write("BattleField.bin");
 }
 
 void BattleField::Load() {
 	BinaryManager manager;
 
-	if (!manager.Boot("BattleField")) {
+	if (!manager.Boot("BattleField.bin")) {
 		return;
 	}
 

@@ -119,6 +119,8 @@
     <ClCompile Include="Compute\ComputeCommandContext.cpp" />
     <ClCompile Include="Compute\ComputeObject.cpp" />
     <ClCompile Include="Compute\PSO\CSPSOManager.cpp" />
+    <ClCompile Include="Compute\Graph\ComputeGraph.cpp" />
+    <ClCompile Include="Compute\Graph\ComputeGraphEditor.cpp" />
     <ClCompile Include="Core\Command\CommandObject.cpp" />
     <ClCompile Include="Core\Command\CommandSet.cpp" />
     <ClCompile Include="Core\Command\ICommandContext.cpp" />
@@ -215,6 +217,8 @@
     <ClInclude Include="Compute\ComputeCommandContext.h" />
     <ClInclude Include="Compute\ComputeObject.h" />
     <ClInclude Include="Compute\PSO\CSPSOManager.h" />
+    <ClInclude Include="Compute\Graph\ComputeGraph.h" />
+    <ClInclude Include="Compute\Graph\ComputeTrigger.h" />
     <ClInclude Include="Core\Command\CommandObject.h" />
     <ClInclude Include="Core\Command\CommandSet.h" />
     <ClInclude Include="Core\Command\ICommandContext.h" />

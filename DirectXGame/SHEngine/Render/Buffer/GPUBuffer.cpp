@@ -2,6 +2,9 @@
 #include <Utility/DirectUtilFuncs.h>
 #include <Utility/ConvertString.h>
 #include <DirectXTex/d3dx12.h>
+#include <format>
+#include <string_view>
+#include <unordered_set>
 
 SHEngine::GPUBuffer::GPUBuffer(BufferType bufferType, size_t strideInBytes, uint32_t num, BufferNum bufferNum) {
 	sizeInBytes_ = strideInBytes * num;
@@ -160,13 +163,26 @@ D3D12_CPU_DESCRIPTOR_HANDLE SHEngine::GPUBuffer::GetCPUDescriptorHandle(BufferTy
 	return {};
 }
 
-void SHEngine::GPUBuffer::CopyBuffer(const void* data, size_t dataSize) {
+void SHEngine::GPUBuffer::CopyBuffer(const void* data, size_t dataSize, [[maybe_unused]] std::source_location location) {
 	//安全性担保
 	assert(dataSize <= sizeInBytes_);
 	if (bufferType_ & BufferType::UAV) {
 		assert(false && "Cant copy data to UAV buffer");
 		return;
 	}
+
+#ifndef SH_RELEASE
+	// 同一フレームで使用(Flush)した後の書き換えを検出する。Flush前の書き換えは最後の値が使われるだけなので問題ない
+	if (copyRecordFrame_ != currentIndex_) {
+		copyRecordFrame_ = currentIndex_;
+		copyRecords_.clear();
+	}
+	const bool afterFlush = lastFlushFrame_ == currentIndex_;
+	copyRecords_.push_back({ location, afterFlush });
+	if (afterFlush) {
+		ReportMultiWrite();
+	}
+#endif
 
 	// 所有を持つバイト配列にコピーして保持する（呼び出し元の寿命に依存しない）
 	nextData_.clear();
@@ -259,6 +275,9 @@ void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 	//UAVが含まれていない場合は値をコピーする
 	if (!(bufferType_ & BufferType::UAV) && !mappedData_.empty()) {
 		std::memcpy(mappedData_[bufferIndex], nextData_.data(), nextData_.size());
+#ifndef SH_RELEASE
+		lastFlushFrame_ = currentIndex_;
+#endif
 	}
 
 	//同じだった場合の処理と過去の状態の更新は関数内に含まれている
@@ -280,6 +299,35 @@ void SHEngine::GPUBuffer::Flush(ID3D12GraphicsCommandList* cmdList) {
 
 		Func::InsertBarrier(cmdList, nextState_, currentState_[bufferIndex], resources_[bufferIndex].res.Get());
 	}
+}
+
+void SHEngine::GPUBuffer::ReportMultiWrite() {
+#ifndef SH_RELEASE
+	multiWriteRecords_ = copyRecords_;
+	multiWriteFrame_ = currentIndex_;
+
+	auto fileName = [](const char* path) {
+		std::string_view view(path);
+		size_t slash = view.find_last_of("/\\");
+		return slash == std::string_view::npos ? view : view.substr(slash + 1);
+		};
+
+	// 同じ呼び出し箇所の組み合わせは1回だけ警告する(毎フレームのログ埋め尽くし防止)
+	std::string key = name_ + "|";
+	std::string detail;
+	for (const auto& record : copyRecords_) {
+		key += std::format("{}:{};", record.location.file_name(), record.location.line());
+		detail += std::format("\n  - {}:{} {} ({})", fileName(record.location.file_name()), record.location.line(),
+			record.location.function_name(), record.afterFlush ? "使用後" : "使用前");
+	}
+	static std::unordered_set<std::string> reported;
+	if (!reported.insert(key).second) {
+		return;
+	}
+
+	logger_->warn("GPUBuffer \"{}\" が同一フレーム内で使用後に書き換えられました。GPU上では先に使用した箇所も最後の値になります。{}",
+		name_.empty() ? "(名前なし)" : name_, detail);
+#endif
 }
 
 void SHEngine::GPUBuffer::ZeroReset() {

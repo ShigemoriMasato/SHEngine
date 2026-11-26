@@ -68,7 +68,7 @@ void TextureData::Release() {
 	textureManager_->DeleteTexture(this);
 }
 
-void TextureData::CopyBuffer(const void*, size_t) {
+void TextureData::CopyBuffer(const void*, size_t, std::source_location) {
 	logger_->error("TextureData::CopyBuffer: Texture can't copy buffer. ({})", name_);
 	assert(false && "TextureData::CopyBuffer: Texture can't copy buffer");
 }

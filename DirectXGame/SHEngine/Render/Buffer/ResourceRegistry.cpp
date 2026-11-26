@@ -26,6 +26,9 @@ namespace {
 
 		GroupID unnamedGroup = kNoGroup;
 
+		// 追加・削除・名前変更のたびに増える
+		uint32_t generation = 0;
+
 		// 選択モード
 		bool isSelecting = false;
 		SlotRequest selectionRequest;
@@ -34,6 +37,9 @@ namespace {
 		// GUI
 		enum class ListMode : int { Texture, Buffer };
 		ListMode listMode = ListMode::Buffer;
+		// Buffer一覧の絞り込み(BufferType::CBV/SRV/UAVのビット)。全て立っているときは絞り込まない
+		static constexpr uint8_t kAllViewFilter = uint8_t(BufferType::CBV) | uint8_t(BufferType::SRV) | uint8_t(BufferType::UAV);
+		uint8_t viewFilter = kAllViewFilter;
 		ResourceRef focused;	// Valueウィンドウに表示する対象
 	};
 
@@ -150,6 +156,7 @@ GroupID ResourceRegistry::CreateGroup(const std::string& name, GroupID parent, b
 }
 
 void ResourceRegistry::DestroyGroup(GroupID group) {
+	++State().generation;
 	auto& state = State();
 	state.groups.erase(group);
 	// 子グループは親を失うので最上位に移す(通常は子コンテナが先に破棄される)
@@ -161,6 +168,7 @@ void ResourceRegistry::DestroyGroup(GroupID group) {
 }
 
 void ResourceRegistry::RenameGroup(GroupID group, const std::string& name) {
+	++State().generation;
 	auto& state = State();
 	auto it = state.groups.find(group);
 	if (it != state.groups.end()) {
@@ -169,6 +177,7 @@ void ResourceRegistry::RenameGroup(GroupID group, const std::string& name) {
 }
 
 void ResourceRegistry::SetGroupParent(GroupID group, GroupID parent) {
+	++State().generation;
 	auto& state = State();
 	auto it = state.groups.find(group);
 	if (it != state.groups.end() && group != parent) {
@@ -199,6 +208,7 @@ GroupID ResourceRegistry::FindOrCreateVirtualGroup(const std::string& name) {
 // ============================================================
 
 ResourceID ResourceRegistry::AddResource(GroupID group, GPUBuffer* buffer, const std::string& name, bool hidden, bool external) {
+	++State().generation;
 	auto& state = State();
 	ResourceEntry entry;
 	entry.id = state.nextResourceID++;
@@ -212,6 +222,7 @@ ResourceID ResourceRegistry::AddResource(GroupID group, GPUBuffer* buffer, const
 }
 
 void ResourceRegistry::RemoveResource(ResourceID id) {
+	++State().generation;
 	auto& state = State();
 	state.resources.erase(id);
 	if (state.focused == ResourceRef::Buffer(id)) {
@@ -220,6 +231,7 @@ void ResourceRegistry::RemoveResource(ResourceID id) {
 }
 
 void ResourceRegistry::MoveResource(ResourceID id, GroupID group) {
+	++State().generation;
 	auto& state = State();
 	auto it = state.resources.find(id);
 	if (it != state.resources.end()) {
@@ -228,6 +240,7 @@ void ResourceRegistry::MoveResource(ResourceID id, GroupID group) {
 }
 
 void ResourceRegistry::RenameResource(ResourceID id, const std::string& name) {
+	++State().generation;
 	auto& state = State();
 	auto it = state.resources.find(id);
 	if (it != state.resources.end() && !name.empty()) {
@@ -304,7 +317,51 @@ std::string ResourceRegistry::GetDisplayName(const ResourceRef& ref) {
 }
 
 bool ResourceRegistry::CanBind(const ResourceRef& ref, const SlotRequest& request) {
-	GPUBuffer* buffer = Resolve(ref);
+	return CanBindBuffer(Resolve(ref), request);
+}
+
+std::string ResourceRegistry::GetPersistentName(const ResourceRef& ref) {
+	if (ref.source == ResourceRef::Source::Texture) {
+		auto* texture = dynamic_cast<TextureData*>(Resolve(ref));
+		if (!texture) return "";
+		if (!texture->GetFilePath().empty()) return texture->GetFilePath();
+		return texture->GetName();
+	}
+	if (ref.source == ResourceRef::Source::Buffer && GetEntry(ResourceID(ref.id))) {
+		return GetDisplayName(ref);
+	}
+	return "";
+}
+
+ResourceRef ResourceRegistry::FindByPersistentName(ResourceRef::Source source, const std::string& name) {
+	auto& state = State();
+	if (name.empty()) {
+		return {};
+	}
+	if (source == ResourceRef::Source::Buffer) {
+		for (const auto& [id, entry] : state.resources) {
+			if (GetDisplayName(ResourceRef::Buffer(id)) == name) {
+				return ResourceRef::Buffer(id);
+			}
+		}
+	} else if (source == ResourceRef::Source::Texture && state.textureManager) {
+		for (const auto& [handle, texture] : state.textureManager->GetTextureDataList()) {
+			if (texture->GetFilePath() == name || (texture->GetFilePath().empty() && texture->GetName() == name)) {
+				return ResourceRef::Texture(handle);
+			}
+		}
+	}
+	return {};
+}
+
+uint32_t ResourceRegistry::GetGeneration() {
+	auto& state = State();
+	// テクスチャの増減も検知できるように枚数を混ぜる
+	uint32_t textureCount = state.textureManager ? uint32_t(state.textureManager->GetTextureDataList().size()) : 0;
+	return state.generation + textureCount * 0x10000u;
+}
+
+bool ResourceRegistry::CanBindBuffer(const GPUBuffer* buffer, const SlotRequest& request) {
 	if (!buffer) {
 		return false;
 	}
@@ -339,6 +396,13 @@ void ResourceRegistry::BeginSelection(const SlotRequest& request, std::function<
 	state.onSelected = std::move(onSelected);
 	// 要求に合わせて一覧の種類を切り替える
 	state.listMode = request.type == SlotRequest::Type::Texture ? RegistryState::ListMode::Texture : RegistryState::ListMode::Buffer;
+	// 絞り込みも要求の種類に合わせる
+	switch (request.type) {
+	case SlotRequest::Type::CBV: state.viewFilter = uint8_t(BufferType::CBV); break;
+	case SlotRequest::Type::SRV: state.viewFilter = uint8_t(BufferType::SRV); break;
+	case SlotRequest::Type::UAV: state.viewFilter = uint8_t(BufferType::UAV); break;
+	default: break;
+	}
 }
 
 void ResourceRegistry::CancelSelection() {
@@ -378,6 +442,12 @@ namespace {
 				callback(ref);
 			}
 		}
+		// ComputeGraphのノード画面などへドラッグできるようにする
+		if (selectable && ImGui::BeginDragDropSource()) {
+			ImGui::SetDragDropPayload(ResourceRegistry::kDragDropPayload, &ref, sizeof(ResourceRef));
+			ImGui::TextUnformatted(label.c_str());
+			ImGui::EndDragDropSource();
+		}
 		if (!selectable) {
 			ImGui::EndDisabled();
 		}
@@ -385,11 +455,19 @@ namespace {
 		ImGui::PopID();
 	}
 
+	// 一覧に表示する項目か(非表示設定とCBV/SRV/UAVの絞り込み)
+	bool IsEntryVisible(const ResourceEntry& entry) {
+		if (entry.hidden) return false;
+		const uint8_t filter = State().viewFilter;
+		if (filter == RegistryState::kAllViewFilter) return true;
+		return entry.buffer && (entry.buffer->GetBufferType() & filter) != 0;
+	}
+
 	// グループ内に表示する項目があるか(子グループも含む)
 	bool HasVisibleItems(GroupID group) {
 		auto& state = State();
 		for (const auto& [id, entry] : state.resources) {
-			if (entry.group == group && !entry.hidden) return true;
+			if (entry.group == group && IsEntryVisible(entry)) return true;
 		}
 		for (const auto& [id, g] : state.groups) {
 			if (g.parent == group && HasVisibleItems(id)) return true;
@@ -414,7 +492,7 @@ namespace {
 			}
 			// 項目
 			for (const auto& [id, entry] : state.resources) {
-				if (entry.group == group && !entry.hidden) {
+				if (entry.group == group && IsEntryVisible(entry)) {
 					DrawItem(ResourceRef::Buffer(id), entry.name);
 				}
 			}
@@ -506,6 +584,33 @@ namespace {
 		ImGui::RadioButton("Buffer", &mode, int(RegistryState::ListMode::Buffer));
 		state.listMode = RegistryState::ListMode(mode);
 
+		// Buffer一覧の絞り込み
+		if (state.listMode == RegistryState::ListMode::Buffer) {
+			auto filterCheckbox = [&](const char* label, BufferType type) {
+				bool enabled = (state.viewFilter & type) != 0;
+				if (ImGui::Checkbox(label, &enabled)) {
+					if (enabled) {
+						state.viewFilter |= uint8_t(type);
+					} else {
+						state.viewFilter &= uint8_t(~uint8_t(type));
+					}
+				}
+				};
+			filterCheckbox("CBV", BufferType::CBV);
+			ImGui::SameLine();
+			filterCheckbox("SRV", BufferType::SRV);
+			ImGui::SameLine();
+			filterCheckbox("UAV", BufferType::UAV);
+			ImGui::SameLine();
+			if (ImGui::SmallButton("All")) {
+				if (state.viewFilter == RegistryState::kAllViewFilter) {
+					state.viewFilter = 0;
+				} else {
+					state.viewFilter = RegistryState::kAllViewFilter;
+				}
+			}
+		}
+
 		if (state.isSelecting) {
 			ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "割り当て先: %s [%s]",
 				state.selectionRequest.label.c_str(), SlotTypeToString(state.selectionRequest.type));
@@ -590,6 +695,20 @@ namespace {
 			PropertyRow("Size", std::format("{} byte", buffer->GetSizeInBytes()));
 			PropertyRow("External", entry.external ? "TRUE" : "FALSE");
 			ImGui::EndTable();
+		}
+
+		// 同一フレームでの使用後の書き換え(GPU上では最後の値になってしまう)
+		const auto& records = buffer->GetMultiWriteRecords();
+		if (!records.empty()) {
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "同一フレームで使用後に書き換えられました (frame %u)", buffer->GetMultiWriteFrame());
+			for (const auto& record : records) {
+				std::string_view file = record.location.file_name();
+				size_t slash = file.find_last_of("/\\");
+				if (slash != std::string_view::npos) file = file.substr(slash + 1);
+				ImGui::BulletText("%.*s:%u %s (%s)", int(file.size()), file.data(), record.location.line(),
+					record.location.function_name(), record.afterFlush ? "使用後" : "使用前");
+			}
 		}
 	}
 

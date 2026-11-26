@@ -1,5 +1,6 @@
 #include "IScene.h"
 #include <Render/Buffer/ResourceRegistry.h>
+#include <Compute/Graph/ComputeGraph.h>
 
 void IScene::DefaultPreDraw() {
 	auto display = commonData_->display.get();
@@ -22,6 +23,8 @@ void IScene::DefaultPostDraw() {
 	ImGui::Text("FPS: %.2f", 1.0f / deltatime);
 	ImGui::End();
 
+	// ComputeShaderの実行順・割り当て (ComputeGraph ウィンドウ)。選択モードを開始するのでResourceRegistryより先に呼ぶ
+	SHEngine::ComputeGraphRegistry::DrawImGui();
 	// GPUBuffer・テクスチャの一覧 (Resource / Value ウィンドウ)
 	SHEngine::ResourceRegistry::DrawImGui();
 #endif

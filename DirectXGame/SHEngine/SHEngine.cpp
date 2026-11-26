@@ -9,6 +9,7 @@
 #include <Tool/DecoEditor/Data/decoObjectController.h>
 #include <Render/PostEffect/PostEffectContext.h>
 #include <Render/Buffer/ResourceRegistry.h>
+#include <Compute/Graph/ComputeGraph.h>
 
 #pragma comment(lib, "Dbghelp.lib")
 
@@ -83,6 +84,7 @@ void Engine::Initialize(HINSTANCE hInstance) {
 	GPUBuffer::SetDevice(device_.get());
 	Text::SetFontLoader(fontLoader_.get());
 	ComputeObject::StaticInitialize(csPsoManager_.get(), device_->GetSRVManager()->GetStartPtr());
+	ComputeGraphRegistry::StaticInitialize(csPsoManager_.get());
 	AudioManager::GetInstance()->Initialize();
 	PostEffectContext::StaticInitialize(this);
 

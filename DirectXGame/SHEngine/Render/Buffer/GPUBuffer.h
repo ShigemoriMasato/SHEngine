@@ -2,6 +2,7 @@
 #include <Core/DXDevice.h>
 #include <Core/Command/CommandObject.h>
 #include <Render/PSO/Shelf/RootSignatureShelf.h>
+#include <source_location>
 
 
 enum class BufferNum : uint8_t {
@@ -30,7 +31,9 @@ namespace SHEngine {
 		virtual ~GPUBuffer();
 
 		// @brief GPUBufferへデータコピーをするときの値を変更する。Flush時に実際にGPUへコピーされる。UAVバッファにはコピーできない。
-		virtual void CopyBuffer(const void* data, size_t dataSize);
+		// @param location 呼び出し元(同一フレームでの使用後の書き換えを警告するために記録する)。通常は省略する
+		// @note 同じフレームでFlush(使用)した後にもう一度CopyBufferすると、GPU上では先に使った箇所も後の値になるため警告を出す(Release以外)
+		virtual void CopyBuffer(const void* data, size_t dataSize, std::source_location location = std::source_location::current());
 		// @brief テクスチャ(TextureData派生)かどうか
 		virtual bool IsTexture() const { return false; }
 
@@ -68,6 +71,18 @@ namespace SHEngine {
 			if (resources_.empty()) return nullptr;
 			return resources_[currentIndex_ % resources_.size()].res.Get();
 		}
+
+		// @brief CopyBufferの呼び出し記録(同一フレームでの使用後の書き換え検出用)
+		struct CopyRecord {
+			std::source_location location;
+			bool afterFlush = false;	// そのフレームで既にFlush(使用)された後の書き換えか
+		};
+		// @brief 最後に「使用後の書き換え」を検出したフレームのCopyBuffer記録。検出していなければ空。Releaseでは常に空
+		const std::vector<CopyRecord>& GetMultiWriteRecords() const { return multiWriteRecords_; }
+		// @brief 最後に「使用後の書き換え」を検出したフレーム
+		uint32_t GetMultiWriteFrame() const { return multiWriteFrame_; }
+		// @brief 現在のフレーム番号(FrameCounterが毎フレーム進める)
+		static uint32_t GetCurrentFrame() { return currentIndex_; }
 
 		//全体のサイズ
 		size_t GetSizeInBytes() const { return sizeInBytes_; }
@@ -112,6 +127,16 @@ namespace SHEngine {
 		bool isUAVBarrier_ = true;
 
 		std::string name_;
+
+		// 同一フレームでの使用後の書き換え検出用(Releaseでは記録しない)
+		std::vector<CopyRecord> copyRecords_;			// 現在のフレームのCopyBuffer記録
+		uint32_t copyRecordFrame_ = UINT32_MAX;			// copyRecords_のフレーム
+		uint32_t lastFlushFrame_ = UINT32_MAX;			// 最後に値をGPUへ書き込んだ(Flushした)フレーム
+		std::vector<CopyRecord> multiWriteRecords_;	// 最後に検出したときの記録
+		uint32_t multiWriteFrame_ = UINT32_MAX;
+
+		// @brief 使用後の書き換えを検出したときに記録・警告する
+		void ReportMultiWrite();
 
 		static inline uint32_t currentIndex_ = 0;
 	};

@@ -30,6 +30,9 @@
     <Filter Include="Compute">
       <UniqueIdentifier>{a0c22c89-00a2-4e46-a07a-d726c8b6e725}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Compute\Graph">
+      <UniqueIdentifier>{3f6d2a71-5c8e-4b0a-9d47-2e1b8c6f0a93}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Compute\PSO">
       <UniqueIdentifier>{8611eec8-9785-4631-879e-2cd8b689aeda}</UniqueIdentifier>
     </Filter>
@@ -144,6 +147,8 @@
     <ClCompile Include="Compute\ComputeCommandContext.cpp"><Filter>Compute</Filter></ClCompile>
     <ClCompile Include="Compute\ComputeObject.cpp"><Filter>Compute</Filter></ClCompile>
     <ClCompile Include="Compute\PSO\CSPSOManager.cpp"><Filter>Compute\PSO</Filter></ClCompile>
+    <ClCompile Include="Compute\Graph\ComputeGraph.cpp"><Filter>Compute\Graph</Filter></ClCompile>
+    <ClCompile Include="Compute\Graph\ComputeGraphEditor.cpp"><Filter>Compute\Graph</Filter></ClCompile>
     <ClCompile Include="Core\DXDevice.cpp"><Filter>Core</Filter></ClCompile>
     <ClCompile Include="Core\DeferredReleaseQueue.cpp"><Filter>Core</Filter></ClCompile>
     <ClCompile Include="Core\FrameCounter.cpp"><Filter>Core</Filter></ClCompile>
@@ -240,6 +245,8 @@
     <ClInclude Include="Compute\ComputeCommandContext.h"><Filter>Compute</Filter></ClInclude>
     <ClInclude Include="Compute\ComputeObject.h"><Filter>Compute</Filter></ClInclude>
     <ClInclude Include="Compute\PSO\CSPSOManager.h"><Filter>Compute\PSO</Filter></ClInclude>
+    <ClInclude Include="Compute\Graph\ComputeGraph.h"><Filter>Compute\Graph</Filter></ClInclude>
+    <ClInclude Include="Compute\Graph\ComputeTrigger.h"><Filter>Compute\Graph</Filter></ClInclude>
     <ClInclude Include="Core\DXDevice.h"><Filter>Core</Filter></ClInclude>
     <ClInclude Include="Core\DeferredReleaseQueue.h"><Filter>Core</Filter></ClInclude>
     <ClInclude Include="Core\FrameCounter.h"><Filter>Core</Filter></ClInclude>

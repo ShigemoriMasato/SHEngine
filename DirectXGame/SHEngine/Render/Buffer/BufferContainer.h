@@ -31,9 +31,9 @@ namespace SHEngine {
 		// @param index GPUBufferのインデックス。Createされた順番で0から振られる。
 		// @param data コピーするデータのポインタ。
 		// @param dataSize コピーするデータのサイズ（バイト単位）
-		void Copy(uint32_t index, const void* data, size_t dataSize) {
+		void Copy(uint32_t index, const void* data, size_t dataSize, std::source_location location = std::source_location::current()) {
 			assert(index < buffers_.size());
-			buffers_[index].buffer->CopyBuffer(data, dataSize);
+			buffers_[index].buffer->CopyBuffer(data, dataSize, location);
 		}
 
 		// @brief GPUBufferを解放する。GPU上のリソースはDeferredReleaseQueueで数フレーム待機したのち解放される。生ポインタは無効になるので注意。

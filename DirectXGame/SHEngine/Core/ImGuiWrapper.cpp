@@ -33,17 +33,13 @@ void ImGuiWrapper::Initialize(DXDevice* device, DirectCommandContext* directCont
 	initInfo.CommandQueue = directContext->GetCommandQueue();
 	initInfo.SrvDescriptorHeap = device->GetSRVManager()->GetHeap();
 
-	srvHandles_.resize(bufferNum_);
-	for (int i = 0; i < bufferNum_; ++i) {
-		srvHandles_[i].UpdateHandle(device->GetSRVManager());
-	}
-
-	initInfo.LegacySingleSrvCpuDescriptor = srvHandles_.front().GetCPU();
-	initInfo.LegacySingleSrvGpuDescriptor = srvHandles_.front().GetGPU();
+	// テクスチャごとにSRVを確保・解放する(旧形式のLegacySingleSrv*は1枚しか扱えず、フォントアトラスの拡張でassertする)
+	device_ = device;
+	initInfo.UserData = this;
+	initInfo.SrvDescriptorAllocFn = &ImGuiWrapper::AllocateSrvDescriptor;
+	initInfo.SrvDescriptorFreeFn = &ImGuiWrapper::FreeSrvDescriptor;
 
 	ImGui_ImplDX12_Init(&initInfo);
-
-	device_ = device;
 
 	logger_->info("ImGui Activate");
 
@@ -133,6 +129,22 @@ void ImGuiWrapper::EndFrame() {
 #ifdef USE_IMGUI
 	ImGui::EndFrame();
 #endif
+}
+
+void ImGuiWrapper::AllocateSrvDescriptor(ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* outCpu, D3D12_GPU_DESCRIPTOR_HANDLE* outGpu) {
+	auto* self = static_cast<ImGuiWrapper*>(info->UserData);
+	auto& handle = self->srvHandles_.emplace_back(std::make_unique<SRVHandle>());
+	handle->UpdateHandle(self->device_->GetSRVManager());
+	*outCpu = handle->GetCPU();
+	*outGpu = handle->GetGPU();
+}
+
+void ImGuiWrapper::FreeSrvDescriptor(ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE cpu, D3D12_GPU_DESCRIPTOR_HANDLE) {
+	auto* self = static_cast<ImGuiWrapper*>(info->UserData);
+	// SRVHandleのデストラクタでSRVManagerの使用中フラグが外れる
+	std::erase_if(self->srvHandles_, [cpu](const std::unique_ptr<SRVHandle>& handle) {
+		return handle->GetCPU().ptr == cpu.ptr;
+		});
 }
 
 void ImGuiWrapper::Finalize() {
