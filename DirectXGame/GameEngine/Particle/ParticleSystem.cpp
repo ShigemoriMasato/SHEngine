@@ -1,7 +1,7 @@
 #include "ParticleSystem.h"
 
 ParticleSystem::ParticleSystem(uint32_t particleCount, bool isCube) {
-	container_ = std::make_unique<SHEngine::BufferContainer>();
+	container_ = std::make_unique<SHEngine::BufferContainer>(32, "ParticleSystem");
 
 	data_.Initialize(container_.get(), particleCount);
 	freeList_.Initialize(container_.get(), particleCount);
@@ -30,8 +30,10 @@ void ParticleSystem::Draw(DCC* dcc) {
 	renderer_->Draw(dcc);
 }
 
-Particle::Emitter* ParticleSystem::CreateEmitter(int countNum, ICC* icc) {
-	auto emitter = std::make_unique<Particle::Emitter>(nextEmitterID_++, countNum, &data_, &freeList_, processor_.get(), icc, container_.get());
+Particle::Emitter* ParticleSystem::CreateEmitter(int countNum, ICC* icc, const std::string& name) {
+	const uint32_t id = nextEmitterID_++;
+	const std::string emitterName = name.empty() ? "Emitter" + std::to_string(id) : name;
+	auto emitter = std::make_unique<Particle::Emitter>(id, countNum, &data_, &freeList_, processor_.get(), icc, container_.get(), emitterName);
 	emitters_.push_back(std::move(emitter));
 	return emitters_.back().get();
 }

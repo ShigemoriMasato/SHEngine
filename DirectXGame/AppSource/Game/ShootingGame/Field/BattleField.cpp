@@ -9,8 +9,8 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::Engine* engin
 	display_->AddRenderTarget(tm, 0xff);	// 見た目
 	display_->AddRenderTarget(tm, 0xff);		// 起伏
 
-	emitter_ = particleSystem->CreateEmitter(textureSize_ * textureSize_, icc);
-	container_ = std::make_unique<SHEngine::BufferContainer>();
+	emitter_ = particleSystem->CreateEmitter(textureSize_ * textureSize_, icc, "BattleField");
+	container_ = std::make_unique<SHEngine::BufferContainer>(32, "BattleField");
 
 	scale_ = container_->Create(BufferType::CBV, sizeof(float));
 	heightScale_ = container_->Create(BufferType::CBV, sizeof(float));
@@ -60,12 +60,26 @@ BattleField::BattleField(ParticleSystem* particleSystem, SHEngine::Engine* engin
 	}, "BattleField");
 #endif
 
-	update_ = emitter_->AddOprionalProcess("ForGame/Field/ApplyTex");
-	update_->SetExecuteNum(textureSize_ * textureSize_, 128);
-	update_->SetGPUBuffers(BufferType::UAV, 4, { velocities_ });
-	update_->SetGPUBuffers(BufferType::SRV, 1, { uvs_, texture_, heightTexture_ });
-	update_->SetGPUBuffers(BufferType::CBV, 1, { heightScale_, deltaTime_ });
-	update_->SetSamplerID(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
+	// ComputeShaderの実行はComputeGraphで設定する。b0/t0/u0~u3(パーティクル共通)はエミッターが既定として割り当て済み
+	initializeTrigger_ = emitter_->CreateTrigger("Initialize");
+	initializeTrigger_->Bind("TextureConfig", textureConfig_);
+	initializeTrigger_->Bind("Scale", scale_);
+	initializeTrigger_->Bind("UVs", uvs_);
+
+	explosionTrigger_ = emitter_->CreateTrigger("Explosion");
+	explosionTrigger_->Bind("ExplosionConfig", explosionConfig_);
+	explosionTrigger_->Bind("UVs", uvs_);
+	explosionTrigger_->Bind("Velocities", velocities_);
+
+	applyTexTrigger_ = emitter_->CreateTrigger("ApplyTex");
+	applyTexTrigger_->Bind("HeightScale", heightScale_);
+	applyTexTrigger_->Bind("DeltaTime", deltaTime_);
+	applyTexTrigger_->Bind("UVs", uvs_);
+	applyTexTrigger_->Bind("ColorTexture", texture_);
+	applyTexTrigger_->Bind("HeightTexture", heightTexture_);
+	applyTexTrigger_->Bind("Velocities", velocities_);
+
+	BuildDefaultGraphs();
 
 	engine_ = engine;
 
@@ -92,11 +106,38 @@ BattleField::~BattleField() {
 }
 
 void BattleField::Initialize() {
-	SHEngine::ComputeObject* init = emitter_->AddTriggerProcess("ForGame/Field/Initialize");
+	// 次のエミッターのUpdateで1回実行される
+	emitter_->Request("Initialize");
+}
 
-	init->SetGPUBuffers(BufferType::CBV, 1, { textureConfig_, scale_ });
-	init->SetGPUBuffers(BufferType::UAV, 4, { uvs_ });
-	init->SetExecuteNum(textureSize_ * textureSize_, 128);
+void BattleField::BuildDefaultGraphs() {
+	using SHEngine::SlotRequest;
+
+	// 保存データがあればそちらを使う(ComputeGraphウィンドウで編集・保存したもの)
+	if (SHEngine::ComputeGraph* graph = initializeTrigger_->GetGraph(); graph->HasNoDispatch()) {
+		auto id = graph->AppendDispatch("Particle/ForGame/Field/Initialize.CS.hlsl", "Particles");
+		graph->ConnectArgument(id, SlotRequest::Type::CBV, 1, "TextureConfig");
+		graph->ConnectArgument(id, SlotRequest::Type::CBV, 2, "Scale");
+		graph->ConnectArgument(id, SlotRequest::Type::UAV, 4, "UVs");
+	}
+
+	if (SHEngine::ComputeGraph* graph = explosionTrigger_->GetGraph(); graph->HasNoDispatch()) {
+		auto id = graph->AppendDispatch("Particle/ForGame/Field/Explosion.CS.hlsl", "Particles");
+		graph->ConnectArgument(id, SlotRequest::Type::CBV, 1, "ExplosionConfig");
+		graph->ConnectArgument(id, SlotRequest::Type::SRV, 1, "UVs");
+		graph->ConnectArgument(id, SlotRequest::Type::UAV, 4, "Velocities");
+	}
+
+	if (SHEngine::ComputeGraph* graph = applyTexTrigger_->GetGraph(); graph->HasNoDispatch()) {
+		auto id = graph->AppendDispatch("Particle/ForGame/Field/ApplyTex.CS.hlsl", "Particles");
+		graph->ConnectArgument(id, SlotRequest::Type::CBV, 1, "HeightScale");
+		graph->ConnectArgument(id, SlotRequest::Type::CBV, 2, "DeltaTime");
+		graph->ConnectArgument(id, SlotRequest::Type::SRV, 1, "UVs");
+		graph->ConnectArgument(id, SlotRequest::Type::Texture, 2, "ColorTexture");
+		graph->ConnectArgument(id, SlotRequest::Type::Texture, 3, "HeightTexture");
+		graph->ConnectArgument(id, SlotRequest::Type::UAV, 4, "Velocities");
+		graph->GetNode(id)->samplerID = uint32_t(SHEngine::PSO::SamplerID::ClampClamp_MinMagNearest);
+	}
 }
 
 void BattleField::Update(float deltaTime) {
@@ -116,17 +157,15 @@ void BattleField::Draw(DCC* dcc) {
 void BattleField::ApplyTexture(ICC* icc) {
 	debugParam_++;
 	debugParamBuffer_->CopyBuffer(&debugParam_, sizeof(int));
-	update_->Execute(icc);
+	applyTexTrigger_->Fire(icc);
 }
 
 void BattleField::Explosion(const ExplosionConfig& config) {
 	explosionConfig_->CopyBuffer(&config, sizeof(ExplosionConfig));
 
-	auto explosion = emitter_->AddTriggerProcess("ForGame/Field/Explosion");
-	explosion->SetGPUBuffers(BufferType::CBV, 1, { explosionConfig_ });
-	explosion->SetGPUBuffers(BufferType::SRV, 1, { uvs_ });
-	explosion->SetGPUBuffers(BufferType::UAV, 4, { velocities_ });
-	explosion->SetExecuteNum(textureSize_ * textureSize_, 128);
+	// 次のエミッターのUpdateで1回実行される
+	// (同じフレームに複数回呼ぶと、explosionConfig_は最後の値になる。GPUBufferの警告で検出できる)
+	emitter_->Request("Explosion");
 }
 
 void BattleField::Save() {

@@ -29,6 +29,9 @@ namespace SHEngine {
 		void Push(std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>>&& resources,
 			std::vector<std::unique_ptr<SRVHandle>>&& descriptors);
 
+		// @brief PSOなど、リソース以外のD3D12オブジェクトを解放待ちに追加する
+		void PushObject(Microsoft::WRL::ComPtr<IUnknown> object);
+
 		// @brief 1フレーム進め、待ち終わったものを解放する。毎フレーム1回呼ぶこと
 		void Update();
 
@@ -44,6 +47,7 @@ namespace SHEngine {
 			uint32_t remainFrames = 0;
 			std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> resources;
 			std::vector<std::unique_ptr<SRVHandle>> descriptors;
+			std::vector<Microsoft::WRL::ComPtr<IUnknown>> objects;
 		};
 
 		std::vector<Pending> pending_;

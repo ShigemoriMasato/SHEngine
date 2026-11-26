@@ -51,6 +51,8 @@ private:
 
 	void Save();
 	void Load();
+	// @brief ComputeGraphの保存データがない場合に、これまでと同じ処理になるグラフを組み立てる
+	void BuildDefaultGraphs();
 
 	SHEngine::Engine* engine_ = nullptr;
 
@@ -76,7 +78,10 @@ private:
 
 	ExplosionConfig testConfig_ = {};
 
-	std::unique_ptr<SHEngine::ComputeObject> update_ = nullptr;
+	// ComputeGraph ("Particle/BattleField/<名前>")。エミッターが所有する
+	SHEngine::ComputeTrigger* initializeTrigger_ = nullptr;	// Request
+	SHEngine::ComputeTrigger* explosionTrigger_ = nullptr;	// Request
+	SHEngine::ComputeTrigger* applyTexTrigger_ = nullptr;	// ApplyTextureで直接Fire
 
 	std::unique_ptr<SHEngine::Screen::Display> display_ = nullptr;
 

@@ -465,11 +465,11 @@ bool Particle::InnerModel::EmitInnerModel(Emitter* emitter, SHEngine::BufferCont
 		volume.triangles.push_back({ 0.0f, 0.0f, 0.0f });
 	}
 
-	auto* configBuffer = container->Create(BufferType::CBV, sizeof(EmitConfig), 1, BufferNum::Single);
-	auto* cellBuffer = container->Create(BufferType::SRV, sizeof(Cell), uint32_t(volume.cells.size()), BufferNum::Single);
-	auto* triangleBuffer = container->Create(BufferType::SRV, sizeof(Vector3), uint32_t(volume.triangles.size()), BufferNum::Single);
-	auto* probabilityBuffer = container->Create(BufferType::SRV, sizeof(float), uint32_t(volume.aliasProbability.size()), BufferNum::Single);
-	auto* aliasBuffer = container->Create(BufferType::SRV, sizeof(uint32_t), uint32_t(volume.aliasIndex.size()), BufferNum::Single);
+	auto* configBuffer = container->Create(BufferType::CBV, sizeof(EmitConfig), 1, BufferNum::Single, "EmitConfig");
+	auto* cellBuffer = container->Create(BufferType::SRV, sizeof(Cell), uint32_t(volume.cells.size()), BufferNum::Single, "Cell");
+	auto* triangleBuffer = container->Create(BufferType::SRV, sizeof(Vector3), uint32_t(volume.triangles.size()), BufferNum::Single, "Triangle");
+	auto* probabilityBuffer = container->Create(BufferType::SRV, sizeof(float), uint32_t(volume.aliasProbability.size()), BufferNum::Single, "Probability");
+	auto* aliasBuffer = container->Create(BufferType::SRV, sizeof(uint32_t), uint32_t(volume.aliasIndex.size()), BufferNum::Single, "Alias");
 
 	configBuffer->CopyBuffer(&config, sizeof(config));
 	cellBuffer->CopyBuffer(volume.cells.data(), sizeof(Cell) * volume.cells.size());

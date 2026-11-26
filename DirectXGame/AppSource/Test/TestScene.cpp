@@ -29,13 +29,15 @@ void TestScene::Initialize() {
 	curveEditor_.SetBinder(&curveBinders_[1]);
 
 	container_ = std::make_unique<SHEngine::BufferContainer>();
+	container_->SetName("FillModel");
 
 	particleSystem_.Initialize(computeContext_);
 	particleSystem_.SetCamera(debugCamera_.get());
-	emitter_ = particleSystem_.CreateEmitter(1024 * 1024, computeContext_);
+	emitter_ = particleSystem_.CreateEmitter(1024 * 1024, computeContext_, "FillModel");
+	auto* update = emitter_->SetUpdateGraph("Update");
 
-	auto model = modelManager_->GetModelData("Pyramid");
-	Particle::InnerModel::EmitInnerModel(emitter_, container_.get(), 1024 * 1024, model, 0.1f, {0.3f, 0.3f, 0.3f, 0.3f});
+	auto model = modelManager_->GetModelData("Gear");
+	Particle::InnerModel::EmitInnerModel(emitter_, container_.get(), 1024 * 1024, model, 0.01f, {0.3f, 0.3f, 0.3f, 0.3f});
 
 	InitializeGraphTest();
 }

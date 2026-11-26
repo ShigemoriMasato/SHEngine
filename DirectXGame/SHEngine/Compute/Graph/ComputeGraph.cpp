@@ -12,7 +12,9 @@ using namespace SHEngine;
 namespace {
 
 	// 保存形式のバージョン。形式を変えたら上げる
-	constexpr uint32_t kFormatVersion = 1;
+	// 1: 初版 / 2: DispatchノードにsamplerIDを追加
+	constexpr uint32_t kFormatVersion = 2;
+	constexpr uint32_t kMinFormatVersion = 1;
 	// Dispatchの1次元あたりの上限
 	constexpr uint32_t kMaxGroupCount = 65535;
 
@@ -219,6 +221,64 @@ std::vector<GraphNodeID> ComputeGraph::GetExecutionOrder() const {
 	return order;
 }
 
+bool ComputeGraph::HasNoDispatch() const {
+	for (const auto& [id, node] : nodes_) {
+		if (node.kind == GraphNodeKind::Dispatch) {
+			return false;
+		}
+	}
+	return true;
+}
+
+GraphNodeID ComputeGraph::AppendDispatch(const std::string& shaderName, const std::string& countArgument) {
+	// 実行順の最後を探す
+	GraphNode* last = GetTriggerNode();
+	std::vector<GraphNodeID> order = GetExecutionOrder();
+	if (!order.empty()) {
+		last = GetNode(order.back());
+	}
+	const Vector2 position = last ? Vector2{ last->position.x + 320.0f, last->position.y } : Vector2{ 360.0f, 80.0f };
+
+	GraphNode& node = AddNode(GraphNodeKind::Dispatch, position);
+	node.shaderName = shaderName;
+	if (!countArgument.empty()) {
+		node.dispatchMode = DispatchMode::ArgumentCount;
+		node.countArgument = countArgument;
+	}
+	const GraphNodeID id = node.id;
+	if (last) {
+		SetNext(last->id, id);
+	}
+	return id;
+}
+
+void ComputeGraph::ConnectArgument(GraphNodeID dispatch, SlotRequest::Type type, uint32_t registerIndex, const std::string& argumentName) {
+	GraphNode* target = GetNode(dispatch);
+	if (!target) {
+		return;
+	}
+
+	GraphNodeID source = kInvalidNodeID;
+	int argumentCount = 0;
+	for (const auto& [id, node] : nodes_) {
+		if (node.kind != GraphNodeKind::Argument) continue;
+		++argumentCount;
+		if (node.argumentName == argumentName) {
+			source = id;
+		}
+	}
+	if (source == kInvalidNodeID) {
+		// 引数ノードはTriggerの下に縦に並べる
+		const GraphNode* trigger = GetTriggerNode();
+		Vector2 position = trigger ? Vector2{ trigger->position.x, trigger->position.y + 120.0f + 70.0f * float(argumentCount) } : Vector2{ 40.0f, 200.0f };
+		GraphNode& node = AddNode(GraphNodeKind::Argument, position);
+		node.argumentName = argumentName;
+		source = node.id;
+	}
+	// 変数名はピンを作るときに付け替えられる(レジスタで照合する)
+	Connect(source, dispatch, { type, registerIndex, "" });
+}
+
 void ComputeGraph::MarkEdited() {
 	unsaved_ = true;
 	needsRefresh_ = true;
@@ -351,6 +411,17 @@ GPUBuffer* ComputeGraph::ResolveSource(GraphNode& node, const ComputeArguments& 
 	return buffer;
 }
 
+GPUBuffer* ComputeGraph::ResolvePin(GraphNode& node, const GraphPinKey& key, bool writable, const ComputeArguments& arguments, GraphNode** outSource) {
+	if (outSource) *outSource = nullptr;
+	if (const GraphLink* link = FindLink(node.id, key)) {
+		GraphNode* source = GetNode(link->from);
+		if (outSource) *outSource = source;
+		return source ? ResolveSource(*source, arguments) : nullptr;
+	}
+	const DefaultBinding* binding = arguments.FindDefault(key, writable);
+	return binding ? binding->buffer : nullptr;
+}
+
 void ComputeGraph::ComputeGroupCount(GraphNode& node, const ComputeArguments& arguments, uint32_t outGroups[3]) {
 	outGroups[0] = outGroups[1] = outGroups[2] = 0;
 
@@ -367,14 +438,13 @@ void ComputeGraph::ComputeGroupCount(GraphNode& node, const ComputeArguments& ar
 		}
 		break;
 	case DispatchMode::ResourceCount:
-		if (const GraphLink* link = FindLink(node.id, node.countPin)) {
-			if (GraphNode* source = GetNode(link->from)) {
-				if (GPUBuffer* buffer = ResolveSource(*source, arguments)) {
-					threads[0] = buffer->GetNum();
-				}
-			}
+	{
+		const GraphPin* pin = FindPin(node, node.countPin);
+		if (GPUBuffer* buffer = ResolvePin(node, node.countPin, pin && pin->request.writable, arguments)) {
+			threads[0] = buffer->GetNum();
 		}
 		break;
+	}
 	case DispatchMode::ArgumentCount:
 	{
 		auto it = arguments.counts.find(node.countArgument);
@@ -418,20 +488,19 @@ void ComputeGraph::Execute(ICommandContext* context, const ComputeArguments& arg
 		object->ResetGPUBuffers();
 		object->SetShader(node.shaderName);
 
-		// ピンの割り当て
+		// ピンの割り当て(リンクがなければ既定のバッファ)
 		std::string problem;
 		for (const auto& pin : node.pins) {
-			const GraphLink* link = FindLink(node.id, pin.key);
-			GraphNode* source = link ? GetNode(link->from) : nullptr;
-			if (!source) {
-				problem = "未接続: " + pin.request.label;
-				break;
-			}
-			GPUBuffer* buffer = ResolveSource(*source, arguments);
+			GraphNode* source = nullptr;
+			GPUBuffer* buffer = ResolvePin(node, pin.key, pin.request.writable, arguments, &source);
 			if (!buffer) {
-				problem = source->kind == GraphNodeKind::Argument
-					? std::format("引数 \"{}\" がBindされていません ({})", source->argumentName, pin.request.label)
-					: std::format("リソース \"{}\" が見つかりません ({})", source->resourceName, pin.request.label);
+				if (!source) {
+					problem = "未接続: " + pin.request.label;
+				} else {
+					problem = source->kind == GraphNodeKind::Argument
+						? std::format("引数 \"{}\" がBindされていません ({})", source->argumentName, pin.request.label)
+						: std::format("リソース \"{}\" が見つかりません ({})", source->resourceName, pin.request.label);
+				}
 				break;
 			}
 			if (!ResourceRegistry::CanBindBuffer(buffer, pin.request)) {
@@ -454,7 +523,8 @@ void ComputeGraph::Execute(ICommandContext* context, const ComputeArguments& arg
 		}
 
 		object->SetUseTexture(node.useBindlessTexture);
-		object->SetSamplerID((node.useSampler || node.useBindlessTexture) ? uint32_t(PSO::SamplerID::Default) : 0u);
+		uint32_t samplerID = node.samplerID != 0 ? node.samplerID : uint32_t(PSO::SamplerID::Default);
+		object->SetSamplerID((node.useSampler || node.useBindlessTexture) ? samplerID : 0u);
 		object->SetThreadGroupSize(int(groups[0]), int(groups[1]), int(groups[2]));
 		object->Execute(context);
 
@@ -475,7 +545,7 @@ bool ComputeGraph::Load() {
 
 	uint32_t version = 0;
 	bin.Reverse(version);
-	if (version != kFormatVersion) {
+	if (version < kMinFormatVersion || version > kFormatVersion) {
 		logger_->error("ComputeGraph \"{}\": 保存形式のバージョンが違うため読み込めません ({} != {})", name_, version, kFormatVersion);
 		return false;
 	}
@@ -519,6 +589,9 @@ bool ComputeGraph::Load() {
 		node.resource.source = ResourceRef::Source(source);
 		bin.Reverse(node.resourceName);
 		bin.Reverse(node.argumentName);
+		if (version >= 2) {
+			bin.Reverse(node.samplerID);
+		}
 	}
 
 	uint32_t linkCount = 0;
@@ -588,6 +661,7 @@ void ComputeGraph::Save() {
 		bin.Register(uint8_t(node.resource.source));
 		bin.Register(node.resourceName);
 		bin.Register(node.argumentName);
+		bin.Register(node.samplerID);
 	}
 
 	bin.Register(uint32_t(links_.size()));
@@ -678,6 +752,23 @@ void ComputeTrigger::Bind(const std::string& argumentName, GPUBuffer* buffer) {
 
 void ComputeTrigger::SetCount(const std::string& countName, uint32_t count) {
 	arguments_.counts[countName] = count;
+}
+
+void ComputeTrigger::BindDefault(BufferType bufferType, uint32_t registerIndex, GPUBuffer* buffer, const std::string& label) {
+	SlotRequest::Type type = SlotRequest::Type::CBV;
+	if (bufferType == BufferType::SRV) {
+		type = SlotRequest::Type::SRV;
+	} else if (bufferType == BufferType::UAV) {
+		type = SlotRequest::Type::UAV;
+	} else if (bufferType != BufferType::CBV) {
+		GetLogger("Engine")->error("ComputeTrigger({})::BindDefault: BufferTypeはCBV/SRV/UAVのどれか1つを指定してください", name_);
+		return;
+	}
+	if (buffer) {
+		arguments_.defaults[{ type, registerIndex }] = { buffer, label.empty() ? buffer->GetName() : label };
+	} else {
+		arguments_.defaults.erase({ type, registerIndex });
+	}
 }
 
 void ComputeTrigger::Fire(ICommandContext* context) {

@@ -1,7 +1,7 @@
 cbuffer ParticleCount : register(b0)
 {
     uint particleCount;
-};
+}
 
 cbuffer Config : register(b1)
 {
@@ -18,7 +18,7 @@ struct Sphere
 {
     float3 center;
     float radius;
-}
+};
 
 StructuredBuffer<uint> indexList : register(t0);
 StructuredBuffer<Sphere> spheres : register(t1);
@@ -28,16 +28,19 @@ RWStructuredBuffer<float3> rotations : register(u1);
 RWStructuredBuffer<float> scales : register(u2);
 RWStructuredBuffer<float16_t4> color : register(u3);
 
+RWStructuredBuffer<float3> stress : register(u4);
+
 [numthreads(128, 1, 1)]
-int main(uint3 DTid : SV_DispatchThreadID)
+void main(uint3 DTid : SV_DispatchThreadID)
 {
     int index = DTid.x;
     if (index >= particleCount)
     {
-        return 0;
+        return;
     }
 
     uint useIndex = indexList[index];
+    float3 stress = float3(0.0f, 0.0f, 0.0f);
 
     for(int i = 0; i < sphereCount; i++)
     {
@@ -50,10 +53,9 @@ int main(uint3 DTid : SV_DispatchThreadID)
         if (dist < s.radius)
         {
             float3 n = normalize(dir);
-            pos += n * (s.radius - dist + ignoreSpeed);
-            positions[useIndex] = pos;
+            stress += (s.radius - dist) / s.radius;
         }
     }
 
-    return 0;
+    stress[index] = stress;
 }

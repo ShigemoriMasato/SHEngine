@@ -12,7 +12,9 @@ public:
 	void Update(ICC* icc);
 	void Draw(DCC* dcc);
 
-	Particle::Emitter* CreateEmitter(int countNum, ICC* icc);
+	// @param name エミッターの名前。ComputeGraphの名前("Particle/<name>/...")に使われる。空なら "Emitter<番号>"
+	// @note 同じ名前のエミッターはComputeGraphを共有する(Bindした引数はエミッターごと)
+	Particle::Emitter* CreateEmitter(int countNum, ICC* icc, const std::string& name = "");
 	void EraseEmitter(Particle::Emitter* emitter);
 
 	void SetCamera(const Camera* camera);

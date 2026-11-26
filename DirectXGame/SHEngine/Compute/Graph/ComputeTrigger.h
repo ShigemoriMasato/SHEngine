@@ -26,6 +26,11 @@ namespace SHEngine {
 		void Bind(const std::string& argumentName, GPUBuffer* buffer);
 		// @brief Dispatch数(ArgumentCount)に使う数を設定する
 		void SetCount(const std::string& countName, uint32_t count);
+		// @brief 何もつながっていないピンに使うバッファを設定する(レジスタ番号で指定)。nullptrで解除
+		// @param bufferType CBV/SRV/UAVのどれか。テクスチャのピンにはSRV(RWTextureはUAV)で指定する
+		// @param label ノード画面に「既定: label」と表示される名前
+		// @note ParticleのEmitterのように、どのシェーダーでも同じレジスタに同じバッファを使う場合に、毎回つなぐ手間を省く
+		void BindDefault(BufferType bufferType, uint32_t registerIndex, GPUBuffer* buffer, const std::string& label = "");
 
 		// @brief グラフに設定されたComputeShaderを順に実行する
 		void Fire(ICommandContext* context);

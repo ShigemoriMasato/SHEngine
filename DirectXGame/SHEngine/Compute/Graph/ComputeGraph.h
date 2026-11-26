@@ -65,6 +65,7 @@ namespace SHEngine {
 		uint32_t dispatchSize[3] = { 1, 1, 1 };
 		GraphPinKey countPin;				// ResourceCount: 要素数を使うピン
 		std::string countArgument;			// ArgumentCount: 数の名前
+		uint32_t samplerID = uint32_t(PSO::SamplerID::Default);	// シェーダーがサンプラーを使う場合のSamplerID(ORの組み合わせ)
 
 		// ---- Resource ----
 		ResourceRef resource;
@@ -93,10 +94,27 @@ namespace SHEngine {
 		GraphPinKey pin;
 	};
 
+	// @brief 何もつながっていないピンに使うバッファ(ComputeTrigger::BindDefault)
+	struct DefaultBinding {
+		GPUBuffer* buffer = nullptr;
+		std::string label;	// ノード画面に表示する名前
+	};
+
 	// @brief ComputeTriggerからグラフへ渡す値
 	struct ComputeArguments {
 		std::unordered_map<std::string, GPUBuffer*> buffers;
 		std::unordered_map<std::string, uint32_t> counts;
+		// (ピンの種類, レジスタ番号) → 既定のバッファ
+		std::map<std::pair<SlotRequest::Type, uint32_t>, DefaultBinding> defaults;
+
+		// @brief ピンの既定のバッファ。テクスチャのピンはSRV/UAVの既定も見る
+		const DefaultBinding* FindDefault(const GraphPinKey& key, bool writable = false) const {
+			auto it = defaults.find({ key.type, key.registerIndex });
+			if (it == defaults.end() && key.type == SlotRequest::Type::Texture) {
+				it = defaults.find({ writable ? SlotRequest::Type::UAV : SlotRequest::Type::SRV, key.registerIndex });
+			}
+			return it != defaults.end() && it->second.buffer ? &it->second : nullptr;
+		}
 	};
 
 	// @brief ComputeShaderをどの順番で、どのリソースを割り当てて実行するかを表すグラフ。
@@ -137,6 +155,21 @@ namespace SHEngine {
 		// @brief Triggerから実行順にたどったDispatchノード
 		std::vector<GraphNodeID> GetExecutionOrder() const;
 
+		// ---- コードから初期状態を作るためのヘルパー ----
+		// 保存データがない(Dispatchノードがない)ときに、コードで既定のグラフを組み立てる用途。
+		//   if (graph->HasNoDispatch()) {
+		//       GraphNodeID id = graph->AppendDispatch("Particle/Update.CS.hlsl", "Particles");
+		//       graph->ConnectArgument(id, SlotRequest::Type::UAV, 4, "Velocities");
+		//   }
+
+		// @brief Dispatchノードが1つもないか
+		bool HasNoDispatch() const;
+		// @brief 実行順の最後にDispatchノードを追加する
+		// @param countArgument 空でなければ、Dispatch数をその引数の数(ArgumentCount)にする
+		GraphNodeID AppendDispatch(const std::string& shaderName, const std::string& countArgument = "");
+		// @brief 引数ノード(同じ名前があれば再利用)をDispatchノードのピンにつなぐ
+		void ConnectArgument(GraphNodeID dispatch, SlotRequest::Type type, uint32_t registerIndex, const std::string& argumentName);
+
 		// @brief 編集したことを記録する(保存が必要になり、次の実行前にピンを作り直す)
 		void MarkEdited();
 		bool HasUnsavedChanges() const { return unsaved_; }
@@ -146,6 +179,8 @@ namespace SHEngine {
 		// @brief シェーダーのリフレクションからピンを作り直し、リンクのキーを付け替える
 		void RefreshPins(GraphNode& node);
 		void RefreshAllPins();
+		// @brief 次の実行前にピンを作り直す(シェーダーを再コンパイルしたときなど。保存は不要)
+		void RequestRefresh() { needsRefresh_ = true; }
 
 		// ---- 実行 ----
 
@@ -153,6 +188,9 @@ namespace SHEngine {
 		void Execute(ICommandContext* context, const ComputeArguments& arguments);
 		// @brief Resource/Argumentノードが指すバッファ
 		GPUBuffer* ResolveSource(GraphNode& node, const ComputeArguments& arguments);
+		// @brief ピンに割り当てるバッファ。リンクがあればその先、なければ既定のバッファ
+		// @param outSource リンク先のノード(既定を使った場合はnullptr)
+		GPUBuffer* ResolvePin(GraphNode& node, const GraphPinKey& key, bool writable, const ComputeArguments& arguments, GraphNode** outSource = nullptr);
 		// @brief Dispatchするスレッドグループ数を計算する。0なら実行しない
 		void ComputeGroupCount(GraphNode& node, const ComputeArguments& arguments, uint32_t outGroups[3]);
 

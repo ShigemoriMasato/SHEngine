@@ -4,6 +4,7 @@
 // ノード編集画面。USE_IMGUIが無効(Release)の場合は何もしない
 #ifdef USE_IMGUI
 #include <imgui/imgui.h>
+#include <Compute/PSO/CSPSOManager.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -261,6 +262,14 @@ namespace {
 		return nullptr;
 	}
 
+	// 表示に使う引数(最初に見つかった生存中のTriggerのもの)。なければnullptr
+	const ComputeArguments* PreviewArguments(const std::string& graphName) {
+		for (ComputeTrigger* trigger : ComputeGraphRegistry::GetTriggers()) {
+			if (trigger->GetName() == graphName) return &trigger->GetArguments();
+		}
+		return nullptr;
+	}
+
 	// 出力ノードが指すバッファ(エディタ表示用)
 	GPUBuffer* PreviewSource(ComputeGraph& graph, GraphNode& node) {
 		if (node.kind == GraphNodeKind::Argument) {
@@ -290,7 +299,29 @@ namespace {
 		graph.RefreshPins(node);
 		// numthreadsのXに合わせておく(1グループ分)
 		node.dispatchSize[0] = node.numThreads[0];
+		// コードからSetCountされた数が1つだけなら、それをDispatch数にする(Emitterの "Particles" など)
+		if (const ComputeArguments* arguments = PreviewArguments(graph.GetName()); arguments && arguments->counts.size() == 1) {
+			node.dispatchMode = DispatchMode::ArgumentCount;
+			node.countArgument = arguments->counts.begin()->first;
+		}
 		return node;
+	}
+
+	// @brief ノードのシェーダーをファイルから読み直してコンパイルし直す
+	void RecompileShader(ComputeGraph& graph, GraphNode& node) {
+		PSO::CSPSOManager* psoManager = ComputeGraphRegistry::GetPSOManager();
+		if (!psoManager || node.shaderName.empty()) {
+			return;
+		}
+		const bool succeeded = psoManager->RecompileShader(node.shaderName);
+		// 同じシェーダーを使う他のグラフも、次の実行前にピンを作り直す
+		for (auto& [name, other] : ComputeGraphRegistry::GetGraphs()) {
+			other->RequestRefresh();
+		}
+		graph.RefreshPins(node);
+		ShowMessage(succeeded
+			? "再コンパイルしました: " + node.shaderName
+			: "コンパイルに失敗しました (ログを確認してください): " + node.shaderName);
 	}
 
 	// 入力ピンの左に置く位置
@@ -399,11 +430,21 @@ namespace {
 			layout.headerColor = node.enabled ? IM_COL32(50, 90, 150, 255) : IM_COL32(70, 70, 70, 255);
 			addPin(PinRole::ExecIn, -1, kExecColor);
 			addPin(PinRole::ExecOut, -1, kExecColor);
+			const ComputeArguments* arguments = PreviewArguments(graph.GetName());
 			for (const auto& pin : node.pins) {
 				const GraphLink* link = graph.FindLink(node.id, pin.key);
 				std::string text = std::format("{}{} {}", PinPrefix(pin.key.type), pin.key.registerIndex, pin.key.name);
 				if (pin.key.type == SlotRequest::Type::Texture) text += pin.request.writable ? " [RWTex]" : " [Tex]";
-				int row = addRow(text, link ? IM_COL32(230, 230, 230, 255) : IM_COL32(150, 150, 150, 255));
+				ImU32 color = link ? IM_COL32(230, 230, 230, 255) : IM_COL32(150, 150, 150, 255);
+				// つながっていなくても既定のバッファがあれば使われる
+				if (!link && arguments) {
+					if (const DefaultBinding* binding = arguments->FindDefault(pin.key, pin.request.writable)) {
+						const bool ok = ResourceRegistry::CanBindBuffer(binding->buffer, pin.request);
+						text += "  = " + binding->label;
+						color = ok ? IM_COL32(150, 190, 230, 255) : kErrorColor;
+					}
+				}
+				int row = addRow(text, color);
 				addPin(PinRole::Input, row, PinColor(pin.key.type), pin.key);
 			}
 			// シェーダーから消えたレジスタにつながっているリンク
@@ -639,6 +680,34 @@ namespace {
 		}
 		}
 
+		// サンプラー(シェーダーがSamplerStateかバインドレスのテクスチャを使う場合のみ)
+		if (node.useSampler || node.useBindlessTexture) {
+			if (ImGui::TreeNode("サンプラー")) {
+				struct SamplerFlag { const char* label; PSO::SamplerID id; };
+				static const SamplerFlag kFlags[] = {
+					{ "Default (Repeat)", PSO::SamplerID::Default },
+					{ "ClampT", PSO::SamplerID::ClampT }, { "MirrorT", PSO::SamplerID::MirrorT },
+					{ "ClampS", PSO::SamplerID::ClampS }, { "MirrorS", PSO::SamplerID::MirrorS },
+					{ "MagNearest", PSO::SamplerID::MagNearest }, { "MagLinear", PSO::SamplerID::MagLinear },
+					{ "MinNearest", PSO::SamplerID::MinNearest }, { "MinLinear", PSO::SamplerID::MinLinear },
+					{ "Point", PSO::SamplerID::Point },
+					{ "MinLinearMipmapNearest", PSO::SamplerID::MinLinearMipmapNearest },
+					{ "MinNearestMipmapLinear", PSO::SamplerID::MinNearestMipmapLinear },
+					{ "MinLinearMipmapLinear", PSO::SamplerID::MinLinearMipmapLinear },
+					{ "ClampClamp_MinMagNearest", PSO::SamplerID::ClampClamp_MinMagNearest },
+				};
+				for (const auto& flag : kFlags) {
+					if (ImGui::CheckboxFlags(flag.label, &node.samplerID, uint32_t(flag.id))) {
+						graph.MarkEdited();
+					}
+				}
+				if (node.samplerID == 0) {
+					ImGui::TextDisabled("未選択の場合はDefaultを使います");
+				}
+				ImGui::TreePop();
+			}
+		}
+
 		// 実際に使われるグループ数(最初のComputeTriggerの引数で計算)
 		auto triggers = LiveTriggers(graph.GetName());
 		if (!triggers.empty()) {
@@ -868,6 +937,9 @@ namespace {
 				if (ImGui::MenuItem("有効", nullptr, node->enabled)) {
 					node->enabled = !node->enabled;
 					graph.MarkEdited();
+				}
+				if (ImGui::MenuItem("再コンパイル", nullptr, false, !node->shaderName.empty())) {
+					RecompileShader(graph, *node);
 				}
 			}
 			if (ImGui::MenuItem("接続をすべて外す")) {

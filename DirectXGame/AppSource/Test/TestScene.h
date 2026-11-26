@@ -22,6 +22,15 @@ public:
 
 private:
 
+	struct Sphere {
+		Vector3 center;
+		float radius;
+	};
+
+	struct Config {
+		int sphereCount = 1;
+	};
+
 	void Save();
 	void Load();
 

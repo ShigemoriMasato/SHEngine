@@ -1,4 +1,5 @@
 #include "CSPSOManager.h"
+#include <Core/DeferredReleaseQueue.h>
 
 void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device, ShelfManager* shelfManager) {
 	device_ = device;
@@ -8,6 +9,25 @@ void SHEngine::PSO::CSPSOManager::Initialize(DXDevice* device, ShelfManager* she
 
 const SHEngine::ShaderReflectionData* SHEngine::PSO::CSPSOManager::GetReflection(const std::string& computeShaderName) const {
 	return shelfManager_->GetShaderReflection(ShaderType::COMPUTE_SHADER, directory_ + computeShaderName);
+}
+
+bool SHEngine::PSO::CSPSOManager::RecompileShader(const std::string& computeShaderName) {
+	// このシェーダーを使うPSOを捨てる(次にSetPSOしたときに作り直される)
+	for (auto it = pso_.begin(); it != pso_.end();) {
+		if (it->first.computeShaderName == computeShaderName) {
+			if (DeferredReleaseQueue* queue = DeferredReleaseQueue::Get()) {
+				queue->PushObject(it->second.pipelineState);
+			}
+			it = pso_.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	// バイトコードとリフレクションを捨てて、コンパイルし直す
+	// (ソースと#includeが更新されていなければ Compiled/Shader/ のキャッシュから読まれる)
+	shelfManager_->ResetShader(directory_ + computeShaderName);
+	return GetReflection(computeShaderName) != nullptr;
 }
 
 bool SHEngine::PSO::CSPSOManager::SetPSO(ID3D12GraphicsCommandList* cmdList, const RootSignatureConfig& rootConfig, const std::string& computeShaderName) {

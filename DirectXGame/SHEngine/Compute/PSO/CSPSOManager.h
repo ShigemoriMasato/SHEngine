@@ -22,6 +22,11 @@ namespace SHEngine::PSO {
 		// @param computeShaderName ComputeShaderのファイル名(Assets/Shader/Compute/以下)
 		const ShaderReflectionData* GetReflection(const std::string& computeShaderName) const;
 
+		// @brief ComputeShaderをファイルから読み直してコンパイルし直す。作成済みのPSOは作り直される
+		// @note 古いPSOはGPUが使用中かもしれないので、DeferredReleaseQueueで数フレーム後に解放する
+		// @return コンパイルに成功したらtrue
+		bool RecompileShader(const std::string& computeShaderName);
+
 	private:
 
 		struct Config {

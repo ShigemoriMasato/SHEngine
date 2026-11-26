@@ -24,6 +24,15 @@ void SHEngine::DeferredReleaseQueue::Push(std::vector<Microsoft::WRL::ComPtr<ID3
 	pending.descriptors = std::move(descriptors);
 }
 
+void SHEngine::DeferredReleaseQueue::PushObject(Microsoft::WRL::ComPtr<IUnknown> object) {
+	if (!object) {
+		return;
+	}
+	Pending& pending = pending_.emplace_back();
+	pending.remainFrames = waitFrames_;
+	pending.objects.push_back(std::move(object));
+}
+
 void SHEngine::DeferredReleaseQueue::Update() {
 	for (size_t i = 0; i < pending_.size();) {
 		if (pending_[i].remainFrames <= 1) {
